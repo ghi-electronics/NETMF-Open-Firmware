@@ -1,0 +1,7 @@
+/BuildOutput
+/Framework/Core/Update/*.cache
+/Framework/TinyCore/*.cache
+/Framework/Core/System/*.cache
+/Framework/Core/System/System/Net/Security/*.cache
+/Framework/Core/Native_Hardware/*.cache
+/Framework/Core/Native_Graphics/*.cache
