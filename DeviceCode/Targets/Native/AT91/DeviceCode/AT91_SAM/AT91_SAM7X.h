@@ -73,11 +73,11 @@
     #define AT91C_RTSC__EXTRST      0x08         // asserts NRST pin
     #define AT91C_RSTC__RESET_KEY   0xA5000000   // reset key
 #define AT91C_BASE_RSTC_SR      0xFFFFFD04 
-    #define AT91C_RTSC_SR__SRCMP    (1ul << 17)   // Software Reset Command in progress
-    #define AT91C_RTSC_SR__NRSTL    (1ul << 16)   // Registers the NRST Pin Level at Master Clock (MCK)
-    #define AT91C_RTSC_SR__RSTTYP   (7ul <<  8)   // Reset Type mask
-    #define AT91C_RTSC_SR__BODSTS   (1ul <<  1)   // Brownout Detection Status
-    #define AT91C_RTSC_SR__URSTS    (1ul <<  0)   // User Reset Status
+    #define AT91C_RTSC_SR__SRCMP    (1ul < 17)   // Software Reset Command in progress
+    #define AT91C_RTSC_SR__NRSTL    (1ul < 16)   // Registers the NRST Pin Level at Master Clock (MCK)
+    #define AT91C_RTSC_SR__RSTTYP   (7ul <  8)   // Reset Type mask
+    #define AT91C_RTSC_SR__BODSTS   (1ul <  1)   // Brownout Detection Status
+    #define AT91C_RTSC_SR__URSTS    (1ul <  0)   // User Reset Status
 #define AT91C_BASE_RSTC_MR      0xFFFFFD08 
   
 // (RTTC) Base Address

@@ -7,6 +7,11 @@
 
 //--//
 
+INT8 LCD_SetSpecialConfig(INT32 key, INT32 value)
+{
+	return 0;
+}
+
 BOOL LCD_Controller_Initialize(DISPLAY_CONTROLLER_CONFIG& config)
 {
     return AT91_LCD_Driver::Initialize(config);

@@ -6,9 +6,23 @@
 #define _DRIVERS_NETWORK_DEFINES_LWIP_H_ 1
 
 /* Pick min, default or max configuration based on platform */
+#if defined(PLATFORM_ARM_SAM7X_EK)
+#define NETWORK_MEMORY_PROFILE_LWIP__small      1
+#elif defined(PLATFORM_ARM_iMXS_net) || defined(PLATFORM_ARM_iMXS_net_dbg) || defined(PLATFORM_ARM_iMXS_THUMB) || defined(PLATFORM_ARM_iMXS_net_open)
+#define NETWORK_MEMORY_PROFILE_LWIP__medium      1
+#elif defined(PLATFORM_ARM_EA_LPC2478)
+#define NETWORK_MEMORY_PROFILE_LWIP__medium     1
+#elif defined(PLATFORM_SH7619_EVB) || defined(PLATFORM_SH7619_NATIVE)
+#define NETWORK_MEMORY_PROFILE_LWIP__medium     1
+#elif defined(PLATFORM_SH7216_RSK)
+#define NETWORK_MEMORY_PROFILE_LWIP__medium     1
+#elif defined(PLATFORM_SH7264_M3A_HS64) || defined(PLATFORM_SH7264_RSK)
+#define NETWORK_MEMORY_PROFILE_LWIP__medium     1
+#else
 #include <lwip_selector.h>
+#endif
 
-#if !defined(NETWORK_MEMORY_PROFILE_LWIP__small) && !defined(NETWORK_MEMORY_PROFILE_LWIP__medium) && !defined(NETWORK_MEMORY_PROFILE_LWIP__large) && !defined(NETWORK_MEMORY_PROFILE_LWIP__custom)
+#if !defined(NETWORK_MEMORY_PROFILE_LWIP__small) && !defined(NETWORK_MEMORY_PROFILE_LWIP__medium) && !defined(NETWORK_MEMORY_PROFILE_LWIP__large)
 #error You must define a NETWORK_MEMORY_PROFILE_LWIP_xxx for this platform
 #endif
 
@@ -38,13 +52,13 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* MEMP_NUM_TCP_PCB: the number of simulatenously active TCP
    connections. */
-#define MEMP_NUM_TCP_PCB__min               8
+#define MEMP_NUM_TCP_PCB__min               6
 #define MEMP_NUM_TCP_PCB__default           16
 #define MEMP_NUM_TCP_PCB__max               32
 
 /* MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP
    connections. */
-#define MEMP_NUM_TCP_PCB_LISTEN__min        4
+#define MEMP_NUM_TCP_PCB_LISTEN__min        5
 #define MEMP_NUM_TCP_PCB_LISTEN__default    8
 #define MEMP_NUM_TCP_PCB_LISTEN__max        12
 
@@ -66,14 +80,14 @@ a lot of data that needs to be copied, this should be set high. */
 #define MEMP_NUM_NETBUF__max                32
 
 /* MEMP_NUM_NETCONN: the number of struct netconns. */
-#define MEMP_NUM_NETCONN__min               10
+#define MEMP_NUM_NETCONN__min               12
 #define MEMP_NUM_NETCONN__default           20
 #define MEMP_NUM_NETCONN__max               40
 
 /* PBUF_POOL_SIZE: the number of buffers in the pbuf pool. */
 #define PBUF_POOL_SIZE__min                 40
 #define PBUF_POOL_SIZE__default             128
-#define PBUF_POOL_SIZE__max                 256
+#define PBUF_POOL_SIZE__max                 128
 
 /* PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool. */
 #define PBUF_POOL_BUFSIZE__min              512
@@ -81,20 +95,20 @@ a lot of data that needs to be copied, this should be set high. */
 #define PBUF_POOL_BUFSIZE__max              2048
 
 /* TCP Maximum segment size. */
-#define TCP_MSS__min                        536
-#define TCP_MSS__default                    1460
+#define TCP_MSS__min                        128
+#define TCP_MSS__default                    256
 #define TCP_MSS__max                        1460
 
 /* TCP sender buffer space (bytes). */
 #define TCP_SND_BUF__min                    (2*TCP_MSS)
-#define TCP_SND_BUF__default                (4*TCP_MSS)
-#define TCP_SND_BUF__max                    (8*TCP_MSS)
+#define TCP_SND_BUF__default                (8*TCP_MSS)
+#define TCP_SND_BUF__max                    (32*TCP_MSS)
 
 /* TCP sender buffer space (pbufs). This must be at least = 2 *
    TCP_SND_BUF/TCP_MSS for things to work. */
-#define TCP_SND_QUEUELEN__min               ((2*TCP_SND_BUF)/TCP_MSS)
-#define TCP_SND_QUEUELEN__default           ((4*TCP_SND_BUF)/TCP_MSS)
-#define TCP_SND_QUEUELEN__max               ((8*TCP_SND_BUF)/TCP_MSS)
+#define TCP_SND_QUEUELEN__min               (4*TCP_SND_BUF/TCP_MSS)
+#define TCP_SND_QUEUELEN__default           (4*TCP_SND_BUF/TCP_MSS)
+#define TCP_SND_QUEUELEN__max               (8*TCP_SND_BUF/TCP_MSS)
 
 /* TCP receive window. */
 #define TCP_WND__min                        (2*1024)
@@ -166,25 +180,6 @@ a lot of data that needs to be copied, this should be set high. */
     #define PLATFORM_DEPENDENT__TCP_SND_QUEUELEN                TCP_SND_QUEUELEN__max
     #define PLATFORM_DEPENDENT__TCP_WND                         TCP_WND__max
     #define PLATFORM_DEPENDENT__TCP_SNDLOWAT                    TCP_SNDLOWAT__max
-#endif
-
-#ifdef NETWORK_MEMORY_PROFILE_LWIP__custom
-    #define PLATFORM_DEPENDENT__MEM_SIZE                        MEM_SIZE__custom
-    #define PLATFORM_DEPENDENT__MEMP_NUM_PBUF                   MEMP_NUM_PBUF__custom
-    #define PLATFORM_DEPENDENT__MEMP_NUM_UDP_PCB                MEMP_NUM_UDP_PCB__custom
-    #define PLATFORM_DEPENDENT__MEMP_NUM_TCP_PCB                MEMP_NUM_TCP_PCB__custom
-    #define PLATFORM_DEPENDENT__MEMP_NUM_TCP_PCB_LISTEN         MEMP_NUM_TCP_PCB_LISTEN__custom
-    #define PLATFORM_DEPENDENT__MEMP_NUM_TCP_SEG                MEMP_NUM_TCP_SEG__custom
-    #define PLATFORM_DEPENDENT__MEMP_NUM_SYS_TIMEOUT            MEMP_NUM_SYS_TIMEOUT__custom
-    #define PLATFORM_DEPENDENT__MEMP_NUM_NETBUF                 MEMP_NUM_NETBUF__custom
-    #define PLATFORM_DEPENDENT__MEMP_NUM_NETCONN                MEMP_NUM_NETCONN__custom
-    #define PLATFORM_DEPENDENT__PBUF_POOL_SIZE                  PBUF_POOL_SIZE__custom
-    #define PLATFORM_DEPENDENT__PBUF_POOL_BUFSIZE               PBUF_POOL_BUFSIZE__custom
-    #define PLATFORM_DEPENDENT__TCP_MSS                         TCP_MSS__custom
-    #define PLATFORM_DEPENDENT__TCP_SND_BUF                     TCP_SND_BUF__custom
-    #define PLATFORM_DEPENDENT__TCP_SND_QUEUELEN                TCP_SND_QUEUELEN__custom
-    #define PLATFORM_DEPENDENT__TCP_WND                         TCP_WND__custom
-    #define PLATFORM_DEPENDENT__TCP_SNDLOWAT                    TCP_SNDLOWAT__custom
 #endif
 
 #define PLATFORM_DEPENDENT__SOCKETS_MAX_COUNT                   (PLATFORM_DEPENDENT__MEMP_NUM_UDP_PCB + PLATFORM_DEPENDENT__MEMP_NUM_TCP_PCB)                                     

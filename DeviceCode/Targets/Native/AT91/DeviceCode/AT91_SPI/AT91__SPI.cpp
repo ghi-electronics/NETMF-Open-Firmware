@@ -1,5 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//  Portions Copyright (c) GHI Electronics, LLC.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <tinyhal.h>
@@ -127,7 +129,7 @@ void AT91_SPI_Driver::ISR(void *Param)
 BOOL AT91_SPI_Driver::nWrite16_nRead16(const SPI_CONFIGURATION &Configuration, UINT16 *Write16, INT32 WriteCount, UINT16 *Read16, INT32 ReadCount, INT32 ReadStartOffset)
 {
     NATIVE_PROFILE_HAL_PROCESSOR_SPI();
-    
+    GLOBAL_LOCK(irq);
     
     SPI_DEBUG_PRINT(" spi write 16 \r\n");
     
@@ -172,7 +174,7 @@ BOOL AT91_SPI_Driver::nWrite16_nRead16(const SPI_CONFIGURATION &Configuration, U
 BOOL AT91_SPI_Driver::nWrite8_nRead8(const SPI_CONFIGURATION &Configuration, UINT8 *Write8, INT32 WriteCount, UINT8 *Read8, INT32 ReadCount, INT32 ReadStartOffset)
 {
     NATIVE_PROFILE_HAL_PROCESSOR_SPI();
-
+	GLOBAL_LOCK(irq);
    
     SPI_DEBUG_PRINT(" spi write 8 \r\n");
     if(g_AT91_SPI_Driver.m_Enabled[Configuration.SPI_mod])
@@ -298,7 +300,7 @@ BOOL AT91_SPI_Driver::Xaction_Start(const SPI_CONFIGURATION &Configuration)
 #if (AT91C_MAX_SPI == 2)
         if((Configuration.DeviceCS != GPIO_PIN_NONE) && (Configuration.DeviceCS != AT91_SPI0_NSS) && (Configuration.DeviceCS != AT91_SPI1_NSS))
 #else
-        if((Configuration.DeviceCS != GPIO_PIN_NONE) && (Configuration.DeviceCS != AT91_SPI0_NSS))
+        if((Configuration.DeviceCS != GPIO_PIN_NONE))// && (Configuration.DeviceCS != AT91_SPI0_NSS))
 #endif        
         {
             CPU_GPIO_EnableOutputPin(Configuration.DeviceCS, Configuration.CS_Active);
@@ -342,7 +344,7 @@ BOOL AT91_SPI_Driver::Xaction_Stop(const SPI_CONFIGURATION &Configuration)
 
 //        // avoid noise drawing excess power on a floating line by putting this in pulldown
 //        CPU_GPIO_EnableInputPin(AT91_SPI0_MISO, FALSE, NULL, GPIO_INT_NONE, RESISTOR_PULLUP);
-
+		/*
         if(Configuration.SPI_mod == 0)
         {
             // avoid noise drawing excess power on a floating line by putting this in pulldown
@@ -373,11 +375,12 @@ BOOL AT91_SPI_Driver::Xaction_Stop(const SPI_CONFIGURATION &Configuration)
             return FALSE;
         }
 #endif
+		*/
         // next, bring the CS to the proper inactive state
 #if (AT91C_MAX_SPI == 2)
         if((Configuration.DeviceCS != GPIO_PIN_NONE) && (Configuration.DeviceCS != AT91_SPI0_NSS) && (Configuration.DeviceCS != AT91_SPI1_NSS))
 #else
-        if((Configuration.DeviceCS != GPIO_PIN_NONE) && (Configuration.DeviceCS != AT91_SPI0_NSS))
+        if((Configuration.DeviceCS != GPIO_PIN_NONE))// && (Configuration.DeviceCS != AT91_SPI0_NSS))
 #endif        
         {
             CPU_GPIO_SetPinState(Configuration.DeviceCS, !Configuration.CS_Active);

@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GHI.OSHW.Native", "GHI.OSHW.Native\Managed\GHI.OSHW.Native.csproj", "{A1717663-FF58-41C8-BC2D-0DA86A71D7E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GHI.OSHW.Hardware", "GHI.OSHW.Hardware\Managed\GHI.OSHW.Hardware.csproj", "{34A78CB1-9277-427A-9DF2-08B1794CB71A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GHI.Hardware.FEZHydra", "GHI.Hardware Assemblies\GHI.Hardware.FEZHydra\GHI.Hardware.FEZHydra.csproj", "{7DFA519D-0100-4009-B6AA-127D28C1BC63}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GHI.Hardware.FEZCerb", "GHI.Hardware Assemblies\GHI.Hardware.FEZCerb\GHI.Hardware.FEZCerb.csproj", "{AAF0AF26-CF29-4D26-9A69-35290E6C5D6D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GHI.GameO.LowLevel", "GHI.GameO.LowLevel\Managed\GHI.GameO.LowLevel.csproj", "{92B298F9-5AE8-473C-BD97-904169BC2B75}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A1717663-FF58-41C8-BC2D-0DA86A71D7E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1717663-FF58-41C8-BC2D-0DA86A71D7E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1717663-FF58-41C8-BC2D-0DA86A71D7E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1717663-FF58-41C8-BC2D-0DA86A71D7E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34A78CB1-9277-427A-9DF2-08B1794CB71A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34A78CB1-9277-427A-9DF2-08B1794CB71A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34A78CB1-9277-427A-9DF2-08B1794CB71A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34A78CB1-9277-427A-9DF2-08B1794CB71A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DFA519D-0100-4009-B6AA-127D28C1BC63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DFA519D-0100-4009-B6AA-127D28C1BC63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DFA519D-0100-4009-B6AA-127D28C1BC63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DFA519D-0100-4009-B6AA-127D28C1BC63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAF0AF26-CF29-4D26-9A69-35290E6C5D6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAF0AF26-CF29-4D26-9A69-35290E6C5D6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAF0AF26-CF29-4D26-9A69-35290E6C5D6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAF0AF26-CF29-4D26-9A69-35290E6C5D6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92B298F9-5AE8-473C-BD97-904169BC2B75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92B298F9-5AE8-473C-BD97-904169BC2B75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92B298F9-5AE8-473C-BD97-904169BC2B75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92B298F9-5AE8-473C-BD97-904169BC2B75}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

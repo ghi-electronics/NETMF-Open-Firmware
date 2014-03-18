@@ -8,6 +8,8 @@
 // THIS SAMPLE CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, 
 // INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSPOSE.
 // 
+//
+//  Portions Copyright (c) GHI Electronics, LLC.
 // 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -322,15 +324,16 @@ void AT91_USBHS_Driver::ClearTxQueue( USB_CONTROLLER_STATE* State, int endpoint 
 }
 
 //--//
-
+#define USBH_TRANSFER_PACKET_TIMEOUT 400000 // 
 void AT91_USBHS_Driver::TxPacket( USB_CONTROLLER_STATE* State, int endpoint )
 {
-    
+    int timeout;
     ASSERT( endpoint < c_Used_Endpoints );    
     ASSERT( State );
 
     struct AT91_UDPHS *pUdp = (struct AT91_UDPHS *) (AT91C_BASE_UDP) ;
     UINT8 * pDest = (UINT8*) ((((struct AT91_UDPHS_EPTFIFO *)AT91C_BASE_UDP_DMA)->UDPHS_READEPT0) + 16384 * endpoint);
+    
     
     GLOBAL_LOCK(irq);
     
@@ -338,15 +341,30 @@ void AT91_USBHS_Driver::TxPacket( USB_CONTROLLER_STATE* State, int endpoint )
     // transmit a packet on UsbPortNum, if there are no more packets to transmit, then die
     USB_PACKET64* Packet64;
 
-    Packet64 = USB_TxDequeue( State, endpoint, TRUE );
-
-    if(Packet64 != NULL && Packet64->Size == 0)
+    for(;;)
     {
-        g_AT91_USBHS_Driver.TxNeedZLPS[endpoint] = TRUE;
-        Packet64 = NULL;
-    }
+        Packet64 = USB_TxDequeue( State, endpoint, TRUE );
 
-    while (pUdp->UDPHS_EPT[endpoint].UDPHS_EPTSTA & AT91C_UDPHS_TX_PK_RDY);
+        if(Packet64 == NULL || Packet64->Size > 0) break;
+    }
+	timeout = 0;
+   	while (!pUdp->UDPHS_EPT[endpoint].UDPHS_EPTSTA & AT91C_UDPHS_TX_COMPLT)
+	{
+		timeout++;
+		if (timeout>USBH_TRANSFER_PACKET_TIMEOUT)
+		{
+			break;
+		}
+	}
+	timeout = 0;
+    while (pUdp->UDPHS_EPT[endpoint].UDPHS_EPTSTA & AT91C_UDPHS_TX_PK_RDY)
+	{
+		timeout++;
+		if (timeout>USBH_TRANSFER_PACKET_TIMEOUT)
+		{
+			break;
+		}
+	}
     
     if(Packet64)
     {
@@ -361,7 +379,7 @@ void AT91_USBHS_Driver::TxPacket( USB_CONTROLLER_STATE* State, int endpoint )
         {
             *pDest++ = Packet64->Buffer[i];
         }
-
+		pUdp->UDPHS_EPT[endpoint].UDPHS_EPTSETSTA = AT91C_UDPHS_TX_PK_RDY;
         g_AT91_USBHS_Driver.TxNeedZLPS[endpoint] = (Packet64->Size == 64);
     }
     else
@@ -370,6 +388,7 @@ void AT91_USBHS_Driver::TxPacket( USB_CONTROLLER_STATE* State, int endpoint )
         // (and we queued a zero length packet to transmit)
         if(g_AT91_USBHS_Driver.TxNeedZLPS[endpoint])
         {
+			pUdp->UDPHS_EPT[endpoint].UDPHS_EPTSETSTA = AT91C_UDPHS_TX_PK_RDY;
              g_AT91_USBHS_Driver.TxNeedZLPS[endpoint] = FALSE;
         }
 
@@ -378,7 +397,7 @@ void AT91_USBHS_Driver::TxPacket( USB_CONTROLLER_STATE* State, int endpoint )
         pUdp->UDPHS_EPT[endpoint].UDPHS_EPTCTLDIS = AT91C_UDPHS_TX_PK_RDY;
         
     }
-    pUdp->UDPHS_EPT[endpoint].UDPHS_EPTSETSTA = AT91C_UDPHS_TX_PK_RDY;
+    
 
 }
 
@@ -538,7 +557,7 @@ void AT91_USBHS_Driver::Endpoint_ISR(UINT32 endpoint)
         // ugly
         if(Status & AT91C_UDPHS_RX_BK_RDY)
         {
-            while(pUdp->UDPHS_EPT[0].UDPHS_EPTSTA & AT91C_UDPHS_RX_BK_RDY) pUdp->UDPHS_EPT[0].UDPHS_EPTCLRSTA &= ~AT91C_UDPHS_RX_BK_RDY;
+            while(pUdp->UDPHS_EPT[0].UDPHS_EPTSTA & AT91C_UDPHS_RX_BK_RDY) pUdp->UDPHS_EPT[0].UDPHS_EPTCLRSTA = AT91C_UDPHS_RX_BK_RDY;
         }
 
         // set up packet receive
@@ -665,7 +684,7 @@ void AT91_USBHS_Driver::Endpoint_ISR(UINT32 endpoint)
         }
     }
 
-    else
+    else //not EP0
     {
 //        debug_printf("status: %x\r\n",Status);
         // IN packet sent
@@ -981,10 +1000,11 @@ BOOL AT91_USBHS_Driver::ProtectPins( int Controller, BOOL On )
                     pMatrix->MATRIX_USBPCR |= AT91C_MATRIX_USBPCR_PUON;
                 #endif
                 
-                if(CPU_GPIO_GetPinState (AT91_VBUS))
-                {
-                    VBus_ISR(0, TRUE, NULL);
-                }
+				// Was removed in 4.1 build
+                //if(CPU_GPIO_GetPinState (AT91_VBUS))
+                //{
+                //    VBus_ISR(0, TRUE, NULL);
+                //}
 
             }
         }
@@ -1048,7 +1068,7 @@ void AT91_USBHS_Driver::VBus_ISR(GPIO_PIN Pin, BOOL PinState, void* Param)
 
     }
     
-        pUdp->UDPHS_TST = 0;
+        //pUdp->UDPHS_TST = 0; // Was removed in 4.1 build and equaled 3
         //pUdp->UDPHS_IEN = 0;
         pUdp->UDPHS_IEN = AT91C_UDPHS_ENDOFRSM | AT91C_UDPHS_WAKE_UP | AT91C_UDPHS_DET_SUSPD;
         pUdp->UDPHS_CLRINT = 0xFE;

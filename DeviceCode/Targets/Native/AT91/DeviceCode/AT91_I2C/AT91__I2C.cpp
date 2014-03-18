@@ -1,5 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//  Portions Copyright (c) GHI Electronics, LLC.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <tinyhal.h>
@@ -117,7 +119,7 @@ void AT91_I2C_Driver::MasterXAction_Start( I2C_HAL_XACTION* xAction, bool repeat
 #if defined(PLATFORM_ARM_SAM7_ANY)
 // for SAM7x and SAM7S
     I2C.TWI_CR = AT91_I2C::TWI_CR_MSEN;
-#elif defined(PLATFORM_ARM_SAM9261_ANY)
+#else if defined(PLATFORM_ARM_SAM9261_ANY)
     I2C.TWI_CR = AT91_I2C::TWI_CR_MSEN | AT91_I2C::TWI_CR_SVDIS;
 #endif
 
@@ -176,7 +178,7 @@ void AT91_I2C_Driver::GetClockRate( UINT32 rateKhz, UINT8& clockRate, UINT8& clo
 
 #if defined(PLATFORM_ARM_SAM7_ANY)
 #define CLOCK_RATE_CONSTANT     3 
-#elif defined(PLATFORM_ARM_SAM9261_ANY)
+#else if defined(PLATFORM_ARM_SAM9261_ANY)
 #define CLOCK_RATE_CONSTANT     4
 #endif
 

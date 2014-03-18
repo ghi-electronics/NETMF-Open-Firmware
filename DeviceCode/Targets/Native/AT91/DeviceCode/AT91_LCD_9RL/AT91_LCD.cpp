@@ -1,9 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//  Portions Copyright (c) GHI Electronics, LLC.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <tinyhal.h>
 #include "AT91_LCD.h"
+#include <..\DeviceCode\GHI\include\OSHW_Configuration.h>
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -13,11 +16,61 @@
 #undef  DEBUG_TRACE
 #define DEBUG_TRACE (TRACE_ALWAYS)
 
+
+OSHW_Configurations_Structure		OSHW_Configurations;
+
 //////////////////////////////////////////////////////////////////////////////
-static UINT32* AT91_LCD_Screen_Buffer = (UINT32*)0x23F00000;
+static UINT32* AT91_LCD_Screen_Buffer = (UINT32*)0x20F00000;
 
 BOOL AT91_LCD_Driver::Initialize(DISPLAY_CONTROLLER_CONFIG& config)
 {
+	OSHW_Configuration_Read();
+
+	 if(OSHW_Configurations.lcd.PixelClockRateKHz == 0x0)
+	 {
+      // ugly hack to prevent system crash!
+           if( OSHW_Configurations.lcd.Width >=64)
+                config.Width						= OSHW_Configurations.lcd.Width;
+           if( OSHW_Configurations.lcd.Height >=64)
+                config.Height						= OSHW_Configurations.lcd.Height;
+		
+           return true;
+	 }
+
+	 if(OSHW_Configurations.lcd.Magic == 0xdeadbeef)
+	 {
+		 config.Width						= OSHW_Configurations.lcd.Width;
+		 config.Height						= OSHW_Configurations.lcd.Height;
+		 config.PixelPolarity				= OSHW_Configurations.lcd.PixelPolarity;
+		 config.FirstLineMarkerPolarity		= OSHW_Configurations.lcd.HorizontalSyncPolarity;
+		 config.LinePulsePolarity			= OSHW_Configurations.lcd.VerticalSyncPolarity;
+		 config.OutputEnablePolarity			= OSHW_Configurations.lcd.OutputEnablePolarity;
+
+		 // Pixel Clock Divider is calculated by this equation Frequency = System Clock / ((Divider + 1) * 2)
+		 // The following equation should calculate Pixel Clock Divider
+		 // Divider = ((SYSTEM_PERIPHERAL_CLOCK_HZ / 2) - (OSHW_Configurations.lcd.PixelClockRateKHz * 1000)) / (OSHW_Configurations.lcd.PixelClockRateKHz * 1000);
+		 if(OSHW_Configurations.lcd.PixelClockRateKHz > 25000) // 25000 KHz is maximum supported frequency
+			 OSHW_Configurations.lcd.PixelClockRateKHz = 25000;
+
+		 config.PixelClockDivider			= ((SYSTEM_PERIPHERAL_CLOCK_HZ / 2) - (OSHW_Configurations.lcd.PixelClockRateKHz * 1000)) / (OSHW_Configurations.lcd.PixelClockRateKHz * 1000);
+
+		 if(((SYSTEM_PERIPHERAL_CLOCK_HZ / 2) - (OSHW_Configurations.lcd.PixelClockRateKHz * 1000)) % (OSHW_Configurations.lcd.PixelClockRateKHz * 1000) > 0)
+			 config.PixelClockDivider += 1;
+
+		 if (config.PixelClockDivider > 511) // Pixel clock divider cannot exceed a 9 bit number which is 511 in Decimal.
+			 config.PixelClockDivider = 511;
+
+		 config.HorizontalSyncPulseWidth		= OSHW_Configurations.lcd.HorizontalSyncPulseWidth;
+		 config.HorizontalSyncWait1			= OSHW_Configurations.lcd.HorizontalBackPorch;
+		 config.HorizontalSyncWait2			= OSHW_Configurations.lcd.HorizontalFrontPorch;
+		 config.VerticalSyncPulseWidth		= OSHW_Configurations.lcd.VerticalSyncPulseWidth;
+		 config.VerticalSyncWait1			= OSHW_Configurations.lcd.VerticalBackPorch;
+		 config.VerticalSyncWait2			= OSHW_Configurations.lcd.VerticalFrontPorch;
+	 }
+
+
+/////////////////////////////////////////////
+
     UINT32 pin;
     UINT32 value;
 
@@ -32,7 +85,12 @@ BOOL AT91_LCD_Driver::Initialize(DISPLAY_CONTROLLER_CONFIG& config)
     }
     /* Enable CS for LCD */
     //CPU_GPIO_EnableOutputPin((GPIO_PIN)AT91_LCDC_CS, 0);
-    
+
+	if(OSHW_Configurations.lcd.OutputEnableIsFixed)
+		CPU_GPIO_EnableOutputPin(AT91_LCDDEN, config.OutputEnablePolarity);
+	else
+		CPU_GPIO_DisablePin(AT91_LCDDEN, RESISTOR_DISABLED, 0, GPIO_ALT_MODE_1);
+
     AT91_PMC &pmc = AT91::PMC();
     pmc.EnablePeriphClock(AT91C_ID_LCDC);    
 
@@ -62,9 +120,9 @@ BOOL AT91_LCD_Driver::Initialize(DISPLAY_CONTROLLER_CONFIG& config)
     else
         value = ( AT91_LCDC::LCDC_MEMOR_LITTLEIND | AT91_LCDC::LCDC_CLKMOD);
 
-    if(config.FirstLineMarkerPolarity == TRUE)
+    if(config.FirstLineMarkerPolarity == FALSE) // Original was if it is true set 1
         value |= 1 << 10;   /* INVLINE */
-    if (config.LinePulsePolarity == TRUE)
+    if (config.LinePulsePolarity == FALSE) // Original was if it is true set 1
         value |= 1 << 9;    /* INVFRAME */
 
     switch(config.BitsPerPixel)
@@ -111,8 +169,15 @@ BOOL AT91_LCD_Driver::Initialize(DISPLAY_CONTROLLER_CONFIG& config)
 
     /* Vertical timing */
     value = (config.VerticalSyncPulseWidth - 1) << 16;
-    value |= config.VerticalSyncWait1 << 8;
-    value |= config.VerticalSyncWait2;
+    
+	
+	
+	
+	config.VerticalSyncWait1 += config.VerticalSyncPulseWidth; //1;//10; For Hydra or Atmel you need to add the VPW to the VBP in order for the screen to align properly.
+	
+	value |= config.VerticalSyncWait1 << 8;
+
+	value |= config.VerticalSyncWait2;
     lcdc.LCDC_TIM1 = value;
 
     value = (config.Width - 1) << 21;
@@ -125,7 +190,7 @@ BOOL AT91_LCD_Driver::Initialize(DISPLAY_CONTROLLER_CONFIG& config)
     lcdc.LCDC_FIFO = value;
 
     /* Toggle LCD_MODE every frame */
-    lcdc.LCDC_MVAL = 0;
+    //lcdc.LCDC_MVAL = 0;
 
     //STN Dithering
     if(!(config.EnableTFT))
@@ -164,6 +229,12 @@ BOOL AT91_LCD_Driver::Uninitialize()
 
 BOOL AT91_LCD_Driver::Enable(BOOL fEnable)
 {
+	OSHW_Configuration_Read();
+
+	if(OSHW_Configurations.lcd.PixelClockRateKHz == 0x0)
+		return true;
+//////////////////////////////////////////////////
+
     AT91_LCDC &lcdc = AT91::LCDC();
 
     if(fEnable)

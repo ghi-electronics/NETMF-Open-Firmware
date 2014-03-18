@@ -133,7 +133,7 @@ BOOL dm9161_lwip_AutoNegotiate()
         goto AutoNegotiateExit;
 
     // Check AutoNegotiate complete
-    retryCount = 1000;
+    retryCount = retryMax;
     while (retryCount--)
     {
         rc  = AT91_EMAC_LWIP_ReadPhy(g_phyAddress, DM9161_BMSR, &value, retryMax)|

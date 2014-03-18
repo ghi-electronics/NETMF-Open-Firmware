@@ -37,7 +37,7 @@ BOOL AT91_TIME_Driver::Initialize()
     g_AT91_TIME_Driver.m_lastRead    = 0;
     g_AT91_TIME_Driver.m_nextCompare = (UINT64) AT91_TIMER_Driver::c_MaxTimerValue;
 
-    if(!AT91_TIMER_Driver::Initialize( AT91_TIMER_Driver::c_SystemTimer, TRUE, AT91_TC::TC_CLKS_TIMER_DIV5_CLOCK, AT91_TIME_Driver::ISR, NULL ))
+    if(!AT91_TIMER_Driver::Initialize( AT91_TIMER_Driver::c_SystemTimer, TRUE, AT91_TC::TC_CLKS_TIMER_DIV4_CLOCK, AT91_TIME_Driver::ISR, NULL ))
         return FALSE;
 
     AT91_TIMER_Driver::SetCompare( AT91_TIMER_Driver::c_SystemTimer, AT91_TIMER_Driver::c_MaxTimerValue );
@@ -115,14 +115,50 @@ void AT91_TIME_Driver::SetCompareValue( UINT64 CompareValue )
 }
 
 //--//
-
+extern HAL_DblLinkedList<HAL_CONTINUATION> g_HAL_Completion_List;
 void AT91_TIME_Driver::ISR( void* Param )
 {
+    int event_tick;
+	int current_tick;
     if(CounterValue() >= g_AT91_TIME_Driver.m_nextCompare)
     {
         // this also schedules the next one, if there is one
-        HAL_COMPLETION::DequeueAndExec();
-    }
+        //HAL_COMPLETION::DequeueAndExec();
+		// this also schedules the next one, if there is one
+        //HAL_COMPLETION::DequeueAndExec();
+		HAL_COMPLETION* ptr     = (HAL_COMPLETION*)g_HAL_Completion_List.FirstNode();
+        HAL_COMPLETION* ptrNext = (HAL_COMPLETION*)ptr->Next();
+       if(ptrNext)
+       {
+
+		   event_tick = ptr->EventTimeTicks;
+		   current_tick = HAL_Time_CurrentTicks();
+		   if (event_tick<=current_tick)
+		   {
+       
+			   Events_Set(SYSTEM_EVENT_FLAG_SYSTEM_TIMER);
+
+				ptr->Unlink();
+
+			   //
+			   // In case there's no other request to serve, set the next interrupt to be 356 years since last powerup (@25kHz).
+			   //
+			   HAL_Time_SetCompare( ptrNext->Next() ? ptrNext->EventTimeTicks : (0x0000FFFFFFFFFFFFull) );
+
+	#if defined(_DEBUG)
+			   ptr->EventTimeTicks = 0;
+	#endif  // defined(_DEBUG)
+
+			   // let the ISR turn on interrupts, if it needs to
+			   ptr->Execute();
+		   }
+		   else 
+		   {			
+				// Don't do anything untill meet its service, completion list will be updated order if there is any service add.
+		   }
+       
+       }
+	}
     else
     {
         //
@@ -183,7 +219,7 @@ void __section(SectionForFlashOperations) AT91_TIME_Driver::Sleep_uSec_Loop( UIN
 {
     // iterations must be signed so that negative iterations will result in the minimum delay
 
-    uSec *= (SYSTEM_CYCLE_CLOCK_HZ / CLOCK_COMMON_FACTOR);
+    uSec *= ((SYSTEM_CYCLE_CLOCK_HZ / 2) / CLOCK_COMMON_FACTOR);
     uSec /= (ONE_MHZ               / CLOCK_COMMON_FACTOR);
 
     // iterations is equal to the number of CPU instruction cycles in the required time minus

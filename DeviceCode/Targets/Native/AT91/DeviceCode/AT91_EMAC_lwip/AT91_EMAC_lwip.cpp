@@ -321,7 +321,7 @@ BOOL AT91_EMAC_LWIP_SetupDevice(struct netif *pNetIf)
         return FALSE;
     }
 
-    while(errCount < 1000 && !dm9161_lwip_GetLinkSpeed(TRUE))
+    while(!dm9161_lwip_GetLinkSpeed(TRUE))
     {
         errCount++;
     }
@@ -426,7 +426,7 @@ void AT91_EMAC_LWIP_Init(struct netif *pNetIf)
 
     // Clear all status bits in the transmit status register
     emac.EMAC_TSR = ( AT91_EMAC::EMAC_UBR | AT91_EMAC::EMAC_COL | AT91_EMAC::EMAC_RLES
-                                | AT91_EMAC::EMAC_TGO | AT91_EMAC::EMAC_BEX | AT91_EMAC::EMAC_COMP
+                                | AT91_EMAC::EMAC_BEX | AT91_EMAC::EMAC_COMP
                                 | AT91_EMAC::EMAC_UND );
 
      // Clear Status

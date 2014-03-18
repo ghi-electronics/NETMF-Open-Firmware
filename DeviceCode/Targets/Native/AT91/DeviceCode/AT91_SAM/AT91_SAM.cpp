@@ -45,15 +45,26 @@ void __section(SectionForFlashOperations) AT91_SAM_Driver::Sleep(void)
 
 BOOL AT91_SAM_Driver::Initialize()
 {
-    CPU_INTC_Initialize();
-    CPU_GPIO_Initialize();
-    return TRUE;
+	CPU_INTC_Initialize();
+	CPU_GPIO_Initialize();
+
+	if( CPU_GPIO_EnableInputPin(((1 * 32) + 31), FALSE, NULL, GPIO_INT_NONE, RESISTOR_PULLUP)) //(1 * 32) + 27) = PB27 Pin9 on Socket 14
+	{
+		HAL_Time_Sleep_MicroSeconds_InterruptEnabled(10 * 1000); // wait for buttons to init
+
+		if(!CPU_GPIO_GetPinState(((1 * 32) + 31)))
+		{
+			HalSystemConfig.DebuggerPorts[0] = HalSystemConfig.MessagingPorts[0] = HalSystemConfig.DebugTextPort = HalSystemConfig.stdio = COM1;
+		}
+	}
+
+
+	return TRUE;
 }
 
 void AT91_SAM_Driver::Halt(void)      
 {
-    volatile bool fContinue=false;
-    while(!fContinue);
+    while(true);
 }
 void AT91_SAM_Driver::Reset(void)     
 {

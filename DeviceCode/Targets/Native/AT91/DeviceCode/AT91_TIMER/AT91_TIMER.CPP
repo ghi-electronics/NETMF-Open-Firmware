@@ -19,7 +19,7 @@ AT91_TIMER_Driver g_AT91_TIMER_Driver;
 #endif
 
 //--//
-
+UINT32 ReadStatusRegister = 0;
 BOOL AT91_TIMER_Driver::Initialize( UINT32 timer, BOOL freeRunning, UINT32 clkSource, HAL_CALLBACK_FPN ISR, void* ISR_Param )
 {
     ASSERT(timer < AT91_MAX_TIMER);
@@ -51,7 +51,8 @@ BOOL AT91_TIMER_Driver::Initialize( UINT32 timer, BOOL freeRunning, UINT32 clkSo
         tc.TC_IDR = 0xFFFFFFFF;
 
         // Clear status bit
-        (void) tc.TC_SR;
+        //(void) tc.TC_SR;
+        ReadStatusRegister = tc.TC_SR;
 
         // Set the Mode of the timer Counter
         if( freeRunning == TRUE )

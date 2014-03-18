@@ -1,5 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+// Portions Copyright (c) GHI Electronics, LLC.
+//
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <tinyhal.h>
@@ -14,6 +17,7 @@
 #undef  DEBUG_TRACE
 #define DEBUG_TRACE (TRACE_ALWAYS)
 
+#define TOUCHSCREEN_ADC_CONTROLLER_CHANNEL_DISABLE_REGISTER	(*(volatile unsigned long *)0xFFFD0014) // TSADCC_MR
 //--//
 
 #if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
@@ -273,8 +277,11 @@ BOOL AT91_GPIO_Driver::Initialize()
 #if  (AT91_MAX_GPIO > 96)
     pmc.EnablePeriphClock(AT91C_ID_PIOD);
 #endif
-
-    return TRUE;
+	
+	// fix a bug if analog were not disabled on power up
+	TOUCHSCREEN_ADC_CONTROLLER_CHANNEL_DISABLE_REGISTER = 0x3F; //disable all channels
+    
+		return TRUE;
 }
 
 //--//
@@ -285,11 +292,12 @@ BOOL AT91_GPIO_Driver::Uninitialize()
 
     // uninitialize the interrupt information
     {
+        PIN_ISR_DESCRIPTOR* pinIsr = g_AT91_GPIO_Driver.m_PinIsr;
         UINT32 volatile trash;
         int i;
 
+
 #if !defined(PLATFORM_ARM_SAM7_ANY)
-        PIN_ISR_DESCRIPTOR* pinIsr = g_AT91_GPIO_Driver.m_PinIsr;
         for(i = 0; i < c_MaxPins; i++)
         {
             pinIsr->m_completion.Abort();

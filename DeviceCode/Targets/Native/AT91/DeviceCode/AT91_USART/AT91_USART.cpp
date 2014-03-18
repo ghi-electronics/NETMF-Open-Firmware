@@ -17,6 +17,7 @@ AT91_USART_Driver g_AT91_USART_Driver;
 #pragma arm section zidata
 #endif
 
+UINT8 com_overflow_flag=0;
 
 //--//
 
@@ -398,9 +399,35 @@ void AT91_USART_Driver::USART_ISR( void* param )
     if(Status & AT91_USART::US_RXRDY)
     {
         c = usart.US_RHR;
-        USART_AddCharToRxBuffer( comPort, c );
+        //USART_AddCharToRxBuffer( comPort, c );
 
-        Events_Set( SYSTEM_EVENT_FLAG_COM_IN );
+        //Events_Set( SYSTEM_EVENT_FLAG_COM_IN );
+        if ((com_overflow_flag & (1<<comPort))==0)
+        {
+          if (USART_AddCharToRxBuffer(comPort, c)== FALSE)
+          {
+            com_overflow_flag |= (1<<comPort);
+          }
+          Events_Set( SYSTEM_EVENT_FLAG_COM_IN );
+        }
+        else 
+        {
+          // check to reset com_overflow_flag
+          // Check a flag is faster than read a function so we should keep it here.
+           if (USART_BytesInBuffer(comPort,TRUE)<PLATFORM_DEPENDENT_RX_USART_BUFFER_SIZE)
+           {
+              com_overflow_flag &= ~(1<<comPort); // reset
+           }
+           if ((com_overflow_flag & (1<<comPort))==0)
+           {
+              if (USART_AddCharToRxBuffer(comPort, c)== FALSE)
+              {
+                com_overflow_flag |= (1<<comPort);
+              }
+              Events_Set( SYSTEM_EVENT_FLAG_COM_IN );
+           }
+
+        }
 
     }
     if(Status & AT91_USART::US_TXRDY)

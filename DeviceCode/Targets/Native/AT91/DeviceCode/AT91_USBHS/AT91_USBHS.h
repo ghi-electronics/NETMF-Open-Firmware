@@ -202,7 +202,7 @@ struct AT91_UDPHS_EPTFIFO {
 struct AT91_USBHS_Driver
 {
     static const UINT32 c_Used_Endpoints           = 6;
-    static const UINT32 c_default_ctrl_packet_size = 8;
+    static const UINT32 c_default_ctrl_packet_size = 64;
 
 	USB_CONTROLLER_STATE*		pUsbControllerState;
     
