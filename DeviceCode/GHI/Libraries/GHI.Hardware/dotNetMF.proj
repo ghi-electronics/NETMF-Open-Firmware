@@ -1,0 +1,48 @@
+<Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Directory>DeviceCode\Targets\Native\Interop\GHI_Hardware</Directory>
+    <AssemblyName>GHI_Hardware</AssemblyName>
+  </PropertyGroup>
+  <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+<ItemGroup>
+<HFile Include="Lib.h" />
+<Compile Include="Lib.cpp" />
+<Compile Include="Lib_GHI_Hardware_Can_mshl.cpp" />
+<HFile Include="Lib_GHI_Hardware_Can.h" />
+<Compile Include="Lib_GHI_Hardware_Can.cpp" />
+<Compile Include="Lib_GHI_Hardware_Configuration__Display_mshl.cpp" />
+<HFile Include="Lib_GHI_Hardware_Configuration__Display.h" />
+<Compile Include="Lib_GHI_Hardware_Configuration__Display.cpp" />
+<Compile Include="Lib_GHI_Hardware_LowLevel_AddressSpace_mshl.cpp" />
+<HFile Include="Lib_GHI_Hardware_LowLevel_AddressSpace.h" />
+<Compile Include="Lib_GHI_Hardware_LowLevel_AddressSpace.cpp" />
+<Compile Include="Lib_GHI_Hardware_LowLevel_Power_mshl.cpp" />
+<HFile Include="Lib_GHI_Hardware_LowLevel_Power.h" />
+<Compile Include="Lib_GHI_Hardware_LowLevel_Power.cpp" />
+<Compile Include="Lib_GHI_Hardware_LowLevel_Register_mshl.cpp" />
+<HFile Include="Lib_GHI_Hardware_LowLevel_Register.h" />
+<Compile Include="Lib_GHI_Hardware_LowLevel_Register.cpp" />
+<Compile Include="Lib_GHI_Hardware_LowLevel_Watchdog_mshl.cpp" />
+<HFile Include="Lib_GHI_Hardware_LowLevel_Watchdog.h" />
+<Compile Include="Lib_GHI_Hardware_LowLevel_Watchdog.cpp" />
+<Compile Include="Lib_GHI_Hardware_RealTimeClock_mshl.cpp" />
+<HFile Include="Lib_GHI_Hardware_RealTimeClock.h" />
+<Compile Include="Lib_GHI_Hardware_RealTimeClock.cpp" />
+<Compile Include="Lib_GHI_Hardware_SignalCapture_mshl.cpp" />
+<HFile Include="Lib_GHI_Hardware_SignalCapture.h" />
+<Compile Include="Lib_GHI_Hardware_SignalCapture.cpp" />
+<Compile Include="Lib_GHI_Hardware_SignalGenerator_mshl.cpp" />
+<HFile Include="Lib_GHI_Hardware_SignalGenerator.h" />
+<Compile Include="Lib_GHI_Hardware_SignalGenerator.cpp" />
+<Compile Include="Lib_GHI_Hardware_SoftwareI2CBus_mshl.cpp" />
+<HFile Include="Lib_GHI_Hardware_SoftwareI2CBus.h" />
+<Compile Include="Lib_GHI_Hardware_SoftwareI2CBus.cpp" />
+<Compile Include="Lib_GHI_Hardware_Configuration__StartupLogo_mshl.cpp" />
+<HFile Include="Lib_GHI_Hardware_Configuration__StartupLogo.h" />
+<Compile Include="Lib_GHI_Hardware_Configuration__StartupLogo.cpp" />
+</ItemGroup>
+<Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
+</Project>

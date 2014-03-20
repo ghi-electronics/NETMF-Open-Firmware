@@ -6,7 +6,7 @@
 
 #include <tinyhal.h>
 #include "AT91_LCD.h"
-#include <..\DeviceCode\GHI\include\OSHW_Configuration.h>
+#include <..\DeviceCode\GHI\include\Configuration.h>
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -17,55 +17,55 @@
 #define DEBUG_TRACE (TRACE_ALWAYS)
 
 
-OSHW_Configurations_Structure		OSHW_Configurations;
+//Configurations_Structure		Configurations; // I might need this one instead of the one in Configurations.cpp
 
 //////////////////////////////////////////////////////////////////////////////
 static UINT32* AT91_LCD_Screen_Buffer = (UINT32*)0x20F00000;
 
 BOOL AT91_LCD_Driver::Initialize(DISPLAY_CONTROLLER_CONFIG& config)
 {
-	OSHW_Configuration_Read();
+	Configuration_Read();
 
-	 if(OSHW_Configurations.lcd.PixelClockRateKHz == 0x0)
+	 if(Configurations.lcd.PixelClockRateKHz == 0x0)
 	 {
       // ugly hack to prevent system crash!
-           if( OSHW_Configurations.lcd.Width >=64)
-                config.Width						= OSHW_Configurations.lcd.Width;
-           if( OSHW_Configurations.lcd.Height >=64)
-                config.Height						= OSHW_Configurations.lcd.Height;
+           if( Configurations.lcd.Width >=64)
+                config.Width						= Configurations.lcd.Width;
+           if( Configurations.lcd.Height >=64)
+                config.Height						= Configurations.lcd.Height;
 		
            return true;
 	 }
 
-	 if(OSHW_Configurations.lcd.Magic == 0xdeadbeef)
+	 if(Configurations.lcd.Magic == 0xdeadbeef)
 	 {
-		 config.Width						= OSHW_Configurations.lcd.Width;
-		 config.Height						= OSHW_Configurations.lcd.Height;
-		 config.PixelPolarity				= OSHW_Configurations.lcd.PixelPolarity;
-		 config.FirstLineMarkerPolarity		= OSHW_Configurations.lcd.HorizontalSyncPolarity;
-		 config.LinePulsePolarity			= OSHW_Configurations.lcd.VerticalSyncPolarity;
-		 config.OutputEnablePolarity			= OSHW_Configurations.lcd.OutputEnablePolarity;
+		 config.Width						= Configurations.lcd.Width;
+		 config.Height						= Configurations.lcd.Height;
+		 config.PixelPolarity				= Configurations.lcd.PixelPolarity;
+		 config.FirstLineMarkerPolarity		= Configurations.lcd.HorizontalSyncPolarity;
+		 config.LinePulsePolarity			= Configurations.lcd.VerticalSyncPolarity;
+		 config.OutputEnablePolarity			= Configurations.lcd.OutputEnablePolarity;
 
 		 // Pixel Clock Divider is calculated by this equation Frequency = System Clock / ((Divider + 1) * 2)
 		 // The following equation should calculate Pixel Clock Divider
-		 // Divider = ((SYSTEM_PERIPHERAL_CLOCK_HZ / 2) - (OSHW_Configurations.lcd.PixelClockRateKHz * 1000)) / (OSHW_Configurations.lcd.PixelClockRateKHz * 1000);
-		 if(OSHW_Configurations.lcd.PixelClockRateKHz > 25000) // 25000 KHz is maximum supported frequency
-			 OSHW_Configurations.lcd.PixelClockRateKHz = 25000;
+		 // Divider = ((SYSTEM_PERIPHERAL_CLOCK_HZ / 2) - (Configurations.lcd.PixelClockRateKHz * 1000)) / (Configurations.lcd.PixelClockRateKHz * 1000);
+		 if(Configurations.lcd.PixelClockRateKHz > 25000) // 25000 KHz is maximum supported frequency
+			 Configurations.lcd.PixelClockRateKHz = 25000;
 
-		 config.PixelClockDivider			= ((SYSTEM_PERIPHERAL_CLOCK_HZ / 2) - (OSHW_Configurations.lcd.PixelClockRateKHz * 1000)) / (OSHW_Configurations.lcd.PixelClockRateKHz * 1000);
+		 config.PixelClockDivider			= ((SYSTEM_PERIPHERAL_CLOCK_HZ / 2) - (Configurations.lcd.PixelClockRateKHz * 1000)) / (Configurations.lcd.PixelClockRateKHz * 1000);
 
-		 if(((SYSTEM_PERIPHERAL_CLOCK_HZ / 2) - (OSHW_Configurations.lcd.PixelClockRateKHz * 1000)) % (OSHW_Configurations.lcd.PixelClockRateKHz * 1000) > 0)
+		 if(((SYSTEM_PERIPHERAL_CLOCK_HZ / 2) - (Configurations.lcd.PixelClockRateKHz * 1000)) % (Configurations.lcd.PixelClockRateKHz * 1000) > 0)
 			 config.PixelClockDivider += 1;
 
 		 if (config.PixelClockDivider > 511) // Pixel clock divider cannot exceed a 9 bit number which is 511 in Decimal.
 			 config.PixelClockDivider = 511;
 
-		 config.HorizontalSyncPulseWidth		= OSHW_Configurations.lcd.HorizontalSyncPulseWidth;
-		 config.HorizontalSyncWait1			= OSHW_Configurations.lcd.HorizontalBackPorch;
-		 config.HorizontalSyncWait2			= OSHW_Configurations.lcd.HorizontalFrontPorch;
-		 config.VerticalSyncPulseWidth		= OSHW_Configurations.lcd.VerticalSyncPulseWidth;
-		 config.VerticalSyncWait1			= OSHW_Configurations.lcd.VerticalBackPorch;
-		 config.VerticalSyncWait2			= OSHW_Configurations.lcd.VerticalFrontPorch;
+		 config.HorizontalSyncPulseWidth		= Configurations.lcd.HorizontalSyncPulseWidth;
+		 config.HorizontalSyncWait1			= Configurations.lcd.HorizontalBackPorch;
+		 config.HorizontalSyncWait2			= Configurations.lcd.HorizontalFrontPorch;
+		 config.VerticalSyncPulseWidth		= Configurations.lcd.VerticalSyncPulseWidth;
+		 config.VerticalSyncWait1			= Configurations.lcd.VerticalBackPorch;
+		 config.VerticalSyncWait2			= Configurations.lcd.VerticalFrontPorch;
 	 }
 
 
@@ -86,7 +86,7 @@ BOOL AT91_LCD_Driver::Initialize(DISPLAY_CONTROLLER_CONFIG& config)
     /* Enable CS for LCD */
     //CPU_GPIO_EnableOutputPin((GPIO_PIN)AT91_LCDC_CS, 0);
 
-	if(OSHW_Configurations.lcd.OutputEnableIsFixed)
+	if(Configurations.lcd.OutputEnableIsFixed)
 		CPU_GPIO_EnableOutputPin(AT91_LCDDEN, config.OutputEnablePolarity);
 	else
 		CPU_GPIO_DisablePin(AT91_LCDDEN, RESISTOR_DISABLED, 0, GPIO_ALT_MODE_1);
@@ -229,9 +229,9 @@ BOOL AT91_LCD_Driver::Uninitialize()
 
 BOOL AT91_LCD_Driver::Enable(BOOL fEnable)
 {
-	OSHW_Configuration_Read();
+	Configuration_Read();
 
-	if(OSHW_Configurations.lcd.PixelClockRateKHz == 0x0)
+	if(Configurations.lcd.PixelClockRateKHz == 0x0)
 		return true;
 //////////////////////////////////////////////////
 

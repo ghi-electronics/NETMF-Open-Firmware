@@ -70,32 +70,45 @@
   <Import Project="$(SPOCLIENT)\Framework\Features\SSL_Open.featureproj" />
 
   <ItemGroup>
-    <InteropFeature Include="GHI_OSHW_Native" />
-    <InteropFeature Include="GHI_OSHW_Hardware" />
+    <!--<InteropFeature Include="GHI_OSHW_Native" />-->
+    <!--<InteropFeature Include="GHI_OSHW_Hardware" />-->
+    <InteropFeature Include="GHI_Hardware" />
   </ItemGroup>
 
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Interop.Settings" />
 
   <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Libraries\GHI.Hardware\dotNetMF.proj" />
+    <DriverLibs Include="GHI_Hardware.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <DriverLibs Include="Configuration.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\Configuration\dotNetMF.proj" />
+  </ItemGroup>
+  <!--<ItemGroup>
     <DriverLibs Include="GHI_OSHW_Native.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\libraries\GHI.OSHW.Native\Native\dotNetMF.proj" />
-  </ItemGroup>
-  <ItemGroup>
+  </ItemGroup>-->
+  <!--<ItemGroup>
     <DriverLibs Include="GHI_OSHW_Hardware.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\libraries\GHI.OSHW.Hardware\Native\dotNetMF.proj" />
-  </ItemGroup>
-  <ItemGroup>
+  </ItemGroup>-->
+  <!--<ItemGroup>
     <DriverLibs Include="GHI_OSHW_StorageDev.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\StorageDev\dotNetMF.proj" />
-  </ItemGroup>
-  <ItemGroup>
+  </ItemGroup>-->
+  <!--<ItemGroup>
     <DriverLibs Include="GHI_OSHW_Configuration.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Configuration\dotNetMF.proj" />
-  </ItemGroup>
-  <ItemGroup>
+  </ItemGroup>-->
+  <!--<ItemGroup>
     <DriverLibs Include="GHI_OSHW_BitmapConverter.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\BitmapConverter\dotNetMF.proj" />
-  </ItemGroup>
+  </ItemGroup>-->
+  <!--<ItemGroup>
+    <DriverLibs Include="GHI_OSHW_SoftwareI2C.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\SoftwareI2C\dotNetMF.proj" />
+  </ItemGroup>-->
 
   <ItemGroup>
     <DriverLibs Include="MFUpdate_PAL_stub.$(LIB_EXT)" />
@@ -585,11 +598,11 @@
   </ItemGroup>
   <ItemGroup>
     <DriverLibs Include="sockets_hal_sockets_lwIP.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\lwip_1_3_2\src\dotnetmf_sockets.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\LWIP\src\dotnetmf_sockets.proj" />
   </ItemGroup>
   <ItemGroup>
     <DriverLibs Include="sockets_hal_DHCP_LWIP.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\lwip_1_3_2\src\dotnetmf_dhcp.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\LWIP\src\dotnetmf_dhcp.proj" />
   </ItemGroup>
   <ItemGroup>
     <DriverLibs Include="sockets_lwIP_pal.$(LIB_EXT)" />
@@ -601,11 +614,11 @@
   </ItemGroup>
   <ItemGroup>
     <DriverLibs Include="sockets_hal_tcp_lwIP.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\lwip_1_3_2\src\dotnetmf_tcp.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\LWIP\src\dotnetmf_tcp.proj" />
   </ItemGroup>
   <ItemGroup>
     <DriverLibs Include="sockets_hal_udp_lwIP.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\lwip_1_3_2\src\dotnetmf_udp.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\LWIP\src\dotnetmf_udp.proj" />
   </ItemGroup>
   <ItemGroup>
     <DriverLibs Include="ETHERNET_enc28j60_lwip.$(LIB_EXT)" />
@@ -632,16 +645,6 @@
   </ItemGroup>
 
 <!-- ********************************************************************************************************************** -->
-
-  <ItemGroup>
-    <DriverLibs Include="GHI_OSHW_SoftwareI2C.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\SoftwareI2C\dotNetMF.proj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <DriverLibs Include="GHI_OSHW_StorageDev.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\StorageDev\dotNetMF.proj" />
-  </ItemGroup>
 
   <ItemGroup>
     <DriverLibs Include="Network_Config_HAL_FEZ_Hydra.$(LIB_EXT)" />
