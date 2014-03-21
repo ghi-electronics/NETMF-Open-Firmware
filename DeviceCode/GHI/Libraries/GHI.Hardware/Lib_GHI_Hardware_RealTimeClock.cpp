@@ -70,6 +70,7 @@ bool InitializeCrystal_32768()
 		//Debug.Print("The slow clock is already the external 32.768kHz crystal. ");
 		return true;
 	}
+
 	tmp = SCKCR;
 	//Page 270
 	//Enable the 32,768 Hz oscillator by setting the bit OSC32EN to 1.
@@ -122,18 +123,18 @@ void RealTimeClock::NativeSetTime( INT32 year, INT32 month, INT32 day, INT32 day
 	UINT32 Tens = 0;
 	UINT32 Ones = 0;
 
-	RTC_CR = 0x2;
-	
-	while ((RTC_SR & 0x1) == 0) ;
-	
-	RTC_SCCR = 0x1;
+	RTC_CR = 0x2; // Sets the Calander to write mode.
+	while ((RTC_SR & 0x1) == 0); // Checks to see if the calander mode is ready to write.
+	RTC_SCCR = 0x1; // Once acknowledged, the acknowledge bit is cleared.
 
-	while ((RTC_SR & 0x4) == 0) ;
+	while ((RTC_SR & 0x4) == 0);
+
 	if ((year < 1900) || (year > 2099) || (month < 1) || (month > 12) || (day < 1) || (day > 31))
 	{
 		hr = CLR_E_OUT_OF_RANGE;
 		return;
 	}
+
 	if (year < 2000)
 	{
 		CalenderRegister |= ((0x1 << 4) | 0x9);
@@ -144,6 +145,7 @@ void RealTimeClock::NativeSetTime( INT32 year, INT32 month, INT32 day, INT32 day
 		CalenderRegister |= ((0x2 << 4) | 0x0);
 		LowerHundredYears = year - 2000;
 	}
+
 	// Add year
 	BinaryCodedDecimalExtract(LowerHundredYears, Tens, Ones);
 	CalenderRegister |= (UINT32)((Tens << 12) | (Ones << 8));
@@ -159,9 +161,13 @@ void RealTimeClock::NativeSetTime( INT32 year, INT32 month, INT32 day, INT32 day
 
 	// Write Calender to register
 	RTC_CALR = CalenderRegister;
+
+	while ((RTC_SR & 0x4) == 0);
+	RTC_SCCR = 0x4; // Clears the flag that the proper time has passed.
+
 	//HAL_Time_Sleep_MicroSeconds(1000000);
 	TimeRegister = 0;
-	RTC_CR |= (1 << 0);
+	RTC_CR = 0x1;
 	while ((TimeRegister & 0x1) == 0)
 	{
 		TimeRegister = RTC_SR;

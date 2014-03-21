@@ -620,14 +620,14 @@
     <DriverLibs Include="sockets_hal_udp_lwIP.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\LWIP\src\dotnetmf_udp.proj" />
   </ItemGroup>
-  <ItemGroup>
-    <DriverLibs Include="ETHERNET_enc28j60_lwip.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\Ethernet\enc28J60_lwip\dotNetMF.proj" />
-  </ItemGroup>
   <!--<ItemGroup>
     <DriverLibs Include="ETHERNET_enc28j60_lwip.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Ethernet\enc28J60_lwip\dotNetMF.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\Ethernet\enc28J60_lwip\dotNetMF.proj" />
   </ItemGroup>-->
+  <ItemGroup>
+    <DriverLibs Include="ETHERNET_enc28j60_lwip.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Ethernet\enc28J60_lwip\dotNetMF.proj" />
+  </ItemGroup>
   <ItemGroup>
     <DriverLibs Include="ETHERNET_loopback_lwip.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Ethernet\Loopback_lwip\dotNetMF.proj" />
