@@ -119,13 +119,16 @@ void lwip_network_uptime_completion(void *arg)
 
     if(status != LwipNetworkStatus)
     {        
-        if(status)
-        {
-            tcpip_callback((sys_timeout_handler)netif_set_link_up, (void*)pNetIf);
-            tcpip_callback((sys_timeout_handler)netif_set_up, (void*)pNetIf);
+		if(status)
+		{
+			BOOL fDhcpStarted = (0 != (pNetIf->flags & NETIF_FLAG_DHCP));
+			if(!fDhcpStarted)
+				dhcp_start( pNetIf );
+			tcpip_callback((sys_timeout_handler)netif_set_link_up, (void*)pNetIf);
+			tcpip_callback((sys_timeout_handler)netif_set_up, (void*)pNetIf);
 
-            Network_PostEvent( NETWORK_EVENT_TYPE__AVAILABILITY_CHANGED, NETWORK_EVENT_FLAGS_IS_AVAILABLE );
-        }
+			Network_PostEvent( NETWORK_EVENT_TYPE__AVAILABILITY_CHANGED, NETWORK_EVENT_FLAGS_IS_AVAILABLE );
+		}
         else
         {
             tcpip_callback((sys_timeout_handler)netif_set_link_down, (void*)pNetIf);
@@ -218,7 +221,8 @@ int ENC28J60_LWIP_Driver::Open( ENC28J60_LWIP_DRIVER_CONFIG* config, int index )
 
     netif_set_default( pNetIF );
 
-    LwipNetworkStatus = enc28j60_get_link_status(&config->SPI_Config);
+    //LwipNetworkStatus = enc28j60_get_link_status(&config->SPI_Config);
+    LwipNetworkStatus = FALSE;
 
     /* Initialize the continuation routine for the driver interrupt and receive */    
     InitContinuations( pNetIF );
