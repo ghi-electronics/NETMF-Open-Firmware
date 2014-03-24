@@ -85,6 +85,10 @@
     <DriverLibs Include="Configuration.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\Configuration\dotNetMF.proj" />
   </ItemGroup>
+  <ItemGroup>
+    <DriverLibs Include="GHI_OSHW_SoftwareI2C.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\SoftwareI2C\dotNetMF.proj" />
+  </ItemGroup>
   <!--<ItemGroup>
     <DriverLibs Include="GHI_OSHW_Native.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\libraries\GHI.OSHW.Native\Native\dotNetMF.proj" />
@@ -105,10 +109,7 @@
     <DriverLibs Include="GHI_OSHW_BitmapConverter.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\BitmapConverter\dotNetMF.proj" />
   </ItemGroup>-->
-  <!--<ItemGroup>
-    <DriverLibs Include="GHI_OSHW_SoftwareI2C.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\SoftwareI2C\dotNetMF.proj" />
-  </ItemGroup>-->
+
 
   <ItemGroup>
     <DriverLibs Include="MFUpdate_PAL_stub.$(LIB_EXT)" />

@@ -14,11 +14,27 @@
 #include "Lib.h"
 #include "Lib_GHI_Hardware_SoftwareI2CBus.h"
 
+#include <..\GHI\Include\GHI_OSHW_HAL.h>
+
 using namespace GHI::Hardware;
 
-INT8 SoftwareI2CBus::NativeWriteRead( INT32 param0, INT32 param1, UINT8 param2, CLR_RT_TypedArray_UINT8 param3, INT32 param4, INT32 param5, CLR_RT_TypedArray_UINT8 param6, INT32 param7, INT32 param8, INT32 * param9, INT32 * param10, HRESULT &hr )
+INT8 SoftwareI2CBus::NativeWriteRead( INT32 clockPin, INT32 dataPin, UINT8 address, CLR_RT_TypedArray_UINT8 writeBuffer, INT32 writeOffset, INT32 writeLength, CLR_RT_TypedArray_UINT8 readBuffer, INT32 readOffset, INT32 readLength, INT32 * numWritten, INT32 * numRead, HRESULT &hr )
 {
-    INT8 retVal = 0; 
-    return retVal;
+	if( (writeOffset < 0) || (writeLength < 0) || ((writeOffset + writeLength) > writeBuffer.GetSize()) ||
+		(readOffset < 0) || (readLength < 0) || ((readOffset + readLength) > readBuffer.GetSize()) 
+		)
+	{
+		hr = CLR_E_INDEX_OUT_OF_RANGE;
+		return FALSE;
+	}
+
+	GHI_OSHW_HAL_SoftwareI2C i2c;
+	i2c.scl = clockPin;
+	i2c.sda = dataPin;
+	i2c.clockSpeed = 100;
+	i2c.address = address;
+
+	return GHI_OSHW_HAL_SoftwareI2C_WriteRead(&i2c, writeBuffer.GetBuffer() + writeOffset, writeLength, readBuffer.GetBuffer() + readOffset, readLength, (UINT32*)numWritten, (UINT32*)numRead);
+
 }
 
