@@ -24,7 +24,8 @@
 #if defined(PLATFORM_ARM_FEZ_Hydra)
 #define HAL_SYSTEM_NAME                 "FEZ_Hydra"
 #define PLATFORM_ARM_SAM9RL64_ANY        1
-    
+
+#define GHI_HYDRA_MODEL 0x0B
 //
 // processor and features
 //
@@ -47,9 +48,9 @@
 // Solution info
 //
 #define GHI_VERSION_MAJOR 4
-#define GHI_VERSION_MINOR 2
-#define GHI_VERSION_BUILD 6
-#define GHI_VERSION_REVISION 2
+#define GHI_VERSION_MINOR 3
+#define GHI_VERSION_BUILD 0
+#define GHI_VERSION_REVISION 0
 #define GHIOEMSTRING "Copyright (C) GHI Electronics, LLC"
 
 //
