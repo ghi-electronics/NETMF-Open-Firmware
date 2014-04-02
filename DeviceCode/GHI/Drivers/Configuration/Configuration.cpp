@@ -16,6 +16,17 @@ BOOL Configuration_Write()
 	return HAL_CONFIG_BLOCK::UpdateBlockWithName(CONFIGURATION_DRIVER_NAME, &Configurations, sizeof(Configurations_Structure), TRUE);
 }
 
+GPAL_ERROR Configuration_LCD_Get(Configuration_LCD_Structure *config)
+{
+	if (!Configuration_Read())
+		return -1;
+
+	memcpy(config, &Configurations.lcd, sizeof(Configuration_LCD_Structure));
+
+	return S_OK;
+}
+
+
 GPAL_ERROR Configuration_LCD_Set(Configuration_LCD_Structure *config, BOOL *didChange)
 {
 	*didChange = FALSE;

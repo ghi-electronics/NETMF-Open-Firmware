@@ -52,5 +52,6 @@ BOOL Configuration_Read();
 BOOL Configuration_Write();
 
 GPAL_ERROR Configuration_LCD_Set(Configuration_LCD_Structure *config, BOOL *didChange);
+GPAL_ERROR Configuration_LCD_Get(Configuration_LCD_Structure *config);
 
 #endif // _OSH_GPAL_CONFIG_H_
