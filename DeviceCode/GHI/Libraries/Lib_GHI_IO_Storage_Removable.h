@@ -30,10 +30,9 @@ namespace GHI
                 // Declaration of stubs. These functions are implemented by Interop code developers
                 static void NativeConstructor( CLR_RT_HeapBlock* pMngObj, UINT32 param0, UINT8 param1, UINT8 param2, HRESULT &hr );
                 static void NativeFinalize( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
-                static void NativeMount( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
+                static void NativeMount( CLR_RT_HeapBlock* pMngObj, INT32 param0, HRESULT &hr );
                 static void NativeUnmount( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
                 static INT8 IsSDCardPresent( HRESULT &hr );
-                static void NativeSetSDClockSpeed( INT32 param0, HRESULT &hr );
                 static UINT32 NativeFindId( LPCSTR param0, HRESULT &hr );
             };
         }

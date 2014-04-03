@@ -28,9 +28,9 @@ void Removable::NativeFinalize( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
 {
 }
 
-void Removable::NativeMount( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
+void Removable::NativeMount( CLR_RT_HeapBlock* pMngObj, INT32 speed, HRESULT &hr )
 {
-	hr = GHI_OSHW_Mount(-1);
+	hr = GHI_OSHW_Mount(speed);
 }
 
 void Removable::NativeUnmount( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
@@ -43,12 +43,6 @@ INT8 Removable::IsSDCardPresent( HRESULT &hr )
 	hr = CLR_E_NOT_SUPPORTED;
 	
     return 0;
-}
-
-void Removable::NativeSetSDClockSpeed( INT32 param0, HRESULT &hr )
-{
-	GHI_OSHW_Unmount();
-	hr = GHI_OSHW_Mount(param0);
 }
 
 UINT32 Removable::NativeFindId( LPCSTR param0, HRESULT &hr )

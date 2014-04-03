@@ -50,7 +50,7 @@ HRESULT Library_Lib_GHI_IO_Storage_Removable::NativeFinalize___VOID( CLR_RT_Stac
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_IO_Storage_Removable::NativeMount___VOID( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_IO_Storage_Removable::NativeMount___VOID__I4( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
@@ -58,7 +58,10 @@ HRESULT Library_Lib_GHI_IO_Storage_Removable::NativeMount___VOID( CLR_RT_StackFr
 
         FAULT_ON_NULL(pMngObj);
 
-        Removable::NativeMount( pMngObj,  hr );
+        INT32 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 1, param0 ) );
+
+        Removable::NativeMount( pMngObj,  param0, hr );
         TINYCLR_CHECK_HRESULT( hr );
     }
     TINYCLR_NOCLEANUP();
@@ -86,19 +89,6 @@ HRESULT Library_Lib_GHI_IO_Storage_Removable::IsSDCardPresent___STATIC__BOOLEAN(
         TINYCLR_CHECK_HRESULT( hr );
         SetResult_INT8( stack, retVal );
 
-    }
-    TINYCLR_NOCLEANUP();
-}
-
-HRESULT Library_Lib_GHI_IO_Storage_Removable::NativeSetSDClockSpeed___STATIC__VOID__I4( CLR_RT_StackFrame& stack )
-{
-    TINYCLR_HEADER(); hr = S_OK;
-    {
-        INT32 param0;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 0, param0 ) );
-
-        Removable::NativeSetSDClockSpeed( param0, hr );
-        TINYCLR_CHECK_HRESULT( hr );
     }
     TINYCLR_NOCLEANUP();
 }
