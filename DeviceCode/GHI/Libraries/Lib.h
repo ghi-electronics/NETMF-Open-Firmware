@@ -209,10 +209,9 @@ struct Library_Lib_GHI_IO_Storage_Removable
 
     TINYCLR_NATIVE_DECLARE(NativeConstructor___VOID__U4__U1__U1);
     TINYCLR_NATIVE_DECLARE(NativeFinalize___VOID);
-    TINYCLR_NATIVE_DECLARE(NativeMount___VOID);
+    TINYCLR_NATIVE_DECLARE(NativeMount___VOID__I4);
     TINYCLR_NATIVE_DECLARE(NativeUnmount___VOID);
     TINYCLR_NATIVE_DECLARE(IsSDCardPresent___STATIC__BOOLEAN);
-    TINYCLR_NATIVE_DECLARE(NativeSetSDClockSpeed___STATIC__VOID__I4);
     TINYCLR_NATIVE_DECLARE(NativeFindId___STATIC__U4__STRING);
 
     //--//

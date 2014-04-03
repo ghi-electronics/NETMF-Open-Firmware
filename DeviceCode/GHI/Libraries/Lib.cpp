@@ -230,13 +230,12 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
+    NULL,
     Library_Lib_GHI_IO_Storage_Removable::NativeConstructor___VOID__U4__U1__U1,
     Library_Lib_GHI_IO_Storage_Removable::NativeFinalize___VOID,
-    Library_Lib_GHI_IO_Storage_Removable::NativeMount___VOID,
+    Library_Lib_GHI_IO_Storage_Removable::NativeMount___VOID__I4,
     Library_Lib_GHI_IO_Storage_Removable::NativeUnmount___VOID,
-    NULL,
     Library_Lib_GHI_IO_Storage_Removable::IsSDCardPresent___STATIC__BOOLEAN,
-    Library_Lib_GHI_IO_Storage_Removable::NativeSetSDClockSpeed___STATIC__VOID__I4,
     Library_Lib_GHI_IO_Storage_Removable::NativeFindId___STATIC__U4__STRING,
     NULL,
     NULL,
@@ -512,7 +511,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Hardware =
 {
     "GHI.Hardware", 
-    0x558E2ECD,
+    0x9CA193EA,
     method_lookup
 };
 
