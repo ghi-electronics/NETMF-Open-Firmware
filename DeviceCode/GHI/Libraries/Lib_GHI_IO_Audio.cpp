@@ -18,5 +18,6 @@ using namespace GHI::IO;
 
 void Audio::NativePlayPCM( UINT8 param0, CLR_RT_TypedArray_UINT8 param1, INT32 param2, INT32 param3, INT32 param4, HRESULT &hr )
 {
+	hr = CLR_E_NOT_SUPPORTED;
 }
 

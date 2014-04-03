@@ -14,13 +14,17 @@
 #include "Lib.h"
 #include "Lib_GHI_Utilities_Bitmaps.h"
 
+#include <GHI\Include\GHI_OSHW_PAL.h>
+
 using namespace GHI::Utilities;
 
-void Bitmaps::NativeConvert( CLR_RT_TypedArray_UINT8 param0, CLR_RT_TypedArray_UINT8 param1, UINT8 param2, HRESULT &hr )
+void Bitmaps::NativeConvert( CLR_RT_TypedArray_UINT8 bitmap, CLR_RT_TypedArray_UINT8 output, UINT8 bpp, HRESULT &hr )
 {
+	hr = OSHW_PAL_Bitmap_ConvertBPP(bitmap.GetBuffer(), bitmap.GetSize(), output.GetBuffer(), output.GetSize(), bpp);
 }
 
 void Bitmaps::NativeConvertToFile( CLR_RT_TypedArray_UINT8 param0, INT32 param1, INT32 param2, CLR_RT_TypedArray_UINT8 param3, HRESULT &hr )
 {
+	hr = CLR_E_NOT_SUPPORTED;
 }
 

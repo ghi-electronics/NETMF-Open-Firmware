@@ -18,13 +18,15 @@ using namespace GHI::Utilities;
 
 UINT16 Crc::NativeCrc16( CLR_RT_TypedArray_UINT8 param0, INT32 param1, INT32 param2, UINT16 param3, HRESULT &hr )
 {
-    UINT16 retVal = 0; 
-    return retVal;
+	hr = CLR_E_NOT_SUPPORTED;
+	
+    return 0;
 }
 
 UINT32 Crc::NativeCrc32( CLR_RT_TypedArray_UINT8 param0, INT32 param1, INT32 param2, UINT32 param3, HRESULT &hr )
 {
-    UINT32 retVal = 0; 
-    return retVal;
+	hr = CLR_E_NOT_SUPPORTED;
+	
+    return 0;
 }
 

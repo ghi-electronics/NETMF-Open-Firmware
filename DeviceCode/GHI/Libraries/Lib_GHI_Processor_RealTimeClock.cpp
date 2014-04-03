@@ -125,8 +125,11 @@ void RealTimeClock::NativeSetTime( INT32 year, INT32 month, INT32 day, INT32 day
 
 	RTC_CR = 0x2; // Sets the Calander to write mode.
 	while ((RTC_SR & 0x1) == 0); // Checks to see if the calander mode is ready to write.
+	
+	
 	RTC_SCCR = 0x1; // Once acknowledged, the acknowledge bit is cleared.
-
+	
+	
 	while ((RTC_SR & 0x4) == 0);
 
 	if ((year < 1900) || (year > 2099) || (month < 1) || (month > 12) || (day < 1) || (day > 31))
@@ -162,9 +165,11 @@ void RealTimeClock::NativeSetTime( INT32 year, INT32 month, INT32 day, INT32 day
 	// Write Calender to register
 	RTC_CALR = CalenderRegister;
 
+	
 	while ((RTC_SR & 0x4) == 0);
 	RTC_SCCR = 0x4; // Clears the flag that the proper time has passed.
-
+	
+	
 	//HAL_Time_Sleep_MicroSeconds(1000000);
 	TimeRegister = 0;
 	RTC_CR = 0x1;

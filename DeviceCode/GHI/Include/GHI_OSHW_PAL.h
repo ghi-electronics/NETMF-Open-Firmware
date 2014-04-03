@@ -8,6 +8,7 @@
 #define _GHI_OSHW_PAL_H_
 
 #include <tinyhal.h>
+#include <TinyCLR_Interop.h>
 
 typedef UINT32 OSHW_PAL_ERROR;
 

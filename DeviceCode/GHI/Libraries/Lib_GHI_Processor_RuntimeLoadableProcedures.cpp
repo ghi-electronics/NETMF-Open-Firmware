@@ -18,15 +18,18 @@ using namespace GHI::Processor;
 
 void RuntimeLoadableProcedures::NativeInitializeZeroRegion( UINT32 param0, UINT32 param1, HRESULT &hr )
 {
+	hr = CLR_E_NOT_SUPPORTED;
 }
 
 void RuntimeLoadableProcedures::NativeLoadELF( CLR_RT_TypedArray_UINT8 param0, UINT32 * param1, UINT32 * param2, UINT32 * param3, HRESULT &hr )
 {
+	hr = CLR_E_NOT_SUPPORTED;
 }
 
 UINT32 RuntimeLoadableProcedures::NativeFindSymbolAddress( CLR_RT_TypedArray_UINT8 param0, LPCSTR param1, INT32 param2, HRESULT &hr )
 {
-    UINT32 retVal = 0; 
-    return retVal;
+	hr = CLR_E_NOT_SUPPORTED;
+	
+    return 0;
 }
 

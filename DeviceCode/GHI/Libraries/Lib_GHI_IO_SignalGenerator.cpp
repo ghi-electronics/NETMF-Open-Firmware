@@ -24,7 +24,6 @@ struct OC
 	UINT32 bufferIndex;
 	UINT32 bufferSize;
 	GPIO_PIN pin;
-	HAL_COMPLETION completion;
 	UINT8 repeat;
 	UINT8 currentState;
 	UINT8 isActive;
@@ -41,6 +40,7 @@ INT8 SignalGenerator::NativeConstructor(  CLR_RT_HeapBlock* pMngObj, INT8 param1
 	if(!oc)
 	{
 		private_free(oc);
+		hr = CLR_E_OUT_OF_MEMORY;
 		return 0;
 	}
 
@@ -92,9 +92,6 @@ void SignalGenerator::NativeDispose( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
 	if(!oc)
 		return;
 
-	if(oc->completion.IsLinked())
-		oc->completion.Abort();
-
 	CPU_GPIO_DisablePin(oc->pin, RESISTOR_PULLUP, 0, GPIO_ALT_PRIMARY);
 
 	if (oc->buffer)
@@ -125,12 +122,31 @@ INT8 SignalGenerator::NativeIsActive( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
 
 void SignalGenerator::NativeSet( CLR_RT_HeapBlock* pMngObj, INT8 param0, HRESULT &hr )
 {
+	GLOBAL_LOCK(irq);
+
+	if(Get_disposed(pMngObj))
+	{
+		hr = CLR_E_OBJECT_DISPOSED;
+		return;
+	}
+
+	OC *oc = (OC*)Get_nativePointer(pMngObj);
+	if(!oc)
+	{
+		hr = CLR_E_ARGUMENT_NULL;
+		return;
+	}
+
+	oc->isActive = FALSE;
+
+	CPU_GPIO_SetPinState(oc->pin, param0);
 }
 
 INT8 SignalGenerator::NativeSet( CLR_RT_HeapBlock* pMngObj, INT8 param0, CLR_RT_TypedArray_UINT32 param1, INT32 param2, INT32 param3, INT8 param4, HRESULT &hr )
 {
-    INT8 retVal = 0; 
-    return retVal;
+    hr = CLR_E_NOT_SUPPORTED;
+	
+    return 0;
 }
 
 void SignalGenerator::NativeSet( CLR_RT_HeapBlock* pMngObj, INT8 initialValue, CLR_RT_TypedArray_UINT32 timingsBuffer_us, INT32 offset, INT32 count, UINT32 lastBitHoldTime_us, INT8 disableInterrupts, UINT32 carrierFrequency_hz, HRESULT &hr )

@@ -18,5 +18,6 @@ using namespace GHI::Processor;
 
 void ApplicationProtection::NativeSetApplicationProtection( UINT8 param0, CLR_RT_TypedArray_UINT8 param1, HRESULT &hr )
 {
+	hr = CLR_E_NOT_SUPPORTED;
 }
 

@@ -18,25 +18,26 @@ using namespace GHI::Processor;
 
 UINT8 Watchdog::NativeLastResetCause( HRESULT &hr )
 {
-    UINT8 retVal = 0; 
-    return retVal;
+    return 0;
 }
 
 UINT32 Watchdog::NativeGetMaxTimeout( HRESULT &hr )
 {
-    UINT32 retVal = 0; 
-    return retVal;
+    return 0;
 }
 
 void Watchdog::NativeEnable( UINT32 param0, HRESULT &hr )
 {
+	hr = CLR_E_NOT_SUPPORTED;
 }
 
 void Watchdog::NativeDisable( HRESULT &hr )
 {
+	hr = CLR_E_NOT_SUPPORTED;
 }
 
 void Watchdog::NativeResetCounter( HRESULT &hr )
 {
+	hr = CLR_E_NOT_SUPPORTED;
 }
 

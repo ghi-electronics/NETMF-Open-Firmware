@@ -1,4 +1,4 @@
-;#<FEEDBACK># ARM Linker, 4.1 [Build 713]: Last Updated: Thu Apr 03 09:59:07 2014
+;#<FEEDBACK># ARM Linker, 4.1 [Build 713]: Last Updated: Thu Apr 03 11:54:18 2014
 ;VERSION 0.2
 ;FILE ARM9_bootstrap.obj
 ;FILE ARM9_mmu_functions.obj
@@ -7,7 +7,6 @@ _Z16CPU_IsMMUEnabledv <= USED 0
 ;FILE AT91SAM9_Bootstrap.obj
 ;FILE AT91_AIC.obj
 _ZN15AT91_AIC_Driver14InterruptStateEj <= USED 0
-_ZN15AT91_AIC_Driver15InterruptEnableEj <= USED 0
 _ZN15AT91_AIC_Driver16InterruptDisableEj <= USED 0
 ;FILE AT91_Analog_functions.obj
 ;FILE AT91_Cache.obj
@@ -48,7 +47,6 @@ _ZN17AT91_USBHS_Driver17GetInterruptStateEv <= USED 0
 _ZN15AT91_SPI_Driver3ISREPv <= USED 0
 ;FILE AT91_intc_functions.obj
 _Z23CPU_INTC_InterruptStatej <= USED 0
-_Z24CPU_INTC_InterruptEnablej <= USED 0
 _Z25CPU_INTC_InterruptDisablej <= USED 0
 ;FILE AT91_time_functions.obj
 Time_CurrentTicks <= USED 0
@@ -72,6 +70,7 @@ _Z9CharReadyv <= USED 0
 _ZN22CLR_RT_BinaryFormatter11TypeHandler11GetDataTypeEP21CLR_RT_TypeDescriptor <= USED 0
 _ZN22CLR_RT_BinaryFormatter5State9FindHintsERNS_27SerializationHintsAttributeERK23CLR_RT_TypeDef_Instance <= USED 0
 ;FILE Bitmap.obj
+;FILE BitmapConvertBPP.obj
 ;FILE Bl_AddDevices_FEZ_Hydra.obj
 ;FILE CLRStartup.obj
 _Z7ClrExitv <= USED 0
@@ -198,6 +197,7 @@ _ZN25CLR_RT_HeapBlock_EndPoint15ExtractInstanceER16CLR_RT_HeapBlockRPS_ <= USED 
 _ZN25CLR_RT_HeapBlock_EndPoint17ReleaseWhenDeadExEv <= USED 0
 _ZN25CLR_RT_HeapBlock_EndPoint4Port7CompareERKS0_ <= USED 0
 ;FILE Random.obj
+;FILE SD_BL_driver.obj
 ;FILE Security_Pkcs11_fastcompile.obj
 ;FILE SerialDataFlash_driver.obj
 ;FILE Session.obj
@@ -222,6 +222,7 @@ _Z25CreateNativeEventInstanceR17CLR_RT_StackFrame <= USED 0
 _Z17Network_PostEventjj <= USED 0
 ;FILE Spot_time_fastcompile.obj
 ;FILE Spot_touch_fastcompile.obj
+;FILE StorageDev.obj
 ;FILE Time_driver.obj
 _ZN10TimeDriver16DateTimeToStringERKx <= USED 0
 _ZN10TimeDriver16DateTimeToStringERKxRPcRj <= USED 0
@@ -387,10 +388,8 @@ BIO_set_ex_data <= USED 0
 BIO_vfree <= USED 0
 ;FILE bio_md.obj
 ;FILE blockstoragelist.obj
-_ZN16BlockStorageList12RemoveDeviceEP18BlockStorageDevicej <= USED 0
 _ZN16BlockStorageList13GetNumDevicesEv <= USED 0
 _ZN18BlockStorageStream8IsErasedEj <= USED 0
-_ZNK15BlockDeviceInfo23PhysicalToSectorAddressEPK15BlockRegionInfoj <= USED 0
 ;FILE bn_add.obj
 ;FILE bn_asm.obj
 bn_mul_comba4 <= USED 0
@@ -930,10 +929,6 @@ tinyclr_ssl_lseek <= USED 0
 ;FILE font8x15.obj
 ;FILE fs.obj
 ;FILE fs_pal.obj
-_Z14FS_MountVolumePKcjjP18BlockStorageDevice <= USED 0
-_Z16FS_UnmountVolumeP18BlockStorageDevice <= USED 0
-_ZN20FileSystemVolumeList12RemoveVolumeEP16FileSystemVolumej <= USED 0
-_ZN20FileSystemVolumeList9AddVolumeEP16FileSystemVolumePKcjjP23STREAM_DRIVER_INTERFACEP27FILESYSTEM_DRIVER_INTERFACEP18BlockStorageDevicejj <= USED 0
 ;FILE gesture_driver.obj
 ;FILE gesture_functions.obj
 _Z20Gesture_ProcessPointjtttx <= USED 0
@@ -996,6 +991,9 @@ _ZN15LZWDecompressor5ResetEh <= USED 0
 EVP_DigestVerifyFinal <= USED 0
 EVP_DigestVerifyInit <= USED 0
 ;FILE m_wp.obj
+;FILE mci.obj
+_Z13MCI_CheckBlkeP3Mci <= USED 0
+_Z9MCI_CloseP3Mci <= USED 0
 ;FILE md4_dgst.obj
 MD4_Transform <= USED 0
 ;FILE md5_dgst.obj
@@ -1451,6 +1449,14 @@ RSA_set_method <= USED 0
 ;FILE rsa_sign.obj
 ;FILE rsa_ssl.obj
 ;FILE rsa_x931.obj
+;FILE sdmmc_mci.obj
+_Z11SD_SPI_InitP7_SdCardP8SdDriver <= USED 0
+_Z5Cmd32P7_SdCardt <= USED 0
+_Z5Cmd33P7_SdCardt <= USED 0
+_Z5Cmd38P7_SdCard <= USED 0
+_Z7SD_StopP7_SdCardP8SdDriver <= USED 0
+_Z8DecodeR1h <= USED 0
+_Z8DecodeR2h <= USED 0
 ;FILE seed.obj
 ;FILE seed_cbc.obj
 ;FILE seed_cfb.obj

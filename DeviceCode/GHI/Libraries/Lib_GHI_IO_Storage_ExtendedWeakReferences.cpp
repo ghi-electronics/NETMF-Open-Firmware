@@ -18,5 +18,6 @@ using namespace GHI::IO::Storage;
 
 void ExtendedWeakReferences::Flush( HRESULT &hr )
 {
+	hr = CLR_E_NOT_SUPPORTED;
 }
 

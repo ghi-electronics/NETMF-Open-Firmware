@@ -71,8 +71,6 @@
   <Import Project="$(SPOCLIENT)\Framework\Features\SSL_Open.featureproj" />
 
   <ItemGroup>
-    <!--<InteropFeature Include="GHI_OSHW_Native" />-->
-    <!--<InteropFeature Include="GHI_OSHW_Hardware" />-->
     <InteropFeature Include="GHI_Hardware" />
     <InteropFeature Include="GHI_Utilities_InternalEvent" />
   </ItemGroup>
@@ -95,26 +93,14 @@
     <DriverLibs Include="GHI_OSHW_SoftwareI2C.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\SoftwareI2C\dotNetMF.proj" />
   </ItemGroup>
-  <!--<ItemGroup>
-    <DriverLibs Include="GHI_OSHW_Native.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\libraries\GHI.OSHW.Native\Native\dotNetMF.proj" />
-  </ItemGroup>-->
-  <!--<ItemGroup>
-    <DriverLibs Include="GHI_OSHW_Hardware.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\libraries\GHI.OSHW.Hardware\Native\dotNetMF.proj" />
-  </ItemGroup>-->
-  <!--<ItemGroup>
+  <ItemGroup>
     <DriverLibs Include="GHI_OSHW_StorageDev.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\StorageDev\dotNetMF.proj" />
-  </ItemGroup>-->
-  <!--<ItemGroup>
-    <DriverLibs Include="GHI_OSHW_Configuration.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Configuration\dotNetMF.proj" />
-  </ItemGroup>-->
-  <!--<ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
     <DriverLibs Include="GHI_OSHW_BitmapConverter.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\BitmapConverter\dotNetMF.proj" />
-  </ItemGroup>-->
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\tinyclr\dotnetmf.proj" />
     <DriverLibs Include="ssl_types.$(LIB_EXT)" />

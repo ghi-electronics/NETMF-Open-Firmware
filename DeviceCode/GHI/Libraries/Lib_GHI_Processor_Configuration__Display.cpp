@@ -95,19 +95,15 @@ INT8 Configuration_Display::NativeSetLcdConfiguration( INT8 bootupMessages, UINT
 
 INT8 Configuration_Display::NativeSetSpiConfiguration( INT32 param0, INT32 param1, INT32 param2, INT32 param3, INT8 param4, INT8 param5, INT8 param6, INT32 param7, INT32 param8, INT32 param9, INT32 param10, INT32 param11, INT8 param12, HRESULT &hr )
 {
-    INT8 retVal = 0; 
-	
 	hr = CLR_E_NOT_SUPPORTED;
 	
-    return retVal;
+    return 0;
 }
 
 INT8 Configuration_Display::NativeSetParallelConfiguration( INT32 param0, INT32 param1, HRESULT &hr )
 {
-    INT8 retVal = 0; 
-	
 	hr = CLR_E_NOT_SUPPORTED;
 	
-    return retVal;
+    return 0;
 }
 

@@ -18,9 +18,11 @@ using namespace GHI::Processor;
 
 void Power::NativeHibernate( UINT32 param0, HRESULT &hr )
 {
+	hr = CLR_E_NOT_SUPPORTED;
 }
 
 void Power::NativeSetEthernetOscillator( INT8 param0, HRESULT &hr )
 {
+	hr = CLR_E_NOT_SUPPORTED;
 }
 

@@ -18,9 +18,11 @@ using namespace GHI::Utilities;
 
 void Xtea::NativeEncrypt( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT8 param0, INT32 param1, INT32 param2, CLR_RT_TypedArray_UINT8 param3, INT32 param4, HRESULT &hr )
 {
+	hr = CLR_E_NOT_SUPPORTED;
 }
 
 void Xtea::NativeDecrypt( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT8 param0, INT32 param1, INT32 param2, CLR_RT_TypedArray_UINT8 param3, INT32 param4, HRESULT &hr )
 {
+	hr = CLR_E_NOT_SUPPORTED;
 }
 
