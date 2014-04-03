@@ -11,6 +11,8 @@
 
 typedef UINT32 OSHW_PAL_ERROR;
 
+extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Utilities_InternalEvent;
+
 OSHW_PAL_ERROR OSHW_PAL_Bitmap_ConvertBPP(BYTE* bimap, INT32 bimapSize, BYTE* output, INT32 outputSize, BYTE bpp);
 
 #endif

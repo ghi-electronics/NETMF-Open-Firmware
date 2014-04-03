@@ -1,0 +1,81 @@
+<Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Directory>DeviceCode\Targets\Native\Interop\GHI_Hardware</Directory>
+    <AssemblyName>GHI_Hardware</AssemblyName>
+  </PropertyGroup>
+  <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+<ItemGroup>
+<HFile Include="Lib.h" />
+<Compile Include="Lib.cpp" />
+<Compile Include="Lib_GHI_Utilities_Bitmaps_mshl.cpp" />
+<HFile Include="Lib_GHI_Utilities_Bitmaps.h" />
+<Compile Include="Lib_GHI_Utilities_Bitmaps.cpp" />
+<Compile Include="Lib_GHI_IO_ControllerAreaNetwork_mshl.cpp" />
+<HFile Include="Lib_GHI_IO_ControllerAreaNetwork.h" />
+<Compile Include="Lib_GHI_IO_ControllerAreaNetwork.cpp" />
+<Compile Include="Lib_GHI_Processor_Configuration__Display_mshl.cpp" />
+<HFile Include="Lib_GHI_Processor_Configuration__Display.h" />
+<Compile Include="Lib_GHI_Processor_Configuration__Display.cpp" />
+<Compile Include="Lib_GHI_Processor_InFieldUpdate_mshl.cpp" />
+<HFile Include="Lib_GHI_Processor_InFieldUpdate.h" />
+<Compile Include="Lib_GHI_Processor_InFieldUpdate.cpp" />
+<Compile Include="Lib_GHI_IO_Audio_mshl.cpp" />
+<HFile Include="Lib_GHI_IO_Audio.h" />
+<Compile Include="Lib_GHI_IO_Audio.cpp" />
+<Compile Include="Lib_GHI_IO_SignalCapture_mshl.cpp" />
+<HFile Include="Lib_GHI_IO_SignalCapture.h" />
+<Compile Include="Lib_GHI_IO_SignalCapture.cpp" />
+<Compile Include="Lib_GHI_IO_SignalGenerator_mshl.cpp" />
+<HFile Include="Lib_GHI_IO_SignalGenerator.h" />
+<Compile Include="Lib_GHI_IO_SignalGenerator.cpp" />
+<Compile Include="Lib_GHI_IO_SoftwareI2CBus_mshl.cpp" />
+<HFile Include="Lib_GHI_IO_SoftwareI2CBus.h" />
+<Compile Include="Lib_GHI_IO_SoftwareI2CBus.cpp" />
+<Compile Include="Lib_GHI_IO_Storage_ExtendedWeakReferences_mshl.cpp" />
+<HFile Include="Lib_GHI_IO_Storage_ExtendedWeakReferences.h" />
+<Compile Include="Lib_GHI_IO_Storage_ExtendedWeakReferences.cpp" />
+<Compile Include="Lib_GHI_IO_Storage_Removable_mshl.cpp" />
+<HFile Include="Lib_GHI_IO_Storage_Removable.h" />
+<Compile Include="Lib_GHI_IO_Storage_Removable.cpp" />
+<Compile Include="Lib_GHI_Processor_AddressSpace_mshl.cpp" />
+<HFile Include="Lib_GHI_Processor_AddressSpace.h" />
+<Compile Include="Lib_GHI_Processor_AddressSpace.cpp" />
+<Compile Include="Lib_GHI_Processor_ApplicationProtection_mshl.cpp" />
+<HFile Include="Lib_GHI_Processor_ApplicationProtection.h" />
+<Compile Include="Lib_GHI_Processor_ApplicationProtection.cpp" />
+<Compile Include="Lib_GHI_Processor_Power_mshl.cpp" />
+<HFile Include="Lib_GHI_Processor_Power.h" />
+<Compile Include="Lib_GHI_Processor_Power.cpp" />
+<Compile Include="Lib_GHI_Processor_RealTimeClock_mshl.cpp" />
+<HFile Include="Lib_GHI_Processor_RealTimeClock.h" />
+<Compile Include="Lib_GHI_Processor_RealTimeClock.cpp" />
+<Compile Include="Lib_GHI_Processor_Register_mshl.cpp" />
+<HFile Include="Lib_GHI_Processor_Register.h" />
+<Compile Include="Lib_GHI_Processor_Register.cpp" />
+<Compile Include="Lib_GHI_Processor_RuntimeLoadableProcedures_mshl.cpp" />
+<HFile Include="Lib_GHI_Processor_RuntimeLoadableProcedures.h" />
+<Compile Include="Lib_GHI_Processor_RuntimeLoadableProcedures.cpp" />
+<Compile Include="Lib_GHI_Processor_Watchdog_mshl.cpp" />
+<HFile Include="Lib_GHI_Processor_Watchdog.h" />
+<Compile Include="Lib_GHI_Processor_Watchdog.cpp" />
+<Compile Include="Lib_GHI_Utilities_Arrays_mshl.cpp" />
+<HFile Include="Lib_GHI_Utilities_Arrays.h" />
+<Compile Include="Lib_GHI_Utilities_Arrays.cpp" />
+<Compile Include="Lib_GHI_Utilities_Crc_mshl.cpp" />
+<HFile Include="Lib_GHI_Utilities_Crc.h" />
+<Compile Include="Lib_GHI_Utilities_Crc.cpp" />
+<Compile Include="Lib_GHI_Utilities_Xtea_mshl.cpp" />
+<HFile Include="Lib_GHI_Utilities_Xtea.h" />
+<Compile Include="Lib_GHI_Utilities_Xtea.cpp" />
+<Compile Include="Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction_mshl.cpp" />
+<HFile Include="Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction.h" />
+<Compile Include="Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction.cpp" />
+<Compile Include="Lib_GHI_Processor_Configuration__StartupLogo_mshl.cpp" />
+<HFile Include="Lib_GHI_Processor_Configuration__StartupLogo.h" />
+<Compile Include="Lib_GHI_Processor_Configuration__StartupLogo.cpp" />
+</ItemGroup>
+<Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
+</Project>

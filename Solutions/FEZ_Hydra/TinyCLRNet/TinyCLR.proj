@@ -76,6 +76,7 @@
     <!--<InteropFeature Include="GHI_OSHW_Native" />-->
     <!--<InteropFeature Include="GHI_OSHW_Hardware" />-->
     <InteropFeature Include="GHI_Hardware" />
+    <InteropFeature Include="GHI_Utilities_InternalEvent" />
   </ItemGroup>
 
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Interop.Settings" />
@@ -83,6 +84,10 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Libraries\dotNetMF.proj" />
     <DriverLibs Include="GHI_Hardware.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Libraries\InternalEvent\dotNetMF.proj" />
+    <DriverLibs Include="GHI_Utilities_InternalEvent.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <DriverLibs Include="Configuration.$(LIB_EXT)" />

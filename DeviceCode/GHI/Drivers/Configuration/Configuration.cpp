@@ -18,6 +18,13 @@ BOOL Configuration_Write()
 
 GPAL_ERROR Configuration_LCD_Get(Configuration_LCD_Structure *config)
 {
+	if (Configuration_Read() == FALSE)
+	{
+		memset(&Configurations, 0xFF, sizeof(Configurations_Structure));
+		Configurations.header.Enable = TRUE;
+		Configuration_Write();
+	}
+
 	if (!Configuration_Read())
 		return -1;
 
