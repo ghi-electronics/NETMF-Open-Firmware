@@ -205,14 +205,34 @@ struct Library_Lib_GHI_IO_Storage_ExtendedWeakReferences
 struct Library_Lib_GHI_IO_Storage_Removable
 {
     static const int FIELD__disposed = 1;
+
+
+    //--//
+
+};
+
+struct Library_Lib_GHI_IO_Storage_SD
+{
     static const int FIELD__id = 2;
 
-    TINYCLR_NATIVE_DECLARE(NativeConstructor___VOID__U4__U1__U1);
+    TINYCLR_NATIVE_DECLARE(NativeConstructor___VOID__U4);
     TINYCLR_NATIVE_DECLARE(NativeFinalize___VOID);
     TINYCLR_NATIVE_DECLARE(NativeMount___VOID__I4);
     TINYCLR_NATIVE_DECLARE(NativeUnmount___VOID);
     TINYCLR_NATIVE_DECLARE(IsSDCardPresent___STATIC__BOOLEAN);
-    TINYCLR_NATIVE_DECLARE(NativeFindId___STATIC__U4__STRING);
+
+    //--//
+
+};
+
+struct Library_Lib_GHI_IO_Storage_UsbMassStorage
+{
+    static const int FIELD__id = 2;
+
+    TINYCLR_NATIVE_DECLARE(NativeConstructor___VOID__U4__U1__U1);
+    TINYCLR_NATIVE_DECLARE(NativeFinalize___VOID);
+    TINYCLR_NATIVE_DECLARE(NativeMount___VOID);
+    TINYCLR_NATIVE_DECLARE(NativeUnmount___VOID);
 
     //--//
 

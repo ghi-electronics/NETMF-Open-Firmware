@@ -37,9 +37,12 @@
 <Compile Include="Lib_GHI_IO_Storage_ExtendedWeakReferences_mshl.cpp" />
 <HFile Include="Lib_GHI_IO_Storage_ExtendedWeakReferences.h" />
 <Compile Include="Lib_GHI_IO_Storage_ExtendedWeakReferences.cpp" />
-<Compile Include="Lib_GHI_IO_Storage_Removable_mshl.cpp" />
-<HFile Include="Lib_GHI_IO_Storage_Removable.h" />
-<Compile Include="Lib_GHI_IO_Storage_Removable.cpp" />
+<Compile Include="Lib_GHI_IO_Storage_SD_mshl.cpp" />
+<HFile Include="Lib_GHI_IO_Storage_SD.h" />
+<Compile Include="Lib_GHI_IO_Storage_SD.cpp" />
+<Compile Include="Lib_GHI_IO_Storage_UsbMassStorage_mshl.cpp" />
+<HFile Include="Lib_GHI_IO_Storage_UsbMassStorage.h" />
+<Compile Include="Lib_GHI_IO_Storage_UsbMassStorage.cpp" />
 <Compile Include="Lib_GHI_Processor_AddressSpace_mshl.cpp" />
 <HFile Include="Lib_GHI_Processor_AddressSpace.h" />
 <Compile Include="Lib_GHI_Processor_AddressSpace.cpp" />

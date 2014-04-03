@@ -1,4 +1,4 @@
-;#<FEEDBACK># ARM Linker, 4.1 [Build 713]: Last Updated: Thu Apr 03 13:48:12 2014
+;#<FEEDBACK># ARM Linker, 4.1 [Build 713]: Last Updated: Thu Apr 03 15:18:33 2014
 ;VERSION 0.2
 ;FILE ARM9_bootstrap.obj
 ;FILE ARM9_mmu_functions.obj
@@ -138,8 +138,10 @@ _Z21LargeBuffer_PostEventt <= USED 0
 ;FILE Lib_GHI_IO_SoftwareI2CBus_mshl.obj
 ;FILE Lib_GHI_IO_Storage_ExtendedWeakReferences.obj
 ;FILE Lib_GHI_IO_Storage_ExtendedWeakReferences_mshl.obj
-;FILE Lib_GHI_IO_Storage_Removable.obj
-;FILE Lib_GHI_IO_Storage_Removable_mshl.obj
+;FILE Lib_GHI_IO_Storage_SD.obj
+;FILE Lib_GHI_IO_Storage_SD_mshl.obj
+;FILE Lib_GHI_IO_Storage_UsbMassStorage.obj
+;FILE Lib_GHI_IO_Storage_UsbMassStorage_mshl.obj
 ;FILE Lib_GHI_Processor_AddressSpace.obj
 ;FILE Lib_GHI_Processor_AddressSpace_mshl.obj
 ;FILE Lib_GHI_Processor_ApplicationProtection.obj
