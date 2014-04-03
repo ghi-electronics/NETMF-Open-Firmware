@@ -23,6 +23,9 @@ typedef struct
 
 BOOL GHI_OSHW_HAL_SoftwareI2C_WriteRead(GHI_OSHW_HAL_SoftwareI2C *i2c, BYTE *writeBuffer, UINT32 writeLength, BYTE *readBuffer, UINT32 readLength, UINT32 *numWritten, UINT32 *numRead);
 
+void OSHW_GHAL_Initialize_Startup();
+void OSHW_GHAL_GetOemModelSku(BYTE* oem, BYTE* model, UINT16* sku);
+
 // StorageDev
 GPAL_ERROR GHI_OSHW_Mount(UINT32 ClockFrequencyInKHz);
 void GHI_OSHW_Unmount();

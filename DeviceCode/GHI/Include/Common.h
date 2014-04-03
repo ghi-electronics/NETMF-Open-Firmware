@@ -1,0 +1,8 @@
+#ifndef _GHI_COMMON_H_
+#define _GHI_COMMON_H_
+
+#define GHI_HYDRA_MODEL				0x0B
+#define GHI_CONFIG_OEM_NUMBER		0x87
+#define GHI_CONFIG_SKU_NUMBER		0x0000
+
+#endif	// _GHI_COMMON_H_

@@ -80,6 +80,14 @@
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Interop.Settings" />
 
   <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\Solutions\FEZ_Hydra\DeviceCode\NETMF_Libs\SystemInfo\dotNetMF.proj" />
+    <DriverLibs Include="FEZHydra_SystemInfo.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Misc\dotNetMF.proj" />
+    <DriverLibs Include="GHI_NETMF_Misc.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Libraries\dotNetMF.proj" />
     <DriverLibs Include="GHI_Hardware.$(LIB_EXT)" />
   </ItemGroup>

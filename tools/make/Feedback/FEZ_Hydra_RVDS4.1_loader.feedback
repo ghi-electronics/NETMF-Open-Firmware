@@ -1,4 +1,4 @@
-;#<FEEDBACK># ARM Linker, 4.1 [Build 713]: Last Updated: Thu Apr 03 11:55:27 2014
+;#<FEEDBACK># ARM Linker, 4.1 [Build 713]: Last Updated: Thu Apr 03 13:51:46 2014
 ;VERSION 0.2
 ;FILE ARM9_bootstrap.obj
 ;FILE ARM9_mmu_functions.obj
@@ -135,12 +135,14 @@ _ZN26ConfigurationSectorManager10GetVersionEv <= USED 0
 ;FILE CryptoInterface.obj
 ;FILE FS_config_stubs.obj
 _Z24FS_MountRemovableVolumesv <= USED 0
+;FILE Misc.obj
 ;FILE SerialDataFlash_driver.obj
 ;FILE SimpleHeap.obj
 _Z21SimpleHeap_ReAllocatePvj <= USED 0
 _Z22SimpleHeap_IsAllocatedPv <= USED 0
 ;FILE SimpleHeap_config.obj
 ;FILE SmartPtr_arm.obj
+;FILE SystemInfo.obj
 ;FILE TimeService_stubs.obj
 _Z16TimeService_Stopv <= USED 0
 _Z17TimeService_Startv <= USED 0

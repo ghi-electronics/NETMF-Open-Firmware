@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <tinyhal.h>
+#include <GHI\Include\GHI_OSHW_HAL.h>
 
 #if !defined(__GNUC__)
 #include <rt_fp.h>
@@ -379,6 +380,8 @@ void HAL_Initialize()
     FS_AddVolumes();
 
     FileSystemVolumeList::InitializeVolumes();
+	
+	OSHW_GHAL_Initialize_Startup();
 
     LCD_Initialize();
     

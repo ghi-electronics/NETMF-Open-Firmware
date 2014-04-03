@@ -292,10 +292,14 @@
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\FEZ_Hydra\DeviceCode\Blockstorage\SerialDataFlash\Driver\dotNetMF.proj" />
   </ItemGroup>
 
-  <!--<ItemGroup>
-    <DriverLibs Include="GHI_OSHW_Configuration.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Configuration\dotNetMF.proj" />
-  </ItemGroup>-->
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\Solutions\FEZ_Hydra\DeviceCode\NETMF_Libs\SystemInfo\dotNetMF.proj" />
+    <DriverLibs Include="FEZHydra_SystemInfo.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Misc\dotNetMF.proj" />
+    <DriverLibs Include="GHI_NETMF_Misc.$(LIB_EXT)" />
+  </ItemGroup>
   <ItemGroup>
     <DriverLibs Include="Configuration.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\Configuration\dotNetMF.proj" />

@@ -1,4 +1,4 @@
-;#<FEEDBACK># ARM Linker, 4.1 [Build 713]: Last Updated: Thu Apr 03 11:54:18 2014
+;#<FEEDBACK># ARM Linker, 4.1 [Build 713]: Last Updated: Thu Apr 03 13:48:12 2014
 ;VERSION 0.2
 ;FILE ARM9_bootstrap.obj
 ;FILE ARM9_mmu_functions.obj
@@ -179,6 +179,7 @@ _ZN13CLR_Messaging14BroadcastEventEjjPhj <= USED 0
 _ZN13CLR_Messaging21Messaging_Send__ReplyEP10WP_MessagePv <= USED 0
 _ZN13CLR_Messaging22Messaging_Query__ReplyEP10WP_MessagePv <= USED 0
 _ZN13CLR_Messaging22Messaging_Reply__ReplyEP10WP_MessagePv <= USED 0
+;FILE Misc.obj
 ;FILE Object.obj
 ;FILE OpenSSL_PKCS11_Token.obj
 ;FILE OpenSSL_PKCS11_digest.obj
@@ -223,6 +224,7 @@ _Z17Network_PostEventjj <= USED 0
 ;FILE Spot_time_fastcompile.obj
 ;FILE Spot_touch_fastcompile.obj
 ;FILE StorageDev.obj
+;FILE SystemInfo.obj
 ;FILE Time_driver.obj
 _ZN10TimeDriver16DateTimeToStringERKx <= USED 0
 _ZN10TimeDriver16DateTimeToStringERKxRPcRj <= USED 0
