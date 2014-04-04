@@ -1671,13 +1671,28 @@ dhcp_create_msg(struct netif *netif, struct dhcp *dhcp, u8_t message_type)
   LWIP_ASSERT("dhcp_create_msg: check that first pbuf can hold struct dhcp_msg",
            (dhcp->p_out->len >= sizeof(struct dhcp_msg)));
 
-  /* reuse transaction identifier in retransmissions */
-  if (dhcp->tries == 0) {
+		   
+		   
+  // GHI CHANGE. Manually applied change from lwip commit http://git.savannah.gnu.org/cgit/lwip.git/commit/?id=c82f04f54c1ad178a810397c79efdb8e5238c3bf
+  
+  /* DHCP_REQUEST should reuse 'xid' from DHCPOFFER */
+  if (message_type != DHCP_REQUEST) {
+    /* reuse transaction identifier in retransmissions */
+    if (dhcp->tries == 0) {
+#if DHCP_CREATE_RAND_XID && defined(LWIP_RAND)
+      xid = LWIP_RAND();
+#else /* DHCP_CREATE_RAND_XID && defined(LWIP_RAND) */
       xid++;
+#endif /* DHCP_CREATE_RAND_XID && defined(LWIP_RAND) */
+    }
+    dhcp->xid = xid;
   }
-  dhcp->xid = xid;
   LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_TRACE,
               ("transaction id xid(%"X32_F")\n", xid));
+			  
+  //END GHI CHANGE
+  
+  
 
   dhcp->msg_out = (struct dhcp_msg *)dhcp->p_out->payload;
 
