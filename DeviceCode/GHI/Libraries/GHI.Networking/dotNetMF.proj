@@ -1,0 +1,27 @@
+<Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Directory>DeviceCode\Targets\Native\Interop\GHI_Networking</Directory>
+    <AssemblyName>GHI_Networking</AssemblyName>
+  </PropertyGroup>
+  <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+<ItemGroup>
+<HFile Include="Lib.h" />
+<Compile Include="Lib.cpp" />
+<Compile Include="Lib_GHI_Networking_BaseInterface_mshl.cpp" />
+<HFile Include="Lib_GHI_Networking_BaseInterface.h" />
+<Compile Include="Lib_GHI_Networking_BaseInterface.cpp" />
+<Compile Include="Lib_GHI_Networking_WiFiRS9110_mshl.cpp" />
+<HFile Include="Lib_GHI_Networking_WiFiRS9110.h" />
+<Compile Include="Lib_GHI_Networking_WiFiRS9110.cpp" />
+<Compile Include="Lib_GHI_Networking_EthernetBuiltIn_mshl.cpp" />
+<HFile Include="Lib_GHI_Networking_EthernetBuiltIn.h" />
+<Compile Include="Lib_GHI_Networking_EthernetBuiltIn.cpp" />
+<Compile Include="Lib_GHI_Networking_EthernetENC28J60_mshl.cpp" />
+<HFile Include="Lib_GHI_Networking_EthernetENC28J60.h" />
+<Compile Include="Lib_GHI_Networking_EthernetENC28J60.cpp" />
+</ItemGroup>
+<Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
+</Project>

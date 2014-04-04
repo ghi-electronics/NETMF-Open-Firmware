@@ -72,6 +72,7 @@
 
   <ItemGroup>
     <InteropFeature Include="GHI_Hardware" />
+    <InteropFeature Include="GHI_Networking" />
     <InteropFeature Include="GHI_Utilities_InternalEvent" />
   </ItemGroup>
 
@@ -86,7 +87,11 @@
     <DriverLibs Include="GHI_NETMF_Misc.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Libraries\dotNetMF.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Libraries\GHI.Networking\dotNetMF.proj" />
+    <DriverLibs Include="GHI_Networking.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Libraries\GHI.Hardware\dotNetMF.proj" />
     <DriverLibs Include="GHI_Hardware.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>

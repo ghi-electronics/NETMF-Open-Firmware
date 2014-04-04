@@ -48,7 +48,7 @@ void Configuration_Display::NativeGetLcdConfiguration( INT8* bootupMessages, UIN
 
 INT8 Configuration_Display::NativeSetLcdConfiguration( INT8 bootupMessages, UINT8 rotation, UINT32 Width, UINT32 Height, INT8 OutputEnableIsFixed, INT8 OutputEnablePolarity, INT8 HorizontalSyncPolarity, INT8 VerticalSyncPolarity, INT8 PixelPolarity, UINT8 HorizontalSyncPulseWidth, UINT8 HorizontalBackPorch, UINT8 HorizontalFrontPorch, UINT8 VerticalSyncPulseWidth, UINT8 VerticalBackPorch, UINT8 VerticalFrontPorch, UINT32 PixelClockRate, HRESULT &hr )
 {
-	BOOL didChange;
+	BOOL didChange = FALSE;
 	
 	if (bootupMessages != TRUE || rotation != 0)
 	{

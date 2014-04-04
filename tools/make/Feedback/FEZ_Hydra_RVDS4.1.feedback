@@ -1,4 +1,4 @@
-;#<FEEDBACK># ARM Linker, 4.1 [Build 713]: Last Updated: Thu Apr 03 15:18:33 2014
+;#<FEEDBACK># ARM Linker, 4.1 [Build 713]: Last Updated: Fri Apr 04 14:54:45 2014
 ;VERSION 0.2
 ;FILE ARM9_bootstrap.obj
 ;FILE ARM9_mmu_functions.obj
@@ -142,6 +142,14 @@ _Z21LargeBuffer_PostEventt <= USED 0
 ;FILE Lib_GHI_IO_Storage_SD_mshl.obj
 ;FILE Lib_GHI_IO_Storage_UsbMassStorage.obj
 ;FILE Lib_GHI_IO_Storage_UsbMassStorage_mshl.obj
+;FILE Lib_GHI_Networking_BaseInterface.obj
+;FILE Lib_GHI_Networking_BaseInterface_mshl.obj
+;FILE Lib_GHI_Networking_EthernetBuiltIn.obj
+;FILE Lib_GHI_Networking_EthernetBuiltIn_mshl.obj
+;FILE Lib_GHI_Networking_EthernetENC28J60.obj
+;FILE Lib_GHI_Networking_EthernetENC28J60_mshl.obj
+;FILE Lib_GHI_Networking_WiFiRS9110.obj
+;FILE Lib_GHI_Networking_WiFiRS9110_mshl.obj
 ;FILE Lib_GHI_Processor_AddressSpace.obj
 ;FILE Lib_GHI_Processor_AddressSpace_mshl.obj
 ;FILE Lib_GHI_Processor_ApplicationProtection.obj
@@ -536,7 +544,6 @@ _Z14SetResult_CHARR17CLR_RT_StackFramec <= USED 0
 _Z14SetResult_boolR17CLR_RT_StackFrameb <= USED 0
 _Z15SetResult_INT16R17CLR_RT_StackFrames <= USED 0
 _Z15SetResult_INT64R17CLR_RT_StackFramex <= USED 0
-_Z16SetResult_LPCSTRR17CLR_RT_StackFramePKc <= USED 0
 _Z16SetResult_UINT64R17CLR_RT_StackFramey <= USED 0
 _Z16SetResult_doubleR17CLR_RT_StackFramed <= USED 0
 _Z17CLR_DebuggerBreakv <= USED 0
@@ -562,7 +569,6 @@ _Z28Interop_Marshal_double_ByRefRK17CLR_RT_StackFramePvjRPd <= USED 0
 _Z29Interop_Marshal_GetField_CHARP16CLR_RT_HeapBlockj <= USED 0
 _Z29Interop_Marshal_GetField_boolP16CLR_RT_HeapBlockj <= USED 0
 _Z30Interop_Marshal_GetField_INT16P16CLR_RT_HeapBlockj <= USED 0
-_Z30Interop_Marshal_GetField_INT32P16CLR_RT_HeapBlockj <= USED 0
 _Z30Interop_Marshal_GetField_INT64P16CLR_RT_HeapBlockj <= USED 0
 _Z30Interop_Marshal_GetField_UINT8P16CLR_RT_HeapBlockj <= USED 0
 _Z30Interop_Marshal_GetField_floatP16CLR_RT_HeapBlockj <= USED 0
