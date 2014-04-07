@@ -1,4 +1,4 @@
-;#<FEEDBACK># ARM Linker, 4.1 [Build 713]: Last Updated: Fri Apr 04 14:54:45 2014
+;#<FEEDBACK># ARM Linker, 4.1 [Build 713]: Last Updated: Mon Apr 07 11:07:10 2014
 ;VERSION 0.2
 ;FILE ARM9_bootstrap.obj
 ;FILE ARM9_mmu_functions.obj
@@ -230,7 +230,6 @@ _Z49__COMPILER_BUG_CORRUPTED_LIB_IF_NO_IMPLEMENATIONSv <= USED 0
 _Z25CreateNativeEventInstanceR17CLR_RT_StackFrame <= USED 0
 ;FILE Spot_Hardware_serial_fastcompile.obj
 ;FILE Spot_Net_fastcompile.obj
-_Z17Network_PostEventjj <= USED 0
 ;FILE Spot_time_fastcompile.obj
 ;FILE Spot_touch_fastcompile.obj
 ;FILE StorageDev.obj
@@ -284,7 +283,6 @@ ASN1_INTEGER_dup <= USED 0
 ASN1_OBJECT_create <= USED 0
 i2d_ASN1_OBJECT <= USED 0
 ;FILE a_octet.obj
-ASN1_OCTET_STRING_cmp <= USED 0
 ;FILE a_print.obj
 ASN1_UNIVERSALSTRING_to_string <= USED 0
 ;FILE a_set.obj
@@ -312,7 +310,6 @@ ASN1_TIME_to_generalizedtime <= USED 0
 d2i_ASN1_TIME <= USED 0
 i2d_ASN1_TIME <= USED 0
 ;FILE a_type.obj
-ASN1_TYPE_cmp <= USED 0
 ASN1_TYPE_set1 <= USED 0
 ;FILE a_utctm.obj
 ASN1_UTCTIME_cmp_time_t <= USED 0
@@ -333,7 +330,6 @@ _Znwj <= USED 0
 EVP_PKEY_asn1_add0 <= USED 0
 EVP_PKEY_asn1_add_alias <= USED 0
 EVP_PKEY_asn1_copy <= USED 0
-EVP_PKEY_asn1_get0_info <= USED 0
 EVP_PKEY_asn1_new <= USED 0
 EVP_PKEY_asn1_set_ctrl <= USED 0
 EVP_PKEY_asn1_set_free <= USED 0
@@ -341,6 +337,15 @@ EVP_PKEY_asn1_set_param <= USED 0
 EVP_PKEY_asn1_set_private <= USED 0
 EVP_PKEY_asn1_set_public <= USED 0
 EVP_PKEY_get0_asn1 <= USED 0
+;FILE api_lib.obj
+netconn_close <= USED 0
+netconn_disconnect <= USED 0
+netconn_join_leave_group <= USED 0
+netconn_sendto <= USED 0
+;FILE api_msg.obj
+do_disconnect <= USED 0
+do_join_leave_group <= USED 0
+;FILE asn1_err.obj
 ;FILE asn1_gen.obj
 ASN1_generate_nconf <= USED 0
 ;FILE asn1_lib.obj
@@ -369,6 +374,7 @@ BIO_dump_indent_cb <= USED 0
 BIO_dump_indent_fp <= USED 0
 _Z11BIO_dump_cbPFiPKvjPvES1_PKci <= USED 0
 ;FILE b_print.obj
+;FILE bf_buff.obj
 ;FILE bf_cfb64.obj
 ;FILE bf_ecb.obj
 BF_options <= USED 0
@@ -377,6 +383,7 @@ BF_options <= USED 0
 ;FILE bf_skey.obj
 ;FILE bio_enc.obj
 BIO_set_cipher <= USED 0
+;FILE bio_err.obj
 ;FILE bio_lib.obj
 BIO_ctrl_pending <= USED 0
 BIO_ctrl_wpending <= USED 0
@@ -386,13 +393,10 @@ BIO_get_callback_arg <= USED 0
 BIO_get_ex_data <= USED 0
 BIO_get_ex_new_index <= USED 0
 BIO_get_retry_BIO <= USED 0
-BIO_get_retry_reason <= USED 0
-BIO_int_ctrl <= USED 0
 BIO_method_name <= USED 0
 BIO_method_type <= USED 0
 BIO_number_read <= USED 0
 BIO_number_written <= USED 0
-BIO_pop <= USED 0
 BIO_ptr_ctrl <= USED 0
 BIO_set_callback <= USED 0
 BIO_set_callback_arg <= USED 0
@@ -419,6 +423,7 @@ BN_BLINDING_set_thread_id <= USED 0
 ;FILE bn_ctx.obj
 BN_CTX_init <= USED 0
 ;FILE bn_div.obj
+;FILE bn_err.obj
 ;FILE bn_exp.obj
 BN_exp <= USED 0
 BN_mod_exp_simple <= USED 0
@@ -471,9 +476,18 @@ BN_RECP_CTX_new <= USED 0
 BIO_new_fp <= USED 0
 ;FILE bss_mem.obj
 ;FILE bss_null.obj
+;FILE bss_sock.obj
+BIO_new_socket <= USED 0
+;FILE buf_err.obj
 ;FILE buffer.obj
-BUF_memdup <= USED 0
 BUF_reverse <= USED 0
+;FILE by_dir.obj
+X509_LOOKUP_hash_dir <= USED 0
+;FILE by_file.obj
+X509_LOOKUP_file <= USED 0
+X509_load_cert_crl_file <= USED 0
+X509_load_cert_file <= USED 0
+X509_load_crl_file <= USED 0
 ;FILE c_all.obj
 ;FILE c_allc.obj
 ;FILE c_alld.obj
@@ -482,11 +496,15 @@ BUF_reverse <= USED 0
 ;FILE c_enc.obj
 ;FILE c_ofb64.obj
 ;FILE c_skey.obj
+;FILE c_zlib.obj
+COMP_zlib_cleanup <= USED 0
 ;FILE cbc128.obj
 ;FILE cfb128.obj
 ;FILE cfb64ede.obj
 ;FILE cfb64enc.obj
 ;FILE cfb_enc.obj
+;FILE comp_err.obj
+;FILE comp_lib.obj
 ;FILE conf_api.obj
 _CONF_add_string <= USED 0
 _CONF_free_data <= USED 0
@@ -498,6 +516,7 @@ _CONF_new_section <= USED 0
 ;FILE conf_def.obj
 NCONF_WIN32 <= USED 0
 NCONF_default <= USED 0
+;FILE conf_err.obj
 ;FILE conf_lib.obj
 CONF_dump_bio <= USED 0
 CONF_dump_fp <= USED 0
@@ -614,6 +633,7 @@ _ZN29CLR_RT_HeapBlock_MemoryStream11BitsWrittenEv <= USED 0
 _ZN29CLR_RT_HeapBlock_MemoryStream5ResetEv <= USED 0
 _ZN29CLR_RT_HeapBlock_MemoryStream6RewindEv <= USED 0
 _ZNK18CLR_RT_MemoryRange12LimitToRangeERS_Phj <= USED 0
+;FILE cpt_err.obj
 ;FILE cryptlib.obj
 CRYPTO_THREADID_get_callback <= USED 0
 CRYPTO_get_add_lock_callback <= USED 0
@@ -641,13 +661,14 @@ _Z34CRYPTO_set_dynlock_create_callbackPFP20CRYPTO_dynlock_valuePKciE <= USED 0
 _Z35CRYPTO_set_dynlock_destroy_callbackPFvP20CRYPTO_dynlock_valuePKciE <= USED 0
 ;FILE d2i_pr.obj
 d2i_AutoPrivateKey <= USED 0
+;FILE def.obj
 ;FILE des_enc.obj
 ;FILE dh_ameth.obj
 DHparams_print <= USED 0
 ;FILE dh_asn1.obj
-DHparams_dup <= USED 0
 ;FILE dh_check.obj
 DH_check <= USED 0
+;FILE dh_err.obj
 ;FILE dh_gen.obj
 ;FILE dh_key.obj
 ;FILE dh_lib.obj
@@ -657,10 +678,16 @@ DH_set_default_method <= USED 0
 DH_set_ex_data <= USED 0
 DH_set_method <= USED 0
 DH_up_ref <= USED 0
+;FILE dhcp.obj
+dhcp_cleanup <= USED 0
+dhcp_inform <= USED 0
+dhcp_set_struct <= USED 0
 ;FILE digest.obj
+;FILE dns.obj
 ;FILE dsa_asn1.obj
 DSAparams_dup <= USED 0
 d2i_DSAPublicKey <= USED 0
+;FILE dsa_err.obj
 ;FILE dsa_gen.obj
 DSA_generate_parameters_ex <= USED 0
 ;FILE dsa_key.obj
@@ -674,6 +701,7 @@ DSA_set_method <= USED 0
 ;FILE dsa_ossl.obj
 ;FILE dsa_sign.obj
 ;FILE dsa_vrf.obj
+;FILE dso_err.obj
 ;FILE dso_lib.obj
 DSO_bind_func <= USED 0
 DSO_bind_var <= USED 0
@@ -707,6 +735,7 @@ DSO_METHOD_openssl <= USED 0
 ;FILE e_des3.obj
 EVP_des_ede3_ecb <= USED 0
 EVP_des_ede_ecb <= USED 0
+;FILE e_null.obj
 ;FILE e_rc2.obj
 ;FILE e_rc4.obj
 ;FILE e_seed.obj
@@ -719,15 +748,13 @@ _Z29X9_62_CHARACTERISTIC_TWO_freeP27x9_62_characteristic_two_st <= USED 0
 ;FILE ec_curve.obj
 EC_get_builtin_curves <= USED 0
 ;FILE ec_cvt.obj
+;FILE ec_err.obj
 ;FILE ec_key.obj
 EC_KEY_check_key <= USED 0
-EC_KEY_copy <= USED 0
-EC_KEY_dup <= USED 0
 EC_KEY_new_by_curve_name <= USED 0
 EC_KEY_precompute_mult <= USED 0
 EC_KEY_set_asn1_flag <= USED 0
 EC_KEY_set_conv_form <= USED 0
-EC_KEY_set_private_key <= USED 0
 ;FILE ec_lib.obj
 EC_GROUP_check_discriminant <= USED 0
 EC_GROUP_precompute_mult <= USED 0
@@ -742,6 +769,7 @@ EC_POINT_point2hex <= USED 0
 ;FILE ecb3_enc.obj
 ;FILE ecb_enc.obj
 DES_options <= USED 0
+;FILE ech_err.obj
 ;FILE ech_key.obj
 ;FILE ech_lib.obj
 ECDH_get_ex_data <= USED 0
@@ -761,6 +789,7 @@ EC_KEY_print_fp <= USED 0
 ;FILE ecp_smpl.obj
 EC_GFp_simple_method <= USED 0
 ;FILE ecs_asn1.obj
+;FILE ecs_err.obj
 ;FILE ecs_lib.obj
 ECDSA_get_ex_data <= USED 0
 ECDSA_get_ex_new_index <= USED 0
@@ -771,6 +800,8 @@ ECDSA_set_method <= USED 0
 ;FILE ecs_sign.obj
 ECDSA_do_sign <= USED 0
 ;FILE ecs_vrf.obj
+;FILE enc28j60_lwip.obj
+;FILE enc28j60_lwip_driver.obj
 ;FILE encode.obj
 EVP_EncodeBlock <= USED 0
 EVP_EncodeFinal <= USED 0
@@ -781,6 +812,7 @@ ENGINE_cmd_is_executable <= USED 0
 ENGINE_ctrl <= USED 0
 ENGINE_ctrl_cmd_string <= USED 0
 _Z15ENGINE_ctrl_cmdP9engine_stPKclPvPFvvEi <= USED 0
+;FILE eng_err.obj
 ;FILE eng_init.obj
 ;FILE eng_lib.obj
 ENGINE_cleanup <= USED 0
@@ -817,6 +849,15 @@ ENGINE_get_next <= USED 0
 ENGINE_get_prev <= USED 0
 ENGINE_remove <= USED 0
 ENGINE_up_ref <= USED 0
+;FILE eng_pkey.obj
+ENGINE_get_load_privkey_function <= USED 0
+ENGINE_get_load_pubkey_function <= USED 0
+ENGINE_get_ssl_client_cert_function <= USED 0
+ENGINE_load_private_key <= USED 0
+ENGINE_load_public_key <= USED 0
+ENGINE_set_load_privkey_function <= USED 0
+ENGINE_set_load_pubkey_function <= USED 0
+ENGINE_set_load_ssl_client_cert_function <= USED 0
 ;FILE eng_table.obj
 ENGINE_get_table_flags <= USED 0
 ENGINE_set_table_flags <= USED 0
@@ -832,8 +873,6 @@ ERR_get_error_line <= USED 0
 ERR_get_implementation <= USED 0
 ERR_get_next_error_library <= USED 0
 ERR_get_string_table <= USED 0
-ERR_load_ERR_strings <= USED 0
-ERR_load_strings <= USED 0
 ERR_peek_error_line <= USED 0
 ERR_peek_error_line_data <= USED 0
 ERR_peek_last_error_line <= USED 0
@@ -843,10 +882,11 @@ ERR_remove_state <= USED 0
 ERR_remove_thread_state <= USED 0
 ERR_set_implementation <= USED 0
 ERR_unload_strings <= USED 0
-_Z14ERR_initializev <= USED 0
+;FILE err_all.obj
 ;FILE err_prn.obj
 ERR_print_errors <= USED 0
-ERR_print_errors_fp <= USED 0
+;FILE etharp.obj
+etharp_find_addr <= USED 0
 ;FILE events.obj
 _Z18Events_SetCallbackPFvPvES_ <= USED 0
 _Z28Events_WaitForEventsInternaljjj <= USED 0
@@ -855,12 +895,11 @@ _Z28Events_WaitForEventsInternaljjj <= USED 0
 EVP_CIPHER_CTX_free <= USED 0
 EVP_CIPHER_CTX_new <= USED 0
 EVP_CipherFinal <= USED 0
-EVP_EncryptInit_ex <= USED 0
+;FILE evp_err.obj
 ;FILE evp_key.obj
 EVP_read_pw_string <= USED 0
 EVP_set_pw_prompt <= USED 0
 ;FILE evp_lib.obj
-EVP_CIPHER_CTX_cipher <= USED 0
 EVP_CIPHER_CTX_clear_flags <= USED 0
 EVP_CIPHER_CTX_get_app_data <= USED 0
 EVP_CIPHER_CTX_nid <= USED 0
@@ -868,7 +907,6 @@ EVP_CIPHER_CTX_set_app_data <= USED 0
 EVP_CIPHER_CTX_set_flags <= USED 0
 EVP_CIPHER_CTX_test_flags <= USED 0
 EVP_CIPHER_flags <= USED 0
-EVP_Cipher <= USED 0
 EVP_MD_flags <= USED 0
 EVP_MD_pkey_type <= USED 0
 ;FILE evp_pbe.obj
@@ -891,7 +929,6 @@ PKCS8_set_broken <= USED 0
 CRYPTO_dup_ex_data <= USED 0
 CRYPTO_ex_data_new_class <= USED 0
 CRYPTO_get_ex_data_implementation <= USED 0
-CRYPTO_get_ex_new_index <= USED 0
 CRYPTO_set_ex_data_implementation <= USED 0
 ;FILE f_int.obj
 a2i_ASN1_INTEGER <= USED 0
@@ -950,8 +987,19 @@ HMAC_CTX_set_flags <= USED 0
 _Z20I2C_XAction_GetStateP15I2C_HAL_XACTION <= USED 0
 ;FILE i2d_pr.obj
 i2d_PrivateKey <= USED 0
+;FILE icmp.obj
+;FILE igmp.obj
+;FILE inet_chksum.obj
+inet_chksum_pseudo_partial <= USED 0
+;FILE init.obj
 ;FILE ink_driver.obj
 ;FILE ink_functions.obj
+;FILE ip.obj
+;FILE ip_addr.obj
+ip4_addr_netmask_valid <= USED 0
+ipaddr_ntoa <= USED 0
+ipaddr_ntoa_r <= USED 0
+;FILE ip_frag.obj
 ;FILE jbytearraydatasrc.obj
 ;FILE jcomapi.obj
 ;FILE jdapimin.obj
@@ -987,6 +1035,9 @@ jpeg_new_colormap <= USED 0
 ;FILE jutils.obj
 ;FILE legacy_support.obj
 ;FILE lhash.obj
+;FILE lwIP_Sockets_functions.obj
+_Z26HAL_SOCK_GlobalLockContextv <= USED 0
+;FILE lwIP__Sockets.obj
 ;FILE lzwread.obj
 _ZN15LZWDecompressor5ResetEh <= USED 0
 ;FILE m_dss.obj
@@ -1009,6 +1060,8 @@ MD4_Transform <= USED 0
 ;FILE md5_dgst.obj
 MD5_Transform <= USED 0
 ;FILE md_rand.obj
+;FILE mem.obj
+mem_calloc <= USED 0
 ;FILE memSSL.obj
 CRYPTO_get_mem_debug_options <= USED 0
 CRYPTO_get_mem_functions <= USED 0
@@ -1036,6 +1089,7 @@ CRYPTO_mem_leaks <= USED 0
 CRYPTO_mem_leaks_cb <= USED 0
 CRYPTO_mem_leaks_fp <= USED 0
 CRYPTO_remove_all_info <= USED 0
+;FILE memp.obj
 ;FILE names.obj
 _Z13EVP_MD_do_allPFvPK9env_md_stPKcS3_PvES4_ <= USED 0
 _Z17EVP_CIPHER_do_allPFvPK13evp_cipher_stPKcS3_PvES4_ <= USED 0
@@ -1044,13 +1098,35 @@ _Z24EVP_CIPHER_do_all_sortedPFvPK13evp_cipher_stPKcS3_PvES4_ <= USED 0
 ;FILE native_double_pal_fastcompile.obj
 _ZN6System4Math4SignEd <= USED 0
 _ZN6System4Math5RoundEd <= USED 0
+;FILE netbuf.obj
+netbuf_alloc <= USED 0
+netbuf_chain <= USED 0
+netbuf_data <= USED 0
+netbuf_first <= USED 0
+netbuf_new <= USED 0
+netbuf_next <= USED 0
+;FILE netdb.obj
+lwip_gethostbyname <= USED 0
+lwip_gethostbyname_r <= USED 0
+;FILE netif.obj
+netif_find <= USED 0
+netif_set_link_callback <= USED 0
+netif_set_status_callback <= USED 0
+;FILE nsseq.obj
+NETSCAPE_CERT_SEQUENCE_free <= USED 0
+NETSCAPE_CERT_SEQUENCE_it <= USED 0
+NETSCAPE_CERT_SEQUENCE_new <= USED 0
+d2i_NETSCAPE_CERT_SEQUENCE <= USED 0
+i2d_NETSCAPE_CERT_SEQUENCE <= USED 0
+;FILE o_dir.obj
+OPENSSL_DIR_end <= USED 0
+OPENSSL_DIR_read <= USED 0
 ;FILE o_names.obj
 OBJ_NAME_do_all <= USED 0
 OBJ_NAME_do_all_sorted <= USED 0
 _Z18OBJ_NAME_new_indexPFmPKcEPFiS0_S0_EPFvS0_iS0_E <= USED 0
 ;FILE o_str.obj
 _Z14OPENSSL_memcmpPKvS0_j <= USED 0
-_Z18OPENSSL_strcasecmpPKcS0_ <= USED 0
 ;FILE o_time.obj
 ;FILE obj_dat.obj
 OBJ_add_object <= USED 0
@@ -1058,6 +1134,7 @@ OBJ_create <= USED 0
 OBJ_create_objects <= USED 0
 OBJ_new_nid <= USED 0
 OBJ_txt2nid <= USED 0
+;FILE obj_err.obj
 ;FILE obj_lib.obj
 ;FILE obj_xref.obj
 OBJ_add_sigid <= USED 0
@@ -1082,7 +1159,6 @@ OCSP_RESPBYTES_free <= USED 0
 OCSP_RESPBYTES_new <= USED 0
 OCSP_RESPDATA_free <= USED 0
 OCSP_RESPDATA_new <= USED 0
-OCSP_RESPID_free <= USED 0
 OCSP_RESPID_new <= USED 0
 OCSP_RESPONSE_free <= USED 0
 OCSP_RESPONSE_it <= USED 0
@@ -1104,7 +1180,6 @@ d2i_OCSP_REQINFO <= USED 0
 d2i_OCSP_REQUEST <= USED 0
 d2i_OCSP_RESPBYTES <= USED 0
 d2i_OCSP_RESPDATA <= USED 0
-d2i_OCSP_RESPID <= USED 0
 d2i_OCSP_RESPONSE <= USED 0
 d2i_OCSP_REVOKEDINFO <= USED 0
 d2i_OCSP_SERVICELOC <= USED 0
@@ -1119,12 +1194,12 @@ i2d_OCSP_REQINFO <= USED 0
 i2d_OCSP_REQUEST <= USED 0
 i2d_OCSP_RESPBYTES <= USED 0
 i2d_OCSP_RESPDATA <= USED 0
-i2d_OCSP_RESPID <= USED 0
 i2d_OCSP_RESPONSE <= USED 0
 i2d_OCSP_REVOKEDINFO <= USED 0
 i2d_OCSP_SERVICELOC <= USED 0
 i2d_OCSP_SIGNATURE <= USED 0
 i2d_OCSP_SINGLERESP <= USED 0
+;FILE ocsp_err.obj
 ;FILE ofb128.obj
 ;FILE ofb64ede.obj
 ;FILE ofb64enc.obj
@@ -1152,6 +1227,8 @@ _Z8owAccessi <= USED 0
 _Z8owVerifyii <= USED 0
 _Z8setcrc16it <= USED 0
 _Z9msGettickv <= USED 0
+;FILE openSsl.obj
+_Z11SSL_GetTimeP15_DATE_TIME_INFO <= USED 0
 ;FILE p12_add.obj
 PKCS12_MAKE_KEYBAG <= USED 0
 PKCS12_MAKE_SHKEYBAG <= USED 0
@@ -1237,11 +1314,16 @@ EVP_PKEY_set_type_str <= USED 0
 ;FILE p_verify.obj
 ;FILE palevent_driver.obj
 ;FILE palevent_functions.obj
+;FILE pbuf.obj
+pbuf_coalesce <= USED 0
+pbuf_dechain <= USED 0
+pbuf_get_at <= USED 0
+pbuf_memcmp <= USED 0
+pbuf_memfind <= USED 0
+pbuf_strstr <= USED 0
+pbuf_take <= USED 0
 ;FILE pcy_cache.obj
-_Z16policy_cache_setP7x509_st <= USED 0
-_Z22policy_cache_find_dataPK20X509_POLICY_CACHE_stPK14asn1_object_st <= USED 0
 ;FILE pcy_data.obj
-_Z15policy_data_newP13POLICYINFO_stPK14asn1_object_sti <= USED 0
 ;FILE pcy_lib.obj
 X509_policy_level_get0_node <= USED 0
 X509_policy_level_node_count <= USED 0
@@ -1250,20 +1332,78 @@ X509_policy_node_get0_policy <= USED 0
 X509_policy_node_get0_qualifiers <= USED 0
 X509_policy_tree_get0_level <= USED 0
 X509_policy_tree_get0_policies <= USED 0
-X509_policy_tree_get0_user_policies <= USED 0
 X509_policy_tree_level_count <= USED 0
 ;FILE pcy_map.obj
-_Z24policy_cache_set_mappingP7x509_stP23stack_st_POLICY_MAPPING <= USED 0
 ;FILE pcy_node.obj
-_Z12tree_find_skP25stack_st_X509_POLICY_NODEPK14asn1_object_st <= USED 0
-_Z14level_add_nodeP20X509_POLICY_LEVEL_stPK19X509_POLICY_DATA_stP19X509_POLICY_NODE_stP19X509_POLICY_TREE_st <= USED 0
-_Z15level_find_nodePK20X509_POLICY_LEVEL_stPK19X509_POLICY_NODE_stPK14asn1_object_st <= USED 0
-_Z16policy_node_freeP19X509_POLICY_NODE_st <= USED 0
-_Z17policy_node_matchPK20X509_POLICY_LEVEL_stPK19X509_POLICY_NODE_stPK14asn1_object_st <= USED 0
-_Z19policy_node_cmp_newv <= USED 0
 ;FILE pcy_tree.obj
-X509_policy_check <= USED 0
-X509_policy_tree_free <= USED 0
+;FILE pem_all.obj
+PEM_read_DHparams <= USED 0
+PEM_read_DSAPrivateKey <= USED 0
+PEM_read_DSA_PUBKEY <= USED 0
+PEM_read_DSAparams <= USED 0
+PEM_read_ECPKParameters <= USED 0
+PEM_read_ECPrivateKey <= USED 0
+PEM_read_EC_PUBKEY <= USED 0
+PEM_read_NETSCAPE_CERT_SEQUENCE <= USED 0
+PEM_read_PKCS7 <= USED 0
+PEM_read_PUBKEY <= USED 0
+PEM_read_RSAPrivateKey <= USED 0
+PEM_read_RSAPublicKey <= USED 0
+PEM_read_RSA_PUBKEY <= USED 0
+PEM_read_X509_CRL <= USED 0
+PEM_read_X509_REQ <= USED 0
+PEM_read_bio_DHparams <= USED 0
+PEM_read_bio_DSAPrivateKey <= USED 0
+PEM_read_bio_DSA_PUBKEY <= USED 0
+PEM_read_bio_DSAparams <= USED 0
+PEM_read_bio_ECPKParameters <= USED 0
+PEM_read_bio_ECPrivateKey <= USED 0
+PEM_read_bio_EC_PUBKEY <= USED 0
+PEM_read_bio_NETSCAPE_CERT_SEQUENCE <= USED 0
+PEM_read_bio_PKCS7 <= USED 0
+PEM_read_bio_PUBKEY <= USED 0
+PEM_read_bio_RSAPrivateKey <= USED 0
+PEM_read_bio_RSAPublicKey <= USED 0
+PEM_read_bio_RSA_PUBKEY <= USED 0
+PEM_read_bio_X509_CRL <= USED 0
+PEM_read_bio_X509_REQ <= USED 0
+PEM_write_DHparams <= USED 0
+PEM_write_DSAPrivateKey <= USED 0
+PEM_write_DSA_PUBKEY <= USED 0
+PEM_write_DSAparams <= USED 0
+PEM_write_ECPKParameters <= USED 0
+PEM_write_ECPrivateKey <= USED 0
+PEM_write_EC_PUBKEY <= USED 0
+PEM_write_NETSCAPE_CERT_SEQUENCE <= USED 0
+PEM_write_PKCS7 <= USED 0
+PEM_write_PUBKEY <= USED 0
+PEM_write_RSAPrivateKey <= USED 0
+PEM_write_RSAPublicKey <= USED 0
+PEM_write_RSA_PUBKEY <= USED 0
+PEM_write_X509_CRL <= USED 0
+PEM_write_X509_REQ <= USED 0
+PEM_write_X509_REQ_NEW <= USED 0
+PEM_write_bio_DHparams <= USED 0
+PEM_write_bio_DSAPrivateKey <= USED 0
+PEM_write_bio_DSA_PUBKEY <= USED 0
+PEM_write_bio_DSAparams <= USED 0
+PEM_write_bio_ECPKParameters <= USED 0
+PEM_write_bio_ECPrivateKey <= USED 0
+PEM_write_bio_EC_PUBKEY <= USED 0
+PEM_write_bio_NETSCAPE_CERT_SEQUENCE <= USED 0
+PEM_write_bio_PKCS7 <= USED 0
+PEM_write_bio_PUBKEY <= USED 0
+PEM_write_bio_RSAPrivateKey <= USED 0
+PEM_write_bio_RSAPublicKey <= USED 0
+PEM_write_bio_RSA_PUBKEY <= USED 0
+PEM_write_bio_X509_CRL <= USED 0
+PEM_write_bio_X509_REQ <= USED 0
+PEM_write_bio_X509_REQ_NEW <= USED 0
+;FILE pem_err.obj
+;FILE pem_info.obj
+PEM_X509_INFO_read <= USED 0
+PEM_X509_INFO_read_bio <= USED 0
+PEM_X509_INFO_write_bio <= USED 0
 ;FILE pem_lib.obj
 PEM_ASN1_read <= USED 0
 PEM_ASN1_write <= USED 0
@@ -1303,8 +1443,18 @@ PEM_write_bio_PrivateKey <= USED 0
 PEM_read_X509 <= USED 0
 PEM_write_X509 <= USED 0
 PEM_write_bio_X509 <= USED 0
+;FILE pem_xaux.obj
+PEM_read_X509_AUX <= USED 0
+PEM_read_X509_CERT_PAIR <= USED 0
+PEM_read_bio_X509_AUX <= USED 0
+PEM_read_bio_X509_CERT_PAIR <= USED 0
+PEM_write_X509_AUX <= USED 0
+PEM_write_X509_CERT_PAIR <= USED 0
+PEM_write_bio_X509_AUX <= USED 0
+PEM_write_bio_X509_CERT_PAIR <= USED 0
 ;FILE piezo_stubs.obj
 _Z15Piezo_IsEnabledv <= USED 0
+;FILE pk12err.obj
 ;FILE pk7_asn1.obj
 PKCS7_ATTR_VERIFY_it <= USED 0
 PKCS7_DIGEST_free <= USED 0
@@ -1381,13 +1531,13 @@ PKCS7_set_cipher <= USED 0
 PKCS7_set_content <= USED 0
 PKCS7_set_digest <= USED 0
 PKCS7_set_type <= USED 0
+;FILE pkcs7err.obj
 ;FILE pmeth_fn.obj
 EVP_PKEY_verify_recover <= USED 0
 EVP_PKEY_verify_recover_init <= USED 0
 ;FILE pmeth_gn.obj
 EVP_PKEY_CTX_get_cb <= USED 0
 EVP_PKEY_CTX_get_keygen_info <= USED 0
-EVP_PKEY_new_mac_key <= USED 0
 ;FILE pmeth_lib.obj
 EVP_PKEY_CTX_ctrl_str <= USED 0
 EVP_PKEY_CTX_get0_peerkey <= USED 0
@@ -1421,11 +1571,13 @@ b2i_PublicKey_bio <= USED 0
 i2b_PVK_bio <= USED 0
 i2b_PrivateKey_bio <= USED 0
 i2b_PublicKey_bio <= USED 0
+;FILE rand_err.obj
 ;FILE rand_imxs.obj
 ;FILE rand_lib.obj
 RAND_cleanup <= USED 0
 RAND_set_rand_engine <= USED 0
 RAND_set_rand_method <= USED 0
+;FILE raw.obj
 ;FILE rc2_cbc.obj
 ;FILE rc2_ecb.obj
 ;FILE rc2_skey.obj
@@ -1437,14 +1589,13 @@ RC4_options <= USED 0
 ;FILE rmd_dgst.obj
 RIPEMD160_Transform <= USED 0
 ;FILE rsa_asn1.obj
-RSAPrivateKey_dup <= USED 0
 RSAPublicKey_dup <= USED 0
 ;FILE rsa_eay.obj
+;FILE rsa_err.obj
 ;FILE rsa_gen.obj
 ;FILE rsa_lib.obj
 RSA_blinding_off <= USED 0
 RSA_blinding_on <= USED 0
-RSA_flags <= USED 0
 RSA_get_ex_data <= USED 0
 RSA_get_ex_new_index <= USED 0
 RSA_get_method <= USED 0
@@ -1459,6 +1610,12 @@ RSA_set_method <= USED 0
 ;FILE rsa_sign.obj
 ;FILE rsa_ssl.obj
 ;FILE rsa_x931.obj
+;FILE s3_both.obj
+;FILE s3_clnt.obj
+;FILE s3_enc.obj
+;FILE s3_lib.obj
+;FILE s3_pkt.obj
+;FILE s3_srvr.obj
 ;FILE sdmmc_mci.obj
 _Z11SD_SPI_InitP7_SdCardP8SdDriver <= USED 0
 _Z5Cmd32P7_SdCardt <= USED 0
@@ -1495,9 +1652,12 @@ SHA512 <= USED 0
 SHA512_Transform <= USED 0
 ;FILE sha_dgst.obj
 SHA_Transform <= USED 0
-;FILE sockets_Stubs.obj
-_Z29SOCKETS_ProcessSocketActivityi <= USED 0
-_Z48HAL_SOCK_CONFIGURATION_LoadWirelessConfigurationjP26SOCK_WirelessConfiguration <= USED 0
+;FILE sockets.obj
+lwip_fcntl <= USED 0
+lwip_read <= USED 0
+lwip_write <= USED 0
+;FILE sockets_lwip.obj
+_ZN19Sockets_LWIP_Driver8ShutdownEii <= USED 0
 ;FILE spot_Hardware_pwm_fastcompile.obj
 ;FILE spot_fastcompile.obj
 ;FILE spot_hardware_onewire_native_Microsoft_SPOT_Hardware_OneWire.obj
@@ -1507,12 +1667,187 @@ _Z48HAL_SOCK_CONFIGURATION_LoadWirelessConfigurationjP26SOCK_WirelessConfigurati
 ;FILE spot_messaging_stub.obj
 ;FILE spot_native_Microsoft_SPOT_Serialization.obj
 ;FILE spot_net_security_native_Microsoft_SPOT_Net_Security_SslNative.obj
-;FILE ssl_pal_Stubs.obj
-_Z11SSL_GetTimeP15_DATE_TIME_INFO <= USED 0
-_Z14SSL_Initializev <= USED 0
-_Z16SSL_Uninitializev <= USED 0
+;FILE ssl_accept_internal.obj
+;FILE ssl_add_cert_auth_internal.obj
+;FILE ssl_algs.obj
+;FILE ssl_asn1.obj
+;FILE ssl_cert.obj
+SSL_CTX_add_client_CA <= USED 0
+SSL_CTX_get_client_CA_list <= USED 0
+SSL_CTX_set_client_CA_list <= USED 0
+SSL_add_client_CA <= USED 0
+SSL_add_dir_cert_subjects_to_stack <= USED 0
+SSL_add_file_cert_subjects_to_stack <= USED 0
+SSL_dup_CA_list <= USED 0
+SSL_load_client_CA_file <= USED 0
+SSL_set_client_CA_list <= USED 0
+ssl_set_peer_cert_type <= USED 0
+;FILE ssl_ciph.obj
+SSL_CIPHER_description <= USED 0
+SSL_CIPHER_get_bits <= USED 0
+SSL_CIPHER_get_name <= USED 0
+SSL_CIPHER_get_version <= USED 0
+SSL_COMP_add_compression_method <= USED 0
+SSL_COMP_get_name <= USED 0
+;FILE ssl_clear_cert_auth_internal.obj
+;FILE ssl_closesocket_internal.obj
+;FILE ssl_connect_internal.obj
+;FILE ssl_err.obj
+;FILE ssl_err2.obj
+;FILE ssl_exit_context_internal.obj
+;FILE ssl_generic_init_internal.obj
+;FILE ssl_initialize_internal.obj
+;FILE ssl_lib.obj
+SSL_CTX_get_ex_data <= USED 0
+SSL_CTX_get_ex_new_index <= USED 0
+SSL_CTX_get_quiet_shutdown <= USED 0
+SSL_CTX_get_verify_callback <= USED 0
+SSL_CTX_get_verify_depth <= USED 0
+SSL_CTX_get_verify_mode <= USED 0
+SSL_CTX_load_verify_locations <= USED 0
+SSL_CTX_sessions <= USED 0
+SSL_CTX_set1_param <= USED 0
+SSL_CTX_set_cipher_list <= USED 0
+SSL_CTX_set_default_passwd_cb <= USED 0
+SSL_CTX_set_default_passwd_cb_userdata <= USED 0
+SSL_CTX_set_default_verify_paths <= USED 0
+SSL_CTX_set_ex_data <= USED 0
+SSL_CTX_set_generate_session_id <= USED 0
+SSL_CTX_set_purpose <= USED 0
+SSL_CTX_set_quiet_shutdown <= USED 0
+SSL_CTX_set_session_id_context <= USED 0
+SSL_CTX_set_ssl_version <= USED 0
+SSL_CTX_set_trust <= USED 0
+SSL_CTX_set_verify_depth <= USED 0
+SSL_CTX_use_psk_identity_hint <= USED 0
+SSL_check_private_key <= USED 0
+SSL_copy_session_id <= USED 0
+SSL_do_handshake <= USED 0
+SSL_dup <= USED 0
+SSL_get_certificate <= USED 0
+SSL_get_cipher_list <= USED 0
+SSL_get_current_cipher <= USED 0
+SSL_get_current_compression <= USED 0
+SSL_get_current_expansion <= USED 0
+SSL_get_ex_data <= USED 0
+SSL_get_ex_new_index <= USED 0
+SSL_get_fd <= USED 0
+SSL_get_finished <= USED 0
+SSL_get_info_callback <= USED 0
+SSL_get_peer_cert_chain <= USED 0
+SSL_get_peer_certificate <= USED 0
+SSL_get_peer_finished <= USED 0
+SSL_get_privatekey <= USED 0
+SSL_get_psk_identity <= USED 0
+SSL_get_psk_identity_hint <= USED 0
+SSL_get_quiet_shutdown <= USED 0
+SSL_get_read_ahead <= USED 0
+SSL_get_rfd <= USED 0
+SSL_get_servername <= USED 0
+SSL_get_servername_type <= USED 0
+SSL_get_shared_ciphers <= USED 0
+SSL_get_shutdown <= USED 0
+SSL_get_ssl_method <= USED 0
+SSL_get_verify_callback <= USED 0
+SSL_get_verify_depth <= USED 0
+SSL_get_verify_mode <= USED 0
+SSL_get_verify_result <= USED 0
+SSL_get_version <= USED 0
+SSL_get_wfd <= USED 0
+SSL_peek <= USED 0
+SSL_renegotiate <= USED 0
+SSL_renegotiate_pending <= USED 0
+SSL_set1_param <= USED 0
+SSL_set_SSL_CTX <= USED 0
+SSL_set_cipher_list <= USED 0
+SSL_set_ex_data <= USED 0
+SSL_set_generate_session_id <= USED 0
+SSL_set_info_callback <= USED 0
+SSL_set_purpose <= USED 0
+SSL_set_quiet_shutdown <= USED 0
+SSL_set_read_ahead <= USED 0
+SSL_set_rfd <= USED 0
+SSL_set_session_id_context <= USED 0
+SSL_set_shutdown <= USED 0
+SSL_set_ssl_method <= USED 0
+SSL_set_trust <= USED 0
+SSL_set_verify <= USED 0
+SSL_set_verify_depth <= USED 0
+SSL_set_verify_result <= USED 0
+SSL_set_wfd <= USED 0
+SSL_use_psk_identity_hint <= USED 0
+_Z17SSL_callback_ctrlP6ssl_stiPFvvE <= USED 0
+_Z18SSL_CTX_set_verifyP10ssl_ctx_stiPFiiP17x509_store_ctx_stE <= USED 0
+_Z20SSL_set_msg_callbackP6ssl_stPFviiiPKvjS0_PvE <= USED 0
+_Z21SSL_CTX_callback_ctrlP10ssl_ctx_stiPFvvE <= USED 0
+_Z23SSL_set_tmp_dh_callbackP6ssl_stPFP5dh_stS0_iiE <= USED 0
+_Z24SSL_CTX_set_msg_callbackP10ssl_ctx_stPFviiiPKvjP6ssl_stPvE <= USED 0
+_Z24SSL_set_tmp_rsa_callbackP6ssl_stPFP6rsa_stS0_iiE <= USED 0
+_Z25SSL_set_tmp_ecdh_callbackP6ssl_stPFP9ec_key_stS0_iiE <= USED 0
+_Z27SSL_CTX_set_tmp_dh_callbackP10ssl_ctx_stPFP5dh_stP6ssl_stiiE <= USED 0
+_Z27SSL_set_psk_client_callbackP6ssl_stPFjS0_PKcPcjPhjE <= USED 0
+_Z27SSL_set_psk_server_callbackP6ssl_stPFjS0_PKcPhjE <= USED 0
+_Z28SSL_CTX_set_tmp_rsa_callbackP10ssl_ctx_stPFP6rsa_stP6ssl_stiiE <= USED 0
+_Z29SSL_CTX_set_tmp_ecdh_callbackP10ssl_ctx_stPFP9ec_key_stP6ssl_stiiE <= USED 0
+_Z31SSL_CTX_set_psk_client_callbackP10ssl_ctx_stPFjP6ssl_stPKcPcjPhjE <= USED 0
+_Z31SSL_CTX_set_psk_server_callbackP10ssl_ctx_stPFjP6ssl_stPKcPhjE <= USED 0
+_Z32SSL_CTX_set_cert_verify_callbackP10ssl_ctx_stPFiP17x509_store_ctx_stPvES3_ <= USED 0
+ssl_bad_method <= USED 0
+ssl_ok <= USED 0
+ssl_undefined_const_function <= USED 0
 ;FILE ssl_parse_certificate_internal.obj
-_Z30ssl_parse_certificate_internalPvjS_S_ <= USED 0
+;FILE ssl_pending_internal.obj
+;FILE ssl_read_internal.obj
+;FILE ssl_rsa.obj
+SSL_CTX_use_PrivateKey_ASN1 <= USED 0
+SSL_CTX_use_PrivateKey_file <= USED 0
+SSL_CTX_use_RSAPrivateKey <= USED 0
+SSL_CTX_use_RSAPrivateKey_ASN1 <= USED 0
+SSL_CTX_use_RSAPrivateKey_file <= USED 0
+SSL_CTX_use_certificate_ASN1 <= USED 0
+SSL_CTX_use_certificate_chain_file <= USED 0
+SSL_CTX_use_certificate_file <= USED 0
+SSL_use_PrivateKey_ASN1 <= USED 0
+SSL_use_PrivateKey_file <= USED 0
+SSL_use_RSAPrivateKey <= USED 0
+SSL_use_RSAPrivateKey_ASN1 <= USED 0
+SSL_use_RSAPrivateKey_file <= USED 0
+SSL_use_certificate_ASN1 <= USED 0
+SSL_use_certificate_file <= USED 0
+;FILE ssl_sess.obj
+PEM_read_SSL_SESSION <= USED 0
+PEM_read_bio_SSL_SESSION <= USED 0
+PEM_write_SSL_SESSION <= USED 0
+PEM_write_bio_SSL_SESSION <= USED 0
+SSL_CTX_get_client_cert_cb <= USED 0
+SSL_CTX_get_info_callback <= USED 0
+SSL_CTX_get_timeout <= USED 0
+SSL_CTX_sess_get_get_cb <= USED 0
+SSL_CTX_sess_get_new_cb <= USED 0
+SSL_CTX_sess_get_remove_cb <= USED 0
+SSL_CTX_set_client_cert_engine <= USED 0
+SSL_CTX_set_timeout <= USED 0
+SSL_SESSION_get_ex_data <= USED 0
+SSL_SESSION_get_ex_new_index <= USED 0
+SSL_SESSION_get_id <= USED 0
+SSL_SESSION_get_time <= USED 0
+SSL_SESSION_get_timeout <= USED 0
+SSL_SESSION_set_ex_data <= USED 0
+SSL_SESSION_set_time <= USED 0
+SSL_SESSION_set_timeout <= USED 0
+SSL_get1_session <= USED 0
+SSL_get_session <= USED 0
+SSL_set_session <= USED 0
+SSL_set_session_ticket_ext <= USED 0
+SSL_set_session_ticket_ext_cb <= USED 0
+_Z23SSL_CTX_sess_set_get_cbP10ssl_ctx_stPFP14ssl_session_stP6ssl_stPhiPiE <= USED 0
+_Z23SSL_CTX_sess_set_new_cbP10ssl_ctx_stPFiP6ssl_stP14ssl_session_stE <= USED 0
+_Z25SSL_CTX_set_info_callbackP10ssl_ctx_stPFvPK6ssl_stiiE <= USED 0
+_Z25SSL_set_session_secret_cbP6ssl_stPFiS0_PvPiP19stack_st_SSL_CIPHERPP13ssl_cipher_stS1_ES1_ <= USED 0
+_Z26SSL_CTX_sess_set_remove_cbP10ssl_ctx_stPFvS0_P14ssl_session_stE <= USED 0
+_Z26SSL_CTX_set_client_cert_cbP10ssl_ctx_stPFiP6ssl_stPP7x509_stPP11evp_pkey_stE <= USED 0
+_Z28SSL_CTX_set_cookie_verify_cbP10ssl_ctx_stPFiP6ssl_stPhjE <= USED 0
+_Z30SSL_CTX_set_cookie_generate_cbP10ssl_ctx_stPFiP6ssl_stPhPjE <= USED 0
 ;FILE ssl_types.obj
 _Z13tinyclr_qsortPvjjPFiPKvS1_E <= USED 0
 tinyclr_localtime <= USED 0
@@ -1523,18 +1858,24 @@ tinyclr_ssl_gethostbyname <= USED 0
 tinyclr_ssl_getservbyname <= USED 0
 tinyclr_ssl_gettimeofday <= USED 0
 tinyclr_ssl_stat <= USED 0
+;FILE ssl_uninitialize_internal.obj
+;FILE ssl_write_internal.obj
 ;FILE stack.obj
-sk_delete_ptr <= USED 0
-sk_dup <= USED 0
 sk_find_ex <= USED 0
-sk_shift <= USED 0
 sk_unshift <= USED 0
-sk_zero <= USED 0
 ;FILE stubs_functions_DA.obj
 ;FILE stubs_functions_WATCHDOG.obj
 _Z15Watchdog_EnablejPFvPvES_ <= USED 0
 _Z17Watchdog_ResetCpuv <= USED 0
+;FILE sys__tinyclr.obj
+_Z17sys_arch_timeoutsv <= USED 0
+sys_jiffies <= USED 0
 ;FILE system_xml_fastcompile.obj
+;FILE t1_clnt.obj
+;FILE t1_enc.obj
+;FILE t1_lib.obj
+;FILE t1_reneg.obj
+;FILE t1_srvr.obj
 ;FILE t_pkey.obj
 ;FILE t_x509.obj
 ASN1_TIME_print <= USED 0
@@ -1627,7 +1968,6 @@ i2d_ASN1_GENERALIZEDTIME <= USED 0
 i2d_ASN1_GENERALSTRING <= USED 0
 i2d_ASN1_IA5STRING <= USED 0
 i2d_ASN1_NULL <= USED 0
-i2d_ASN1_OCTET_STRING <= USED 0
 i2d_ASN1_PRINTABLE <= USED 0
 i2d_ASN1_PRINTABLESTRING <= USED 0
 i2d_ASN1_T61STRING <= USED 0
@@ -1699,6 +2039,18 @@ ENGINE_register_all_RSA <= USED 0
 ENGINE_set_RSA <= USED 0
 ENGINE_set_default_RSA <= USED 0
 ENGINE_unregister_RSA <= USED 0
+;FILE tcp.obj
+tcp_debug_print_pcbs <= USED 0
+tcp_debug_state_str <= USED 0
+tcp_setprio <= USED 0
+;FILE tcp_in.obj
+;FILE tcp_out.obj
+;FILE tcpip.obj
+mem_free_callback <= USED 0
+pbuf_free_callback <= USED 0
+tcpip_netifapi <= USED 0
+tcpip_untimeout <= USED 0
+;FILE timers.obj
 ;FILE timeservice_driver.obj
 ;FILE timeservice_functions.obj
 ;FILE tinyclr.obj
@@ -1717,6 +2069,10 @@ _Z28GHI_OSH_HAL_Touch_UseDefaultj <= USED 0
 ;FILE touchpanel_driver.obj
 ;FILE touchpanel_functions.obj
 _Z33TOUCH_PANEL_EnableTouchCollectioniiiiiP14PAL_GFX_Bitmap <= USED 0
+;FILE ts_err.obj
+;FILE udp.obj
+udp_disconnect <= USED 0
+;FILE ui_err.obj
 ;FILE ui_lib.obj
 UI_add_error_string <= USED 0
 UI_add_info_string <= USED 0
@@ -1836,13 +2192,11 @@ i2d_EXTENDED_KEY_USAGE <= USED 0
 ;FILE v3_genn.obj
 EDIPARTYNAME_free <= USED 0
 EDIPARTYNAME_new <= USED 0
-GENERAL_NAME_cmp <= USED 0
 GENERAL_NAME_dup <= USED 0
 GENERAL_NAME_get0_otherName <= USED 0
 GENERAL_NAME_get0_value <= USED 0
 GENERAL_NAME_set0_othername <= USED 0
 GENERAL_NAME_set0_value <= USED 0
-OTHERNAME_cmp <= USED 0
 OTHERNAME_free <= USED 0
 d2i_EDIPARTYNAME <= USED 0
 d2i_GENERAL_NAME <= USED 0
@@ -1868,7 +2222,6 @@ X509V3_EXT_cleanup <= USED 0
 X509V3_add1_i2d <= USED 0
 X509V3_add_standard_extensions <= USED 0
 ;FILE v3_ncons.obj
-NAME_CONSTRAINTS_check <= USED 0
 ;FILE v3_pcia.obj
 PROXY_POLICY_free <= USED 0
 PROXY_POLICY_new <= USED 0
@@ -1890,20 +2243,13 @@ X509V3_EXT_val_prn <= USED 0
 X509V3_extensions_print <= USED 0
 ;FILE v3_purp.obj
 X509_PURPOSE_cleanup <= USED 0
-X509_PURPOSE_get0 <= USED 0
 X509_PURPOSE_get0_name <= USED 0
 X509_PURPOSE_get0_sname <= USED 0
-X509_PURPOSE_get_by_id <= USED 0
 X509_PURPOSE_get_by_sname <= USED 0
 X509_PURPOSE_get_count <= USED 0
 X509_PURPOSE_get_id <= USED 0
 X509_PURPOSE_get_trust <= USED 0
 X509_PURPOSE_set <= USED 0
-X509_check_akid <= USED 0
-X509_check_ca <= USED 0
-X509_check_issued <= USED 0
-X509_check_purpose <= USED 0
-X509_supported_extension <= USED 0
 _Z16X509_PURPOSE_addiiiPFiPK15x509_purpose_stPK7x509_stiEPcS7_Pv <= USED 0
 ;FILE v3_skey.obj
 ;FILE v3_sxnet.obj
@@ -1920,6 +2266,7 @@ X509_REQ_get1_email <= USED 0
 X509_email_free <= USED 0
 X509_get1_email <= USED 0
 X509_get1_ocsp <= USED 0
+;FILE v3err.obj
 ;FILE wp_block.obj
 ;FILE wp_dgst.obj
 WHIRLPOOL <= USED 0
@@ -1944,11 +2291,8 @@ X509at_get_attr_by_NID <= USED 0
 X509at_get_attr_by_OBJ <= USED 0
 X509at_get_attr_count <= USED 0
 ;FILE x509_cmp.obj
-X509_CRL_cmp <= USED 0
-X509_CRL_match <= USED 0
 X509_NAME_hash <= USED 0
 X509_NAME_hash_old <= USED 0
-X509_cmp <= USED 0
 X509_find_by_issuer_and_serial <= USED 0
 X509_find_by_subject <= USED 0
 X509_get0_pubkey_bitstr <= USED 0
@@ -1957,9 +2301,11 @@ X509_issuer_and_serial_hash <= USED 0
 X509_issuer_name_cmp <= USED 0
 X509_issuer_name_hash <= USED 0
 X509_issuer_name_hash_old <= USED 0
-X509_subject_name_cmp <= USED 0
 X509_subject_name_hash <= USED 0
 X509_subject_name_hash_old <= USED 0
+;FILE x509_d2.obj
+X509_STORE_load_locations <= USED 0
+X509_STORE_set_default_paths <= USED 0
 ;FILE x509_def.obj
 X509_get_default_cert_area <= USED 0
 X509_get_default_cert_dir <= USED 0
@@ -1967,12 +2313,11 @@ X509_get_default_cert_dir_env <= USED 0
 X509_get_default_cert_file <= USED 0
 X509_get_default_cert_file_env <= USED 0
 X509_get_default_private_dir <= USED 0
+;FILE x509_err.obj
 ;FILE x509_ext.obj
 X509_CRL_add1_ext_i2d <= USED 0
 X509_CRL_add_ext <= USED 0
 X509_CRL_delete_ext <= USED 0
-X509_CRL_get_ext <= USED 0
-X509_CRL_get_ext_by_NID <= USED 0
 X509_CRL_get_ext_by_OBJ <= USED 0
 X509_CRL_get_ext_by_critical <= USED 0
 X509_CRL_get_ext_count <= USED 0
@@ -1989,32 +2334,15 @@ X509_add_ext <= USED 0
 X509_delete_ext <= USED 0
 X509_get_ext_by_OBJ <= USED 0
 X509_get_ext_by_critical <= USED 0
-X509_get_ext_count <= USED 0
-X509_get_ext_d2i <= USED 0
 ;FILE x509_lu.obj
 X509_LOOKUP_by_alias <= USED 0
 X509_LOOKUP_by_fingerprint <= USED 0
 X509_LOOKUP_by_issuer_serial <= USED 0
-X509_LOOKUP_by_subject <= USED 0
 X509_LOOKUP_ctrl <= USED 0
-X509_LOOKUP_free <= USED 0
 X509_LOOKUP_init <= USED 0
 X509_LOOKUP_new <= USED 0
-X509_LOOKUP_shutdown <= USED 0
-X509_OBJECT_free_contents <= USED 0
-X509_OBJECT_idx_by_subject <= USED 0
-X509_OBJECT_retrieve_by_subject <= USED 0
-X509_OBJECT_retrieve_match <= USED 0
-X509_OBJECT_up_ref_count <= USED 0
-X509_STORE_CTX_get1_issuer <= USED 0
-X509_STORE_add_cert <= USED 0
 X509_STORE_add_crl <= USED 0
 X509_STORE_add_lookup <= USED 0
-X509_STORE_free <= USED 0
-X509_STORE_get1_certs <= USED 0
-X509_STORE_get1_crls <= USED 0
-X509_STORE_get_by_subject <= USED 0
-X509_STORE_new <= USED 0
 X509_STORE_set1_param <= USED 0
 X509_STORE_set_depth <= USED 0
 X509_STORE_set_flags <= USED 0
@@ -2043,34 +2371,26 @@ X509_REQ_set_extension_nids <= USED 0
 X509_to_X509_REQ <= USED 0
 ;FILE x509_trs.obj
 X509_TRUST_cleanup <= USED 0
-X509_TRUST_get0 <= USED 0
 X509_TRUST_get0_name <= USED 0
-X509_TRUST_get_by_id <= USED 0
 X509_TRUST_get_count <= USED 0
 X509_TRUST_get_flags <= USED 0
 X509_TRUST_get_trust <= USED 0
 X509_TRUST_set <= USED 0
-X509_check_trust <= USED 0
 _Z14X509_TRUST_addiiPFiP13x509_trust_stP7x509_stiEPciPv <= USED 0
 _Z22X509_TRUST_set_defaultPFiiP7x509_stiE <= USED 0
 ;FILE x509_v3.obj
 X509_EXTENSION_create_by_NID <= USED 0
 X509_EXTENSION_create_by_OBJ <= USED 0
-X509_EXTENSION_get_data <= USED 0
-X509_EXTENSION_get_object <= USED 0
 X509_EXTENSION_set_critical <= USED 0
 X509_EXTENSION_set_data <= USED 0
 X509_EXTENSION_set_object <= USED 0
 X509v3_add_ext <= USED 0
 X509v3_delete_ext <= USED 0
 X509v3_get_ext_by_critical <= USED 0
-X509v3_get_ext_count <= USED 0
 ;FILE x509_vfy.obj
-X509_STORE_CTX_cleanup <= USED 0
 X509_STORE_CTX_free <= USED 0
 X509_STORE_CTX_get0_current_crl <= USED 0
 X509_STORE_CTX_get0_current_issuer <= USED 0
-X509_STORE_CTX_get0_param <= USED 0
 X509_STORE_CTX_get0_parent_ctx <= USED 0
 X509_STORE_CTX_get0_policy_tree <= USED 0
 X509_STORE_CTX_get1_chain <= USED 0
@@ -2079,42 +2399,27 @@ X509_STORE_CTX_get_current_cert <= USED 0
 X509_STORE_CTX_get_error <= USED 0
 X509_STORE_CTX_get_error_depth <= USED 0
 X509_STORE_CTX_get_ex_data <= USED 0
-X509_STORE_CTX_get_ex_new_index <= USED 0
 X509_STORE_CTX_get_explicit_policy <= USED 0
-X509_STORE_CTX_init <= USED 0
 X509_STORE_CTX_new <= USED 0
 X509_STORE_CTX_purpose_inherit <= USED 0
 X509_STORE_CTX_set0_crls <= USED 0
-X509_STORE_CTX_set0_param <= USED 0
 X509_STORE_CTX_set_cert <= USED 0
 X509_STORE_CTX_set_chain <= USED 0
-X509_STORE_CTX_set_default <= USED 0
 X509_STORE_CTX_set_depth <= USED 0
 X509_STORE_CTX_set_error <= USED 0
-X509_STORE_CTX_set_ex_data <= USED 0
 X509_STORE_CTX_set_flags <= USED 0
 X509_STORE_CTX_set_purpose <= USED 0
 X509_STORE_CTX_set_time <= USED 0
 X509_STORE_CTX_set_trust <= USED 0
-X509_STORE_CTX_set_verify_cb <= USED 0
 X509_STORE_CTX_trusted_stack <= USED 0
 X509_cmp_current_time <= USED 0
-X509_cmp_time <= USED 0
-X509_get_pubkey_parameters <= USED 0
-X509_verify_cert <= USED 0
 ;FILE x509_vpm.obj
 X509_VERIFY_PARAM_add0_policy <= USED 0
 X509_VERIFY_PARAM_add0_table <= USED 0
 X509_VERIFY_PARAM_clear_flags <= USED 0
-X509_VERIFY_PARAM_free <= USED 0
 X509_VERIFY_PARAM_get_depth <= USED 0
 X509_VERIFY_PARAM_get_flags <= USED 0
-X509_VERIFY_PARAM_inherit <= USED 0
-X509_VERIFY_PARAM_lookup <= USED 0
-X509_VERIFY_PARAM_new <= USED 0
-X509_VERIFY_PARAM_set1 <= USED 0
 X509_VERIFY_PARAM_set1_name <= USED 0
-X509_VERIFY_PARAM_set1_policies <= USED 0
 X509_VERIFY_PARAM_set_depth <= USED 0
 X509_VERIFY_PARAM_set_flags <= USED 0
 X509_VERIFY_PARAM_set_purpose <= USED 0
@@ -2131,6 +2436,7 @@ X509_NAME_get_text_by_OBJ <= USED 0
 X509_REQ_set_pubkey <= USED 0
 X509_REQ_set_subject_name <= USED 0
 X509_REQ_set_version <= USED 0
+;FILE x509type.obj
 ;FILE x_algor.obj
 X509_ALGORS_it <= USED 0
 X509_ALGOR_dup <= USED 0
@@ -2146,10 +2452,8 @@ X509_NAME_digest <= USED 0
 X509_REQ_digest <= USED 0
 X509_REQ_sign <= USED 0
 X509_REQ_verify <= USED 0
-X509_digest <= USED 0
 X509_pubkey_digest <= USED 0
 X509_sign <= USED 0
-X509_verify <= USED 0
 d2i_DSAPrivateKey_bio <= USED 0
 d2i_DSAPrivateKey_fp <= USED 0
 d2i_DSA_PUBKEY_bio <= USED 0
@@ -2223,14 +2527,11 @@ X509_CRL_INFO_new <= USED 0
 X509_CRL_METHOD_free <= USED 0
 X509_CRL_add0_revoked <= USED 0
 X509_CRL_dup <= USED 0
-X509_CRL_free <= USED 0
-X509_CRL_get0_by_cert <= USED 0
 X509_CRL_get0_by_serial <= USED 0
 X509_CRL_get_meth_data <= USED 0
 X509_CRL_new <= USED 0
 X509_CRL_set_default_method <= USED 0
 X509_CRL_set_meth_data <= USED 0
-X509_CRL_verify <= USED 0
 X509_REVOKED_free <= USED 0
 X509_REVOKED_new <= USED 0
 _Z19X509_CRL_METHOD_newPFiP11X509_crl_stES2_PFiS0_PP15x509_revoked_stP14asn1_string_stP12X509_name_stEPFiS0_P11evp_pkey_stE <= USED 0
@@ -2241,18 +2542,16 @@ i2d_X509_CRL <= USED 0
 i2d_X509_CRL_INFO <= USED 0
 i2d_X509_REVOKED <= USED 0
 ;FILE x_exten.obj
-X509_EXTENSIONS_it <= USED 0
 X509_EXTENSION_dup <= USED 0
-X509_EXTENSION_free <= USED 0
 X509_EXTENSION_new <= USED 0
 d2i_X509_EXTENSION <= USED 0
-d2i_X509_EXTENSIONS <= USED 0
 i2d_X509_EXTENSION <= USED 0
-i2d_X509_EXTENSIONS <= USED 0
+;FILE x_info.obj
+X509_INFO_free <= USED 0
+X509_INFO_new <= USED 0
 ;FILE x_long.obj
 ;FILE x_name.obj
 X509_NAME_set <= USED 0
-d2i_X509_NAME <= USED 0
 d2i_X509_NAME_ENTRY <= USED 0
 i2d_X509_NAME_ENTRY <= USED 0
 ;FILE x_pkey.obj

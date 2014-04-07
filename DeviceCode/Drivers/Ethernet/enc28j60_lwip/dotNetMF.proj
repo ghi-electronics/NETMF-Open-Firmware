@@ -42,7 +42,7 @@
   <ItemGroup>
     <Compile Include="enc28j60_lwip.cpp" />
     <Compile Include="enc28j60_lwip_driver.cpp" />
-    <IncludePaths Include="DeviceCode\arm\Drivers\Ethernet\ENC28J60_lwip" />
+    <IncludePaths Include="DeviceCode\Drivers\Ethernet\ENC28J60_lwip" />
     <IncludePaths Include="DeviceCode\pal\net" />
     <IncludePaths Include="DeviceCode\pal\lwip\LWIP\src\include" />
     <IncludePaths Include="DeviceCode\pal\lwip\LWIP\src\include\ipv4" />

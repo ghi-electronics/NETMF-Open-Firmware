@@ -29,7 +29,7 @@ void        enc28j60_lwip_setup_recv_buffer( struct netif *pNetIF, SPI_CONFIGURA
 
 /*          STRUCTURES                                                  */
 
-#define ETHERSIZE        ((ENC28J60_TRANSMIT_BUFFER_END - ENC28J60_TRANSMIT_BUFFER_START)>>1)   /* maximum number of bytes in ETHERNET packet */
+#define ETHERSIZE        (ENC28J60_TRANSMIT_BUFFER_END - ENC28J60_TRANSMIT_BUFFER_START)   /* maximum number of bytes in ETHERNET packet */
                                 /* (used by ethernet drivers)   */
 
 #define ETHER_MIN_LEN    64  /* minimum number of bytes in an ETHERNET */
