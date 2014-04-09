@@ -19,8 +19,7 @@ struct Library_Lib_GHI_Networking_BaseInterface
     static const int FIELD__networkAvailable = 1;
     static const int FIELD__type = 2;
     static const int FIELD__networkInterface = 3;
-    static const int FIELD__interfaceIndex = 4;
-    static const int FIELD__disposed = 5;
+    static const int FIELD__disposed = 4;
 
     TINYCLR_NATIVE_DECLARE(NativeConstructor___VOID);
     TINYCLR_NATIVE_DECLARE(NativeDispose___VOID);
@@ -34,23 +33,23 @@ struct Library_Lib_GHI_Networking_BaseInterface
 
 struct Library_Lib_GHI_Networking_WiFiRS9110
 {
-    static const int FIELD__waitOnScan = 6;
-    static const int FIELD__waitOnSendBssidRequest = 7;
-    static const int FIELD__waitOnJoin = 8;
-    static const int FIELD__waitOnDisconnect = 9;
-    static const int FIELD__waitOnConnectionStatusResponse = 10;
-    static const int FIELD__waitOnCardReady = 11;
-    static const int FIELD__waitOnImageUpgrade = 12;
-    static const int FIELD__activeNetwork = 13;
-    static const int FIELD__resetPin = 14;
-    static const int FIELD__eventWorker = 15;
-    static const int FIELD__version = 16;
-    static const int FIELD__spi = 17;
-    static const int FIELD__chipSelect = 18;
-    static const int FIELD__externalInterrupt = 19;
-    static const int FIELD__clockRate = 20;
-    static const int FIELD__timeout = 21;
-    static const int FIELD__hardwareMacAddress = 22;
+    static const int FIELD__waitOnScan = 5;
+    static const int FIELD__waitOnSendBssidRequest = 6;
+    static const int FIELD__waitOnJoin = 7;
+    static const int FIELD__waitOnDisconnect = 8;
+    static const int FIELD__waitOnConnectionStatusResponse = 9;
+    static const int FIELD__waitOnCardReady = 10;
+    static const int FIELD__waitOnImageUpgrade = 11;
+    static const int FIELD__activeNetwork = 12;
+    static const int FIELD__resetPin = 13;
+    static const int FIELD__eventWorker = 14;
+    static const int FIELD__version = 15;
+    static const int FIELD__spi = 16;
+    static const int FIELD__chipSelect = 17;
+    static const int FIELD__externalInterrupt = 18;
+    static const int FIELD__clockRate = 19;
+    static const int FIELD__timeout = 20;
+    static const int FIELD__hardwareMacAddress = 21;
 
     TINYCLR_NATIVE_DECLARE(NativeGetLastJoinError___U2);
     TINYCLR_NATIVE_DECLARE(NativeGetScanResponseSize___I4);
@@ -90,11 +89,11 @@ struct Library_Lib_GHI_Networking_EthernetBuiltIn
 
 struct Library_Lib_GHI_Networking_EthernetENC28J60
 {
-    static const int FIELD__resetPin = 6;
-    static const int FIELD__spi = 7;
-    static const int FIELD__chipSelect = 8;
-    static const int FIELD__externalInterrupt = 9;
-    static const int FIELD__clockRate = 10;
+    static const int FIELD__resetPin = 5;
+    static const int FIELD__spi = 6;
+    static const int FIELD__chipSelect = 7;
+    static const int FIELD__externalInterrupt = 8;
+    static const int FIELD__clockRate = 9;
 
     TINYCLR_NATIVE_DECLARE(NativeSetHalConfig___VOID);
     TINYCLR_NATIVE_DECLARE(NativeIsCableConnected___BOOLEAN);

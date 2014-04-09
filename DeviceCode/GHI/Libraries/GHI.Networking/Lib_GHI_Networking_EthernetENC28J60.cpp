@@ -16,16 +16,16 @@
 
 using namespace GHI::Networking;
 
+bool ENC28J60Ethernet_Network_Interface_IsCableConnected();
+void ENC28J60Ethernet_Netwrok_Interface_SetHalConfig(INT32 spi, INT32 chipSelect, INT32 externalInterrupt, INT32 clockRateKhz);
+
 void EthernetENC28J60::NativeSetHalConfig( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
 {
-	if (Get_spi(pMngObj) != 0 || Get_chipSelect(pMngObj) != 45 || Get_externalInterrupt(pMngObj) != 40)
-		hr = CLR_E_NOT_SUPPORTED;
+	ENC28J60Ethernet_Netwrok_Interface_SetHalConfig(Get_spi(pMngObj), Get_chipSelect(pMngObj), Get_externalInterrupt(pMngObj), Get_clockRate(pMngObj));
 }
 
 INT8 EthernetENC28J60::NativeIsCableConnected( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
 {
-    hr = CLR_E_NOT_SUPPORTED;
-	
-	return 0;
+    return ENC28J60Ethernet_Network_Interface_IsCableConnected();
 }
 
