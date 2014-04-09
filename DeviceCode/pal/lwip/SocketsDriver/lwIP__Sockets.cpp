@@ -69,7 +69,7 @@ BOOL LWIP_SOCKETS_Driver::Initialize()
     g_LOOPBACK_LWIP_Driver.Bind();
     g_LOOPBACK_LWIP_Driver.Open();
 #endif 
-
+#if 1
     for(i=0; i<g_NetworkConfig.NetworkInterfaceCount; i++)
     {
         int interfaceNumber;
@@ -105,7 +105,7 @@ BOOL LWIP_SOCKETS_Driver::Initialize()
         }
         
     }
-
+#endif
     return TRUE;
 }
 
@@ -719,6 +719,7 @@ HRESULT LWIP_SOCKETS_Driver::UpdateAdapterConfiguration( UINT32 interfaceIndex, 
                 // dns
                 if(fEnableDhcp && fDhcpStarted)
                 {
+					netif_set_addr(pNetIf, 0, 0, 0);
                     dhcp_stop(pNetIf);
                     dhcp_start(pNetIf);
                 }
@@ -752,6 +753,7 @@ HRESULT LWIP_SOCKETS_Driver::UpdateAdapterConfiguration( UINT32 interfaceIndex, 
         {   
             if(!fDhcpStarted)
             {
+				netif_set_addr(pNetIf, 0, 0, 0);
                 if(ERR_OK != dhcp_start(pNetIf))
                 {
                     return CLR_E_FAIL;
@@ -1131,5 +1133,9 @@ struct netif *netif_find_interface(int num)
         }
     }
     return NULL;
+}
+void LWIP_SOCKETS_Driver::SetInterfaceNumber( UINT32 interfaceIndex,int interfaceNumber)
+{
+	g_LWIP_SOCKETS_Driver.m_interfaces[interfaceIndex].m_interfaceNumber = interfaceNumber;
 }
 

@@ -153,3 +153,7 @@ void * HAL_SOCK_GlobalLockContext()
     NATIVE_PROFILE_PAL_NETWORK();
     return NULL;
 }
+void  HAL_SOCK_LWIP_SOCKETS_Driver_SET_InterfaceNumber(UINT32 index, int interfaceNumber)
+{
+	 LWIP_SOCKETS_Driver::SetInterfaceNumber(index,interfaceNumber);
+}

@@ -186,7 +186,8 @@ lwip_socket_init(void)
   //[MS_CHANGE] - make sure the globals are initialized to zero
   select_cb_list = NULL;
   memset(sockets, 0, sizeof(struct lwip_sock) * NUM_SOCKETS);
-  //[END_MS_CHANGE]
+  //[END_MS_CHANGE]
+
 }
 
 /**
@@ -515,7 +516,12 @@ lwip_connect(int s, const struct sockaddr *name, socklen_t namelen)
     LWIP_DEBUGF(SOCKETS_DEBUG, (" port=%"U16_F")\n", ntohs(remote_port)));
 
     //[MS_CHANGE]
-    sock->conn->state = NETCONN_CONNECT;
+    //sock->conn->state = NETCONN_CONNECT;
+	//TQD fix can not read website - 3/12/2014
+    if(sock->conn->type == NETCONN_TCP)
+    {
+        sock->sendevent = 0;
+    }
     //[END_MS_CHANGE]
     
     err = netconn_connect(sock->conn, &remote_addr, ntohs(remote_port));
@@ -998,7 +1004,8 @@ lwip_socket(int domain, int type, int protocol)
        set_errno(EINVAL);
        return -1;
     }
-    //[END_MS_CHANGE]
+    //[END_MS_CHANGE]
+
     conn = netconn_new_with_callback( (protocol == IPPROTO_UDPLITE) ?
                  NETCONN_UDPLITE : NETCONN_UDP, event_callback);
     LWIP_DEBUGF(SOCKETS_DEBUG, ("lwip_socket(%s, SOCK_DGRAM, %d) = ",

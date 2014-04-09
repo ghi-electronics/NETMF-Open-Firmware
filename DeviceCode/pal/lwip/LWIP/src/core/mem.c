@@ -182,6 +182,8 @@ u8_t ram_heap[MEM_SIZE_ALIGNED + (2*SIZEOF_STRUCT_MEM) + MEM_ALIGNMENT];
 #define LWIP_RAM_HEAP_POINTER ram_heap
 #endif /* LWIP_RAM_HEAP_POINTER */
 
+u32_t SOCKETS_HAL_SOCKETS_LWIP_RAM_HEAP_SDRAM_ADDRESS = (((u32_t)&ram_heap));
+u32_t SOCKETS_HAL_SOCKETS_LWIP_RAM_HEAP_SDRAM_SIZE = ((sizeof(ram_heap)/sizeof(ram_heap[0])));
 /** pointer to the heap (ram_heap): for alignment, ram is now a pointer instead of an array */
 static u8_t *ram;
 /** the last entry, always unused! */

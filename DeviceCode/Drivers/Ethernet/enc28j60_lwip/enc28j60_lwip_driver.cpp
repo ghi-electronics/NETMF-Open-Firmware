@@ -82,7 +82,7 @@ void enc28j60_status_callback(struct netif *netif)
 err_t   enc28j60_ethhw_init( netif * myNetIf) 
 { 
     myNetIf->mtu = ETHERSIZE;
-
+	myNetIf->flags = NETIF_FLAG_IGMP | NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_ETHERNET;
     /* ethhw_init() is user-defined */
     /* use ip_input instead of ethernet_input for non-ethernet hardware */
     /* (this function is assigned to netif.input and should be called by the hardware driver) */
@@ -267,7 +267,7 @@ BOOL ENC28J60_LWIP_Driver::Close( ENC28J60_LWIP_DRIVER_CONFIG* config, int index
     if(config == NULL) return FALSE;
 
     LwipUpTimeCompletion.Abort();
-
+netif_set_link_down( &g_ENC28J60_NetIF );
     netif_set_down( &g_ENC28J60_NetIF );
     netif_remove( &g_ENC28J60_NetIF );
 

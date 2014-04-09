@@ -200,6 +200,7 @@
 // communicaiton facilities
 /////////////////////////////////////////////////////////
 
+#define NETWORK_USE_DHCP                            1
 #include <processor_selector.h>
 
 #endif // PLATFORM_ARM_FEZ_Hydra

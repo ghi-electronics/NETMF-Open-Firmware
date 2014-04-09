@@ -346,8 +346,8 @@ BOOL HAL_CONFIG_BLOCK::UpdateBlockWithName( const char* Name, void* Data, size_t
                     physAddr = (const void*)(blData.ConfigAddress + ((size_t)pConfig - (size_t)pXipConfigBuf));
                     physEnd  = (const void*)(blData.ConfigAddress + ((size_t)pLastConfig - (size_t)pXipConfigBuf));
 
-                    // private_free(pXipConfigBuf);
-                    // pXipConfigBuf = NULL;
+//                    private_free(pXipConfigBuf);
+//                    pXipConfigBuf = NULL;
                 }
 
                 if(Data != NULL)
@@ -370,7 +370,7 @@ BOOL HAL_CONFIG_BLOCK::UpdateBlockWithName( const char* Name, void* Data, size_t
                 if(fRet) break;
             }
         
-            if (CompactBlock( blData, pStaticCfg, pLastConfig )==TRUE)
+            if (CompactBlock( blData, pStaticCfg, pLastConfig )== TRUE)
 			{
 
 				if(!blData.isXIP && pXipConfigBuf != NULL)
@@ -382,11 +382,11 @@ BOOL HAL_CONFIG_BLOCK::UpdateBlockWithName( const char* Name, void* Data, size_t
 				else
 				{
 					//TQD added
-			// if(pXipConfigBuf != NULL)
-					// {
-						// private_free(pXipConfigBuf);
-					// }
-					// pXipConfigBuf = (BYTE*)private_malloc(blData.BlockLength);
+//					if(pXipConfigBuf != NULL)
+//					{
+//						private_free(pXipConfigBuf);
+//					}
+//					pXipConfigBuf = (BYTE*)private_malloc(blData.BlockLength);
 					if (pXipConfigBuf!= NULL)
 					{
 					  blData.Device->Read( blData.ConfigAddress, blData.BlockLength, pXipConfigBuf );
@@ -401,7 +401,7 @@ BOOL HAL_CONFIG_BLOCK::UpdateBlockWithName( const char* Name, void* Data, size_t
 
 				pConfig = pConfig->Find(Name, FALSE, TRUE);
 
-				pLastConfig = pConfig->Find("", FALSE, TRUE);  
+				pLastConfig = pConfig->Find("", FALSE, TRUE);   
 			}			
         }
     }
@@ -466,7 +466,10 @@ BOOL HAL_CONFIG_BLOCK::ApplyConfig( const char* Name, void* Address, size_t Leng
             if(*newAlloc)
             {
                 memcpy( *newAlloc, header->Data(), header->Size );
-
+				if(pXipConfigBuf != NULL)
+				{
+					private_free(pXipConfigBuf);
+				}
                 return TRUE;
             }
         }
@@ -476,7 +479,10 @@ BOOL HAL_CONFIG_BLOCK::ApplyConfig( const char* Name, void* Address, size_t Leng
             {
                 memcpy( Address, header->Data(), Length );
             }
-
+			if(pXipConfigBuf != NULL)
+			{
+				private_free(pXipConfigBuf);
+			}
             return TRUE;
         }
     }

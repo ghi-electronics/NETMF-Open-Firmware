@@ -102,6 +102,9 @@ struct LWIP_SOCKETS_Driver
     static HRESULT UpdateAdapterConfiguration( UINT32 interfaceIndex, UINT32 updateFlags, SOCK_NetworkConfiguration* config );
 
     static HRESULT LoadWirelessConfiguration( UINT32 interfaceIndex, SOCK_WirelessConfiguration* wirelessConfig );
+	
+	// GHI Specific
+	static void SetInterfaceNumber( UINT32 interfaceIndex,int interfaceNumber);
 
 
 private:
