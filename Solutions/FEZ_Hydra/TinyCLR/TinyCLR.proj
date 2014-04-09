@@ -29,6 +29,8 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
+    <IncludePaths Include="DeviceCode\pal\OpenSSL" />
+    <IncludePaths Include="DeviceCode\pal\OpenSSL\OpenSSL_1_0" />
     <Compile Include="allocator.cpp" />
     <Compile Include="tinyclr.cpp" />
     <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_application.h" />
@@ -114,6 +116,20 @@
     <DriverLibs Include="GHI_OSHW_BitmapConverter.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\BitmapConverter\dotNetMF.proj" />
   </ItemGroup>
+
+  <!-- Open SSL ************************** Hail Hydra!! ***************************** -->
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\COM\sockets\openssl\dotnetmf.proj" />
+    <DriverLibs Include="openssl_pal.$(LIB_EXT)" />
+  </ItemGroup>
+  <!--<ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\COM\sockets\openssl\stubs\dotnetmf.proj" />
+    <DriverLibs Include="openssl_pal_stubs.$(LIB_EXT)" />
+  </ItemGroup>-->
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\ssl\dotnetmf.proj" />
+    <DriverLibs Include="libssl_openssl.$(LIB_EXT)" />
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\tinyclr\dotnetmf.proj" />
     <DriverLibs Include="ssl_types.$(LIB_EXT)" />
@@ -139,15 +155,16 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\dotnetmf.proj" />
     <DriverLibs Include="crypto_openssl.$(LIB_EXT)" />
   </ItemGroup>
+  <!-- ****************************************************************************** -->
 
   <ItemGroup>
     <DriverLibs Include="MFUpdate_PAL_stub.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\MFUpdate\stubs\dotnetmf.proj" />
   </ItemGroup>
-  <ItemGroup>
+  <!--<ItemGroup>
     <DriverLibs Include="ssl_pal_stubs.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\ssl\stubs\dotNetMF.proj" />
-  </ItemGroup>
+  </ItemGroup>-->
   <ItemGroup>
     <PlatformIndependentLibs Include="Core.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Core\dotNetMF.proj" />
@@ -593,14 +610,14 @@
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT_TimeService\dotnetmf.proj" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <DriverLibs Include="sockets_pal_stubs.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\stubs\dotNetMF.proj" />
-  </ItemGroup>
-  <!--<ItemGroup>
+  </ItemGroup>-->
+  <ItemGroup>
     <DriverLibs Include="sockets_pal_lwip.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets_lwip\dotNetMF.proj" />
-  </ItemGroup>-->
+  </ItemGroup>
 
   <ItemGroup>
     <PlatformIndependentLibs Include="SPOT_Net_Security.$(LIB_EXT)" />
@@ -626,38 +643,34 @@
     <DriverLibs Include="TouchScreen_Config_HAL_FEZ_Hydra.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\FEZ_Hydra\DeviceCode\touchpanel\config\dotNetMF.proj" />
   </ItemGroup>
-  <!-- *** Hail Hydra! *** -->
-  <!--<ItemGroup>
+  <ItemGroup>
     <DriverLibs Include="sockets_hal_sockets_lwIP.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\lwip_1_3_2\src\dotnetmf_sockets.proj" />
-  </ItemGroup>-->
-  <!--<ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\LWIP\src\dotnetmf_sockets.proj" />
+  </ItemGroup>
+  <ItemGroup>
     <DriverLibs Include="sockets_hal_DHCP_LWIP.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\lwip_1_3_2\src\dotnetmf_dhcp.proj" />
-  </ItemGroup>-->
-  <!--<ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\LWIP\src\dotnetmf_dhcp.proj" />
+  </ItemGroup>
+  <ItemGroup>
     <DriverLibs Include="sockets_lwIP_pal.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\SocketsDriver\dotnetmf.proj" />
-  </ItemGroup>-->
-  <!--<ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
     <DriverLibs Include="sockets_hal_async_lwIP.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\tinyclr\dotnetmf.proj" />
-  </ItemGroup>-->
-  <!--<ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
     <DriverLibs Include="sockets_hal_tcp_lwIP.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\lwip_1_3_2\src\dotnetmf_tcp.proj" />
-  </ItemGroup>-->
-  <!--<ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\LWIP\src\dotnetmf_tcp.proj" />
+  </ItemGroup>
+  <ItemGroup>
     <DriverLibs Include="sockets_hal_udp_lwIP.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\lwip_1_3_2\src\dotnetmf_udp.proj" />
-  </ItemGroup>-->
-  <!-- ******************* -->
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\lwip\LWIP\src\dotnetmf_udp.proj" />
+  </ItemGroup>
   <!--<ItemGroup>
     <DriverLibs Include="ETHERNET_enc28j60_lwip.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\Ethernet\enc28J60_lwip\dotNetMF.proj" />
   </ItemGroup>-->
-  <!-- ******************* -->
-  <!-- *** Hail Hydra! *** -->
   <!--<ItemGroup>
     <DriverLibs Include="ETHERNET_enc28j60_lwip.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Ethernet\enc28J60_lwip\dotNetMF.proj" />
@@ -665,6 +678,25 @@
   <ItemGroup>
     <DriverLibs Include="ETHERNET_loopback_lwip.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Ethernet\Loopback_lwip\dotNetMF.proj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <DriverLibs Include="NetworkInterfacesSwitcher.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\NetworkInterfacesSwitcher\dotNetMF.proj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DriverLibs Include="Network_Config_HAL.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\NetworkInterfacesSwitcher\Network_Config_HAL\dotNetMF.proj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DriverLibs Include="ETHERNET_enc28j60_lwip.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Ethernet\enc28J60_lwip\dotNetMF.proj" />
+  </ItemGroup>
+  <ItemGroup>
+    <DriverLibs Include="ENC28J60_HAL_Config.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\NetworkInterfacesSwitcher\ENC28J60_HAL_Config\dotNetMF.proj" />
   </ItemGroup>
 
 <!-- *************************************************** PWM ************************************************************** -->  
@@ -685,20 +717,19 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\CRC\dotNetMF.proj" />
     <DriverLibs Include="GHI_NETMF_CRC.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup>
+  
+  <!--<ItemGroup>
     <DriverLibs Include="Network_Config_HAL_FEZ_Hydra.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\FEZ_Hydra\DeviceCode\Network_Config_HAL\dotNetMF.proj" />
-  </ItemGroup>
+  </ItemGroup>-->
   <ItemGroup>
     <DriverLibs Include="timeservice_hal_generic.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\timeservice\driver\dotNetMF.proj" />
   </ItemGroup>
-  <!-- *** Hail Hydra! *** -->
-  <!--<ItemGroup>
+  <!--0<ItemGroup>
     <DriverLibs Include="ENC28J60_Config_LWIP_HAL_FEZ_Hydra.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\FEZ_Hydra\DeviceCode\ENC28J60_Config_LWIP_HAL\dotNetMF.proj" />
   </ItemGroup>-->
-  <!-- ******************* -->
   <ItemGroup>
     <DriverLibs Include="VirtualKey_FEZ_Hydra.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\FEZ_Hydra\DeviceCode\VirtualKey\dotnetmf.proj" />

@@ -1,4 +1,4 @@
-;#<FEEDBACK># ARM Linker, 4.1 [Build 713]: Last Updated: Tue Apr 08 10:05:30 2014
+;#<FEEDBACK># ARM Linker, 4.1 [Build 713]: Last Updated: Wed Apr 09 13:05:45 2014
 ;VERSION 0.2
 ;FILE ARM9_bootstrap.obj
 ;FILE ARM9_mmu_functions.obj
@@ -190,6 +190,9 @@ _ZN13CLR_Messaging21Messaging_Send__ReplyEP10WP_MessagePv <= USED 0
 _ZN13CLR_Messaging22Messaging_Query__ReplyEP10WP_MessagePv <= USED 0
 _ZN13CLR_Messaging22Messaging_Reply__ReplyEP10WP_MessagePv <= USED 0
 ;FILE Misc.obj
+;FILE Network_Interfaces.obj
+_Z40Network_Interface_GetActivatedInterfacesv <= USED 0
+_Z43Network_Interface_SaveNetworkConfigurationsv <= USED 0
 ;FILE Object.obj
 ;FILE OpenSSL_PKCS11_Token.obj
 ;FILE OpenSSL_PKCS11_digest.obj
@@ -248,6 +251,7 @@ _Z28Time_CurrentDateTimeToStringv <= USED 0
 _Z31EmulatorHook__Watchdog_Callbackv <= USED 0
 ;FILE WireProtocol.obj
 _ZN10WP_Message10SetPayloadEPh <= USED 0
+;FILE XTEA.obj
 ;FILE Xml_fastcompile.obj
 ;FILE a_bitstr.obj
 ASN1_BIT_STRING_check <= USED 0
@@ -1035,6 +1039,9 @@ jpeg_new_colormap <= USED 0
 ;FILE jutils.obj
 ;FILE legacy_support.obj
 ;FILE lhash.obj
+;FILE loopback_lwip.obj
+loop_lwip_statistics <= USED 0
+;FILE loopback_lwip_driver.obj
 ;FILE lwIP_Sockets_functions.obj
 _Z26HAL_SOCK_GlobalLockContextv <= USED 0
 ;FILE lwIP__Sockets.obj
