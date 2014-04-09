@@ -623,8 +623,32 @@ BOOL SerialDataFlash_BS_Driver::EraseBlock( void* context, ByteAddress byteAddre
 	GLOBAL_LOCK(irq);
      unsigned char command[4];
 
-     unsigned int pageNumber, temp;
+     //unsigned int pageNumber, temp;
+	 unsigned int temp, blockNumber;
+     blockNumber = byteAddress/ (FLASH_SECTOR_SIZE*8); // each block = 8 pages, each page = 528 bytes;
 
+     for (int i=0; i<2; i++)
+     {
+       
+        command[0] = 0x50;
+         temp = blockNumber<<3u;
+         command[1] = temp >> 6u;
+          command[2] = ((unsigned char)(temp & 0x3F) << 2u) + ((unsigned char)(0 >> 8u));
+          command[3] = 0x00;
+           CPU_SPI_nWrite8_nRead8(spiConfig, command, 4, command, 4, 0);
+          int timeout;
+          for (timeout = 0; timeout < TIMEOUT; timeout++)
+          {
+               //df_timeout++;
+               if (getSPI_Status() & 0x80)
+                    break;
+                   // return TRUE;
+          }
+          if(timeout == TIMEOUT)
+               return FALSE;
+           blockNumber++;
+     }
+/*
      pageNumber = byteAddress / FLASH_BLOCK_SIZE;
 
      //for(int x = 0; x < 100000; x++){}
@@ -652,7 +676,7 @@ BOOL SerialDataFlash_BS_Driver::EraseBlock( void* context, ByteAddress byteAddre
           pageNumber++;
      }
 
-
+*/
      // a hack fro now!
 /*
      pageNumber++;
