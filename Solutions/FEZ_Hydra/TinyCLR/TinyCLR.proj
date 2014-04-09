@@ -680,6 +680,11 @@
 
 <!-- ********************************************************************************************************************** -->
 
+  <!--CRC-->
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\CRC\dotNetMF.proj" />
+    <DriverLibs Include="GHI_NETMF_CRC.$(LIB_EXT)" />
+  </ItemGroup>
   <ItemGroup>
     <DriverLibs Include="Network_Config_HAL_FEZ_Hydra.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\FEZ_Hydra\DeviceCode\Network_Config_HAL\dotNetMF.proj" />
