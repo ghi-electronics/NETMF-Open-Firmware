@@ -671,13 +671,32 @@
     <DriverLibs Include="ETHERNET_enc28j60_lwip.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\Ethernet\enc28J60_lwip\dotNetMF.proj" />
   </ItemGroup>-->
+  <!--<ItemGroup>
+    <DriverLibs Include="ETHERNET_enc28j60_lwip.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Ethernet\enc28J60_lwip\dotNetMF.proj" />
+  </ItemGroup>-->
+  <ItemGroup>
+    <DriverLibs Include="ETHERNET_loopback_lwip.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Ethernet\Loopback_lwip\dotNetMF.proj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <DriverLibs Include="NetworkInterfacesSwitcher.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\NetworkInterfacesSwitcher\dotNetMF.proj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DriverLibs Include="Network_Config_HAL.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\NetworkInterfacesSwitcher\Network_Config_HAL\dotNetMF.proj" />
+  </ItemGroup>
+
   <ItemGroup>
     <DriverLibs Include="ETHERNET_enc28j60_lwip.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Ethernet\enc28J60_lwip\dotNetMF.proj" />
   </ItemGroup>
   <ItemGroup>
-    <DriverLibs Include="ETHERNET_loopback_lwip.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Ethernet\Loopback_lwip\dotNetMF.proj" />
+    <DriverLibs Include="ENC28J60_HAL_Config.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\NetworkInterfacesSwitcher\ENC28J60_HAL_Config\dotNetMF.proj" />
   </ItemGroup>
 
 <!-- *************************************************** PWM ************************************************************** -->  
@@ -693,18 +712,18 @@
 
 <!-- ********************************************************************************************************************** -->
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <DriverLibs Include="Network_Config_HAL_FEZ_Hydra.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\FEZ_Hydra\DeviceCode\Network_Config_HAL\dotNetMF.proj" />
-  </ItemGroup>
+  </ItemGroup>-->
   <ItemGroup>
     <DriverLibs Include="timeservice_hal_generic.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\timeservice\driver\dotNetMF.proj" />
   </ItemGroup>
-  <ItemGroup>
+  <!--0<ItemGroup>
     <DriverLibs Include="ENC28J60_Config_LWIP_HAL_FEZ_Hydra.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\FEZ_Hydra\DeviceCode\ENC28J60_Config_LWIP_HAL\dotNetMF.proj" />
-  </ItemGroup>
+  </ItemGroup>-->
   <ItemGroup>
     <DriverLibs Include="VirtualKey_FEZ_Hydra.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\FEZ_Hydra\DeviceCode\VirtualKey\dotnetmf.proj" />

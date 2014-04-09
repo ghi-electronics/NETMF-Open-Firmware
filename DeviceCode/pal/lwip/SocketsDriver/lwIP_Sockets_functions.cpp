@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "LWIP_Sockets.h"
-
+bool Network_Interface_IsActivated(int index); // This is in Network_Interfaces.cpp
 
 BOOL HAL_SOCK_Initialize()
 {
@@ -131,7 +131,10 @@ HRESULT HAL_SOCK_CONFIGURATION_LoadAdapterConfiguration( UINT32 interfaceIndex, 
 HRESULT HAL_SOCK_CONFIGURATION_UpdateAdapterConfiguration( UINT32 interfaceIndex, UINT32 updateFlags, SOCK_NetworkConfiguration* config )
 {
     NATIVE_PROFILE_PAL_NETWORK();
-    return LWIP_SOCKETS_Driver::UpdateAdapterConfiguration(interfaceIndex, updateFlags, config);
+	if(Network_Interface_IsActivated(interfaceIndex))
+		return LWIP_SOCKETS_Driver::UpdateAdapterConfiguration(interfaceIndex, updateFlags, config);
+	else
+		return S_OK;
 }
 
 HRESULT HAL_SOCK_CONFIGURATION_LoadWirelessConfiguration( UINT32 interfaceIndex, SOCK_WirelessConfiguration* wirelessConfig )

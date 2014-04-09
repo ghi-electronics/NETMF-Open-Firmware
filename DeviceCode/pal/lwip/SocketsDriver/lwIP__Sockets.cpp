@@ -69,7 +69,7 @@ BOOL LWIP_SOCKETS_Driver::Initialize()
     g_LOOPBACK_LWIP_Driver.Bind();
     g_LOOPBACK_LWIP_Driver.Open();
 #endif 
-#if 1
+#if 0	
     for(i=0; i<g_NetworkConfig.NetworkInterfaceCount; i++)
     {
         int interfaceNumber;
@@ -257,11 +257,18 @@ int LWIP_SOCKETS_Driver::GetAddrInfo(const char* nodename, char* servname, const
     if(res == NULL) return -1;
 
     *res = NULL;
+    int active_iface_index;
+	for(active_iface_index=0; active_iface_index<g_NetworkConfig.NetworkInterfaceCount; active_iface_index++)
+    {
+		if(SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE == (g_NetworkConfig.NetworkInterfaces[active_iface_index].flags & SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE))
+			break;
+	}
 
     // if the nodename == "" then return the IP address of this device
     if(nodename[0] == 0 && servname == NULL)
     {
-        struct netif *pNetIf = netif_find_interface(g_LWIP_SOCKETS_Driver.m_interfaces[0].m_interfaceNumber);
+        
+		  struct netif *pNetIf = netif_find_interface(g_LWIP_SOCKETS_Driver.m_interfaces[active_iface_index].m_interfaceNumber);
 
         if(pNetIf == NULL) return -1;
 
@@ -368,10 +375,14 @@ int LWIP_SOCKETS_Driver::Ioctl( SOCK_SOCKET socket, int cmd, int* data )
     return lwip_ioctl(socket,cmd,data);
 }
 
+//extern volatile bool rs2_netmf_fatal_error;
 int LWIP_SOCKETS_Driver::GetLastError()
 {
     NATIVE_PROFILE_PAL_NETWORK();
-
+	// if( rs2_netmf_fatal_error == true)
+	// {
+		// return SOCK_NO_RECOVERY;
+	// }
     return GetNativeError(errno);
 }
 
@@ -395,9 +406,8 @@ static void MARSHAL_FDSET_TO_SOCK_FDSET(SOCK_fd_set *sf, fd_set *f)
 {
     if(sf != NULL && f != NULL) 
     { 
-        int cnt = sf->fd_count;
         sf->fd_count = 0; 
-        for(int i=0; i<cnt; i++) 
+        for(int i=0; i<sf->fd_count; i++) 
         { 
             if(FD_ISSET(sf->fd_array[i],f)) 
             { 
@@ -421,11 +431,17 @@ int LWIP_SOCKETS_Driver::Select( int nfds, SOCK_fd_set* readfds, SOCK_fd_set* wr
     fd_set* pR = (readfds   != NULL) ? &read  : NULL;
     fd_set* pW = (writefds  != NULL) ? &write : NULL;
     fd_set* pE = (exceptfds != NULL) ? &excpt : NULL;
+    int active_iface_index;
+	 for(active_iface_index=0; active_iface_index<g_NetworkConfig.NetworkInterfaceCount; active_iface_index++)
+    {
+		if(SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE == (g_NetworkConfig.NetworkInterfaces[active_iface_index].flags & SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE))
+			break;
+	 }
 
     // If the network goes down then we should alert any pending socket actions
     if(exceptfds != NULL && exceptfds->fd_count > 0)
     {
-        struct netif *pNetIf = netif_find_interface(g_LWIP_SOCKETS_Driver.m_interfaces[0].m_interfaceNumber);
+        struct netif *pNetIf = netif_find_interface(g_LWIP_SOCKETS_Driver.m_interfaces[active_iface_index].m_interfaceNumber);
 
         if(pNetIf != NULL)
         {
@@ -769,7 +785,7 @@ HRESULT LWIP_SOCKETS_Driver::UpdateAdapterConfiguration( UINT32 interfaceIndex, 
 
             netif_set_addr(pNetIf, (struct ip_addr *) &config->ipaddr, (struct ip_addr *)&config->subnetmask, (struct ip_addr *)&config->gateway);
 
-            Network_PostEvent( NETWORK_EVENT_TYPE_ADDRESS_CHANGED, 0 );
+            //Network_PostEvent( NETWORK_EVENT_TYPE_ADDRESS_CHANGED, 0 );
         }
     }
 

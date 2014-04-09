@@ -22,6 +22,7 @@ int         enc28j60_lwip_recv ( struct netif *pNetIF );
 void        enc28j60_lwip_interrupt ( struct netif *pNetIF );
 void        enc28j60_lwip_pre_interrupt (GPIO_PIN Pin, BOOL PinState, void *pArg );
 void        enc28j60_lwip_setup_recv_buffer( struct netif *pNetIF, SPI_CONFIGURATION  *SpiConf);
+BOOL enc28j60_get_link_status(SPI_CONFIGURATION* spiConf);
 
 
 /*          FUNCTION PROTOTYPE                                          */
@@ -29,7 +30,7 @@ void        enc28j60_lwip_setup_recv_buffer( struct netif *pNetIF, SPI_CONFIGURA
 
 /*          STRUCTURES                                                  */
 
-#define ETHERSIZE        (ENC28J60_TRANSMIT_BUFFER_END - ENC28J60_TRANSMIT_BUFFER_START)   /* maximum number of bytes in ETHERNET packet */
+#define ETHERSIZE        ((ENC28J60_TRANSMIT_BUFFER_END - ENC28J60_TRANSMIT_BUFFER_START)>>1)   /* maximum number of bytes in ETHERNET packet */
                                 /* (used by ethernet drivers)   */
 
 #define ETHER_MIN_LEN    64  /* minimum number of bytes in an ETHERNET */
@@ -41,8 +42,9 @@ void        enc28j60_lwip_setup_recv_buffer( struct netif *pNetIF, SPI_CONFIGURA
 #define     CFG_NUM_ENC28J60            NETWORK_INTERFACE_COUNT                                    
 #define     CFG_MAX_PACKETS_PROCESSED   10          /* The maximum number of packets to process in one
                                                         shot */
-
-#define     ENC28J60_FULL_DUPLEX        0           /* DON'T CHANGE adds support for full duplex */
+#ifndef	ENC28J60_FULL_DUPLEX
+	#define     ENC28J60_FULL_DUPLEX        0           /* DON'T CHANGE adds support for full duplex */
+#endif /* #ifndef __ENC28J60_H__   */
 #define     ENC28J60_MAXIMUM_FRAME_SIZE 1530        /* maximum frame sizes to be transmitted */
                                     
 #define     ENC28J60_MAC_ADDRESS0       0xBA        /* Configures the MAC address to */

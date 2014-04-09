@@ -17,28 +17,30 @@ extern "C"
 static ENC28J60_LWIP_Driver g_ENC28J60_LWIP_Driver;
 static struct netif         g_ENC28J60_NetIF;
 
-HAL_CONTINUATION    InterruptTaskContinuation;
-HAL_COMPLETION      LwipUpTimeCompletion;
-static UINT32       LwipNetworkStatus = 0;
-static UINT32       LwipLastIpAddress = 0;
+HAL_CONTINUATION    enc28j60_InterruptTaskContinuation;
+HAL_COMPLETION      enc28j60_LwipUpTimeCompletion;
+static UINT32       enc28j60_LwipNetworkStatus = 0;
+static UINT32       enc28j60_LwipLastIpAddress = 0;
 
 #if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
 #pragma arm section zidata
 #endif
 
-extern ENC28J60_LWIP_DEVICE_CONFIG   g_ENC28J60_LWIP_Config;
+extern ENC28J60_HAL_CONFIG   g_enc28j60_hal_config;
 extern NETWORK_CONFIG                g_NetworkConfig;
+const SOCK_NetworkConfiguration *g_enc28j60_iface;
+static int g_enc28j60_index = -1;
 
 extern unsigned short enc28j60_lwip_read_phy_register(SPI_CONFIGURATION *spiConf, UINT8 registerAddress);
-
+extern BOOL enc28j60_get_link_status(SPI_CONFIGURATION* spiConf);
 
 
 void enc28j60_status_callback(struct netif *netif)
 {
-    if(LwipLastIpAddress != netif->ip_addr.addr)
+    if(enc28j60_LwipLastIpAddress != netif->ip_addr.addr)
     {
-        Network_PostEvent( NETWORK_EVENT_TYPE_ADDRESS_CHANGED, 0 );
-        LwipLastIpAddress = netif->ip_addr.addr;
+        Network_PostEvent( NETWORK_EVENT_TYPE_ADDRESS_CHANGED, 0 | ((1<< g_enc28j60_index)<<1));
+        enc28j60_LwipLastIpAddress = netif->ip_addr.addr;
     }
 
 #if defined(_DEBUG)
@@ -82,7 +84,9 @@ void enc28j60_status_callback(struct netif *netif)
 err_t   enc28j60_ethhw_init( netif * myNetIf) 
 { 
     myNetIf->mtu = ETHERSIZE;
-	myNetIf->flags = NETIF_FLAG_IGMP | NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_ETHERNET;
+
+    myNetIf->flags = NETIF_FLAG_IGMP | NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_ETHERNET;
+
     /* ethhw_init() is user-defined */
     /* use ip_input instead of ethernet_input for non-ethernet hardware */
     /* (this function is assigned to netif.input and should be called by the hardware driver) */
@@ -94,7 +98,7 @@ err_t   enc28j60_ethhw_init( netif * myNetIf)
 
     enc28j60_lwip_open( myNetIf );
 
-    return 0; 
+    return ERR_OK; 
 }
 
 void lwip_interrupt_continuation( )
@@ -102,9 +106,9 @@ void lwip_interrupt_continuation( )
     NATIVE_PROFILE_PAL_NETWORK();
     GLOBAL_LOCK(irq);
     
-    if(!InterruptTaskContinuation.IsLinked())
+    if(!enc28j60_InterruptTaskContinuation.IsLinked())
     {
-        InterruptTaskContinuation.Enqueue();
+        enc28j60_InterruptTaskContinuation.Enqueue();
     }
 }
 
@@ -112,79 +116,137 @@ void lwip_network_uptime_completion(void *arg)
 {
     NATIVE_PROFILE_PAL_NETWORK();
 
+
+   UINT32 status = enc28j60_get_link_status(&g_enc28j60_hal_config.DeviceConfigs[0].SPI_Config);
+	if(g_enc28j60_iface !=NULL)
+	{
+		if(status != enc28j60_LwipNetworkStatus)
+		{
+			struct netif* pNetIf = (struct netif*)arg;
+        
+			if(status)
+			{
+				if(SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE == (g_enc28j60_iface->flags & SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE))
+				{
+					if(g_enc28j60_iface->flags & SOCK_NETWORKCONFIGURATION_FLAGS_DHCP)
+					{
+						netif_set_addr(pNetIf, 0, 0, 0);
+						BOOL fDhcpStarted = (0 != (pNetIf->flags & NETIF_FLAG_DHCP));
+						if(!fDhcpStarted)
+							dhcp_start( pNetIf );
+					}
+					tcpip_timeout(100, (sys_timeout_handler)netif_set_link_up, (void*)pNetIf);
+					tcpip_timeout(100, (sys_timeout_handler)netif_set_up, (void*)pNetIf);
+				}
+
+				Network_PostEvent( NETWORK_EVENT_TYPE__AVAILABILITY_CHANGED, NETWORK_EVENT_FLAGS_IS_AVAILABLE| ((1<< g_enc28j60_index)<<1) );
+			}
+			else
+			{
+				
+				if(SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE == (g_enc28j60_iface->flags & SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE))
+				{
+					tcpip_callback((sys_timeout_handler)netif_set_link_down, (void*)pNetIf);
+					tcpip_callback((sys_timeout_handler)netif_set_down, (void*)pNetIf);
+					if(g_enc28j60_iface->flags & SOCK_NETWORKCONFIGURATION_FLAGS_DHCP)
+					{
+						netif_set_addr(pNetIf, 0, 0, 0); // This is important for some DHCP servers that do not accpet DHCP requests from IPs other than 0.0.0.0
+					}
+				}
+
+				Network_PostEvent( NETWORK_EVENT_TYPE__AVAILABILITY_CHANGED, 0| ((1<< g_enc28j60_index)<<1));
+			}
+
+			Events_Set(SYSTEM_EVENT_FLAG_SOCKET);
+			Events_Set(SYSTEM_EVENT_FLAG_NETWORK);
+
+			enc28j60_LwipNetworkStatus = status;
+			if(SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE == (g_enc28j60_iface->flags & SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE))
+				enc28j60_status_callback(pNetIf);
+		}
+      
+	}
+
+    enc28j60_LwipUpTimeCompletion.EnqueueDelta64( 2000000 );
+    
+}
+
+void  ENC28J60_Network_Interface_ForceUpdateActivationStatus(bool activate)
+{
+	  NATIVE_PROFILE_PAL_NETWORK();
+
     UINT16 phyStat = 0;
     
     {
         GLOBAL_LOCK(irq);
 
-        phyStat = enc28j60_lwip_read_phy_register(&g_ENC28J60_LWIP_Config.DeviceConfigs[0].SPI_Config, ENC28J60_PHSTAT2);
+        phyStat = enc28j60_lwip_read_phy_register(&g_enc28j60_hal_config.DeviceConfigs[0].SPI_Config, ENC28J60_PHSTAT2);
     }
 
     // linkstatus bit
     UINT32 status = ((phyStat >> ENC28J60_PHSTAT2_LSTAT_BIT) & 1);
 
-    if(status != LwipNetworkStatus)
-    {
-        struct netif* pNetIf = (struct netif*)arg;
-        
-        if(status)
-        {
-            tcpip_timeout(1000, (sys_timeout_handler)netif_set_link_up, (void*)pNetIf);
-            tcpip_timeout(1000, (sys_timeout_handler)netif_set_up, (void*)pNetIf);
+	if(g_enc28j60_iface != NULL)
+	{
+		struct netif* pNetIf = &g_ENC28J60_NetIF;
 
-            Network_PostEvent( NETWORK_EVENT_TYPE__AVAILABILITY_CHANGED, NETWORK_EVENT_FLAGS_IS_AVAILABLE );
-        }
-        else
-        {
-            tcpip_callback((sys_timeout_handler)netif_set_link_down, (void*)pNetIf);
-            tcpip_callback((sys_timeout_handler)netif_set_down, (void*)pNetIf);
-
-            Network_PostEvent( NETWORK_EVENT_TYPE__AVAILABILITY_CHANGED, 0);
-        }
-
-        Events_Set(SYSTEM_EVENT_FLAG_SOCKET);
-        Events_Set(SYSTEM_EVENT_FLAG_NETWORK);
-
-        LwipNetworkStatus = status;
-    }
-
-    LwipUpTimeCompletion.EnqueueDelta64( 2000000 );
+		if(activate && status)
+		{
+			if(g_enc28j60_iface->flags & SOCK_NETWORKCONFIGURATION_FLAGS_DHCP)
+			{
+				netif_set_addr(pNetIf, 0, 0, 0);
+				BOOL fDhcpStarted = (0 != (pNetIf->flags & NETIF_FLAG_DHCP));
+				if(!fDhcpStarted)
+					dhcp_start( pNetIf );
+			}
+			tcpip_timeout(100, (sys_timeout_handler)netif_set_link_up, (void*)pNetIf);
+			tcpip_timeout(100, (sys_timeout_handler)netif_set_up, (void*)pNetIf);
+		}
+		else
+		{
+			tcpip_callback((sys_timeout_handler)netif_set_link_down, (void*)pNetIf);
+			tcpip_callback((sys_timeout_handler)netif_set_down, (void*)pNetIf);
+			netif_set_addr(pNetIf, 0, 0, 0); // This is important for some DHCP servers that do not accpet DHCP requests from IPs other than 0.0.0.0
+		}
+		Events_Set(SYSTEM_EVENT_FLAG_SOCKET);
+		Events_Set(SYSTEM_EVENT_FLAG_NETWORK);
+	}
 }
 
 void InitContinuations( struct netif* pNetIf )
 {
-    InterruptTaskContinuation.InitializeCallback( (HAL_CALLBACK_FPN)enc28j60_lwip_interrupt, &g_ENC28J60_NetIF );
+    enc28j60_InterruptTaskContinuation.InitializeCallback( (HAL_CALLBACK_FPN)enc28j60_lwip_interrupt, &g_ENC28J60_NetIF );
 
-    LwipUpTimeCompletion.InitializeForUserMode( (HAL_CALLBACK_FPN)lwip_network_uptime_completion, pNetIf );
+    enc28j60_LwipUpTimeCompletion.InitializeForUserMode( (HAL_CALLBACK_FPN)lwip_network_uptime_completion, pNetIf );
     
-    LwipUpTimeCompletion.EnqueueDelta64( 2000000 );
+    enc28j60_LwipUpTimeCompletion.EnqueueDelta64( 2000000 );
 }
 
-BOOL Network_Interface_Bind(int index)
+void ENC28J60_Network_Interface_SetAsDefaultInterfaces(int index)
+{
+	netif_set_default( &g_ENC28J60_NetIF );
+}
+
+BOOL ENC28J60_Network_Interface_Bind(int index)
 {
     NATIVE_PROFILE_HAL_DRIVERS_ETHERNET();
-    if(index >= ARRAYSIZE(g_ENC28J60_LWIP_Config.DeviceConfigs)) return FALSE;
-
-    return g_ENC28J60_LWIP_Driver.Bind(&g_ENC28J60_LWIP_Config.DeviceConfigs[index], index);
+    return g_ENC28J60_LWIP_Driver.Bind(&g_enc28j60_hal_config.DeviceConfigs[0], index); //We support only one ENC28J60 interface [0]
 }
-int  Network_Interface_Open(int index)
+int  ENC28J60_Network_Interface_Open(int index)
 {
     NATIVE_PROFILE_HAL_DRIVERS_ETHERNET();
-    if(index >= ARRAYSIZE(g_ENC28J60_LWIP_Config.DeviceConfigs)) return -1;
-    
-    HAL_CONFIG_BLOCK::ApplyConfig( ENC28J60_LWIP_DEVICE_CONFIG::GetDriverName(), &g_ENC28J60_LWIP_Config, sizeof(g_ENC28J60_LWIP_Config) );
-    
-    return g_ENC28J60_LWIP_Driver.Open(&g_ENC28J60_LWIP_Config.DeviceConfigs[index], index);
+	       
+    HAL_CONFIG_BLOCK::ApplyConfig( ENC28J60_HAL_CONFIG::GetDriverName(), &g_enc28j60_hal_config, sizeof(g_enc28j60_hal_config) );// This needs to be replace with something more dynamic that is independant from Config
+    return g_ENC28J60_LWIP_Driver.Open(&g_enc28j60_hal_config.DeviceConfigs[0], index); //We support only one ENC28J60 interface [0]
+	
 }
-BOOL Network_Interface_Close(int index)
+BOOL ENC28J60_Network_Interface_Close(int index)
 {
     NATIVE_PROFILE_HAL_DRIVERS_ETHERNET();
-    if(index >= ARRAYSIZE(g_ENC28J60_LWIP_Config.DeviceConfigs)) return FALSE;
-
-    return g_ENC28J60_LWIP_Driver.Close(&g_ENC28J60_LWIP_Config.DeviceConfigs[index], index);
+	return g_ENC28J60_LWIP_Driver.Close(&g_enc28j60_hal_config.DeviceConfigs[0], index); //We support only one ENC28J60 interface [0]
 }
 
-int ENC28J60_LWIP_Driver::Open( ENC28J60_LWIP_DRIVER_CONFIG* config, int index )
+int ENC28J60_LWIP_Driver::Open(ENC28J60_LWIP_DRIVER_CONFIG* config, int index )
 {
     NATIVE_PROFILE_HAL_DRIVERS_ETHERNET();
 
@@ -192,14 +254,16 @@ int ENC28J60_LWIP_Driver::Open( ENC28J60_LWIP_DRIVER_CONFIG* config, int index )
     struct ip_addr ipaddr, netmask, gw;
     struct netif *pNetIF;
     int len;
-    const SOCK_NetworkConfiguration *iface;
-    iface = &g_NetworkConfig.NetworkInterfaces[index];
+	if(config == NULL) return -1;
+    enc28j60_LwipLastIpAddress = 0;
+	g_enc28j60_index = index;
+    g_enc28j60_iface = &g_NetworkConfig.NetworkInterfaces[index];
 
-    if(0 == (iface->flags & SOCK_NETWORKCONFIGURATION_FLAGS_DHCP))
+    if(0 == (g_enc28j60_iface->flags & SOCK_NETWORKCONFIGURATION_FLAGS_DHCP))
     {
-        ipaddr.addr  = iface->ipaddr;
-        gw.addr      = iface->gateway;
-        netmask.addr = iface->subnetmask;
+        ipaddr.addr  = g_enc28j60_iface->ipaddr;
+        gw.addr      = g_enc28j60_iface->gateway;
+        netmask.addr = g_enc28j60_iface->subnetmask;
     }
     else
     {
@@ -209,19 +273,16 @@ int ENC28J60_LWIP_Driver::Open( ENC28J60_LWIP_DRIVER_CONFIG* config, int index )
         IP4_ADDR(&netmask, 255, 255, 255, 0);
     }
 
-    if(config == NULL) return -1;
-
-    
 
     len = g_ENC28J60_NetIF.hwaddr_len;
 
-    if(len == 0 || iface->macAddressLen < len)
+    if(len == 0 || g_enc28j60_iface->macAddressLen < len)
     {
-        len = iface->macAddressLen;
+        len = g_enc28j60_iface->macAddressLen;
         g_ENC28J60_NetIF.hwaddr_len = len;
     }
    
-    memcpy(g_ENC28J60_NetIF.hwaddr, iface->macAddressBuffer, len);
+    memcpy(g_ENC28J60_NetIF.hwaddr, g_enc28j60_iface->macAddressBuffer, len);
 
     g_ENC28J60_NetIF.flags = NETIF_FLAG_IGMP | NETIF_FLAG_BROADCAST;
         
@@ -238,11 +299,26 @@ int ENC28J60_LWIP_Driver::Open( ENC28J60_LWIP_DRIVER_CONFIG* config, int index )
         return -1;
     }
 
-    netif_set_default( pNetIF );
-    LwipNetworkStatus = 1;
-    netif_set_link_up( pNetIF );
-    netif_set_up( pNetIF );
-    
+	UINT16 phyStat = 0;
+	 {
+        GLOBAL_LOCK(irq);
+
+        phyStat = enc28j60_lwip_read_phy_register(&g_enc28j60_hal_config.DeviceConfigs[0].SPI_Config, ENC28J60_PHSTAT2);
+	}
+	 //enc28j60_LwipNetworkStatus = ((phyStat >> ENC28J60_PHSTAT2_LSTAT_BIT) & 1);
+	 enc28j60_LwipNetworkStatus = 0;// TQD fix bug Reset CLR does not reset network ((phyStat >> ENC28J60_PHSTAT2_LSTAT_BIT) & 1);
+	 
+	if(SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE == (g_enc28j60_iface->flags & SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE))
+	{
+		
+		netif_set_default( pNetIF );
+		// if (enc28j60_LwipNetworkStatus)
+		// {
+			// netif_set_up( pNetIF );
+			// netif_set_link_up( pNetIF );
+		// }
+	}
+	
     /* Enable the CHIP SELECT pin */
     if (CPU_GPIO_EnableInputPin (config->SPI_Config.DeviceCS, 
                             FALSE, 
@@ -263,15 +339,18 @@ int ENC28J60_LWIP_Driver::Open( ENC28J60_LWIP_DRIVER_CONFIG* config, int index )
 BOOL ENC28J60_LWIP_Driver::Close( ENC28J60_LWIP_DRIVER_CONFIG* config, int index )
 {
     NATIVE_PROFILE_HAL_DRIVERS_ETHERNET();
-
+	g_enc28j60_index = -1;
     if(config == NULL) return FALSE;
 
-    LwipUpTimeCompletion.Abort();
-netif_set_link_down( &g_ENC28J60_NetIF );
+	if( g_ENC28J60_NetIF.num >0)
+	{
+    enc28j60_LwipUpTimeCompletion.Abort();
+	netif_set_link_down( &g_ENC28J60_NetIF );
     netif_set_down( &g_ENC28J60_NetIF );
     netif_remove( &g_ENC28J60_NetIF );
 
-    /* Disable the INTERRUPT pin */                            
+    /* Disable the INTERRUPT pin */     
+	 if(config->INT_Pin !=GPIO_PIN_NONE)
     CPU_GPIO_EnableInputPin2(config->INT_Pin, 
                               FALSE,                         /* Glitch filter enable */
                               NULL,                          /* ISR                  */
@@ -279,11 +358,13 @@ netif_set_link_down( &g_ENC28J60_NetIF );
                               GPIO_INT_NONE,                 /* Interrupt edge       */
                               RESISTOR_PULLUP);              /* Resistor State       */
 
-    InterruptTaskContinuation.Abort();
+    enc28j60_InterruptTaskContinuation.Abort();
 
-    LwipNetworkStatus = 0;
+    
     
     enc28j60_lwip_close( &g_ENC28J60_NetIF );
+	 }
+    enc28j60_LwipNetworkStatus = 0;
 
     memset(&g_ENC28J60_NetIF, 0, sizeof(g_ENC28J60_NetIF));
 
@@ -300,4 +381,30 @@ BOOL  ENC28J60_LWIP_Driver::Bind  ( ENC28J60_LWIP_DRIVER_CONFIG* config, int ind
 
     
 
+bool ENC28J60Ethernet_Network_Interface_IsCableConnected()
+{
 
+	UINT16 phyStat = 0;
+    
+    {
+        GLOBAL_LOCK(irq);
+
+        phyStat = enc28j60_lwip_read_phy_register(&g_enc28j60_hal_config.DeviceConfigs[0].SPI_Config, ENC28J60_PHSTAT2);
+    }
+
+    // linkstatus bit
+    UINT32 status = ((phyStat >> ENC28J60_PHSTAT2_LSTAT_BIT) & 1);
+
+	if(status)
+		return true;
+	else
+		return false;
+
+}
+void ENC28J60Ethernet_Netwrok_Interface_SetHalConfig(INT32 spi, INT32 chipSelect, INT32 externalInterrupt, INT32 clockRateKhz)
+{
+	g_enc28j60_hal_config.DeviceConfigs[0].SPI_Config.SPI_mod = spi;
+	g_enc28j60_hal_config.DeviceConfigs[0].SPI_Config.Clock_RateKHz = clockRateKhz;
+	g_enc28j60_hal_config.DeviceConfigs[0].SPI_Config.DeviceCS = (GPIO_PIN)chipSelect;
+	g_enc28j60_hal_config.DeviceConfigs[0].INT_Pin = (GPIO_PIN)externalInterrupt;
+}

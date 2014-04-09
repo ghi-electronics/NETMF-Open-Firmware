@@ -200,7 +200,11 @@
 // communicaiton facilities
 /////////////////////////////////////////////////////////
 
+#define NETWORK_INTERFACE_COUNT                     3//2//1//2
+#define NETWORK_USE_LOOPBACK                        1
 #define NETWORK_USE_DHCP                            1
+#define SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE 0xFF00
+
 #include <processor_selector.h>
 
 #endif // PLATFORM_ARM_FEZ_Hydra
