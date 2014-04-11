@@ -64,6 +64,7 @@ INT8 Configuration_Display::NativeSetLcdConfiguration( INT8 bootupMessages, UINT
 
 	Configuration_LCD_Structure config;
 
+      config.PriorityEnable = TRUE;
 	config.Width = Width;
     config.Height = Height;
 
