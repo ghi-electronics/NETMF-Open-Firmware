@@ -25,7 +25,7 @@ void ResetArray( char* arr, int len );
 void InsertValueIntoArray_helper(CLR_RT_TypedArray_UINT8 array, void* value, INT32 offset, INT32 valueSize, HRESULT &hr);
 void ExtractValueFromArray_helper(CLR_RT_TypedArray_UINT8 array, void* value, INT32 offset, INT32 valueSize, HRESULT &hr);
 
-void Arrays::NativeInsertValue( CLR_RT_TypedArray_UINT8 bytes, INT32 offset, LPCSTR str, INT8 nullTerminate, HRESULT &hr )
+void Arrays::NativeInsertString( CLR_RT_TypedArray_UINT8 bytes, INT32 offset, LPCSTR str, INT8 nullTerminate, HRESULT &hr )
 {
 	int length = hal_strlen_s(str);
 	BYTE *buffer = bytes.GetBuffer();
@@ -43,12 +43,24 @@ void Arrays::NativeInsertValue( CLR_RT_TypedArray_UINT8 bytes, INT32 offset, LPC
 	}
 }
 
-void Arrays::NativeInsertValue( CLR_RT_TypedArray_UINT8 array, INT32 offset, float param2, HRESULT &hr )
+void Arrays::NativeInsertInt32( CLR_RT_TypedArray_UINT8 array, INT32 offset, INT32 param2, HRESULT &hr )
+{
+	InsertValueIntoArray_helper(array, &param2, offset, sizeof(INT32), hr);
+}
+
+void Arrays::NativeInsertFloat( CLR_RT_TypedArray_UINT8 array, INT32 offset, float param2, HRESULT &hr )
 {
 	InsertValueIntoArray_helper(array, &param2, offset, sizeof(float), hr);
 }
 
-float Arrays::NativeExtractValue( CLR_RT_TypedArray_UINT8 array, INT32 offset, HRESULT &hr )
+INT32 Arrays::NativeExtractInt32( CLR_RT_TypedArray_UINT8 array, INT32 offset, HRESULT &hr )
+{
+	INT32 i;
+	ExtractValueFromArray_helper(array, &i, offset, sizeof(i), hr);
+	return i;
+}
+
+float Arrays::NativeExtractFloat( CLR_RT_TypedArray_UINT8 array, INT32 offset, HRESULT &hr )
 {
 	float f;
 	ExtractValueFromArray_helper(array, &f, offset, sizeof(f), hr);

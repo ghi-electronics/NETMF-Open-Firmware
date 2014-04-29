@@ -33,8 +33,9 @@ struct Library_Lib_GHI_IO_ControllerAreaNetwork
     static const int FIELD__channel = 3;
     static const int FIELD__receiveBufferSize = 4;
     static const int FIELD__baudRateRegister = 5;
-    static const int FIELD__MessageAvailable = 6;
-    static const int FIELD__ErrorReceived = 7;
+    static const int FIELD__timings = 6;
+    static const int FIELD__MessageAvailable = 7;
+    static const int FIELD__ErrorReceived = 8;
 
     TINYCLR_NATIVE_DECLARE(NativeSetExplicitFilters___VOID__SZARRAY_U4);
     TINYCLR_NATIVE_DECLARE(NativeSetGroupFilters___VOID__SZARRAY_U4__SZARRAY_U4);
@@ -425,9 +426,11 @@ struct Library_Lib_GHI_Usb_Position
 
 struct Library_Lib_GHI_Utilities_Arrays
 {
-    TINYCLR_NATIVE_DECLARE(NativeInsertValue___STATIC__VOID__SZARRAY_U1__I4__STRING__BOOLEAN);
-    TINYCLR_NATIVE_DECLARE(NativeInsertValue___STATIC__VOID__SZARRAY_U1__I4__R4);
-    TINYCLR_NATIVE_DECLARE(NativeExtractValue___STATIC__R4__SZARRAY_U1__I4);
+    TINYCLR_NATIVE_DECLARE(NativeInsertString___STATIC__VOID__SZARRAY_U1__I4__STRING__BOOLEAN);
+    TINYCLR_NATIVE_DECLARE(NativeInsertFloat___STATIC__VOID__SZARRAY_U1__I4__R4);
+    TINYCLR_NATIVE_DECLARE(NativeInsertInt32___STATIC__VOID__SZARRAY_U1__I4__I4);
+    TINYCLR_NATIVE_DECLARE(NativeExtractFloat___STATIC__R4__SZARRAY_U1__I4);
+    TINYCLR_NATIVE_DECLARE(NativeExtractInt32___STATIC__I4__SZARRAY_U1__I4);
     TINYCLR_NATIVE_DECLARE(NativeSplitToArray___STATIC__I4__SZARRAY_U1__I4__CHAR__SZARRAY_R4);
 
     //--//
