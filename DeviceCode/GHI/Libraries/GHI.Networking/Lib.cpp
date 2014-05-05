@@ -80,6 +80,9 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
+    NULL,
+    NULL,
+    Library_Lib_GHI_Networking_WiFiRS9110::NativeExecuteCompletion___BOOLEAN,
     Library_Lib_GHI_Networking_WiFiRS9110::NativeGetLastJoinError___U2,
     Library_Lib_GHI_Networking_WiFiRS9110::NativeGetScanResponseSize___I4,
     Library_Lib_GHI_Networking_WiFiRS9110::NativeGetBssidReponseSize___I4,
@@ -142,7 +145,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Networking =
 {
     "GHI.Networking", 
-    0xDEA68932,
+    0x3AB6032D,
     method_lookup
 };
 

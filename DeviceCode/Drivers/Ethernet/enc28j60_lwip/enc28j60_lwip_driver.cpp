@@ -37,11 +37,44 @@ extern BOOL enc28j60_get_link_status(SPI_CONFIGURATION* spiConf);
 
 void enc28j60_status_callback(struct netif *netif)
 {
-    if(enc28j60_LwipLastIpAddress != netif->ip_addr.addr)
+//    if(enc28j60_LwipLastIpAddress != netif->ip_addr.addr)
+//    {
+//        Network_PostEvent( NETWORK_EVENT_TYPE_ADDRESS_CHANGED, 0 | ((1<< g_enc28j60_index)<<1));
+//        enc28j60_LwipLastIpAddress = netif->ip_addr.addr;
+//    }
+    // TQD I separated to many cases that can raise an event.
+    BOOL raiseEvent = FALSE;
+    UINT32 connectionStatus = enc28j60_get_link_status(&g_enc28j60_hal_config.DeviceConfigs[0].SPI_Config);
+    if (g_enc28j60_iface->flags & SOCK_NETWORKCONFIGURATION_FLAGS_DHCP) // DHCP is enable
+    {
+        if (connectionStatus == FALSE) // Not connect
+        {
+            if (enc28j60_LwipLastIpAddress != netif->ip_addr.addr && enc28j60_LwipLastIpAddress!=0)
+            {
+                raiseEvent = TRUE;
+            }
+        }
+        else // connected
+        {
+            if (enc28j60_LwipLastIpAddress != netif->ip_addr.addr && enc28j60_LwipLastIpAddress==0)
+            {
+                 raiseEvent = TRUE;
+            }
+        }
+    }
+    else // staticIP is enable
+    {
+        if (enc28j60_LwipNetworkStatus!=connectionStatus /*&& connectionStatus == TRUE*/) // Only raise event when connected if staticIP
+        {
+            raiseEvent = TRUE;
+        }
+    }
+    if (raiseEvent)
     {
         Network_PostEvent( NETWORK_EVENT_TYPE_ADDRESS_CHANGED, 0 | ((1<< g_enc28j60_index)<<1));
         enc28j60_LwipLastIpAddress = netif->ip_addr.addr;
     }
+     enc28j60_LwipNetworkStatus = connectionStatus;
 
 #if defined(_DEBUG)
     lcd_printf("\f\n\n\n\n\n\nLink Update: %s\n", (netif_is_up(netif) ? "UP  " : "DOWN") );
@@ -103,7 +136,7 @@ err_t   enc28j60_ethhw_init( netif * myNetIf)
 
 void lwip_interrupt_continuation( )
 {
-    NATIVE_PROFILE_PAL_NETWORK();
+    //NATIVE_PROFILE_PAL_NETWORK();
     GLOBAL_LOCK(irq);
     
     if(!enc28j60_InterruptTaskContinuation.IsLinked())
@@ -114,9 +147,8 @@ void lwip_interrupt_continuation( )
 
 void lwip_network_uptime_completion(void *arg)
 {
-    NATIVE_PROFILE_PAL_NETWORK();
-
-
+    //NATIVE_PROFILE_PAL_NETWORK(); // G120 is not happy with this	
+		
    UINT32 status = enc28j60_get_link_status(&g_enc28j60_hal_config.DeviceConfigs[0].SPI_Config);
 	if(g_enc28j60_iface !=NULL)
 	{
@@ -160,9 +192,15 @@ void lwip_network_uptime_completion(void *arg)
 			Events_Set(SYSTEM_EVENT_FLAG_SOCKET);
 			Events_Set(SYSTEM_EVENT_FLAG_NETWORK);
 
-			enc28j60_LwipNetworkStatus = status;
+			//enc28j60_LwipNetworkStatus = status; // TQD => We will update in callback function
 			if(SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE == (g_enc28j60_iface->flags & SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE))
-				enc28j60_status_callback(pNetIf);
+			{
+                                enc28j60_status_callback(pNetIf);
+                        }
+                        else // TQD Do we need it? this is called after netif.Open() so it is alway active, but I still keep it here for sure
+                        {
+                              enc28j60_LwipNetworkStatus = status;
+                        }
 		}
       
 	}
@@ -173,7 +211,8 @@ void lwip_network_uptime_completion(void *arg)
 
 void  ENC28J60_Network_Interface_ForceUpdateActivationStatus(bool activate)
 {
-	  NATIVE_PROFILE_PAL_NETWORK();
+#if 0	// TQD Do we need these? I use completion + callback to control the status network - All event should be raise after netif.Open().
+    NATIVE_PROFILE_PAL_NETWORK();
 
     UINT16 phyStat = 0;
     
@@ -211,6 +250,8 @@ void  ENC28J60_Network_Interface_ForceUpdateActivationStatus(bool activate)
 		Events_Set(SYSTEM_EVENT_FLAG_SOCKET);
 		Events_Set(SYSTEM_EVENT_FLAG_NETWORK);
 	}
+#endif
+        enc28j60_LwipUpTimeCompletion.EnqueueDelta64( 2000000 ); // TQD Start completion for next 2 seconds
 }
 
 void InitContinuations( struct netif* pNetIf )
@@ -219,7 +260,7 @@ void InitContinuations( struct netif* pNetIf )
 
     enc28j60_LwipUpTimeCompletion.InitializeForUserMode( (HAL_CALLBACK_FPN)lwip_network_uptime_completion, pNetIf );
     
-    enc28j60_LwipUpTimeCompletion.EnqueueDelta64( 2000000 );
+    //enc28j60_LwipUpTimeCompletion.EnqueueDelta64( 2000000 ); // TQD should not start completion here, should start after netif.Open() so easier to control event
 }
 
 void ENC28J60_Network_Interface_SetAsDefaultInterfaces(int index)
@@ -255,8 +296,12 @@ int ENC28J60_LWIP_Driver::Open(ENC28J60_LWIP_DRIVER_CONFIG* config, int index )
     struct netif *pNetIF;
     int len;
 	if(config == NULL) return -1;
-    enc28j60_LwipLastIpAddress = 0;
-	g_enc28j60_index = index;
+
+    enc28j60_LwipLastIpAddress = 0; // Reset IP
+    enc28j60_LwipNetworkStatus = 0; // Reset connection   
+
+    /* Apply network configuration */
+    g_enc28j60_index = index;
     g_enc28j60_iface = &g_NetworkConfig.NetworkInterfaces[index];
 
     if(0 == (g_enc28j60_iface->flags & SOCK_NETWORKCONFIGURATION_FLAGS_DHCP))
@@ -299,25 +344,25 @@ int ENC28J60_LWIP_Driver::Open(ENC28J60_LWIP_DRIVER_CONFIG* config, int index )
         return -1;
     }
 
-	UINT16 phyStat = 0;
-	 {
-        GLOBAL_LOCK(irq);
-
-        phyStat = enc28j60_lwip_read_phy_register(&g_enc28j60_hal_config.DeviceConfigs[0].SPI_Config, ENC28J60_PHSTAT2);
-	}
-	 //enc28j60_LwipNetworkStatus = ((phyStat >> ENC28J60_PHSTAT2_LSTAT_BIT) & 1);
-	 enc28j60_LwipNetworkStatus = 0;// TQD fix bug Reset CLR does not reset network ((phyStat >> ENC28J60_PHSTAT2_LSTAT_BIT) & 1);
-	 
-	if(SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE == (g_enc28j60_iface->flags & SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE))
-	{
-		
-		netif_set_default( pNetIF );
-		// if (enc28j60_LwipNetworkStatus)
-		// {
-			// netif_set_up( pNetIF );
-			// netif_set_link_up( pNetIF );
-		// }
-	}
+//	UINT16 phyStat = 0;
+//	 {
+//        GLOBAL_LOCK(irq);
+//
+//        phyStat = enc28j60_lwip_read_phy_register(&g_enc28j60_hal_config.DeviceConfigs[0].SPI_Config, ENC28J60_PHSTAT2);
+//	}
+//	 enc28j60_LwipNetworkStatus = ((phyStat >> ENC28J60_PHSTAT2_LSTAT_BIT) & 1); => TQD removed => This will fix bug if the cable connected at the second time, event won't be raised because status connection is same
+//	
+//	 
+//	if(SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE == (g_enc28j60_iface->flags & SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE))
+//	{
+//		
+//		netif_set_default( pNetIF );
+//		// if (enc28j60_LwipNetworkStatus)  // TQD let completion handle that => should not in initialize
+//		// {
+//			// netif_set_up( pNetIF );
+//			// netif_set_link_up( pNetIF );
+//		// }
+//	}
 	
     /* Enable the CHIP SELECT pin */
     if (CPU_GPIO_EnableInputPin (config->SPI_Config.DeviceCS, 
@@ -367,7 +412,8 @@ BOOL ENC28J60_LWIP_Driver::Close( ENC28J60_LWIP_DRIVER_CONFIG* config, int index
     enc28j60_LwipNetworkStatus = 0;
 
     memset(&g_ENC28J60_NetIF, 0, sizeof(g_ENC28J60_NetIF));
-
+    enc28j60_LwipLastIpAddress = 0; // Reset IP
+    enc28j60_LwipNetworkStatus = 0; // Reset connection  
     return TRUE;
 
 }

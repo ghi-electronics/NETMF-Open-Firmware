@@ -246,7 +246,7 @@ HRESULT SOCK_CONFIGURATION_UpdateAdapterConfiguration( UINT32 interfaceIndex, UI
     NATIVE_PROFILE_PAL_COM();
     HRESULT hr = S_OK;
     BOOL fDbg = FALSE;
-
+    SOCK_NetworkConfiguration* configbk =  &g_NetworkConfig.NetworkInterfaces[interfaceIndex];    
     if(interfaceIndex >= NETWORK_INTERFACE_COUNT) 
     {
         return CLR_E_INVALID_PARAMETER;
@@ -267,7 +267,36 @@ HRESULT SOCK_CONFIGURATION_UpdateAdapterConfiguration( UINT32 interfaceIndex, UI
 
     if(SUCCEEDED(hr))
     {
-        Sockets_LWIP_Driver::SaveConfig(interfaceIndex, config);
+       // TQD fix 2 bug:
+       // Event is not raised if StaticIP enable at 2nd
+       // Should not save DHCP IP address 
+        configbk->flags = config->flags; 
+        configbk->networkInterfaceType = config->networkInterfaceType;
+        if ((updateFlags & SOCK_NETWORKCONFIGURATION_UPDATE_DHCP) == SOCK_NETWORKCONFIGURATION_UPDATE_DHCP) // if request DHCP  flag
+        {
+            // if request DHCP enable => only update flags
+                                  
+            if ((config->flags & SOCK_NETWORKCONFIGURATION_FLAGS_DHCP) != SOCK_NETWORKCONFIGURATION_FLAGS_DHCP)  
+            {
+                configbk->ipaddr = config->ipaddr;
+                configbk->subnetmask = config->subnetmask;
+                configbk->gateway = config->gateway;
+            }
+        }
+        if ((updateFlags & SOCK_NETWORKCONFIGURATION_UPDATE_MAC) == SOCK_NETWORKCONFIGURATION_UPDATE_MAC) // if request MAC Update  flag
+        {
+             configbk->macAddressLen = config->macAddressLen;
+             memcpy( configbk->macAddressBuffer, config->macAddressBuffer, 64);
+        }
+        if ((updateFlags & SOCK_NETWORKCONFIGURATION_UPDATE_DNS) == SOCK_NETWORKCONFIGURATION_UPDATE_DNS) // if request DNS Update  flag
+        {
+            if ((config->flags & SOCK_NETWORKCONFIGURATION_FLAGS_DYNAMIC_DNS) != SOCK_NETWORKCONFIGURATION_FLAGS_DYNAMIC_DNS) //
+            {
+                  configbk->dnsServer1 = config->dnsServer1;
+                  configbk->dnsServer2 = config->dnsServer2;
+            }
+        }            
+        Sockets_LWIP_Driver::SaveConfig(interfaceIndex, configbk);
     }
     else
     {
@@ -277,7 +306,15 @@ HRESULT SOCK_CONFIGURATION_UpdateAdapterConfiguration( UINT32 interfaceIndex, UI
 
     if(0 != (updateFlags & c_reInitFlag))
     {
-        if(fDbg) SOCKETS_Initialize(COM_SOCKET_DBG);
+        if(fDbg) 
+        {
+          SOCKETS_Initialize(COM_SOCKET_DBG);
+          //if (updateFlags & SOCK_NETWORKCONFIGURATION_UPDATE_DHCP == SOCK_NETWORKCONFIGURATION_UPDATE_DHCP || (updateFlags & SOCK_NETWORKCONFIGURATION_UPDATE_DNS == SOCK_NETWORKCONFIGURATION_UPDATE_DNS) )// Enable DHCP
+          //{
+          //    Network_PostEvent( NETWORK_EVENT_TYPE_ADDRESS_CHANGED, 0 | ((1<< interfaceIndex)<<1));
+
+          //}
+        }
     }
 
     return hr;
@@ -555,8 +592,16 @@ void Sockets_LWIP_Driver::MulticastDiscoveryRespond(void* arg)
             INT32 nonblocking = 1;
             SOCKET_CHECK_ENTER();
 
-            // Load is required here because the g_NetworkConfig contains only the static ip address (not DHCP)
-            HAL_SOCK_CONFIGURATION_LoadAdapterConfiguration(0, &current);
+            
+			int active_iface_index;
+			for(active_iface_index=0; active_iface_index<g_NetworkConfig.NetworkInterfaceCount; active_iface_index++)
+			{
+				if(SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE == (g_NetworkConfig.NetworkInterfaces[active_iface_index].flags & SOCK_NETWORKCONFIGURATION_FLAGS_ACTIVE_INTERFACE))
+					break;
+			}
+            
+			// Load is required here because the g_NetworkConfig contains only the static ip address (not DHCP)
+			HAL_SOCK_CONFIGURATION_LoadAdapterConfiguration(active_iface_index, &current);
 
             info.ipaddr        = current.ipaddr;
             info.macAddressLen = current.macAddressLen;

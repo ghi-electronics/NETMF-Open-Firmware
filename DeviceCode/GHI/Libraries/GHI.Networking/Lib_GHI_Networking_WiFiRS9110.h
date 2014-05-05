@@ -41,6 +41,8 @@ namespace GHI
 
             static UNSUPPORTED_TYPE& Get_eventWorker( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UNSUPPORTED_TYPE( pMngObj, Library_Lib_GHI_Networking_WiFiRS9110::FIELD__eventWorker ); }
 
+            static UNSUPPORTED_TYPE& Get_completionWorker( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UNSUPPORTED_TYPE( pMngObj, Library_Lib_GHI_Networking_WiFiRS9110::FIELD__completionWorker ); }
+
             static UNSUPPORTED_TYPE& Get_version( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UNSUPPORTED_TYPE( pMngObj, Library_Lib_GHI_Networking_WiFiRS9110::FIELD__version ); }
 
             static INT32& Get_spi( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT32( pMngObj, Library_Lib_GHI_Networking_WiFiRS9110::FIELD__spi ); }
@@ -56,6 +58,7 @@ namespace GHI
             static UNSUPPORTED_TYPE& Get_hardwareMacAddress( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UNSUPPORTED_TYPE( pMngObj, Library_Lib_GHI_Networking_WiFiRS9110::FIELD__hardwareMacAddress ); }
 
             // Declaration of stubs. These functions are implemented by Interop code developers
+            static INT8 NativeExecuteCompletion( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
             static UINT16 NativeGetLastJoinError( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
             static INT32 NativeGetScanResponseSize( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
             static INT32 NativeGetBssidReponseSize( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );

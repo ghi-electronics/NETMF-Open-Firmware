@@ -43,14 +43,16 @@ struct Library_Lib_GHI_Networking_WiFiRS9110
     static const int FIELD__activeNetwork = 12;
     static const int FIELD__resetPin = 13;
     static const int FIELD__eventWorker = 14;
-    static const int FIELD__version = 15;
-    static const int FIELD__spi = 16;
-    static const int FIELD__chipSelect = 17;
-    static const int FIELD__externalInterrupt = 18;
-    static const int FIELD__clockRate = 19;
-    static const int FIELD__timeout = 20;
-    static const int FIELD__hardwareMacAddress = 21;
+    static const int FIELD__completionWorker = 15;
+    static const int FIELD__version = 16;
+    static const int FIELD__spi = 17;
+    static const int FIELD__chipSelect = 18;
+    static const int FIELD__externalInterrupt = 19;
+    static const int FIELD__clockRate = 20;
+    static const int FIELD__timeout = 21;
+    static const int FIELD__hardwareMacAddress = 22;
 
+    TINYCLR_NATIVE_DECLARE(NativeExecuteCompletion___BOOLEAN);
     TINYCLR_NATIVE_DECLARE(NativeGetLastJoinError___U2);
     TINYCLR_NATIVE_DECLARE(NativeGetScanResponseSize___I4);
     TINYCLR_NATIVE_DECLARE(NativeGetBssidReponseSize___I4);

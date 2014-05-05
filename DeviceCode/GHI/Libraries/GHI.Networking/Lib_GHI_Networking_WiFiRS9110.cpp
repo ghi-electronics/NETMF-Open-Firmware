@@ -162,4 +162,10 @@ INT8 WiFiRS9110::NativeJoin( CLR_RT_HeapBlock* pMngObj, INT32 param0, INT32 para
 	
 	return 0;
 }
+INT8 WiFiRS9110::NativeExecuteCompletion( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
+{
+    INT8 retVal = 0; 
+  
+    return retVal;
+}
 

@@ -13,6 +13,22 @@
 using namespace GHI::Networking;
 
 
+HRESULT Library_Lib_GHI_Networking_WiFiRS9110::NativeExecuteCompletion___BOOLEAN( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+        INT8 retVal = WiFiRS9110::NativeExecuteCompletion( pMngObj,  hr );
+        TINYCLR_CHECK_HRESULT( hr );
+        SetResult_INT8( stack, retVal );
+
+    }
+    TINYCLR_NOCLEANUP();
+}
+
 HRESULT Library_Lib_GHI_Networking_WiFiRS9110::NativeGetLastJoinError___U2( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
