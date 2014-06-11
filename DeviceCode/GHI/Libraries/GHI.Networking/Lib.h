@@ -31,6 +31,20 @@ struct Library_Lib_GHI_Networking_BaseInterface
 
 };
 
+struct Library_Lib_GHI_Networking_PPPSerialModem
+{
+    static const int FIELD__deviceId = 5;
+    static const int FIELD__port = 6;
+
+    TINYCLR_NATIVE_DECLARE(NativeEnable___VOID__U4);
+    TINYCLR_NATIVE_DECLARE(NativeConnect___I4__U4__STRING__STRING__U4);
+    TINYCLR_NATIVE_DECLARE(NativeDisconnect___VOID);
+    TINYCLR_NATIVE_DECLARE(NativeIsLinkConnected___BOOLEAN);
+
+    //--//
+
+};
+
 struct Library_Lib_GHI_Networking_WiFiRS9110
 {
     static const int FIELD__waitOnScan = 5;
@@ -65,6 +79,7 @@ struct Library_Lib_GHI_Networking_WiFiRS9110
     TINYCLR_NATIVE_DECLARE(NativeSetBootloaderOption___BOOLEAN__I4);
     TINYCLR_NATIVE_DECLARE(NativeQueryMacAddress___BOOLEAN);
     TINYCLR_NATIVE_DECLARE(NativeGetMacAddress___VOID__SZARRAY_U1);
+    TINYCLR_NATIVE_DECLARE(NativeUpdateInternalMacAddress___STRING__SZARRAY_U1);
     TINYCLR_NATIVE_DECLARE(NativeSendBandRequest___VOID__I4);
     TINYCLR_NATIVE_DECLARE(NativeInitializeRequest___VOID);
     TINYCLR_NATIVE_DECLARE(NativeScan___BOOLEAN__U4__STRING);

@@ -13,6 +13,9 @@
 <Compile Include="Lib_GHI_Networking_BaseInterface_mshl.cpp" />
 <HFile Include="Lib_GHI_Networking_BaseInterface.h" />
 <Compile Include="Lib_GHI_Networking_BaseInterface.cpp" />
+<Compile Include="Lib_GHI_Networking_PPPSerialModem_mshl.cpp" />
+<HFile Include="Lib_GHI_Networking_PPPSerialModem.h" />
+<Compile Include="Lib_GHI_Networking_PPPSerialModem.cpp" />
 <Compile Include="Lib_GHI_Networking_WiFiRS9110_mshl.cpp" />
 <HFile Include="Lib_GHI_Networking_WiFiRS9110.h" />
 <Compile Include="Lib_GHI_Networking_WiFiRS9110.cpp" />

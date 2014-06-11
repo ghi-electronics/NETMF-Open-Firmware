@@ -275,10 +275,6 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
     Library_Lib_GHI_Processor_RealTimeClock::NativeSetTime___STATIC__VOID__I4__I4__I4__I4__I4__I4__I4__I4,
     Library_Lib_GHI_Processor_RealTimeClock::NativeGetTime___STATIC__VOID__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4,
     Library_Lib_GHI_Processor_RealTimeClock::NativeSetAlarm___STATIC__VOID__I4__I4__I4__I4__I4__I4__I4__I4,
@@ -354,7 +350,6 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
-    NULL,
     Library_Lib_GHI_Processor_RuntimeLoadableProcedures::NativeInitializeZeroRegion___STATIC__VOID__U4__U4,
     Library_Lib_GHI_Processor_RuntimeLoadableProcedures::NativeLoadELF___STATIC__VOID__SZARRAY_U1__BYREF_U4__BYREF_U4__BYREF_U4,
     Library_Lib_GHI_Processor_RuntimeLoadableProcedures::NativeFindSymbolAddress___STATIC__U4__SZARRAY_U1__STRING__GHIProcessorRuntimeLoadableProceduresSymbolType,
@@ -371,6 +366,10 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_Lib_GHI_Processor_Watchdog::NativeEnable___STATIC__VOID__U4,
     Library_Lib_GHI_Processor_Watchdog::NativeDisable___STATIC__VOID,
     Library_Lib_GHI_Processor_Watchdog::NativeResetCounter___STATIC__VOID,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
     NULL,
     NULL,
     NULL,
@@ -532,7 +531,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Hardware =
 {
     "GHI.Hardware", 
-    0xE97518F6,
+    0xDD5C9C3B,
     method_lookup
 };
 

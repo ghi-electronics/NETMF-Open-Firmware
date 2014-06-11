@@ -71,6 +71,7 @@ namespace GHI
             static INT8 NativeSetBootloaderOption( CLR_RT_HeapBlock* pMngObj, INT32 param0, HRESULT &hr );
             static INT8 NativeQueryMacAddress( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
             static void NativeGetMacAddress( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT8 param0, HRESULT &hr );
+            static LPCSTR NativeUpdateInternalMacAddress( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT8 param0, HRESULT &hr );
             static void NativeSendBandRequest( CLR_RT_HeapBlock* pMngObj, INT32 param0, HRESULT &hr );
             static void NativeInitializeRequest( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
             static INT8 NativeScan( CLR_RT_HeapBlock* pMngObj, UINT32 param0, LPCSTR param1, HRESULT &hr );
