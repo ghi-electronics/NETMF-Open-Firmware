@@ -488,7 +488,10 @@ void HAL_Uninitialize()
 
 extern "C"
 {
-
+void HAL_ResetCLR()
+{
+   GHI_OSHW_ResetCLR();
+}
 void BootEntry()
 {
 
@@ -545,7 +548,7 @@ void BootEntry()
     CPU_Initialize();
 
     HAL_Time_Initialize();
-
+	HAL_ResetCLR();
     HAL_Initialize();
 
 #if !defined(BUILD_RTM) 

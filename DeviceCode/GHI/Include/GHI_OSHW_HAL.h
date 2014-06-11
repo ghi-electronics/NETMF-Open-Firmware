@@ -29,5 +29,5 @@ void OSHW_GHAL_GetOemModelSku(BYTE* oem, BYTE* model, UINT16* sku);
 // StorageDev
 GPAL_ERROR GHI_OSHW_Mount(UINT32 ClockFrequencyInKHz);
 void GHI_OSHW_Unmount();
-
+void GHI_OSHW_ResetCLR();
 #endif

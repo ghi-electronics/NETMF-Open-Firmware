@@ -175,4 +175,9 @@ INT8 WiFiRS9110::NativeExecuteCompletion( CLR_RT_HeapBlock* pMngObj, HRESULT &hr
   
     return retVal;
 }
+LPCSTR WiFiRS9110::NativeUpdateInternalMacAddress( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT8 param0, HRESULT &hr )
+{
+    LPCSTR retVal = 0; 
+    return retVal;
+}
 
