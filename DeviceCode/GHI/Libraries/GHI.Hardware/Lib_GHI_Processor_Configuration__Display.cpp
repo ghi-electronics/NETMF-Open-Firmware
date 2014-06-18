@@ -100,11 +100,3 @@ INT8 Configuration_Display::NativeSetSpiConfiguration( INT32 param0, INT32 param
 	
     return 0;
 }
-
-INT8 Configuration_Display::NativeSetParallelConfiguration( INT32 param0, INT32 param1, HRESULT &hr )
-{
-	hr = CLR_E_NOT_SUPPORTED;
-	
-    return 0;
-}
-

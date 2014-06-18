@@ -25,7 +25,6 @@ namespace GHI
             static void NativeGetLcdConfiguration( INT8 * param0, UINT8 * param1, UINT32 * param2, UINT32 * param3, INT8 * param4, INT8 * param5, INT8 * param6, INT8 * param7, INT8 * param8, UINT8 * param9, UINT8 * param10, UINT8 * param11, UINT8 * param12, UINT8 * param13, UINT8 * param14, UINT32 * param15, HRESULT &hr );
             static INT8 NativeSetLcdConfiguration( INT8 param0, UINT8 param1, UINT32 param2, UINT32 param3, INT8 param4, INT8 param5, INT8 param6, INT8 param7, INT8 param8, UINT8 param9, UINT8 param10, UINT8 param11, UINT8 param12, UINT8 param13, UINT8 param14, UINT32 param15, HRESULT &hr );
             static INT8 NativeSetSpiConfiguration( INT32 param0, INT32 param1, INT32 param2, INT32 param3, INT8 param4, INT8 param5, INT8 param6, INT32 param7, INT32 param8, INT32 param9, INT32 param10, INT32 param11, INT8 param12, HRESULT &hr );
-            static INT8 NativeSetParallelConfiguration( INT32 param0, INT32 param1, HRESULT &hr );
         };
     }
 }

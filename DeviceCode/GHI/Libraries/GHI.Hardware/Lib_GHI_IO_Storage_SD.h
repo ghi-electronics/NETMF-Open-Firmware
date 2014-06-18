@@ -26,7 +26,7 @@ namespace GHI
                 static UINT32& Get_id( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UINT32( pMngObj, Library_Lib_GHI_IO_Storage_SD::FIELD__id ); }
 
                 // Declaration of stubs. These functions are implemented by Interop code developers
-                static void NativeConstructor( CLR_RT_HeapBlock* pMngObj, UINT32 param0, HRESULT &hr );
+                static void NativeConstructor( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
                 static void NativeFinalize( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
                 static void NativeMount( CLR_RT_HeapBlock* pMngObj, INT32 param0, HRESULT &hr );
                 static void NativeUnmount( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );

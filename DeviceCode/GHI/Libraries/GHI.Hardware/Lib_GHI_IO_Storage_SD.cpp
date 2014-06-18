@@ -18,10 +18,8 @@
 
 using namespace GHI::IO::Storage;
 
-void SD::NativeConstructor( CLR_RT_HeapBlock* pMngObj, UINT32 param0, HRESULT &hr )
+void SD::NativeConstructor( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
 {
-	if (param0 != 0)
-		hr = CLR_E_NOT_SUPPORTED;
 }
 
 void SD::NativeFinalize( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )

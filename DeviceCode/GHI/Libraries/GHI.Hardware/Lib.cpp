@@ -140,7 +140,6 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_Lib_GHI_Processor_Configuration__Display::NativeGetLcdConfiguration___STATIC__VOID__BYREF_BOOLEAN__BYREF_U1__BYREF_U4__BYREF_U4__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U4,
     Library_Lib_GHI_Processor_Configuration__Display::NativeSetLcdConfiguration___STATIC__BOOLEAN__BOOLEAN__U1__U4__U4__BOOLEAN__BOOLEAN__BOOLEAN__BOOLEAN__BOOLEAN__U1__U1__U1__U1__U1__U1__U4,
     Library_Lib_GHI_Processor_Configuration__Display::NativeSetSpiConfiguration___STATIC__BOOLEAN__I4__I4__I4__I4__BOOLEAN__BOOLEAN__BOOLEAN__I4__I4__I4__I4__I4__BOOLEAN,
-    Library_Lib_GHI_Processor_Configuration__Display::NativeSetParallelConfiguration___STATIC__BOOLEAN__I4__I4,
     NULL,
     NULL,
     NULL,
@@ -237,8 +236,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
-    NULL,
-    Library_Lib_GHI_IO_Storage_SD::NativeConstructor___VOID__U4,
+    Library_Lib_GHI_IO_Storage_SD::NativeConstructor___VOID,
     Library_Lib_GHI_IO_Storage_SD::NativeFinalize___VOID,
     Library_Lib_GHI_IO_Storage_SD::NativeMount___VOID__I4,
     Library_Lib_GHI_IO_Storage_SD::NativeUnmount___VOID,
@@ -531,7 +529,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Hardware =
 {
     "GHI.Hardware", 
-    0xDD5C9C3B,
+    0x5F6913AB,
     method_lookup
 };
 
