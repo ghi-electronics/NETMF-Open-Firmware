@@ -43,8 +43,6 @@ namespace GHI
 
             static UNSUPPORTED_TYPE& Get_completionWorker( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UNSUPPORTED_TYPE( pMngObj, Library_Lib_GHI_Networking_WiFiRS9110::FIELD__completionWorker ); }
 
-            static UNSUPPORTED_TYPE& Get_version( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UNSUPPORTED_TYPE( pMngObj, Library_Lib_GHI_Networking_WiFiRS9110::FIELD__version ); }
-
             static INT32& Get_spi( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT32( pMngObj, Library_Lib_GHI_Networking_WiFiRS9110::FIELD__spi ); }
 
             static INT32& Get_chipSelect( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT32( pMngObj, Library_Lib_GHI_Networking_WiFiRS9110::FIELD__chipSelect ); }
@@ -54,8 +52,6 @@ namespace GHI
             static INT32& Get_clockRate( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT32( pMngObj, Library_Lib_GHI_Networking_WiFiRS9110::FIELD__clockRate ); }
 
             static INT32& Get_timeout( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT32( pMngObj, Library_Lib_GHI_Networking_WiFiRS9110::FIELD__timeout ); }
-
-            static UNSUPPORTED_TYPE& Get_hardwareMacAddress( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UNSUPPORTED_TYPE( pMngObj, Library_Lib_GHI_Networking_WiFiRS9110::FIELD__hardwareMacAddress ); }
 
             // Declaration of stubs. These functions are implemented by Interop code developers
             static INT8 NativeExecuteCompletion( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
@@ -70,8 +66,7 @@ namespace GHI
             static INT32 NativeGetEvent( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
             static INT8 NativeSetBootloaderOption( CLR_RT_HeapBlock* pMngObj, INT32 param0, HRESULT &hr );
             static INT8 NativeQueryMacAddress( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
-            static void NativeGetMacAddress( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT8 param0, HRESULT &hr );
-            static LPCSTR NativeUpdateInternalMacAddress( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT8 param0, HRESULT &hr );
+            static void NativeGetInternalMacAddress( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT8 param0, HRESULT &hr );
             static void NativeSendBandRequest( CLR_RT_HeapBlock* pMngObj, INT32 param0, HRESULT &hr );
             static void NativeInitializeRequest( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
             static INT8 NativeScan( CLR_RT_HeapBlock* pMngObj, UINT32 param0, LPCSTR param1, HRESULT &hr );

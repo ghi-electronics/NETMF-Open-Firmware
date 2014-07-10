@@ -58,13 +58,11 @@ struct Library_Lib_GHI_Networking_WiFiRS9110
     static const int FIELD__resetPin = 13;
     static const int FIELD__eventWorker = 14;
     static const int FIELD__completionWorker = 15;
-    static const int FIELD__version = 16;
-    static const int FIELD__spi = 17;
-    static const int FIELD__chipSelect = 18;
-    static const int FIELD__externalInterrupt = 19;
-    static const int FIELD__clockRate = 20;
-    static const int FIELD__timeout = 21;
-    static const int FIELD__hardwareMacAddress = 22;
+    static const int FIELD__spi = 16;
+    static const int FIELD__chipSelect = 17;
+    static const int FIELD__externalInterrupt = 18;
+    static const int FIELD__clockRate = 19;
+    static const int FIELD__timeout = 20;
 
     TINYCLR_NATIVE_DECLARE(NativeExecuteCompletion___BOOLEAN);
     TINYCLR_NATIVE_DECLARE(NativeGetLastJoinError___U2);
@@ -78,8 +76,7 @@ struct Library_Lib_GHI_Networking_WiFiRS9110
     TINYCLR_NATIVE_DECLARE(NativeGetEvent___I4);
     TINYCLR_NATIVE_DECLARE(NativeSetBootloaderOption___BOOLEAN__I4);
     TINYCLR_NATIVE_DECLARE(NativeQueryMacAddress___BOOLEAN);
-    TINYCLR_NATIVE_DECLARE(NativeGetMacAddress___VOID__SZARRAY_U1);
-    TINYCLR_NATIVE_DECLARE(NativeUpdateInternalMacAddress___STRING__SZARRAY_U1);
+    TINYCLR_NATIVE_DECLARE(NativeGetInternalMacAddress___VOID__SZARRAY_U1);
     TINYCLR_NATIVE_DECLARE(NativeSendBandRequest___VOID__I4);
     TINYCLR_NATIVE_DECLARE(NativeInitializeRequest___VOID);
     TINYCLR_NATIVE_DECLARE(NativeScan___BOOLEAN__U4__STRING);

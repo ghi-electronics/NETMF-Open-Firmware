@@ -71,6 +71,5 @@ void BaseInterface::NativeDeactivate( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
 
 void BaseInterface::NativeUpdateMacAddress( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT8 param0, HRESULT &hr )
 {
-	int index = Get_type(pMngObj);
-	Network_Interface_UpdateMacAddressConfig(index, param0.GetBuffer()); 
+	hr = CLR_E_NOT_SUPPORTED;
 }

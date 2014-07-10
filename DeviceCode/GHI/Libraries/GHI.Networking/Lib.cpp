@@ -44,7 +44,6 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
-    NULL,
     Library_Lib_GHI_Networking_BaseInterface::NativeConstructor___VOID,
     Library_Lib_GHI_Networking_BaseInterface::NativeDispose___VOID,
     Library_Lib_GHI_Networking_BaseInterface::NativeActivate___VOID,
@@ -103,8 +102,6 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
-    NULL,
-    NULL,
     Library_Lib_GHI_Networking_WiFiRS9110::NativeExecuteCompletion___BOOLEAN,
     Library_Lib_GHI_Networking_WiFiRS9110::NativeGetLastJoinError___U2,
     Library_Lib_GHI_Networking_WiFiRS9110::NativeGetScanResponseSize___I4,
@@ -117,8 +114,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_Lib_GHI_Networking_WiFiRS9110::NativeGetEvent___I4,
     Library_Lib_GHI_Networking_WiFiRS9110::NativeSetBootloaderOption___BOOLEAN__I4,
     Library_Lib_GHI_Networking_WiFiRS9110::NativeQueryMacAddress___BOOLEAN,
-    Library_Lib_GHI_Networking_WiFiRS9110::NativeGetMacAddress___VOID__SZARRAY_U1,
-    Library_Lib_GHI_Networking_WiFiRS9110::NativeUpdateInternalMacAddress___STRING__SZARRAY_U1,
+    Library_Lib_GHI_Networking_WiFiRS9110::NativeGetInternalMacAddress___VOID__SZARRAY_U1,
     Library_Lib_GHI_Networking_WiFiRS9110::NativeSendBandRequest___VOID__I4,
     Library_Lib_GHI_Networking_WiFiRS9110::NativeInitializeRequest___VOID,
     Library_Lib_GHI_Networking_WiFiRS9110::NativeScan___BOOLEAN__U4__STRING,
@@ -170,7 +166,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Networking =
 {
     "GHI.Networking", 
-    0xA9FBAAE2,
+    0xB02F7CD8,
     method_lookup
 };
 

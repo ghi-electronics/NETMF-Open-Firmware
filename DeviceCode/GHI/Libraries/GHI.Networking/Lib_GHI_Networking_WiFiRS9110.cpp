@@ -85,16 +85,9 @@ INT8 WiFiRS9110::NativeQueryMacAddress( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
 	return 0;
 }
 
-void WiFiRS9110::NativeGetMacAddress( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT8 param0, HRESULT &hr )
+void WiFiRS9110::NativeGetInternalMacAddress( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT8 param0, HRESULT &hr )
 {
     hr = CLR_E_NOT_SUPPORTED;
-}
-
-LPCSTR WiFiRS9110::NativeUpdateInternalMacAddress( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT8 param0, HRESULT &hr )
-{
-    hr = CLR_E_NOT_SUPPORTED;
-	
-    return 0;
 }
 
 void WiFiRS9110::NativeSendBandRequest( CLR_RT_HeapBlock* pMngObj, INT32 param0, HRESULT &hr )
