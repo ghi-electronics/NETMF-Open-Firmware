@@ -44,6 +44,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
+    NULL,
     Library_Lib_GHI_Networking_BaseInterface::NativeConstructor___VOID,
     Library_Lib_GHI_Networking_BaseInterface::NativeDispose___VOID,
     Library_Lib_GHI_Networking_BaseInterface::NativeActivate___VOID,
@@ -166,7 +167,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Networking =
 {
     "GHI.Networking", 
-    0xB02F7CD8,
+    0x5E10B321,
     method_lookup
 };
 

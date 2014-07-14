@@ -37,9 +37,9 @@
 <Compile Include="Lib_GHI_IO_Storage_ExtendedWeakReferences_mshl.cpp" />
 <HFile Include="Lib_GHI_IO_Storage_ExtendedWeakReferences.h" />
 <Compile Include="Lib_GHI_IO_Storage_ExtendedWeakReferences.cpp" />
-<Compile Include="Lib_GHI_IO_Storage_SD_mshl.cpp" />
-<HFile Include="Lib_GHI_IO_Storage_SD.h" />
-<Compile Include="Lib_GHI_IO_Storage_SD.cpp" />
+<Compile Include="Lib_GHI_IO_Storage_SDCard_mshl.cpp" />
+<HFile Include="Lib_GHI_IO_Storage_SDCard.h" />
+<Compile Include="Lib_GHI_IO_Storage_SDCard.cpp" />
 <Compile Include="Lib_GHI_IO_Storage_UsbMassStorage_mshl.cpp" />
 <HFile Include="Lib_GHI_IO_Storage_UsbMassStorage.h" />
 <Compile Include="Lib_GHI_IO_Storage_UsbMassStorage.cpp" />

@@ -212,7 +212,7 @@ struct Library_Lib_GHI_IO_Storage_Removable
 
 };
 
-struct Library_Lib_GHI_IO_Storage_SD
+struct Library_Lib_GHI_IO_Storage_SDCard
 {
     static const int FIELD__id = 2;
 
@@ -220,7 +220,7 @@ struct Library_Lib_GHI_IO_Storage_SD
     TINYCLR_NATIVE_DECLARE(NativeFinalize___VOID);
     TINYCLR_NATIVE_DECLARE(NativeMount___VOID__I4);
     TINYCLR_NATIVE_DECLARE(NativeUnmount___VOID);
-    TINYCLR_NATIVE_DECLARE(IsSDCardPresent___STATIC__BOOLEAN);
+    TINYCLR_NATIVE_DECLARE(NativeIsCardPresent___STATIC__BOOLEAN);
 
     //--//
 
@@ -364,7 +364,7 @@ struct Library_Lib_GHI_Usb_Descriptors_Configuration
 
 struct Library_Lib_GHI_Usb_Descriptors_Device
 {
-    static const int FIELD__USBSpecificationNumber = 3;
+    static const int FIELD__UsbSpecificationNumber = 3;
     static const int FIELD__ClassCode = 4;
     static const int FIELD__SubclassCode = 5;
     static const int FIELD__ProtocalCode = 6;

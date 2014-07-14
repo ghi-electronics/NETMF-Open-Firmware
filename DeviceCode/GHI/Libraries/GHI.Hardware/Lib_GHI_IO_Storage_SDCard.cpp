@@ -18,25 +18,25 @@
 
 using namespace GHI::IO::Storage;
 
-void SD::NativeConstructor( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
+void SDCard::NativeConstructor( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
 {
 }
 
-void SD::NativeFinalize( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
+void SDCard::NativeFinalize( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
 {
 }
 
-void SD::NativeMount( CLR_RT_HeapBlock* pMngObj, INT32 param0, HRESULT &hr )
+void SDCard::NativeMount( CLR_RT_HeapBlock* pMngObj, INT32 param0, HRESULT &hr )
 {
 	hr = GHI_OSHW_Mount(param0);
 }
 
-void SD::NativeUnmount( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
+void SDCard::NativeUnmount( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
 {
 	GHI_OSHW_Unmount();
 }
 
-INT8 SD::IsSDCardPresent( HRESULT &hr )
+INT8 SDCard:NativeIsCardPresent( HRESULT &hr )
 {
 	hr = CLR_E_NOT_SUPPORTED;
 	
