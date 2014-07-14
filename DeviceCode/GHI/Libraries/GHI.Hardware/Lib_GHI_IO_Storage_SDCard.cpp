@@ -12,7 +12,7 @@
 
 
 #include "Lib.h"
-#include "Lib_GHI_IO_Storage_SD.h"
+#include "Lib_GHI_IO_Storage_SDCard.h"
 
 #include <GHI\Include\GHI_OSHW_HAL.h>
 
@@ -36,7 +36,7 @@ void SDCard::NativeUnmount( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
 	GHI_OSHW_Unmount();
 }
 
-INT8 SDCard:NativeIsCardPresent( HRESULT &hr )
+INT8 SDCard::NativeIsCardPresent( HRESULT &hr )
 {
 	hr = CLR_E_NOT_SUPPORTED;
 	

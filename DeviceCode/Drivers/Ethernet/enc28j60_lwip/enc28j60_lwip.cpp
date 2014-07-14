@@ -72,6 +72,9 @@ short   enc28j60_lwip_read_phy_register(SPI_CONFIGURATION *spiConf,
 static unsigned short s_ENC28J60_TRANSMIT_BUFFER_START = ENC28J60_TRANSMIT_BUFFER_START;
 static unsigned short s_ENC28J60_RECEIVE_BUFFER_START  = ENC28J60_RECEIVE_BUFFER_START;
 
+HAL_COMPLETION      enc28j60_Lwip_pre_interrupt_completion;
+void  enc28j60_lwip_pre_interrupt_completion  (void* pArg );
+
 
 /* ********************************************************************
    open the ENC28J60 driver interface.
@@ -86,7 +89,7 @@ bool enc28j60_lwip_open( struct netif *pNetIF )
     
 {
     NATIVE_PROFILE_HAL_DRIVERS_ETHERNET();
-
+	enc28j60_Lwip_pre_interrupt_completion.InitializeForUserMode( (HAL_CALLBACK_FPN)enc28j60_lwip_pre_interrupt_completion, pNetIF );
     return enc28j60_lwip_setup_device( pNetIF );
 }
 
@@ -104,6 +107,9 @@ bool enc28j60_lwip_open( struct netif *pNetIF )
 void enc28j60_lwip_close( struct netif *pNetIF )
 {
     NATIVE_PROFILE_HAL_DRIVERS_ETHERNET();
+	
+	 if (enc28j60_Lwip_pre_interrupt_completion.IsLinked())
+		enc28j60_Lwip_pre_interrupt_completion.Abort(); //1
 
     SPI_CONFIGURATION*  SpiConf = &g_enc28j60_hal_config.DeviceConfigs[0].SPI_Config;
 
@@ -191,9 +197,46 @@ void enc28j60_handle_xmit_error( struct netif *pNetIF, SPI_CONFIGURATION  *SpiCo
         s_retriesTransmit = TRANSMIT_RETRIES;
     }
 }
+void  enc28j60_lwip_pre_interrupt_completion  (void* pArg )
+{
 
+	 NATIVE_PROFILE_HAL_DRIVERS_ETHERNET();
+
+    struct netif       *pNetIF = (struct netif*)pArg;
+    UINT8               byteData;
+    UINT8               eirData;
+    SPI_CONFIGURATION  *SpiConf = &g_enc28j60_hal_config.DeviceConfigs[0].SPI_Config;
+    
+    GLOBAL_LOCK(encIrq);
+
+    /* After an interrupt occurs, the host controller should
+        clear the global enable bit for the interrupt pin before
+        servicing the interrupt. Clearing the enable bit will
+        cause the interrupt pin to return to the non-asserted
+        state (high). Doing so will prevent the host controller
+        from missing a falling edge should another interrupt
+        occur while the immediate interrupt is being serviced.
+     */
+    
+    byteData = (1 << ENC28J60_EIE_INTIE_BIT);
+    enc28j60_lwip_write_spi(SpiConf, ENC28J60_SPI_BIT_FIELD_CLEAR_OPCODE, ENC28J60_EIE, byteData);
+
+    enc28j60_lwip_read_spi(SpiConf,  ENC28J60_SPI_READ_CONTROL_REGISTER_OPCODE, ENC28J60_EIR, &eirData, 1, 0);  
+
+    /* recover from tx error */
+    if (eirData & (1 << ENC28J60_EIR_TXERIF_BIT))
+    {            
+        enc28j60_handle_xmit_error( pNetIF, SpiConf );
+    }
+
+    lwip_interrupt_continuation( );
+}
 void  enc28j60_lwip_pre_interrupt  (GPIO_PIN Pin, BOOL PinState, void* pArg )
 {
+	 NATIVE_PROFILE_HAL_DRIVERS_ETHERNET();
+	 if (!enc28j60_Lwip_pre_interrupt_completion.IsLinked())
+		enc28j60_Lwip_pre_interrupt_completion.EnqueueDelta64(1); //1
+#if 0
     NATIVE_PROFILE_HAL_DRIVERS_ETHERNET();
 
     struct netif       *pNetIF = (struct netif*)pArg;
@@ -224,6 +267,7 @@ void  enc28j60_lwip_pre_interrupt  (GPIO_PIN Pin, BOOL PinState, void* pArg )
     }
 
     lwip_interrupt_continuation( );
+#endif	
 }
 
 /* ********************************************************************
