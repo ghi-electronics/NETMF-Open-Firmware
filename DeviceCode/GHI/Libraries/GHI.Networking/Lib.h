@@ -47,6 +47,8 @@ struct Library_Lib_GHI_Networking_PPPSerialModem
 
 struct Library_Lib_GHI_Networking_WiFiRS9110
 {
+    static const int FIELD_STATIC__FIRMWARE_VERSION = 2;
+
     static const int FIELD__waitOnScan = 5;
     static const int FIELD__waitOnSendBssidRequest = 6;
     static const int FIELD__waitOnJoin = 7;

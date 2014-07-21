@@ -129,6 +129,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_Lib_GHI_Networking_WiFiRS9110::NativeJoin___BOOLEAN__I4__I4__SZARRAY_U1__SZARRAY_U1__I4__I4__I4__I4__I4,
     NULL,
     NULL,
+    NULL,
     Library_Lib_GHI_Networking_EthernetBuiltIn::NativeIsCableConnected___BOOLEAN,
     NULL,
     NULL,
@@ -162,12 +163,15 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
+    NULL,
+    NULL,
+    NULL,
 };
 
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Networking =
 {
     "GHI.Networking", 
-    0x5E10B321,
+    0x7EAD2394,
     method_lookup
 };
 

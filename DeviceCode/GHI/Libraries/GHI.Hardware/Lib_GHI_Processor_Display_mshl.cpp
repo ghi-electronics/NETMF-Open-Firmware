@@ -8,12 +8,12 @@
 
 
 #include "Lib.h"
-#include "Lib_GHI_Processor_Configuration__Display.h"
+#include "Lib_GHI_Processor_Display.h"
 
 using namespace GHI::Processor;
 
 
-HRESULT Library_Lib_GHI_Processor_Configuration__Display::NativeGetLcdConfiguration___STATIC__VOID__BYREF_BOOLEAN__BYREF_U1__BYREF_U4__BYREF_U4__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_Display::NativeGetLcdConfiguration___STATIC__VOID__BYREF_BOOLEAN__BYREF_U1__BYREF_U4__BYREF_U4__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U4( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
@@ -81,7 +81,7 @@ HRESULT Library_Lib_GHI_Processor_Configuration__Display::NativeGetLcdConfigurat
         UINT8 heapblock15[CLR_RT_HEAP_BLOCK_SIZE];
         TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32_ByRef( stack, heapblock15, 15, param15 ) );
 
-        Configuration_Display::NativeGetLcdConfiguration( param0, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, param12, param13, param14, param15, hr );
+        Display::NativeGetLcdConfiguration( param0, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, param12, param13, param14, param15, hr );
         TINYCLR_CHECK_HRESULT( hr );
         TINYCLR_CHECK_HRESULT( Interop_Marshal_StoreRef( stack, heapblock0, 0 ) );
         TINYCLR_CHECK_HRESULT( Interop_Marshal_StoreRef( stack, heapblock1, 1 ) );
@@ -103,7 +103,7 @@ HRESULT Library_Lib_GHI_Processor_Configuration__Display::NativeGetLcdConfigurat
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_Configuration__Display::NativeSetLcdConfiguration___STATIC__BOOLEAN__BOOLEAN__U1__U4__U4__BOOLEAN__BOOLEAN__BOOLEAN__BOOLEAN__BOOLEAN__U1__U1__U1__U1__U1__U1__U4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_Display::NativeSetLcdConfiguration___STATIC__BOOLEAN__BOOLEAN__U1__U4__U4__BOOLEAN__BOOLEAN__BOOLEAN__BOOLEAN__BOOLEAN__U1__U1__U1__U1__U1__U1__U4( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
@@ -155,7 +155,7 @@ HRESULT Library_Lib_GHI_Processor_Configuration__Display::NativeSetLcdConfigurat
         UINT32 param15;
         TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32( stack, 15, param15 ) );
 
-        INT8 retVal = Configuration_Display::NativeSetLcdConfiguration( param0, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, param12, param13, param14, param15, hr );
+        INT8 retVal = Display::NativeSetLcdConfiguration( param0, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, param12, param13, param14, param15, hr );
         TINYCLR_CHECK_HRESULT( hr );
         SetResult_INT8( stack, retVal );
 
@@ -163,7 +163,7 @@ HRESULT Library_Lib_GHI_Processor_Configuration__Display::NativeSetLcdConfigurat
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_Configuration__Display::NativeSetSpiConfiguration___STATIC__BOOLEAN__I4__I4__I4__I4__BOOLEAN__BOOLEAN__BOOLEAN__I4__I4__I4__I4__I4__BOOLEAN( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_Display::NativeSetSpiConfiguration___STATIC__BOOLEAN__I4__I4__I4__I4__BOOLEAN__BOOLEAN__BOOLEAN__I4__I4__I4__I4__I4__BOOLEAN( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
@@ -206,7 +206,7 @@ HRESULT Library_Lib_GHI_Processor_Configuration__Display::NativeSetSpiConfigurat
         INT8 param12;
         TINYCLR_CHECK_HRESULT( Interop_Marshal_INT8( stack, 12, param12 ) );
 
-        INT8 retVal = Configuration_Display::NativeSetSpiConfiguration( param0, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, param12, hr );
+        INT8 retVal = Display::NativeSetSpiConfiguration( param0, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, param12, hr );
         TINYCLR_CHECK_HRESULT( hr );
         SetResult_INT8( stack, retVal );
 

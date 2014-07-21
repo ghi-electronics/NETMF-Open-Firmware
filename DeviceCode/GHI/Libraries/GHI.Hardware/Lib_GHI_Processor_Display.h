@@ -11,14 +11,14 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef _LIB_GHI_PROCESSOR_CONFIGURATION__DISPLAY_H_
-#define _LIB_GHI_PROCESSOR_CONFIGURATION__DISPLAY_H_
+#ifndef _LIB_GHI_PROCESSOR_DISPLAY_H_
+#define _LIB_GHI_PROCESSOR_DISPLAY_H_
 
 namespace GHI
 {
     namespace Processor
     {
-        struct Configuration_Display
+        struct Display
         {
             // Helper Functions to access fields of managed object
             // Declaration of stubs. These functions are implemented by Interop code developers
@@ -28,4 +28,4 @@ namespace GHI
         };
     }
 }
-#endif  //_LIB_GHI_PROCESSOR_CONFIGURATION__DISPLAY_H_
+#endif  //_LIB_GHI_PROCESSOR_DISPLAY_H_

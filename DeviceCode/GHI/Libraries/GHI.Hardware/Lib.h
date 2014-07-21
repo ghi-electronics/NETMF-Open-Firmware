@@ -58,24 +58,7 @@ struct Library_Lib_GHI_IO_ControllerAreaNetwork
 
 };
 
-struct Library_Lib_GHI_Usb_Device
-{
-    static const int FIELD__disposed = 1;
-    static const int FIELD__id = 2;
-    static const int FIELD__interfaceIndex = 3;
-    static const int FIELD__type = 4;
-    static const int FIELD__vendorId = 5;
-    static const int FIELD__productId = 6;
-    static const int FIELD__portNumber = 7;
-    static const int FIELD__connected = 8;
-    static const int FIELD__Disconnected = 9;
-
-
-    //--//
-
-};
-
-struct Library_Lib_GHI_Processor_Configuration__Display
+struct Library_Lib_GHI_Processor_Display
 {
     static const int FIELD_STATIC__width = 6;
     static const int FIELD_STATIC__height = 7;
@@ -203,18 +186,10 @@ struct Library_Lib_GHI_IO_Storage_ExtendedWeakReferences
 
 };
 
-struct Library_Lib_GHI_IO_Storage_Removable
-{
-    static const int FIELD__disposed = 1;
-
-
-    //--//
-
-};
-
 struct Library_Lib_GHI_IO_Storage_SDCard
 {
-    static const int FIELD__id = 2;
+    static const int FIELD__id = 1;
+    static const int FIELD__disposed = 2;
 
     TINYCLR_NATIVE_DECLARE(NativeConstructor___VOID);
     TINYCLR_NATIVE_DECLARE(NativeFinalize___VOID);
@@ -226,31 +201,10 @@ struct Library_Lib_GHI_IO_Storage_SDCard
 
 };
 
-struct Library_Lib_GHI_IO_Storage_UsbMassStorage
-{
-    static const int FIELD__id = 2;
-
-    TINYCLR_NATIVE_DECLARE(NativeConstructor___VOID__U4__U1__U1);
-    TINYCLR_NATIVE_DECLARE(NativeFinalize___VOID);
-    TINYCLR_NATIVE_DECLARE(NativeMount___VOID);
-    TINYCLR_NATIVE_DECLARE(NativeUnmount___VOID);
-
-    //--//
-
-};
-
 struct Library_Lib_GHI_Processor_AddressSpace
 {
     TINYCLR_NATIVE_DECLARE(NativeWrite___STATIC__VOID__U4__SZARRAY_U1__I4__I4);
     TINYCLR_NATIVE_DECLARE(NativeRead___STATIC__VOID__U4__SZARRAY_U1__I4__I4);
-
-    //--//
-
-};
-
-struct Library_Lib_GHI_Processor_ApplicationProtection
-{
-    TINYCLR_NATIVE_DECLARE(NativeSetApplicationProtection___STATIC__VOID__U1__SZARRAY_U1);
 
     //--//
 
@@ -310,114 +264,38 @@ struct Library_Lib_GHI_Processor_RuntimeLoadableProcedures
 
 };
 
+struct Library_Lib_GHI_Processor_StartupLogo
+{
+    static const int FIELD_STATIC__width = 41;
+    static const int FIELD_STATIC__height = 42;
+    static const int FIELD_STATIC__x = 43;
+    static const int FIELD_STATIC__y = 44;
+    static const int FIELD_STATIC__enabled = 45;
+    static const int FIELD_STATIC__image = 46;
+
+    TINYCLR_NATIVE_DECLARE(NativeSupportedWidth___STATIC__I4);
+    TINYCLR_NATIVE_DECLARE(NativeSupportedHeight___STATIC__I4);
+    TINYCLR_NATIVE_DECLARE(NativeGetEnabled___STATIC__BOOLEAN);
+    TINYCLR_NATIVE_DECLARE(NativeGetBitmap___STATIC__VOID__SZARRAY_U1);
+    TINYCLR_NATIVE_DECLARE(NativeGetCoords___STATIC__VOID__BYREF_I4__BYREF_I4);
+    TINYCLR_NATIVE_DECLARE(NativeSave___STATIC__BOOLEAN__SZARRAY_U1__I4__I4__BOOLEAN);
+
+    //--//
+
+};
+
 struct Library_Lib_GHI_Processor_Watchdog
 {
-    static const int FIELD_STATIC__lastResetCause = 41;
-    static const int FIELD_STATIC__maxTimeout = 42;
-    static const int FIELD_STATIC__timeout = 43;
-    static const int FIELD_STATIC__enabled = 44;
+    static const int FIELD_STATIC__lastResetCause = 47;
+    static const int FIELD_STATIC__maxTimeout = 48;
+    static const int FIELD_STATIC__timeout = 49;
+    static const int FIELD_STATIC__enabled = 50;
 
     TINYCLR_NATIVE_DECLARE(NativeLastResetCause___STATIC__U1);
     TINYCLR_NATIVE_DECLARE(NativeGetMaxTimeout___STATIC__U4);
     TINYCLR_NATIVE_DECLARE(NativeEnable___STATIC__VOID__U4);
     TINYCLR_NATIVE_DECLARE(NativeDisable___STATIC__VOID);
     TINYCLR_NATIVE_DECLARE(NativeResetCounter___STATIC__VOID);
-
-    //--//
-
-};
-
-struct Library_Lib_GHI_Usb_Descriptors_BaseDescriptor
-{
-    static const int FIELD__Length = 1;
-    static const int FIELD__Type = 2;
-
-
-    //--//
-
-};
-
-struct Library_Lib_GHI_Usb_Descriptors_Auxiliary
-{
-    static const int FIELD__Payload = 3;
-
-
-    //--//
-
-};
-
-struct Library_Lib_GHI_Usb_Descriptors_Configuration
-{
-    static const int FIELD__TotalLength = 3;
-    static const int FIELD__NumberOfInterfaces = 4;
-    static const int FIELD__Value = 5;
-    static const int FIELD__Index = 6;
-    static const int FIELD__Attributes = 7;
-    static const int FIELD__MaxPower = 8;
-    static const int FIELD__AuxiliaryDescriptors = 9;
-    static const int FIELD__Interfaces = 10;
-
-
-    //--//
-
-};
-
-struct Library_Lib_GHI_Usb_Descriptors_Device
-{
-    static const int FIELD__UsbSpecificationNumber = 3;
-    static const int FIELD__ClassCode = 4;
-    static const int FIELD__SubclassCode = 5;
-    static const int FIELD__ProtocalCode = 6;
-    static const int FIELD__MaximumPacketSize = 7;
-    static const int FIELD__VendorId = 8;
-    static const int FIELD__ProductId = 9;
-    static const int FIELD__ReleaseNumber = 10;
-    static const int FIELD__ManufacturerIndex = 11;
-    static const int FIELD__ProductIndex = 12;
-    static const int FIELD__SerialNumberIndex = 13;
-    static const int FIELD__NumberOfConfigurations = 14;
-
-
-    //--//
-
-};
-
-struct Library_Lib_GHI_Usb_Descriptors_Endpoint
-{
-    static const int FIELD__Address = 3;
-    static const int FIELD__Attributes = 4;
-    static const int FIELD__MaximumPacketSize = 5;
-    static const int FIELD__Interval = 6;
-    static const int FIELD__AuxiliaryDescriptors = 7;
-
-
-    //--//
-
-};
-
-struct Library_Lib_GHI_Usb_Descriptors_Interface
-{
-    static const int FIELD__Number = 3;
-    static const int FIELD__AlternateSetting = 4;
-    static const int FIELD__NumberEndpoints = 5;
-    static const int FIELD__ClassCode = 6;
-    static const int FIELD__SubclassCode = 7;
-    static const int FIELD__ProtocolCode = 8;
-    static const int FIELD__Index = 9;
-    static const int FIELD__AuxiliaryDescriptors = 10;
-    static const int FIELD__Endpoints = 11;
-
-
-    //--//
-
-};
-
-struct Library_Lib_GHI_Usb_Position
-{
-    static const int FIELD__X = 1;
-    static const int FIELD__Y = 2;
-    static const int FIELD__Z = 3;
-
 
     //--//
 
@@ -524,26 +402,6 @@ struct Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction
     TINYCLR_NATIVE_DECLARE(InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_CHAR__I4__SZARRAY_U4);
     TINYCLR_NATIVE_DECLARE(InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__I4__SZARRAY_U4);
     TINYCLR_NATIVE_DECLARE(InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_I1__I4__SZARRAY_U4);
-
-    //--//
-
-};
-
-struct Library_Lib_GHI_Processor_Configuration__StartupLogo
-{
-    static const int FIELD_STATIC__width = 45;
-    static const int FIELD_STATIC__height = 46;
-    static const int FIELD_STATIC__x = 47;
-    static const int FIELD_STATIC__y = 48;
-    static const int FIELD_STATIC__enabled = 49;
-    static const int FIELD_STATIC__image = 50;
-
-    TINYCLR_NATIVE_DECLARE(NativeSupportedWidth___STATIC__I4);
-    TINYCLR_NATIVE_DECLARE(NativeSupportedHeight___STATIC__I4);
-    TINYCLR_NATIVE_DECLARE(NativeGetEnabled___STATIC__BOOLEAN);
-    TINYCLR_NATIVE_DECLARE(NativeGetBitmap___STATIC__VOID__SZARRAY_U1);
-    TINYCLR_NATIVE_DECLARE(NativeGetCoords___STATIC__VOID__BYREF_I4__BYREF_I4);
-    TINYCLR_NATIVE_DECLARE(NativeSave___STATIC__BOOLEAN__SZARRAY_U1__I4__I4__BOOLEAN);
 
     //--//
 

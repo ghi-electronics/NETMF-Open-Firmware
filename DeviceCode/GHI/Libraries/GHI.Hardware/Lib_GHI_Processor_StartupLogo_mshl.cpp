@@ -8,16 +8,16 @@
 
 
 #include "Lib.h"
-#include "Lib_GHI_Processor_Configuration__StartupLogo.h"
+#include "Lib_GHI_Processor_StartupLogo.h"
 
 using namespace GHI::Processor;
 
 
-HRESULT Library_Lib_GHI_Processor_Configuration__StartupLogo::NativeSupportedWidth___STATIC__I4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_StartupLogo::NativeSupportedWidth___STATIC__I4( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
-        INT32 retVal = Configuration_StartupLogo::NativeSupportedWidth( hr );
+        INT32 retVal = StartupLogo::NativeSupportedWidth( hr );
         TINYCLR_CHECK_HRESULT( hr );
         SetResult_INT32( stack, retVal );
 
@@ -25,11 +25,11 @@ HRESULT Library_Lib_GHI_Processor_Configuration__StartupLogo::NativeSupportedWid
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_Configuration__StartupLogo::NativeSupportedHeight___STATIC__I4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_StartupLogo::NativeSupportedHeight___STATIC__I4( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
-        INT32 retVal = Configuration_StartupLogo::NativeSupportedHeight( hr );
+        INT32 retVal = StartupLogo::NativeSupportedHeight( hr );
         TINYCLR_CHECK_HRESULT( hr );
         SetResult_INT32( stack, retVal );
 
@@ -37,11 +37,11 @@ HRESULT Library_Lib_GHI_Processor_Configuration__StartupLogo::NativeSupportedHei
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_Configuration__StartupLogo::NativeGetEnabled___STATIC__BOOLEAN( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_StartupLogo::NativeGetEnabled___STATIC__BOOLEAN( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
-        INT8 retVal = Configuration_StartupLogo::NativeGetEnabled( hr );
+        INT8 retVal = StartupLogo::NativeGetEnabled( hr );
         TINYCLR_CHECK_HRESULT( hr );
         SetResult_INT8( stack, retVal );
 
@@ -49,20 +49,20 @@ HRESULT Library_Lib_GHI_Processor_Configuration__StartupLogo::NativeGetEnabled__
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_Configuration__StartupLogo::NativeGetBitmap___STATIC__VOID__SZARRAY_U1( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_StartupLogo::NativeGetBitmap___STATIC__VOID__SZARRAY_U1( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
         CLR_RT_TypedArray_UINT8 param0;
         TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 0, param0 ) );
 
-        Configuration_StartupLogo::NativeGetBitmap( param0, hr );
+        StartupLogo::NativeGetBitmap( param0, hr );
         TINYCLR_CHECK_HRESULT( hr );
     }
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_Configuration__StartupLogo::NativeGetCoords___STATIC__VOID__BYREF_I4__BYREF_I4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_StartupLogo::NativeGetCoords___STATIC__VOID__BYREF_I4__BYREF_I4( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
@@ -74,7 +74,7 @@ HRESULT Library_Lib_GHI_Processor_Configuration__StartupLogo::NativeGetCoords___
         UINT8 heapblock1[CLR_RT_HEAP_BLOCK_SIZE];
         TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32_ByRef( stack, heapblock1, 1, param1 ) );
 
-        Configuration_StartupLogo::NativeGetCoords( param0, param1, hr );
+        StartupLogo::NativeGetCoords( param0, param1, hr );
         TINYCLR_CHECK_HRESULT( hr );
         TINYCLR_CHECK_HRESULT( Interop_Marshal_StoreRef( stack, heapblock0, 0 ) );
         TINYCLR_CHECK_HRESULT( Interop_Marshal_StoreRef( stack, heapblock1, 1 ) );
@@ -82,7 +82,7 @@ HRESULT Library_Lib_GHI_Processor_Configuration__StartupLogo::NativeGetCoords___
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_Configuration__StartupLogo::NativeSave___STATIC__BOOLEAN__SZARRAY_U1__I4__I4__BOOLEAN( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_StartupLogo::NativeSave___STATIC__BOOLEAN__SZARRAY_U1__I4__I4__BOOLEAN( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
@@ -98,7 +98,7 @@ HRESULT Library_Lib_GHI_Processor_Configuration__StartupLogo::NativeSave___STATI
         INT8 param3;
         TINYCLR_CHECK_HRESULT( Interop_Marshal_INT8( stack, 3, param3 ) );
 
-        INT8 retVal = Configuration_StartupLogo::NativeSave( param0, param1, param2, param3, hr );
+        INT8 retVal = StartupLogo::NativeSave( param0, param1, param2, param3, hr );
         TINYCLR_CHECK_HRESULT( hr );
         SetResult_INT8( stack, retVal );
 

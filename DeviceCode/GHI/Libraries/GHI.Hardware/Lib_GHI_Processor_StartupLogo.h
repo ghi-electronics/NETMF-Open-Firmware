@@ -11,14 +11,14 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef _LIB_GHI_PROCESSOR_CONFIGURATION__STARTUPLOGO_H_
-#define _LIB_GHI_PROCESSOR_CONFIGURATION__STARTUPLOGO_H_
+#ifndef _LIB_GHI_PROCESSOR_STARTUPLOGO_H_
+#define _LIB_GHI_PROCESSOR_STARTUPLOGO_H_
 
 namespace GHI
 {
     namespace Processor
     {
-        struct Configuration_StartupLogo
+        struct StartupLogo
         {
             // Helper Functions to access fields of managed object
             // Declaration of stubs. These functions are implemented by Interop code developers
@@ -31,4 +31,4 @@ namespace GHI
         };
     }
 }
-#endif  //_LIB_GHI_PROCESSOR_CONFIGURATION__STARTUPLOGO_H_
+#endif  //_LIB_GHI_PROCESSOR_STARTUPLOGO_H_

@@ -25,6 +25,8 @@ namespace GHI
                 // Helper Functions to access fields of managed object
                 static UINT32& Get_id( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UINT32( pMngObj, Library_Lib_GHI_IO_Storage_SDCard::FIELD__id ); }
 
+                static INT8& Get_disposed( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT8( pMngObj, Library_Lib_GHI_IO_Storage_SDCard::FIELD__disposed ); }
+
                 // Declaration of stubs. These functions are implemented by Interop code developers
                 static void NativeConstructor( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
                 static void NativeFinalize( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );

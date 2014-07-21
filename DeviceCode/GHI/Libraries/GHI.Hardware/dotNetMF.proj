@@ -16,9 +16,9 @@
 <Compile Include="Lib_GHI_IO_ControllerAreaNetwork_mshl.cpp" />
 <HFile Include="Lib_GHI_IO_ControllerAreaNetwork.h" />
 <Compile Include="Lib_GHI_IO_ControllerAreaNetwork.cpp" />
-<Compile Include="Lib_GHI_Processor_Configuration__Display_mshl.cpp" />
-<HFile Include="Lib_GHI_Processor_Configuration__Display.h" />
-<Compile Include="Lib_GHI_Processor_Configuration__Display.cpp" />
+<Compile Include="Lib_GHI_Processor_Display_mshl.cpp" />
+<HFile Include="Lib_GHI_Processor_Display.h" />
+<Compile Include="Lib_GHI_Processor_Display.cpp" />
 <Compile Include="Lib_GHI_Processor_InFieldUpdate_mshl.cpp" />
 <HFile Include="Lib_GHI_Processor_InFieldUpdate.h" />
 <Compile Include="Lib_GHI_Processor_InFieldUpdate.cpp" />
@@ -40,15 +40,9 @@
 <Compile Include="Lib_GHI_IO_Storage_SDCard_mshl.cpp" />
 <HFile Include="Lib_GHI_IO_Storage_SDCard.h" />
 <Compile Include="Lib_GHI_IO_Storage_SDCard.cpp" />
-<Compile Include="Lib_GHI_IO_Storage_UsbMassStorage_mshl.cpp" />
-<HFile Include="Lib_GHI_IO_Storage_UsbMassStorage.h" />
-<Compile Include="Lib_GHI_IO_Storage_UsbMassStorage.cpp" />
 <Compile Include="Lib_GHI_Processor_AddressSpace_mshl.cpp" />
 <HFile Include="Lib_GHI_Processor_AddressSpace.h" />
 <Compile Include="Lib_GHI_Processor_AddressSpace.cpp" />
-<Compile Include="Lib_GHI_Processor_ApplicationProtection_mshl.cpp" />
-<HFile Include="Lib_GHI_Processor_ApplicationProtection.h" />
-<Compile Include="Lib_GHI_Processor_ApplicationProtection.cpp" />
 <Compile Include="Lib_GHI_Processor_Power_mshl.cpp" />
 <HFile Include="Lib_GHI_Processor_Power.h" />
 <Compile Include="Lib_GHI_Processor_Power.cpp" />
@@ -61,6 +55,9 @@
 <Compile Include="Lib_GHI_Processor_RuntimeLoadableProcedures_mshl.cpp" />
 <HFile Include="Lib_GHI_Processor_RuntimeLoadableProcedures.h" />
 <Compile Include="Lib_GHI_Processor_RuntimeLoadableProcedures.cpp" />
+<Compile Include="Lib_GHI_Processor_StartupLogo_mshl.cpp" />
+<HFile Include="Lib_GHI_Processor_StartupLogo.h" />
+<Compile Include="Lib_GHI_Processor_StartupLogo.cpp" />
 <Compile Include="Lib_GHI_Processor_Watchdog_mshl.cpp" />
 <HFile Include="Lib_GHI_Processor_Watchdog.h" />
 <Compile Include="Lib_GHI_Processor_Watchdog.cpp" />
@@ -76,9 +73,6 @@
 <Compile Include="Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction_mshl.cpp" />
 <HFile Include="Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction.h" />
 <Compile Include="Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction.cpp" />
-<Compile Include="Lib_GHI_Processor_Configuration__StartupLogo_mshl.cpp" />
-<HFile Include="Lib_GHI_Processor_Configuration__StartupLogo.h" />
-<Compile Include="Lib_GHI_Processor_Configuration__StartupLogo.cpp" />
 </ItemGroup>
 <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>
