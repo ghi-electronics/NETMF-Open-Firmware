@@ -13,27 +13,14 @@
 using namespace GHI::Processor;
 
 
-HRESULT Library_Lib_GHI_Processor_Power::NativeHibernate___STATIC__VOID__U4( CLR_RT_StackFrame& stack )
-{
-    TINYCLR_HEADER(); hr = S_OK;
-    {
-        UINT32 param0;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32( stack, 0, param0 ) );
-
-        Power::NativeHibernate( param0, hr );
-        TINYCLR_CHECK_HRESULT( hr );
-    }
-    TINYCLR_NOCLEANUP();
-}
-
-HRESULT Library_Lib_GHI_Processor_Power::NativeSetEthernetOscillator___STATIC__VOID__BOOLEAN( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_Power::SetEthernetOscillatorState___STATIC__VOID__BOOLEAN( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
         INT8 param0;
         TINYCLR_CHECK_HRESULT( Interop_Marshal_INT8( stack, 0, param0 ) );
 
-        Power::NativeSetEthernetOscillator( param0, hr );
+        Power::SetEthernetOscillatorState( param0, hr );
         TINYCLR_CHECK_HRESULT( hr );
     }
     TINYCLR_NOCLEANUP();

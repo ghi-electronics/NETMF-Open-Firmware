@@ -13,14 +13,15 @@
 using namespace GHI::Processor;
 
 
-HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::InvokeNative___STATIC__I4__U4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeInvoke___I4( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
-        UINT32 param0;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32( stack, 0, param0 ) );
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
 
-        INT32 retVal = RuntimeLoadableProcedures_NativeFunction::InvokeNative( param0, hr );
+        FAULT_ON_NULL(pMngObj);
+
+        INT32 retVal = RuntimeLoadableProcedures_NativeFunction::NativeInvoke( pMngObj,  hr );
         TINYCLR_CHECK_HRESULT( hr );
         SetResult_INT32( stack, retVal );
 
@@ -28,386 +29,393 @@ HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::Inv
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U4__I4__SZARRAY_U4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeBeginArguments___VOID__I4( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
-        UINT32 param0;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32( stack, 0, param0 ) );
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
 
-        CLR_RT_TypedArray_UINT8 param1;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 1, param1 ) );
+        FAULT_ON_NULL(pMngObj);
 
-        CLR_RT_TypedArray_UINT8 param2;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 2, param2 ) );
+        INT32 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 1, param0 ) );
 
-        CLR_RT_TypedArray_UINT8 param3;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 3, param3 ) );
-
-        CLR_RT_TypedArray_UINT8 param4;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 4, param4 ) );
-
-        CLR_RT_TypedArray_UINT8 param5;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 5, param5 ) );
-
-        CLR_RT_TypedArray_UINT8 param6;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 6, param6 ) );
-
-        CLR_RT_TypedArray_UINT8 param7;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 7, param7 ) );
-
-        CLR_RT_TypedArray_UINT8 param8;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 8, param8 ) );
-
-        CLR_RT_TypedArray_UINT32 param9;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32_ARRAY( stack, 9, param9 ) );
-
-        INT32 param10;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 10, param10 ) );
-
-        CLR_RT_TypedArray_UINT32 param11;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32_ARRAY( stack, 11, param11 ) );
-
-        INT32 retVal = RuntimeLoadableProcedures_NativeFunction::InvokeNative( param0, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, hr );
+        RuntimeLoadableProcedures_NativeFunction::NativeBeginArguments( pMngObj,  param0, hr );
         TINYCLR_CHECK_HRESULT( hr );
-        SetResult_INT32( stack, retVal );
-
     }
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_I4__I4__SZARRAY_U4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__U1( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
-        UINT32 param0;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32( stack, 0, param0 ) );
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
 
-        CLR_RT_TypedArray_UINT8 param1;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 1, param1 ) );
+        FAULT_ON_NULL(pMngObj);
 
-        CLR_RT_TypedArray_UINT8 param2;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 2, param2 ) );
+        UINT8 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8( stack, 1, param0 ) );
 
-        CLR_RT_TypedArray_UINT8 param3;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 3, param3 ) );
-
-        CLR_RT_TypedArray_UINT8 param4;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 4, param4 ) );
-
-        CLR_RT_TypedArray_UINT8 param5;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 5, param5 ) );
-
-        CLR_RT_TypedArray_UINT8 param6;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 6, param6 ) );
-
-        CLR_RT_TypedArray_UINT8 param7;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 7, param7 ) );
-
-        CLR_RT_TypedArray_UINT8 param8;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 8, param8 ) );
-
-        CLR_RT_TypedArray_INT32 param9;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32_ARRAY( stack, 9, param9 ) );
-
-        INT32 param10;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 10, param10 ) );
-
-        CLR_RT_TypedArray_UINT32 param11;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32_ARRAY( stack, 11, param11 ) );
-
-        INT32 retVal = RuntimeLoadableProcedures_NativeFunction::InvokeNative( param0, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, hr );
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
         TINYCLR_CHECK_HRESULT( hr );
-        SetResult_INT32( stack, retVal );
-
     }
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_R4__I4__SZARRAY_U4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__I1( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
-        UINT32 param0;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32( stack, 0, param0 ) );
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
 
-        CLR_RT_TypedArray_UINT8 param1;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 1, param1 ) );
+        FAULT_ON_NULL(pMngObj);
 
-        CLR_RT_TypedArray_UINT8 param2;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 2, param2 ) );
+        INT8 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT8( stack, 1, param0 ) );
 
-        CLR_RT_TypedArray_UINT8 param3;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 3, param3 ) );
-
-        CLR_RT_TypedArray_UINT8 param4;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 4, param4 ) );
-
-        CLR_RT_TypedArray_UINT8 param5;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 5, param5 ) );
-
-        CLR_RT_TypedArray_UINT8 param6;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 6, param6 ) );
-
-        CLR_RT_TypedArray_UINT8 param7;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 7, param7 ) );
-
-        CLR_RT_TypedArray_UINT8 param8;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 8, param8 ) );
-
-        CLR_RT_TypedArray_float param9;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_float_ARRAY( stack, 9, param9 ) );
-
-        INT32 param10;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 10, param10 ) );
-
-        CLR_RT_TypedArray_UINT32 param11;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32_ARRAY( stack, 11, param11 ) );
-
-        INT32 retVal = RuntimeLoadableProcedures_NativeFunction::InvokeNative( param0, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, hr );
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
         TINYCLR_CHECK_HRESULT( hr );
-        SetResult_INT32( stack, retVal );
-
     }
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_I2__I4__SZARRAY_U4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__U2( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
-        UINT32 param0;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32( stack, 0, param0 ) );
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
 
-        CLR_RT_TypedArray_UINT8 param1;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 1, param1 ) );
+        FAULT_ON_NULL(pMngObj);
 
-        CLR_RT_TypedArray_UINT8 param2;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 2, param2 ) );
+        UINT16 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT16( stack, 1, param0 ) );
 
-        CLR_RT_TypedArray_UINT8 param3;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 3, param3 ) );
-
-        CLR_RT_TypedArray_UINT8 param4;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 4, param4 ) );
-
-        CLR_RT_TypedArray_UINT8 param5;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 5, param5 ) );
-
-        CLR_RT_TypedArray_UINT8 param6;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 6, param6 ) );
-
-        CLR_RT_TypedArray_UINT8 param7;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 7, param7 ) );
-
-        CLR_RT_TypedArray_UINT8 param8;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 8, param8 ) );
-
-        CLR_RT_TypedArray_INT16 param9;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT16_ARRAY( stack, 9, param9 ) );
-
-        INT32 param10;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 10, param10 ) );
-
-        CLR_RT_TypedArray_UINT32 param11;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32_ARRAY( stack, 11, param11 ) );
-
-        INT32 retVal = RuntimeLoadableProcedures_NativeFunction::InvokeNative( param0, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, hr );
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
         TINYCLR_CHECK_HRESULT( hr );
-        SetResult_INT32( stack, retVal );
-
     }
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U2__I4__SZARRAY_U4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__I2( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
-        UINT32 param0;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32( stack, 0, param0 ) );
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
 
-        CLR_RT_TypedArray_UINT8 param1;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 1, param1 ) );
+        FAULT_ON_NULL(pMngObj);
 
-        CLR_RT_TypedArray_UINT8 param2;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 2, param2 ) );
+        INT16 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT16( stack, 1, param0 ) );
 
-        CLR_RT_TypedArray_UINT8 param3;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 3, param3 ) );
-
-        CLR_RT_TypedArray_UINT8 param4;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 4, param4 ) );
-
-        CLR_RT_TypedArray_UINT8 param5;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 5, param5 ) );
-
-        CLR_RT_TypedArray_UINT8 param6;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 6, param6 ) );
-
-        CLR_RT_TypedArray_UINT8 param7;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 7, param7 ) );
-
-        CLR_RT_TypedArray_UINT8 param8;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 8, param8 ) );
-
-        CLR_RT_TypedArray_UINT16 param9;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT16_ARRAY( stack, 9, param9 ) );
-
-        INT32 param10;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 10, param10 ) );
-
-        CLR_RT_TypedArray_UINT32 param11;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32_ARRAY( stack, 11, param11 ) );
-
-        INT32 retVal = RuntimeLoadableProcedures_NativeFunction::InvokeNative( param0, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, hr );
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
         TINYCLR_CHECK_HRESULT( hr );
-        SetResult_INT32( stack, retVal );
-
     }
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_CHAR__I4__SZARRAY_U4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__U4( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
         UINT32 param0;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32( stack, 0, param0 ) );
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32( stack, 1, param0 ) );
 
-        CLR_RT_TypedArray_UINT8 param1;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 1, param1 ) );
-
-        CLR_RT_TypedArray_UINT8 param2;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 2, param2 ) );
-
-        CLR_RT_TypedArray_UINT8 param3;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 3, param3 ) );
-
-        CLR_RT_TypedArray_UINT8 param4;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 4, param4 ) );
-
-        CLR_RT_TypedArray_UINT8 param5;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 5, param5 ) );
-
-        CLR_RT_TypedArray_UINT8 param6;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 6, param6 ) );
-
-        CLR_RT_TypedArray_UINT8 param7;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 7, param7 ) );
-
-        CLR_RT_TypedArray_UINT8 param8;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 8, param8 ) );
-
-        CLR_RT_TypedArray_CHAR param9;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_CHAR_ARRAY( stack, 9, param9 ) );
-
-        INT32 param10;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 10, param10 ) );
-
-        CLR_RT_TypedArray_UINT32 param11;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32_ARRAY( stack, 11, param11 ) );
-
-        INT32 retVal = RuntimeLoadableProcedures_NativeFunction::InvokeNative( param0, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, hr );
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
         TINYCLR_CHECK_HRESULT( hr );
-        SetResult_INT32( stack, retVal );
-
     }
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__I4__SZARRAY_U4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__I4( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
-        UINT32 param0;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32( stack, 0, param0 ) );
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
 
-        CLR_RT_TypedArray_UINT8 param1;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 1, param1 ) );
+        FAULT_ON_NULL(pMngObj);
 
-        CLR_RT_TypedArray_UINT8 param2;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 2, param2 ) );
+        INT32 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 1, param0 ) );
 
-        CLR_RT_TypedArray_UINT8 param3;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 3, param3 ) );
-
-        CLR_RT_TypedArray_UINT8 param4;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 4, param4 ) );
-
-        CLR_RT_TypedArray_UINT8 param5;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 5, param5 ) );
-
-        CLR_RT_TypedArray_UINT8 param6;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 6, param6 ) );
-
-        CLR_RT_TypedArray_UINT8 param7;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 7, param7 ) );
-
-        CLR_RT_TypedArray_UINT8 param8;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 8, param8 ) );
-
-        CLR_RT_TypedArray_UINT8 param9;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 9, param9 ) );
-
-        INT32 param10;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 10, param10 ) );
-
-        CLR_RT_TypedArray_UINT32 param11;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32_ARRAY( stack, 11, param11 ) );
-
-        INT32 retVal = RuntimeLoadableProcedures_NativeFunction::InvokeNative( param0, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, hr );
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
         TINYCLR_CHECK_HRESULT( hr );
-        SetResult_INT32( stack, retVal );
-
     }
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_I1__I4__SZARRAY_U4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__U8( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
-        UINT32 param0;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32( stack, 0, param0 ) );
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
 
-        CLR_RT_TypedArray_UINT8 param1;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 1, param1 ) );
+        FAULT_ON_NULL(pMngObj);
 
-        CLR_RT_TypedArray_UINT8 param2;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 2, param2 ) );
+        UINT64 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT64( stack, 1, param0 ) );
 
-        CLR_RT_TypedArray_UINT8 param3;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 3, param3 ) );
-
-        CLR_RT_TypedArray_UINT8 param4;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 4, param4 ) );
-
-        CLR_RT_TypedArray_UINT8 param5;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 5, param5 ) );
-
-        CLR_RT_TypedArray_UINT8 param6;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 6, param6 ) );
-
-        CLR_RT_TypedArray_UINT8 param7;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 7, param7 ) );
-
-        CLR_RT_TypedArray_UINT8 param8;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 8, param8 ) );
-
-        CLR_RT_TypedArray_INT8 param9;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT8_ARRAY( stack, 9, param9 ) );
-
-        INT32 param10;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 10, param10 ) );
-
-        CLR_RT_TypedArray_UINT32 param11;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32_ARRAY( stack, 11, param11 ) );
-
-        INT32 retVal = RuntimeLoadableProcedures_NativeFunction::InvokeNative( param0, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, hr );
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
         TINYCLR_CHECK_HRESULT( hr );
-        SetResult_INT32( stack, retVal );
+    }
+    TINYCLR_NOCLEANUP();
+}
 
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__I8( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+        INT64 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT64( stack, 1, param0 ) );
+
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__R4( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+        float param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_float( stack, 1, param0 ) );
+
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__R8( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+        double param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_double( stack, 1, param0 ) );
+
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgumentBool___VOID__BOOLEAN( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+        INT8 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT8( stack, 1, param0 ) );
+
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgumentBool( pMngObj,  param0, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__SZARRAY_U1( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+        CLR_RT_TypedArray_UINT8 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 1, param0 ) );
+
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__SZARRAY_I1( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+        CLR_RT_TypedArray_INT8 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT8_ARRAY( stack, 1, param0 ) );
+
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__SZARRAY_U2( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+        CLR_RT_TypedArray_UINT16 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT16_ARRAY( stack, 1, param0 ) );
+
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__SZARRAY_I2( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+        CLR_RT_TypedArray_INT16 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT16_ARRAY( stack, 1, param0 ) );
+
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__SZARRAY_U4( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+        CLR_RT_TypedArray_UINT32 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32_ARRAY( stack, 1, param0 ) );
+
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__SZARRAY_I4( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+        CLR_RT_TypedArray_INT32 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32_ARRAY( stack, 1, param0 ) );
+
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__SZARRAY_U8( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+        CLR_RT_TypedArray_UINT64 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT64_ARRAY( stack, 1, param0 ) );
+
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__SZARRAY_I8( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+        CLR_RT_TypedArray_INT64 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT64_ARRAY( stack, 1, param0 ) );
+
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__SZARRAY_R4( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+        CLR_RT_TypedArray_float param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_float_ARRAY( stack, 1, param0 ) );
+
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__SZARRAY_R8( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+        CLR_RT_TypedArray_double param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_double_ARRAY( stack, 1, param0 ) );
+
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( pMngObj,  param0, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgumentBool___VOID__SZARRAY_BOOLEAN( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+        CLR_RT_TypedArray_INT8 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT8_ARRAY( stack, 1, param0 ) );
+
+        RuntimeLoadableProcedures_NativeFunction::NativeAddArgumentBool( pMngObj,  param0, hr );
+        TINYCLR_CHECK_HRESULT( hr );
     }
     TINYCLR_NOCLEANUP();
 }

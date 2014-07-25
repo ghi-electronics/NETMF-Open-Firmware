@@ -27,6 +27,8 @@ namespace GHI
 
                 static INT8& Get_disposed( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT8( pMngObj, Library_Lib_GHI_IO_Storage_SDCard::FIELD__disposed ); }
 
+                static INT8& Get_mounted( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT8( pMngObj, Library_Lib_GHI_IO_Storage_SDCard::FIELD__mounted ); }
+
                 // Declaration of stubs. These functions are implemented by Interop code developers
                 static void NativeConstructor( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
                 static void NativeFinalize( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );

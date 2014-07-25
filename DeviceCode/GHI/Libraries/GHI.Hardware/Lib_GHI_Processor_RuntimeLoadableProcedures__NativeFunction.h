@@ -23,22 +23,31 @@ namespace GHI
             // Helper Functions to access fields of managed object
             static UINT32& Get_address( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UINT32( pMngObj, Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::FIELD__address ); }
 
-            static UNSUPPORTED_TYPE& Get_arguments( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UNSUPPORTED_TYPE( pMngObj, Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::FIELD__arguments ); }
-
-            static UNSUPPORTED_TYPE& Get_argumentSizes( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UNSUPPORTED_TYPE( pMngObj, Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::FIELD__argumentSizes ); }
-
-            static UNSUPPORTED_TYPE& Get_emptyArray( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UNSUPPORTED_TYPE( pMngObj, Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::FIELD__emptyArray ); }
-
             // Declaration of stubs. These functions are implemented by Interop code developers
-            static INT32 InvokeNative( UINT32 param0, HRESULT &hr );
-            static INT32 InvokeNative( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, CLR_RT_TypedArray_UINT8 param2, CLR_RT_TypedArray_UINT8 param3, CLR_RT_TypedArray_UINT8 param4, CLR_RT_TypedArray_UINT8 param5, CLR_RT_TypedArray_UINT8 param6, CLR_RT_TypedArray_UINT8 param7, CLR_RT_TypedArray_UINT8 param8, CLR_RT_TypedArray_UINT32 param9, INT32 param10, CLR_RT_TypedArray_UINT32 param11, HRESULT &hr );
-            static INT32 InvokeNative( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, CLR_RT_TypedArray_UINT8 param2, CLR_RT_TypedArray_UINT8 param3, CLR_RT_TypedArray_UINT8 param4, CLR_RT_TypedArray_UINT8 param5, CLR_RT_TypedArray_UINT8 param6, CLR_RT_TypedArray_UINT8 param7, CLR_RT_TypedArray_UINT8 param8, CLR_RT_TypedArray_INT32 param9, INT32 param10, CLR_RT_TypedArray_UINT32 param11, HRESULT &hr );
-            static INT32 InvokeNative( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, CLR_RT_TypedArray_UINT8 param2, CLR_RT_TypedArray_UINT8 param3, CLR_RT_TypedArray_UINT8 param4, CLR_RT_TypedArray_UINT8 param5, CLR_RT_TypedArray_UINT8 param6, CLR_RT_TypedArray_UINT8 param7, CLR_RT_TypedArray_UINT8 param8, CLR_RT_TypedArray_float param9, INT32 param10, CLR_RT_TypedArray_UINT32 param11, HRESULT &hr );
-            static INT32 InvokeNative( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, CLR_RT_TypedArray_UINT8 param2, CLR_RT_TypedArray_UINT8 param3, CLR_RT_TypedArray_UINT8 param4, CLR_RT_TypedArray_UINT8 param5, CLR_RT_TypedArray_UINT8 param6, CLR_RT_TypedArray_UINT8 param7, CLR_RT_TypedArray_UINT8 param8, CLR_RT_TypedArray_INT16 param9, INT32 param10, CLR_RT_TypedArray_UINT32 param11, HRESULT &hr );
-            static INT32 InvokeNative( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, CLR_RT_TypedArray_UINT8 param2, CLR_RT_TypedArray_UINT8 param3, CLR_RT_TypedArray_UINT8 param4, CLR_RT_TypedArray_UINT8 param5, CLR_RT_TypedArray_UINT8 param6, CLR_RT_TypedArray_UINT8 param7, CLR_RT_TypedArray_UINT8 param8, CLR_RT_TypedArray_UINT16 param9, INT32 param10, CLR_RT_TypedArray_UINT32 param11, HRESULT &hr );
-            static INT32 InvokeNative( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, CLR_RT_TypedArray_UINT8 param2, CLR_RT_TypedArray_UINT8 param3, CLR_RT_TypedArray_UINT8 param4, CLR_RT_TypedArray_UINT8 param5, CLR_RT_TypedArray_UINT8 param6, CLR_RT_TypedArray_UINT8 param7, CLR_RT_TypedArray_UINT8 param8, CLR_RT_TypedArray_CHAR param9, INT32 param10, CLR_RT_TypedArray_UINT32 param11, HRESULT &hr );
-            static INT32 InvokeNative( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, CLR_RT_TypedArray_UINT8 param2, CLR_RT_TypedArray_UINT8 param3, CLR_RT_TypedArray_UINT8 param4, CLR_RT_TypedArray_UINT8 param5, CLR_RT_TypedArray_UINT8 param6, CLR_RT_TypedArray_UINT8 param7, CLR_RT_TypedArray_UINT8 param8, CLR_RT_TypedArray_UINT8 param9, INT32 param10, CLR_RT_TypedArray_UINT32 param11, HRESULT &hr );
-            static INT32 InvokeNative( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, CLR_RT_TypedArray_UINT8 param2, CLR_RT_TypedArray_UINT8 param3, CLR_RT_TypedArray_UINT8 param4, CLR_RT_TypedArray_UINT8 param5, CLR_RT_TypedArray_UINT8 param6, CLR_RT_TypedArray_UINT8 param7, CLR_RT_TypedArray_UINT8 param8, CLR_RT_TypedArray_INT8 param9, INT32 param10, CLR_RT_TypedArray_UINT32 param11, HRESULT &hr );
+            static INT32 NativeInvoke( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
+            static void NativeBeginArguments( CLR_RT_HeapBlock* pMngObj, INT32 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, UINT8 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, INT8 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, UINT16 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, INT16 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, UINT32 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, INT32 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, UINT64 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, INT64 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, float param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, double param0, HRESULT &hr );
+            static void NativeAddArgumentBool( CLR_RT_HeapBlock* pMngObj, INT8 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT8 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_INT8 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT16 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_INT16 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT32 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_INT32 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT64 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_INT64 param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_float param0, HRESULT &hr );
+            static void NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_double param0, HRESULT &hr );
+            static void NativeAddArgumentBool( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_INT8 param0, HRESULT &hr );
         };
     }
 }

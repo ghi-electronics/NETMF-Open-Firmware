@@ -22,8 +22,7 @@ namespace GHI
         {
             // Helper Functions to access fields of managed object
             // Declaration of stubs. These functions are implemented by Interop code developers
-            static void NativeHibernate( UINT32 param0, HRESULT &hr );
-            static void NativeSetEthernetOscillator( INT8 param0, HRESULT &hr );
+            static void SetEthernetOscillatorState( INT8 param0, HRESULT &hr );
         };
     }
 }

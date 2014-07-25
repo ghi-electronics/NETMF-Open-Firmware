@@ -16,66 +16,196 @@
 
 using namespace GHI::Processor;
 
-#define MAX_ARGS 8
-void *_args[MAX_ARGS];
+void** arguments = NULL;
+bool* freeNeededList = NULL;
+int next = 0;
+int count = 0;
 
-typedef int (*USER_FUNCTION)(unsigned int* generalArray, void** args, unsigned int argsCount, unsigned int* argSize);
-
-INT32 General_Invoke_Helper( UINT32 address, CLR_RT_TypedArray_UINT8 param0, CLR_RT_TypedArray_UINT8 param1, CLR_RT_TypedArray_UINT8 param2, CLR_RT_TypedArray_UINT8 param3, CLR_RT_TypedArray_UINT8 param4, CLR_RT_TypedArray_UINT8 param5, CLR_RT_TypedArray_UINT8 param6, CLR_RT_TypedArray_UINT8 param7, unsigned int *generalArray, INT32 param10, CLR_RT_TypedArray_UINT32 param11, HRESULT &hr )
+void FreeMemory()
 {
-	_args[0] = param0.GetBuffer();
-	_args[1] = param1.GetBuffer();
-	_args[2] = param2.GetBuffer();
-	_args[3] = param3.GetBuffer();
-	_args[4] = param4.GetBuffer();
-	_args[5] = param5.GetBuffer();
-	_args[6] = param6.GetBuffer();
-	_args[7] = param7.GetBuffer();
-
-	return ((USER_FUNCTION)address)(generalArray, _args, param10, param11.GetBuffer());
+	if (count > 0)
+	{
+		for (int i = 0; i < count; i++)
+			if (freeNeededList[i])
+				private_free(arguments[i]);
+			
+		private_free(arguments);
+		private_free(freeNeededList);
+	}
+	
+	next = 0;
+	count = 0;
+	arguments = NULL;
+	freeNeededList = NULL;
 }
 
-INT32 RuntimeLoadableProcedures_NativeFunction::InvokeNative( UINT32 address, HRESULT &hr )
+void AddParameter(void* value, int size, HRESULT &hr)
 {
-	return ((USER_FUNCTION)address)(NULL, NULL, 0, NULL);
+	void* argument = arguments[next] = private_malloc(size);
+	
+	if (argument == NULL)
+	{
+		FreeMemory();
+		hr = CLR_E_OUT_OF_MEMORY;		
+		return;
+	}
+	
+	memcpy(argument, value, size);
+	freeNeededList[next++] = true;
 }
 
-INT32 RuntimeLoadableProcedures_NativeFunction::InvokeNative( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, CLR_RT_TypedArray_UINT8 param2, CLR_RT_TypedArray_UINT8 param3, CLR_RT_TypedArray_UINT8 param4, CLR_RT_TypedArray_UINT8 param5, CLR_RT_TypedArray_UINT8 param6, CLR_RT_TypedArray_UINT8 param7, CLR_RT_TypedArray_UINT8 param8, CLR_RT_TypedArray_UINT32 param9, INT32 param10, CLR_RT_TypedArray_UINT32 param11, HRESULT &hr )
+void AddArray(void* value)
 {
-    return General_Invoke_Helper(param0, param1, param2, param3, param4, param5, param6, param7, param8, (unsigned int*)param9.GetBuffer(), param10, param11, hr);
+	arguments[next] = value;
+	freeNeededList[next++] = false;
 }
 
-INT32 RuntimeLoadableProcedures_NativeFunction::InvokeNative( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, CLR_RT_TypedArray_UINT8 param2, CLR_RT_TypedArray_UINT8 param3, CLR_RT_TypedArray_UINT8 param4, CLR_RT_TypedArray_UINT8 param5, CLR_RT_TypedArray_UINT8 param6, CLR_RT_TypedArray_UINT8 param7, CLR_RT_TypedArray_UINT8 param8, CLR_RT_TypedArray_INT32 param9, INT32 param10, CLR_RT_TypedArray_UINT32 param11, HRESULT &hr )
+INT32 RuntimeLoadableProcedures_NativeFunction::NativeInvoke( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
 {
-    return General_Invoke_Helper(param0, param1, param2, param3, param4, param5, param6, param7, param8, (unsigned int*)param9.GetBuffer(), param10, param11, hr);
+	INT32 result = ((int(*)(void**))Get_address(pMngObj))(arguments);
+
+	FreeMemory();
+	
+	return result;
 }
 
-INT32 RuntimeLoadableProcedures_NativeFunction::InvokeNative( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, CLR_RT_TypedArray_UINT8 param2, CLR_RT_TypedArray_UINT8 param3, CLR_RT_TypedArray_UINT8 param4, CLR_RT_TypedArray_UINT8 param5, CLR_RT_TypedArray_UINT8 param6, CLR_RT_TypedArray_UINT8 param7, CLR_RT_TypedArray_UINT8 param8, CLR_RT_TypedArray_float param9, INT32 param10, CLR_RT_TypedArray_UINT32 param11, HRESULT &hr )
+void RuntimeLoadableProcedures_NativeFunction::NativeBeginArguments( CLR_RT_HeapBlock* pMngObj, INT32 param0, HRESULT &hr )
 {
-    return General_Invoke_Helper(param0, param1, param2, param3, param4, param5, param6, param7, param8, (unsigned int*)param9.GetBuffer(), param10, param11, hr);
+	next = 0;
+	count = param0;
+	
+	if (count == 0)
+		return;
+		
+	arguments = (void**)private_malloc(sizeof(void*) * count);
+	freeNeededList = (bool*)private_malloc(sizeof(bool) * count);
+	if (arguments == NULL || freeNeededList == NULL)
+	{
+		hr = CLR_E_OUT_OF_MEMORY;	
+		count = 0;
+		
+		if (arguments != NULL)
+			private_free(arguments);
+		
+		if (freeNeededList != NULL)
+			private_free(freeNeededList);
+		
+		return;
+	}
+	
+	for (int i = 0; i < count; i++)
+	{
+		arguments[i] = NULL;
+		freeNeededList[i] = false;
+	}	
 }
 
-INT32 RuntimeLoadableProcedures_NativeFunction::InvokeNative( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, CLR_RT_TypedArray_UINT8 param2, CLR_RT_TypedArray_UINT8 param3, CLR_RT_TypedArray_UINT8 param4, CLR_RT_TypedArray_UINT8 param5, CLR_RT_TypedArray_UINT8 param6, CLR_RT_TypedArray_UINT8 param7, CLR_RT_TypedArray_UINT8 param8, CLR_RT_TypedArray_INT16 param9, INT32 param10, CLR_RT_TypedArray_UINT32 param11, HRESULT &hr )
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, UINT8 param0, HRESULT &hr )
 {
-    return General_Invoke_Helper(param0, param1, param2, param3, param4, param5, param6, param7, param8, (unsigned int*)param9.GetBuffer(), param10, param11, hr);
+	AddParameter(&param0, sizeof(param0), hr);
 }
 
-INT32 RuntimeLoadableProcedures_NativeFunction::InvokeNative( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, CLR_RT_TypedArray_UINT8 param2, CLR_RT_TypedArray_UINT8 param3, CLR_RT_TypedArray_UINT8 param4, CLR_RT_TypedArray_UINT8 param5, CLR_RT_TypedArray_UINT8 param6, CLR_RT_TypedArray_UINT8 param7, CLR_RT_TypedArray_UINT8 param8, CLR_RT_TypedArray_UINT16 param9, INT32 param10, CLR_RT_TypedArray_UINT32 param11, HRESULT &hr )
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, INT8 param0, HRESULT &hr )
 {
-    return General_Invoke_Helper(param0, param1, param2, param3, param4, param5, param6, param7, param8, (unsigned int*)param9.GetBuffer(), param10, param11, hr);
+	AddParameter(&param0, sizeof(param0), hr);
 }
 
-INT32 RuntimeLoadableProcedures_NativeFunction::InvokeNative( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, CLR_RT_TypedArray_UINT8 param2, CLR_RT_TypedArray_UINT8 param3, CLR_RT_TypedArray_UINT8 param4, CLR_RT_TypedArray_UINT8 param5, CLR_RT_TypedArray_UINT8 param6, CLR_RT_TypedArray_UINT8 param7, CLR_RT_TypedArray_UINT8 param8, CLR_RT_TypedArray_CHAR param9, INT32 param10, CLR_RT_TypedArray_UINT32 param11, HRESULT &hr )
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, UINT16 param0, HRESULT &hr )
 {
-    return General_Invoke_Helper(param0, param1, param2, param3, param4, param5, param6, param7, param8, (unsigned int*)param9.GetBuffer(), param10, param11, hr);
+	AddParameter(&param0, sizeof(param0), hr);
 }
 
-INT32 RuntimeLoadableProcedures_NativeFunction::InvokeNative( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, CLR_RT_TypedArray_UINT8 param2, CLR_RT_TypedArray_UINT8 param3, CLR_RT_TypedArray_UINT8 param4, CLR_RT_TypedArray_UINT8 param5, CLR_RT_TypedArray_UINT8 param6, CLR_RT_TypedArray_UINT8 param7, CLR_RT_TypedArray_UINT8 param8, CLR_RT_TypedArray_UINT8 param9, INT32 param10, CLR_RT_TypedArray_UINT32 param11, HRESULT &hr )
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, INT16 param0, HRESULT &hr )
 {
-    return General_Invoke_Helper(param0, param1, param2, param3, param4, param5, param6, param7, param8, (unsigned int*)param9.GetBuffer(), param10, param11, hr);
+	AddParameter(&param0, sizeof(param0), hr);
 }
 
-INT32 RuntimeLoadableProcedures_NativeFunction::InvokeNative( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, CLR_RT_TypedArray_UINT8 param2, CLR_RT_TypedArray_UINT8 param3, CLR_RT_TypedArray_UINT8 param4, CLR_RT_TypedArray_UINT8 param5, CLR_RT_TypedArray_UINT8 param6, CLR_RT_TypedArray_UINT8 param7, CLR_RT_TypedArray_UINT8 param8, CLR_RT_TypedArray_INT8 param9, INT32 param10, CLR_RT_TypedArray_UINT32 param11, HRESULT &hr )
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, UINT32 param0, HRESULT &hr )
 {
-    return General_Invoke_Helper(param0, param1, param2, param3, param4, param5, param6, param7, param8, (unsigned int*)param9.GetBuffer(), param10, param11, hr);
+	AddParameter(&param0, sizeof(param0), hr);
+}
+
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, INT32 param0, HRESULT &hr )
+{
+	AddParameter(&param0, sizeof(param0), hr);
+}
+
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, UINT64 param0, HRESULT &hr )
+{
+	AddParameter(&param0, sizeof(param0), hr);
+}
+
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, INT64 param0, HRESULT &hr )
+{
+	AddParameter(&param0, sizeof(param0), hr);
+}
+
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, float param0, HRESULT &hr )
+{
+	AddParameter(&param0, sizeof(param0), hr);
+}
+
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, double param0, HRESULT &hr )
+{
+	AddParameter(&param0, sizeof(param0), hr);
+}
+
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgumentBool( CLR_RT_HeapBlock* pMngObj, INT8 param0, HRESULT &hr )
+{
+	AddParameter(&param0, sizeof(param0), hr);
+}
+
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT8 param0, HRESULT &hr )
+{
+	AddArray(param0.GetBuffer());
+}
+
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_INT8 param0, HRESULT &hr )
+{
+	AddArray(param0.GetBuffer());
+}
+
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT16 param0, HRESULT &hr )
+{
+	AddArray(param0.GetBuffer());
+}
+
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_INT16 param0, HRESULT &hr )
+{
+	AddArray(param0.GetBuffer());
+}
+
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT32 param0, HRESULT &hr )
+{
+	AddArray(param0.GetBuffer());
+}
+
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_INT32 param0, HRESULT &hr )
+{
+	AddArray(param0.GetBuffer());
+}
+
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT64 param0, HRESULT &hr )
+{
+	AddArray(param0.GetBuffer());
+}
+
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_INT64 param0, HRESULT &hr )
+{
+	AddArray(param0.GetBuffer());
+}
+
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_float param0, HRESULT &hr )
+{
+	AddArray(param0.GetBuffer());
+}
+
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_double param0, HRESULT &hr )
+{
+	AddArray(param0.GetBuffer());
+}
+
+void RuntimeLoadableProcedures_NativeFunction::NativeAddArgumentBool( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_INT8 param0, HRESULT &hr )
+{
+	AddArray(param0.GetBuffer());
 }

@@ -19,6 +19,9 @@
 <Compile Include="Lib_GHI_Processor_Display_mshl.cpp" />
 <HFile Include="Lib_GHI_Processor_Display.h" />
 <Compile Include="Lib_GHI_Processor_Display.cpp" />
+<Compile Include="Lib_GHI_Processor_RuntimeLoadableProcedures__ElfImage_mshl.cpp" />
+<HFile Include="Lib_GHI_Processor_RuntimeLoadableProcedures__ElfImage.h" />
+<Compile Include="Lib_GHI_Processor_RuntimeLoadableProcedures__ElfImage.cpp" />
 <Compile Include="Lib_GHI_Processor_InFieldUpdate_mshl.cpp" />
 <HFile Include="Lib_GHI_Processor_InFieldUpdate.h" />
 <Compile Include="Lib_GHI_Processor_InFieldUpdate.cpp" />
@@ -52,9 +55,6 @@
 <Compile Include="Lib_GHI_Processor_Register_mshl.cpp" />
 <HFile Include="Lib_GHI_Processor_Register.h" />
 <Compile Include="Lib_GHI_Processor_Register.cpp" />
-<Compile Include="Lib_GHI_Processor_RuntimeLoadableProcedures_mshl.cpp" />
-<HFile Include="Lib_GHI_Processor_RuntimeLoadableProcedures.h" />
-<Compile Include="Lib_GHI_Processor_RuntimeLoadableProcedures.cpp" />
 <Compile Include="Lib_GHI_Processor_StartupLogo_mshl.cpp" />
 <HFile Include="Lib_GHI_Processor_StartupLogo.h" />
 <Compile Include="Lib_GHI_Processor_StartupLogo.cpp" />

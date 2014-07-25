@@ -89,6 +89,30 @@ struct Library_Lib_GHI_Processor_Display
 
 };
 
+struct Library_Lib_GHI_Processor_RuntimeLoadableProcedures
+{
+    static const int FIELD_STATIC__NativeEvent = 26;
+
+
+    //--//
+
+};
+
+struct Library_Lib_GHI_Processor_RuntimeLoadableProcedures__ElfImage
+{
+    static const int FIELD__address = 1;
+    static const int FIELD__size = 2;
+    static const int FIELD__regionCount = 3;
+    static const int FIELD__imageData = 4;
+
+    TINYCLR_NATIVE_DECLARE(NativeZeroRegion___VOID__U4__U4);
+    TINYCLR_NATIVE_DECLARE(NativeLoadElf___VOID__SZARRAY_U1);
+    TINYCLR_NATIVE_DECLARE(NativeFindSymbolAddress___U4__SZARRAY_U1__STRING__GHIProcessorRuntimeLoadableProceduresElfImageSymbolType);
+
+    //--//
+
+};
+
 struct Library_Lib_GHI_IO_ControllerAreaNetwork__ErrorReceivedEventArgs
 {
     static const int FIELD__error = 1;
@@ -100,12 +124,12 @@ struct Library_Lib_GHI_IO_ControllerAreaNetwork__ErrorReceivedEventArgs
 
 struct Library_Lib_GHI_Utilities_InternalEvent
 {
-    static const int FIELD_STATIC__dispatcher = 26;
-    static const int FIELD_STATIC__ControllerAreaNetworkActivity = 27;
-    static const int FIELD_STATIC__RuntimeLoadableProceduresEvent = 28;
-    static const int FIELD_STATIC__UsbDeviceConnected = 29;
-    static const int FIELD_STATIC__UsbDeviceConnectionFailed = 30;
-    static const int FIELD_STATIC__UsbDeviceDisconnected = 31;
+    static const int FIELD_STATIC__dispatcher = 27;
+    static const int FIELD_STATIC__ControllerAreaNetworkActivity = 28;
+    static const int FIELD_STATIC__RuntimeLoadableProceduresEvent = 29;
+    static const int FIELD_STATIC__UsbDeviceConnected = 30;
+    static const int FIELD_STATIC__UsbDeviceConnectionFailed = 31;
+    static const int FIELD_STATIC__UsbDeviceDisconnected = 32;
 
 
     //--//
@@ -114,8 +138,8 @@ struct Library_Lib_GHI_Utilities_InternalEvent
 
 struct Library_Lib_GHI_Processor_InFieldUpdate
 {
-    static const int FIELD_STATIC__initialized = 32;
-    static const int FIELD_STATIC__initializedType = 33;
+    static const int FIELD_STATIC__initialized = 33;
+    static const int FIELD_STATIC__initializedType = 34;
 
     TINYCLR_NATIVE_DECLARE(NativeInitialize___STATIC__BOOLEAN__GHIProcessorInFieldUpdateTypes);
     TINYCLR_NATIVE_DECLARE(NativeLoad___STATIC__BOOLEAN__GHIProcessorInFieldUpdateTypes__SZARRAY_U1__I4);
@@ -190,6 +214,7 @@ struct Library_Lib_GHI_IO_Storage_SDCard
 {
     static const int FIELD__id = 1;
     static const int FIELD__disposed = 2;
+    static const int FIELD__mounted = 3;
 
     TINYCLR_NATIVE_DECLARE(NativeConstructor___VOID);
     TINYCLR_NATIVE_DECLARE(NativeFinalize___VOID);
@@ -212,10 +237,7 @@ struct Library_Lib_GHI_Processor_AddressSpace
 
 struct Library_Lib_GHI_Processor_Power
 {
-    static const int FIELD_STATIC__ethernetEnabled = 34;
-
-    TINYCLR_NATIVE_DECLARE(NativeHibernate___STATIC__VOID__U4);
-    TINYCLR_NATIVE_DECLARE(NativeSetEthernetOscillator___STATIC__VOID__BOOLEAN);
+    TINYCLR_NATIVE_DECLARE(SetEthernetOscillatorState___STATIC__VOID__BOOLEAN);
 
     //--//
 
@@ -248,30 +270,14 @@ struct Library_Lib_GHI_Processor_Register
 
 };
 
-struct Library_Lib_GHI_Processor_RuntimeLoadableProcedures
-{
-    static const int FIELD_STATIC__imageAddress = 36;
-    static const int FIELD_STATIC__imageSize = 37;
-    static const int FIELD_STATIC__regionCount = 38;
-    static const int FIELD_STATIC__imageData = 39;
-    static const int FIELD_STATIC__NativeEvent = 40;
-
-    TINYCLR_NATIVE_DECLARE(NativeInitializeZeroRegion___STATIC__VOID__U4__U4);
-    TINYCLR_NATIVE_DECLARE(NativeLoadELF___STATIC__VOID__SZARRAY_U1__BYREF_U4__BYREF_U4__BYREF_U4);
-    TINYCLR_NATIVE_DECLARE(NativeFindSymbolAddress___STATIC__U4__SZARRAY_U1__STRING__GHIProcessorRuntimeLoadableProceduresSymbolType);
-
-    //--//
-
-};
-
 struct Library_Lib_GHI_Processor_StartupLogo
 {
-    static const int FIELD_STATIC__width = 41;
-    static const int FIELD_STATIC__height = 42;
-    static const int FIELD_STATIC__x = 43;
-    static const int FIELD_STATIC__y = 44;
-    static const int FIELD_STATIC__enabled = 45;
-    static const int FIELD_STATIC__image = 46;
+    static const int FIELD_STATIC__width = 36;
+    static const int FIELD_STATIC__height = 37;
+    static const int FIELD_STATIC__x = 38;
+    static const int FIELD_STATIC__y = 39;
+    static const int FIELD_STATIC__enabled = 40;
+    static const int FIELD_STATIC__image = 41;
 
     TINYCLR_NATIVE_DECLARE(NativeSupportedWidth___STATIC__I4);
     TINYCLR_NATIVE_DECLARE(NativeSupportedHeight___STATIC__I4);
@@ -286,10 +292,10 @@ struct Library_Lib_GHI_Processor_StartupLogo
 
 struct Library_Lib_GHI_Processor_Watchdog
 {
-    static const int FIELD_STATIC__lastResetCause = 47;
-    static const int FIELD_STATIC__maxTimeout = 48;
-    static const int FIELD_STATIC__timeout = 49;
-    static const int FIELD_STATIC__enabled = 50;
+    static const int FIELD_STATIC__lastResetCause = 42;
+    static const int FIELD_STATIC__maxTimeout = 43;
+    static const int FIELD_STATIC__timeout = 44;
+    static const int FIELD_STATIC__enabled = 45;
 
     TINYCLR_NATIVE_DECLARE(NativeLastResetCause___STATIC__U1);
     TINYCLR_NATIVE_DECLARE(NativeGetMaxTimeout___STATIC__U4);
@@ -389,19 +395,31 @@ struct Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeEventEventArgs
 struct Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction
 {
     static const int FIELD__address = 1;
-    static const int FIELD__arguments = 2;
-    static const int FIELD__argumentSizes = 3;
-    static const int FIELD__emptyArray = 4;
 
-    TINYCLR_NATIVE_DECLARE(InvokeNative___STATIC__I4__U4);
-    TINYCLR_NATIVE_DECLARE(InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U4__I4__SZARRAY_U4);
-    TINYCLR_NATIVE_DECLARE(InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_I4__I4__SZARRAY_U4);
-    TINYCLR_NATIVE_DECLARE(InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_R4__I4__SZARRAY_U4);
-    TINYCLR_NATIVE_DECLARE(InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_I2__I4__SZARRAY_U4);
-    TINYCLR_NATIVE_DECLARE(InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U2__I4__SZARRAY_U4);
-    TINYCLR_NATIVE_DECLARE(InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_CHAR__I4__SZARRAY_U4);
-    TINYCLR_NATIVE_DECLARE(InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__I4__SZARRAY_U4);
-    TINYCLR_NATIVE_DECLARE(InvokeNative___STATIC__I4__U4__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_U1__SZARRAY_I1__I4__SZARRAY_U4);
+    TINYCLR_NATIVE_DECLARE(NativeInvoke___I4);
+    TINYCLR_NATIVE_DECLARE(NativeBeginArguments___VOID__I4);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__U1);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__I1);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__U2);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__I2);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__U4);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__I4);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__U8);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__I8);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__R4);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__R8);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgumentBool___VOID__BOOLEAN);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__SZARRAY_U1);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__SZARRAY_I1);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__SZARRAY_U2);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__SZARRAY_I2);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__SZARRAY_U4);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__SZARRAY_I4);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__SZARRAY_U8);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__SZARRAY_I8);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__SZARRAY_R4);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__SZARRAY_R8);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgumentBool___VOID__SZARRAY_BOOLEAN);
 
     //--//
 
