@@ -13,7 +13,7 @@
 using namespace GHI::Networking;
 
 
-HRESULT Library_Lib_GHI_Networking_BaseInterface::NativeConstructor___VOID( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Networking_BaseInterface::NativeOpen___VOID( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
@@ -21,13 +21,13 @@ HRESULT Library_Lib_GHI_Networking_BaseInterface::NativeConstructor___VOID( CLR_
 
         FAULT_ON_NULL(pMngObj);
 
-        BaseInterface::NativeConstructor( pMngObj,  hr );
+        BaseInterface::NativeOpen( pMngObj,  hr );
         TINYCLR_CHECK_HRESULT( hr );
     }
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Networking_BaseInterface::NativeDispose___VOID( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Networking_BaseInterface::NativeClose___VOID( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
@@ -35,35 +35,7 @@ HRESULT Library_Lib_GHI_Networking_BaseInterface::NativeDispose___VOID( CLR_RT_S
 
         FAULT_ON_NULL(pMngObj);
 
-        BaseInterface::NativeDispose( pMngObj,  hr );
-        TINYCLR_CHECK_HRESULT( hr );
-    }
-    TINYCLR_NOCLEANUP();
-}
-
-HRESULT Library_Lib_GHI_Networking_BaseInterface::NativeActivate___VOID( CLR_RT_StackFrame& stack )
-{
-    TINYCLR_HEADER(); hr = S_OK;
-    {
-        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
-
-        FAULT_ON_NULL(pMngObj);
-
-        BaseInterface::NativeActivate( pMngObj,  hr );
-        TINYCLR_CHECK_HRESULT( hr );
-    }
-    TINYCLR_NOCLEANUP();
-}
-
-HRESULT Library_Lib_GHI_Networking_BaseInterface::NativeDeactivate___VOID( CLR_RT_StackFrame& stack )
-{
-    TINYCLR_HEADER(); hr = S_OK;
-    {
-        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
-
-        FAULT_ON_NULL(pMngObj);
-
-        BaseInterface::NativeDeactivate( pMngObj,  hr );
+        BaseInterface::NativeClose( pMngObj,  hr );
         TINYCLR_CHECK_HRESULT( hr );
     }
     TINYCLR_NOCLEANUP();

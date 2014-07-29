@@ -49,7 +49,7 @@
 //
 #define GHI_VERSION_MAJOR 4
 #define GHI_VERSION_MINOR 3
-#define GHI_VERSION_BUILD 2
+#define GHI_VERSION_BUILD 3
 #define GHI_VERSION_REVISION 0
 #define GHIOEMSTRING "Copyright (C) GHI Electronics, LLC"
 

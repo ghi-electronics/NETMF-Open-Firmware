@@ -30,10 +30,8 @@ namespace GHI
             static INT8& Get_disposed( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT8( pMngObj, Library_Lib_GHI_Networking_BaseInterface::FIELD__disposed ); }
 
             // Declaration of stubs. These functions are implemented by Interop code developers
-            static void NativeConstructor( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
-            static void NativeDispose( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
-            static void NativeActivate( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
-            static void NativeDeactivate( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
+            static void NativeOpen( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
+            static void NativeClose( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
             static void NativeUpdateMacAddress( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT8 param0, HRESULT &hr );
         };
     }

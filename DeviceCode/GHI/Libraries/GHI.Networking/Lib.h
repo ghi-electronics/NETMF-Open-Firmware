@@ -21,10 +21,8 @@ struct Library_Lib_GHI_Networking_BaseInterface
     static const int FIELD__networkInterface = 3;
     static const int FIELD__disposed = 4;
 
-    TINYCLR_NATIVE_DECLARE(NativeConstructor___VOID);
-    TINYCLR_NATIVE_DECLARE(NativeDispose___VOID);
-    TINYCLR_NATIVE_DECLARE(NativeActivate___VOID);
-    TINYCLR_NATIVE_DECLARE(NativeDeactivate___VOID);
+    TINYCLR_NATIVE_DECLARE(NativeOpen___VOID);
+    TINYCLR_NATIVE_DECLARE(NativeClose___VOID);
     TINYCLR_NATIVE_DECLARE(NativeUpdateMacAddress___VOID__SZARRAY_U1);
 
     //--//
