@@ -44,8 +44,11 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
-    Library_Lib_GHI_Networking_BaseInterface::NativeOpen___VOID,
-    Library_Lib_GHI_Networking_BaseInterface::NativeClose___VOID,
+    NULL,
+    Library_Lib_GHI_Networking_BaseInterface::NativeConstructor___VOID,
+    Library_Lib_GHI_Networking_BaseInterface::NativeDispose___VOID,
+    Library_Lib_GHI_Networking_BaseInterface::NativeActivate___VOID,
+    Library_Lib_GHI_Networking_BaseInterface::NativeDeactivate___VOID,
     Library_Lib_GHI_Networking_BaseInterface::NativeUpdateMacAddress___VOID__SZARRAY_U1,
     NULL,
     NULL,
@@ -168,7 +171,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Networking =
 {
     "GHI.Networking", 
-    0xEB6AB982,
+    0x7EAD2394,
     method_lookup
 };
 
