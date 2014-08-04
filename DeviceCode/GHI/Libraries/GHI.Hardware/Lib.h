@@ -202,14 +202,6 @@ struct Library_Lib_GHI_IO_SoftwareI2CBus
 
 };
 
-struct Library_Lib_GHI_IO_Storage_ExtendedWeakReferences
-{
-    TINYCLR_NATIVE_DECLARE(Flush___STATIC__VOID);
-
-    //--//
-
-};
-
 struct Library_Lib_GHI_IO_Storage_SDCard
 {
     static const int FIELD__id = 1;

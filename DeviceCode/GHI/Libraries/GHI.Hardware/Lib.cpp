@@ -218,7 +218,6 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     Library_Lib_GHI_IO_SoftwareI2CBus::NativeWriteRead___STATIC__BOOLEAN__I4__I4__U1__SZARRAY_U1__I4__I4__SZARRAY_U1__I4__I4__BYREF_I4__BYREF_I4,
-    Library_Lib_GHI_IO_Storage_ExtendedWeakReferences::Flush___STATIC__VOID,
     NULL,
     NULL,
     NULL,
@@ -443,6 +442,10 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
     Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeInvoke___I4,
     Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeBeginArguments___VOID__I4,
     Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__U1,
@@ -487,7 +490,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Hardware =
 {
     "GHI.Hardware", 
-    0x2AECB3E3,
+    0x3005069F,
     method_lookup
 };
 

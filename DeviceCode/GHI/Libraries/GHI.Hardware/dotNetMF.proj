@@ -37,9 +37,6 @@
 <Compile Include="Lib_GHI_IO_SoftwareI2CBus_mshl.cpp" />
 <HFile Include="Lib_GHI_IO_SoftwareI2CBus.h" />
 <Compile Include="Lib_GHI_IO_SoftwareI2CBus.cpp" />
-<Compile Include="Lib_GHI_IO_Storage_ExtendedWeakReferences_mshl.cpp" />
-<HFile Include="Lib_GHI_IO_Storage_ExtendedWeakReferences.h" />
-<Compile Include="Lib_GHI_IO_Storage_ExtendedWeakReferences.cpp" />
 <Compile Include="Lib_GHI_IO_Storage_SDCard_mshl.cpp" />
 <HFile Include="Lib_GHI_IO_Storage_SDCard.h" />
 <Compile Include="Lib_GHI_IO_Storage_SDCard.cpp" />
