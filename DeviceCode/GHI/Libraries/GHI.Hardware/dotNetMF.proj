@@ -67,6 +67,9 @@
 <Compile Include="Lib_GHI_Utilities_Xtea_mshl.cpp" />
 <HFile Include="Lib_GHI_Utilities_Xtea.h" />
 <Compile Include="Lib_GHI_Utilities_Xtea.cpp" />
+<Compile Include="Lib_GHI_Processor_RuntimeLoadableProcedures__Memory_mshl.cpp" />
+<HFile Include="Lib_GHI_Processor_RuntimeLoadableProcedures__Memory.h" />
+<Compile Include="Lib_GHI_Processor_RuntimeLoadableProcedures__Memory.cpp" />
 <Compile Include="Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction_mshl.cpp" />
 <HFile Include="Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction.h" />
 <Compile Include="Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction.cpp" />

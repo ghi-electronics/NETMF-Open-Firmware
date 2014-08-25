@@ -352,6 +352,17 @@ struct Library_Lib_GHI_Utilities_InternalEvent__InternalEventEventArgs
 
 };
 
+struct Library_Lib_GHI_Processor_RuntimeLoadableProcedures__Memory
+{
+    static const int FIELD_STATIC__baseAddress = 46;
+    static const int FIELD_STATIC__size = 47;
+
+    TINYCLR_NATIVE_DECLARE(NativeGetRlpInfo___STATIC__VOID__BYREF_U4__BYREF_U4);
+
+    //--//
+
+};
+
 struct Library_Lib_GHI_IO_ControllerAreaNetwork__Message
 {
     static const int FIELD__data = 1;
@@ -386,10 +397,16 @@ struct Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeEventEventArgs
 
 struct Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction
 {
-    static const int FIELD__address = 1;
+    static const int FIELD__disposed = 1;
+    static const int FIELD__address = 2;
+    static const int FIELD__sizeSet = 3;
+    static const int FIELD__nativeParameterPool = 4;
+    static const int FIELD__nativeParameterList = 5;
+    static const int FIELD__nativeIndex = 6;
 
+    TINYCLR_NATIVE_DECLARE(NativeDispose___VOID);
     TINYCLR_NATIVE_DECLARE(NativeInvoke___I4);
-    TINYCLR_NATIVE_DECLARE(NativeBeginArguments___VOID__I4);
+    TINYCLR_NATIVE_DECLARE(NativeSetSize___VOID__I4);
     TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__U1);
     TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__I1);
     TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__U2);

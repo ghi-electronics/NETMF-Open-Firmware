@@ -13,6 +13,20 @@
 using namespace GHI::Processor;
 
 
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeDispose___VOID( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+        RuntimeLoadableProcedures_NativeFunction::NativeDispose( pMngObj,  hr );
+        TINYCLR_CHECK_HRESULT( hr );
+    }
+    TINYCLR_NOCLEANUP();
+}
+
 HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeInvoke___I4( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
@@ -29,7 +43,7 @@ HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::Nat
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeBeginArguments___VOID__I4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeSetSize___VOID__I4( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
@@ -40,7 +54,7 @@ HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::Nat
         INT32 param0;
         TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 1, param0 ) );
 
-        RuntimeLoadableProcedures_NativeFunction::NativeBeginArguments( pMngObj,  param0, hr );
+        RuntimeLoadableProcedures_NativeFunction::NativeSetSize( pMngObj,  param0, hr );
         TINYCLR_CHECK_HRESULT( hr );
     }
     TINYCLR_NOCLEANUP();

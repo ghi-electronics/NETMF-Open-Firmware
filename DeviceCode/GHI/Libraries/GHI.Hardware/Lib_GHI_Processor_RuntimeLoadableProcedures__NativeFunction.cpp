@@ -16,196 +16,158 @@
 
 using namespace GHI::Processor;
 
-void** arguments = NULL;
-bool* freeNeededList = NULL;
-int next = 0;
-int count = 0;
-
-void FreeMemory()
+void RuntimeLoadableProcedures_NativeFunction::NativeDispose( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
 {
-	if (count > 0)
-	{
-		for (int i = 0; i < count; i++)
-			if (freeNeededList[i])
-				private_free(arguments[i]);
-			
-		private_free(arguments);
-		private_free(freeNeededList);
-	}
+	void* pool = (void*)Get_nativeParameterPool(pMngObj);
+	void** list = (void**)Get_nativeParameterList(pMngObj);
 	
-	next = 0;
-	count = 0;
-	arguments = NULL;
-	freeNeededList = NULL;
-}
-
-void AddParameter(void* value, int size, HRESULT &hr)
-{
-	void* argument = arguments[next] = private_malloc(size);
-	
-	if (argument == NULL)
-	{
-		FreeMemory();
-		hr = CLR_E_OUT_OF_MEMORY;		
-		return;
-	}
-	
-	memcpy(argument, value, size);
-	freeNeededList[next++] = true;
-}
-
-void AddArray(void* value)
-{
-	arguments[next] = value;
-	freeNeededList[next++] = false;
+	if (pool) private_free(pool);
+	if (list) private_free(list);
 }
 
 INT32 RuntimeLoadableProcedures_NativeFunction::NativeInvoke( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
 {
-	INT32 result = ((int(*)(void**))Get_address(pMngObj))(arguments);
-
-	FreeMemory();
+	Get_nativeIndex(pMngObj) = 0;
 	
-	return result;
+	return ((int(*)(void**))Get_address(pMngObj))((void**)Get_nativeParameterList(pMngObj));
 }
 
-void RuntimeLoadableProcedures_NativeFunction::NativeBeginArguments( CLR_RT_HeapBlock* pMngObj, INT32 param0, HRESULT &hr )
+void RuntimeLoadableProcedures_NativeFunction::NativeSetSize( CLR_RT_HeapBlock* pMngObj, INT32 count, HRESULT &hr )
 {
-	next = 0;
-	count = param0;
-	
 	if (count == 0)
-		return;
-		
-	arguments = (void**)private_malloc(sizeof(void*) * count);
-	freeNeededList = (bool*)private_malloc(sizeof(bool) * count);
-	if (arguments == NULL || freeNeededList == NULL)
 	{
-		hr = CLR_E_OUT_OF_MEMORY;	
-		count = 0;
+		Get_nativeParameterPool(pMngObj) = NULL;
+		Get_nativeParameterList(pMngObj) = NULL;
 		
-		if (arguments != NULL)
-			private_free(arguments);
+		return;
+	}
 		
-		if (freeNeededList != NULL)
-			private_free(freeNeededList);
+	void* pool = private_malloc(count * 8);
+	void** list = (void**)private_malloc(count * sizeof(void*));
+	
+	if (pool == NULL || list == NULL) 
+	{
+		if (pool) private_free(pool);
+		if (list) private_free(list);
+		
+		hr = CLR_E_OUT_OF_MEMORY;
 		
 		return;
 	}
 	
+	Get_nativeParameterPool(pMngObj) = (UINT32)pool;
+	Get_nativeParameterList(pMngObj) = (UINT32)list;
+	
 	for (int i = 0; i < count; i++)
-	{
-		arguments[i] = NULL;
-		freeNeededList[i] = false;
-	}	
+		list[i] = ((UINT8*)pool) + (i * 8);
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, UINT8 param0, HRESULT &hr )
 {
-	AddParameter(&param0, sizeof(param0), hr);
+	*(UINT8*)(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0;
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, INT8 param0, HRESULT &hr )
 {
-	AddParameter(&param0, sizeof(param0), hr);
+	*(INT8*)(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0;
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, UINT16 param0, HRESULT &hr )
 {
-	AddParameter(&param0, sizeof(param0), hr);
+	*(UINT16*)(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0;
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, INT16 param0, HRESULT &hr )
 {
-	AddParameter(&param0, sizeof(param0), hr);
+	*(INT16*)(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0;
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, UINT32 param0, HRESULT &hr )
 {
-	AddParameter(&param0, sizeof(param0), hr);
+	*(UINT32*)(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0;
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, INT32 param0, HRESULT &hr )
 {
-	AddParameter(&param0, sizeof(param0), hr);
+	*(INT32*)(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0;
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, UINT64 param0, HRESULT &hr )
 {
-	AddParameter(&param0, sizeof(param0), hr);
+	*(UINT64*)(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0;
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, INT64 param0, HRESULT &hr )
 {
-	AddParameter(&param0, sizeof(param0), hr);
+	*(INT64*)(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0;
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, float param0, HRESULT &hr )
 {
-	AddParameter(&param0, sizeof(param0), hr);
+	*(float*)(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0;
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, double param0, HRESULT &hr )
 {
-	AddParameter(&param0, sizeof(param0), hr);
+	*(double*)(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0;
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgumentBool( CLR_RT_HeapBlock* pMngObj, INT8 param0, HRESULT &hr )
 {
-	AddParameter(&param0, sizeof(param0), hr);
+	*(INT8*)(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0;
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT8 param0, HRESULT &hr )
 {
-	AddArray(param0.GetBuffer());
+	(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0.GetBuffer();
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_INT8 param0, HRESULT &hr )
 {
-	AddArray(param0.GetBuffer());
+	(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0.GetBuffer();
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT16 param0, HRESULT &hr )
 {
-	AddArray(param0.GetBuffer());
+	(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0.GetBuffer();
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_INT16 param0, HRESULT &hr )
 {
-	AddArray(param0.GetBuffer());
+	(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0.GetBuffer();
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT32 param0, HRESULT &hr )
 {
-	AddArray(param0.GetBuffer());
+	(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0.GetBuffer();
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_INT32 param0, HRESULT &hr )
 {
-	AddArray(param0.GetBuffer());
+	(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0.GetBuffer();
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_UINT64 param0, HRESULT &hr )
 {
-	AddArray(param0.GetBuffer());
+	(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0.GetBuffer();
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_INT64 param0, HRESULT &hr )
 {
-	AddArray(param0.GetBuffer());
+	(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0.GetBuffer();
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_float param0, HRESULT &hr )
 {
-	AddArray(param0.GetBuffer());
+	(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0.GetBuffer();
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgument( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_double param0, HRESULT &hr )
 {
-	AddArray(param0.GetBuffer());
+	(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0.GetBuffer();
 }
 
 void RuntimeLoadableProcedures_NativeFunction::NativeAddArgumentBool( CLR_RT_HeapBlock* pMngObj, CLR_RT_TypedArray_INT8 param0, HRESULT &hr )
 {
-	AddArray(param0.GetBuffer());
+	(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0.GetBuffer();
 }

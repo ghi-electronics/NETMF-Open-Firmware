@@ -418,6 +418,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
+    Library_Lib_GHI_Processor_RuntimeLoadableProcedures__Memory::NativeGetRlpInfo___STATIC__VOID__BYREF_U4__BYREF_U4,
     NULL,
     NULL,
     NULL,
@@ -446,8 +447,15 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeDispose___VOID,
     Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeInvoke___I4,
-    Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeBeginArguments___VOID__I4,
+    Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeSetSize___VOID__I4,
     Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__U1,
     Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__I1,
     Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__U2,
@@ -490,7 +498,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Hardware =
 {
     "GHI.Hardware", 
-    0x3005069F,
+    0x59043403,
     method_lookup
 };
 
