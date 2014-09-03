@@ -400,9 +400,10 @@ struct Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction
     static const int FIELD__disposed = 1;
     static const int FIELD__address = 2;
     static const int FIELD__sizeSet = 3;
-    static const int FIELD__nativeParameterPool = 4;
-    static const int FIELD__nativeParameterList = 5;
-    static const int FIELD__nativeIndex = 6;
+    static const int FIELD__argumentCount = 4;
+    static const int FIELD__nativeParameterPool = 5;
+    static const int FIELD__nativeParameterList = 6;
+    static const int FIELD__nativeIndex = 7;
 
     TINYCLR_NATIVE_DECLARE(NativeDispose___VOID);
     TINYCLR_NATIVE_DECLARE(NativeInvoke___I4);

@@ -27,6 +27,8 @@ namespace GHI
 
             static INT8& Get_sizeSet( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT8( pMngObj, Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::FIELD__sizeSet ); }
 
+            static INT32& Get_argumentCount( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT32( pMngObj, Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::FIELD__argumentCount ); }
+
             static UINT32& Get_nativeParameterPool( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UINT32( pMngObj, Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::FIELD__nativeParameterPool ); }
 
             static UINT32& Get_nativeParameterList( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UINT32( pMngObj, Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::FIELD__nativeParameterList ); }
