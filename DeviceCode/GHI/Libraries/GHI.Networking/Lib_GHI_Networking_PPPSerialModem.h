@@ -27,7 +27,7 @@ namespace GHI
 
             // Declaration of stubs. These functions are implemented by Interop code developers
             static void NativeEnable( CLR_RT_HeapBlock* pMngObj, UINT32 param0, HRESULT &hr );
-            static INT32 NativeConnect( CLR_RT_HeapBlock* pMngObj, UINT32 param0, LPCSTR param1, LPCSTR param2, UINT32 param3, HRESULT &hr );
+            static INT32 NativeConnect( CLR_RT_HeapBlock* pMngObj, UINT32 param0, LPCSTR param1, LPCSTR param2, UINT32 param3, INT8 param4, HRESULT &hr );
             static void NativeDisconnect( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
             static INT8 NativeIsLinkConnected( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
         };

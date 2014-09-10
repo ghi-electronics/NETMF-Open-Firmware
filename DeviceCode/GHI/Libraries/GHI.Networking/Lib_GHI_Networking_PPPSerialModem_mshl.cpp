@@ -30,7 +30,7 @@ HRESULT Library_Lib_GHI_Networking_PPPSerialModem::NativeEnable___VOID__U4( CLR_
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Networking_PPPSerialModem::NativeConnect___I4__U4__STRING__STRING__U4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Networking_PPPSerialModem::NativeConnect___I4__U4__STRING__STRING__U4__BOOLEAN( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
@@ -50,7 +50,10 @@ HRESULT Library_Lib_GHI_Networking_PPPSerialModem::NativeConnect___I4__U4__STRIN
         UINT32 param3;
         TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32( stack, 4, param3 ) );
 
-        INT32 retVal = PPPSerialModem::NativeConnect( pMngObj,  param0, param1, param2, param3, hr );
+        INT8 param4;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT8( stack, 5, param4 ) );
+
+        INT32 retVal = PPPSerialModem::NativeConnect( pMngObj,  param0, param1, param2, param3, param4, hr );
         TINYCLR_CHECK_HRESULT( hr );
         SetResult_INT32( stack, retVal );
 

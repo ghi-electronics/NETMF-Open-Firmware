@@ -61,8 +61,10 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
+    NULL,
+    NULL,
     Library_Lib_GHI_Networking_PPPSerialModem::NativeEnable___VOID__U4,
-    Library_Lib_GHI_Networking_PPPSerialModem::NativeConnect___I4__U4__STRING__STRING__U4,
+    Library_Lib_GHI_Networking_PPPSerialModem::NativeConnect___I4__U4__STRING__STRING__U4__BOOLEAN,
     Library_Lib_GHI_Networking_PPPSerialModem::NativeDisconnect___VOID,
     Library_Lib_GHI_Networking_PPPSerialModem::NativeIsLinkConnected___BOOLEAN,
     NULL,
@@ -171,7 +173,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Networking =
 {
     "GHI.Networking", 
-    0x7EAD2394,
+    0x2FF0C722,
     method_lookup
 };
 
