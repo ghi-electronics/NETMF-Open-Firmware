@@ -212,7 +212,6 @@ struct Library_Lib_GHI_IO_Storage_SDCard
     TINYCLR_NATIVE_DECLARE(NativeFinalize___VOID);
     TINYCLR_NATIVE_DECLARE(NativeMount___VOID__I4);
     TINYCLR_NATIVE_DECLARE(NativeUnmount___VOID);
-    TINYCLR_NATIVE_DECLARE(NativeIsCardPresent___STATIC__BOOLEAN);
 
     //--//
 

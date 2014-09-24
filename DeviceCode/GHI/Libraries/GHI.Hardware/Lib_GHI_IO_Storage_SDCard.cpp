@@ -35,11 +35,3 @@ void SDCard::NativeUnmount( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
 {
 	GHI_OSHW_Unmount();
 }
-
-INT8 SDCard::NativeIsCardPresent( HRESULT &hr )
-{
-	hr = CLR_E_NOT_SUPPORTED;
-	
-    return 0;
-}
-

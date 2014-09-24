@@ -71,15 +71,3 @@ HRESULT Library_Lib_GHI_IO_Storage_SDCard::NativeUnmount___VOID( CLR_RT_StackFra
     }
     TINYCLR_NOCLEANUP();
 }
-
-HRESULT Library_Lib_GHI_IO_Storage_SDCard::NativeIsCardPresent___STATIC__BOOLEAN( CLR_RT_StackFrame& stack )
-{
-    TINYCLR_HEADER(); hr = S_OK;
-    {
-        INT8 retVal = SDCard::NativeIsCardPresent( hr );
-        TINYCLR_CHECK_HRESULT( hr );
-        SetResult_INT8( stack, retVal );
-
-    }
-    TINYCLR_NOCLEANUP();
-}

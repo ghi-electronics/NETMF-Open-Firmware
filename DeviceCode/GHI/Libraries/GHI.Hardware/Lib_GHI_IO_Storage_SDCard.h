@@ -34,7 +34,6 @@ namespace GHI
                 static void NativeFinalize( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
                 static void NativeMount( CLR_RT_HeapBlock* pMngObj, INT32 param0, HRESULT &hr );
                 static void NativeUnmount( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
-                static INT8 NativeIsCardPresent( HRESULT &hr );
             };
         }
     }

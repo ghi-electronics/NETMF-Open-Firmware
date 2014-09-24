@@ -21,7 +21,7 @@ void PPPSerialModem::NativeEnable( CLR_RT_HeapBlock* pMngObj, UINT32 param0, HRE
     hr = CLR_E_NOT_SUPPORTED;
 }
 
-INT32 PPPSerialModem::NativeConnect( CLR_RT_HeapBlock* pMngObj, UINT32 param0, LPCSTR param1, LPCSTR param2, UINT32 param3, INT8 param4, HRESULT &hr )
+INT8 PPPSerialModem::NativeConnect( CLR_RT_HeapBlock* pMngObj, UINT32 param0, LPCSTR param1, LPCSTR param2, UINT32 param3, INT8 param4, HRESULT &hr )
 {
     hr = CLR_E_NOT_SUPPORTED;
 	

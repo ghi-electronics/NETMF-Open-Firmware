@@ -37,7 +37,7 @@ struct Library_Lib_GHI_Networking_PPPSerialModem
     static const int FIELD__port = 6;
 
     TINYCLR_NATIVE_DECLARE(NativeEnable___VOID__U4);
-    TINYCLR_NATIVE_DECLARE(NativeConnect___I4__U4__STRING__STRING__U4__BOOLEAN);
+    TINYCLR_NATIVE_DECLARE(NativeConnect___BOOLEAN__U4__STRING__STRING__U4__BOOLEAN);
     TINYCLR_NATIVE_DECLARE(NativeDisconnect___VOID);
     TINYCLR_NATIVE_DECLARE(NativeIsLinkConnected___BOOLEAN);
 
