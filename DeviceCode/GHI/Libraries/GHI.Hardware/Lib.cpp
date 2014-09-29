@@ -233,7 +233,8 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
-    Library_Lib_GHI_IO_Storage_SDCard::NativeConstructor___VOID,
+    NULL,
+    Library_Lib_GHI_IO_Storage_SDCard::NativeConstructor___VOID__U4,
     Library_Lib_GHI_IO_Storage_SDCard::NativeFinalize___VOID,
     Library_Lib_GHI_IO_Storage_SDCard::NativeMount___VOID__I4,
     Library_Lib_GHI_IO_Storage_SDCard::NativeUnmount___VOID,
@@ -496,7 +497,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Hardware =
 {
     "GHI.Hardware", 
-    0x58C47439,
+    0x650FE414,
     method_lookup
 };
 

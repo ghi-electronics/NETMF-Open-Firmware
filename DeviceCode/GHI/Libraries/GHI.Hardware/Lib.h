@@ -208,7 +208,7 @@ struct Library_Lib_GHI_IO_Storage_SDCard
     static const int FIELD__disposed = 2;
     static const int FIELD__mounted = 3;
 
-    TINYCLR_NATIVE_DECLARE(NativeConstructor___VOID);
+    TINYCLR_NATIVE_DECLARE(NativeConstructor___VOID__U4);
     TINYCLR_NATIVE_DECLARE(NativeFinalize___VOID);
     TINYCLR_NATIVE_DECLARE(NativeMount___VOID__I4);
     TINYCLR_NATIVE_DECLARE(NativeUnmount___VOID);

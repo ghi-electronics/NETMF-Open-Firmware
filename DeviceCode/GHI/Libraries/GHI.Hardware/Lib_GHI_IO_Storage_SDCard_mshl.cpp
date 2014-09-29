@@ -13,7 +13,7 @@
 using namespace GHI::IO::Storage;
 
 
-HRESULT Library_Lib_GHI_IO_Storage_SDCard::NativeConstructor___VOID( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_IO_Storage_SDCard::NativeConstructor___VOID__U4( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
@@ -21,7 +21,10 @@ HRESULT Library_Lib_GHI_IO_Storage_SDCard::NativeConstructor___VOID( CLR_RT_Stac
 
         FAULT_ON_NULL(pMngObj);
 
-        SDCard::NativeConstructor( pMngObj,  hr );
+        UINT32 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32( stack, 1, param0 ) );
+
+        SDCard::NativeConstructor( pMngObj,  param0, hr );
         TINYCLR_CHECK_HRESULT( hr );
     }
     TINYCLR_NOCLEANUP();

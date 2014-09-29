@@ -18,7 +18,7 @@
 
 using namespace GHI::IO::Storage;
 
-void SDCard::NativeConstructor( CLR_RT_HeapBlock* pMngObj, HRESULT &hr )
+void SDCard::NativeConstructor( CLR_RT_HeapBlock* pMngObj, UINT32 param0, HRESULT &hr )
 {
 }
 
