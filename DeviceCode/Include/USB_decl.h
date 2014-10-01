@@ -511,7 +511,7 @@ struct USB_CONTROLLER_STATE
     /* Queues & MaxPacketSize must be initialized by the HAL */
     Hal_Queue_KnownSize<USB_PACKET64,USB_QUEUE_PACKET_COUNT> *Queues[USB_MAX_QUEUES];
     UINT8                                                    CurrentPacketOffset[USB_MAX_QUEUES];
-    UINT8                                                    MaxPacketSize[USB_MAX_QUEUES];
+    UINT16                                                    MaxPacketSize[USB_MAX_QUEUES];
     BOOL                                                     IsTxQueue[USB_MAX_QUEUES];
 
     /* Arbitrarily as many streams as endpoints since that is the maximum number of streams

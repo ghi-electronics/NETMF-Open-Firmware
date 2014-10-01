@@ -35,9 +35,9 @@ Hal_Queue_KnownSize<USB_PACKET64,USB_QUEUE_PACKET_COUNT> QueueBuffers[AT91_USBHS
 #define AT91C_CKGR_BIASEN_ENABLED  (0x1 << 24) // (PMC) The UTMI BIAS is enabled
 #define SHIFT_INTERUPT             8
 
-UINT32 ep_dir[6]={0,0,0,0,0,0};
-UINT32 num_ep_int1 = 0;
-UINT32 num_ep_int2 = 0;
+// UINT32 ep_dir[6]={0,0,0,0,0,0};
+// UINT32 num_ep_int1 = 0;
+// UINT32 num_ep_int2 = 0;
 
 __inline void AT91_PMC_EnableUSBClock(void)
 {
@@ -63,9 +63,9 @@ __inline void AT91_PMC_DisableUTMIBIAS(void)
 ///////////////////////////////////////////////////////////////////////////////
 AT91_USBHS_Driver::UDP_EPATTRIBUTE AT91_USBHS_Driver::s_EpAttr[] =
 {
-    {AT91C_UDPHS_EPT_TYPE_CTL_EPT|AT91C_UDPHS_EPT_DIR_OUT,         64,      FALSE,     AT91C_UDPHS_BK_NUMBER_1},
-    {AT91C_UDPHS_EPT_TYPE_BUL_EPT|AT91C_UDPHS_EPT_DIR_IN,      64,     TRUE,       AT91C_UDPHS_BK_NUMBER_2},
-    {AT91C_UDPHS_EPT_TYPE_BUL_EPT|AT91C_UDPHS_EPT_DIR_OUT, 64,     TRUE,       AT91C_UDPHS_BK_NUMBER_2},
+    {AT91C_UDPHS_EPT_TYPE_CTL_EPT|AT91C_UDPHS_EPT_DIR_OUT,         USB_CTRL_WMAXPACKETSIZE0_EP_WRITE,      FALSE,     AT91C_UDPHS_BK_NUMBER_1},
+    {AT91C_UDPHS_EPT_TYPE_BUL_EPT|AT91C_UDPHS_EPT_DIR_IN,      USB_BULK_WMAXPACKETSIZE_EP_WRITE,     TRUE,       AT91C_UDPHS_BK_NUMBER_2},
+    {AT91C_UDPHS_EPT_TYPE_BUL_EPT|AT91C_UDPHS_EPT_DIR_OUT, USB_BULK_WMAXPACKETSIZE_EP_READ,     TRUE,       AT91C_UDPHS_BK_NUMBER_2},
 };
 
 UINT32 AT91_USBHS_Driver::MAX_EP = sizeof(AT91_USBHS_Driver::s_EpAttr)  \
@@ -93,15 +93,15 @@ HRESULT AT91_USBHS_Driver::Initialize( int Controller )
 
     struct AT91_UDPHS *pUdp = (struct AT91_UDPHS *) (AT91C_BASE_UDP);
     struct AT91_UDPHS_EPT *pEp = (struct AT91_UDPHS_EPT *) (AT91C_BASE_UDP + 0x100);
-    ep_dir[0]=0;
-    ep_dir[1]=0;
-    ep_dir[2]=0;
-    ep_dir[3]=0;
-    ep_dir[4]=0;
-    ep_dir[5]=0;
+    // ep_dir[0]=0;
+    // ep_dir[1]=0;
+    // ep_dir[2]=0;
+    // ep_dir[3]=0;
+    // ep_dir[4]=0;
+    // ep_dir[5]=0;
     
-    num_ep_int1= 0;
-    num_ep_int2= 0;
+    // num_ep_int1= 0;
+    // num_ep_int2= 0;
 
     GLOBAL_LOCK(irq);
     
@@ -280,7 +280,7 @@ BOOL AT91_USBHS_Driver::StartOutput( USB_CONTROLLER_STATE* State, int endpoint )
     if(!(BOOL)((UINT8)g_AT91_USBHS_Driver.TxRunning[endpoint]))
     {
 
-        num_ep_int1++;
+        //num_ep_int1++;
         g_AT91_USBHS_Driver.TxRunning[endpoint] = TRUE;
 
         TxPacket( State, endpoint );
@@ -520,16 +520,16 @@ void AT91_USBHS_Driver::Global_ISR( void* Param )
                         
                     endpoint  = i;
                     Endpoint_ISR(endpoint);
-                    if (endpoint == 1)
-                    {
-//                        debug_printf("1\r\n");
-//                        num_ep_int1 += 1;
-                    }
-                    if (endpoint == 2)
-                    {
-//                        debug_printf("2\r\n");
-//                        num_ep_int2 += 1;
-                    }
+                    // if (endpoint == 1)
+                    // {
+                       //debug_printf("1\r\n");
+                       //num_ep_int1 += 1;
+                    // }
+                    // if (endpoint == 2)
+                    // {
+                       //debug_printf("2\r\n");
+                       //num_ep_int2 += 1;
+                    // }
                     
                 }
                 USB_INTR >>= 1;
@@ -688,39 +688,52 @@ void AT91_USBHS_Driver::Endpoint_ISR(UINT32 endpoint)
     {
 //        debug_printf("status: %x\r\n",Status);
         // IN packet sent
-        if((!(Status & AT91C_UDPHS_TX_PK_RDY)) && (pUdp->UDPHS_EPT[endpoint].UDPHS_EPTCTL & AT91C_UDPHS_TX_PK_RDY))
+        if(((!(Status & AT91C_UDPHS_TX_PK_RDY)) && (pUdp->UDPHS_EPT[endpoint].UDPHS_EPTCTL & AT91C_UDPHS_TX_PK_RDY)) && (endpoint==USB_DEBUG_EP_WRITE))
         {
             TxPacket( State, endpoint );
         }
         // OUT packet received
-        if (Status & AT91C_UDPHS_RX_BK_RDY)
+        if ((Status & AT91C_UDPHS_RX_BK_RDY )&&  (endpoint==USB_DEBUG_EP_READ))
         {
             BOOL          DisableRx;
 
-
-            USB_PACKET64* Packet64 = USB_RxEnqueue( State, endpoint, DisableRx );
-
-            /* copy packet in, making sure that Packet64->Buffer is never overflowed */
-            if(Packet64)
+            UINT32 len = (( Status & AT91C_UDPHS_BYTE_COUNT) >> 20)&0x7FF;
+            UINT8 *pDest = (UINT8 *)(pFifo->UDPHS_READEPT0 + 16384*endpoint);
+            UINT8 block = len / USB_MAX_DATA_PACKET_SIZE;
+            UINT8 rest = len % USB_MAX_DATA_PACKET_SIZE;
+            while(block>0)
             {
-                UINT32 len = (( Status & AT91C_UDPHS_BYTE_COUNT) >> 20)&0x7FF;
-                UINT8 *pDest = (UINT8 *)(pFifo->UDPHS_READEPT0 + 16384*endpoint);
-                
-                for(int i = 0; i < len; i++)
-                {
-                    Packet64->Buffer[i] = *pDest++;
-                }
-
-                Packet64->Size = len;
-
-             
-
+              USB_PACKET64* Packet64 = USB_RxEnqueue( State, endpoint, DisableRx );
+              if (!DisableRx)
+              {
+                //for(int i = 0; i < USB_MAX_DATA_PACKET_SIZE; i++)
+                 //{
+                  //   Packet64->Buffer[i] = *pDest++;
+                 //}
+                  memcpy(&(Packet64->Buffer[0]), pDest,USB_MAX_DATA_PACKET_SIZE);
+                  Packet64->Size = USB_MAX_DATA_PACKET_SIZE;
+                  pDest += USB_MAX_DATA_PACKET_SIZE;
+                  block--;                
+              }
+              else
+              {
+                 // should not be happened
+              }
             }
-            else
+            if ((rest>0) && (block == 0))
             {
-                /* flow control should absolutely protect us from ever getting here, so if we do, it is a bug */
-                
-                ASSERT(0);
+              USB_PACKET64* Packet64 = USB_RxEnqueue( State, endpoint, DisableRx );
+              if (!DisableRx)
+              {
+                  // for(int i = 0; i < USB_MAX_DATA_PACKET_SIZE; i++)
+                  // {
+                      // Packet64->Buffer[i] = *pDest++;
+                  // }
+                  memcpy(&(Packet64->Buffer[0]), pDest,rest);
+                  pDest += rest;
+                  Packet64->Size = rest;
+				  
+              }
             }
 
             pUdp->UDPHS_EPT[endpoint].UDPHS_EPTCLRSTA = AT91C_UDPHS_RX_BK_RDY;

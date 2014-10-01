@@ -35,7 +35,7 @@
 // device descriptor
 #define     PRODUCT_ID         0x0102
 #define     VENDOR_ID          0x1B9F
-#define     MAX_EP0_SIZE            64
+#define     MAX_EP0_SIZE            USB_CTRL_WMAXPACKETSIZE0_EP_WRITE
 //configuration descriptor
 //#define     USB_MAX_CURRENT     (MAX_SYSTEM_CURRENT_LOAD_MA + CHRG_CURRENT_MA)/USB_CURRENT_UNIT
 #define     USB_MAX_CURRENT     280/USB_CURRENT_UNIT
@@ -139,9 +139,9 @@ const ADS_PACKED struct GNU_PACKED USB_DYNAMIC_CONFIGURATION
     {
         sizeof(USB_ENDPOINT_DESCRIPTOR),
         USB_ENDPOINT_DESCRIPTOR_TYPE,
-        USB_ENDPOINT_DIRECTION_IN + 1,
+        USB_ENDPOINT_DIRECTION_IN + USB_DEBUG_EP_WRITE,
         USB_ENDPOINT_ATTRIBUTE_BULK,
-        64,                                         // Endpoint 1 packet size
+        USB_BULK_WMAXPACKETSIZE_EP_WRITE,                                         // Endpoint 1 packet size
         0                                           // Endpoint 1 interval		
     },
 
@@ -149,9 +149,9 @@ const ADS_PACKED struct GNU_PACKED USB_DYNAMIC_CONFIGURATION
     {
         sizeof(USB_ENDPOINT_DESCRIPTOR),
         USB_ENDPOINT_DESCRIPTOR_TYPE,
-        USB_ENDPOINT_DIRECTION_OUT + 2,
+        USB_ENDPOINT_DIRECTION_OUT + USB_DEBUG_EP_READ,
         USB_ENDPOINT_ATTRIBUTE_BULK,
-        64,                                         // Endpoint 2 packet size
+        USB_BULK_WMAXPACKETSIZE_EP_READ,                                         // Endpoint 2 packet size
         0                                           // Endpoint 2 interval
     },
 

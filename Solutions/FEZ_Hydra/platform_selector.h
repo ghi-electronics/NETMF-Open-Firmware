@@ -192,10 +192,16 @@
 
 #define USB_IRQ_INDEX               0  // TODO set right index
 
+#define USB_DEBUG_EP_WRITE      1
+#define USB_DEBUG_EP_READ       2
+#define USB_CTRL_WMAXPACKETSIZE0_EP_WRITE 64
+#define USB_BULK_WMAXPACKETSIZE_EP_WRITE 64
+#define USB_BULK_WMAXPACKETSIZE_EP_READ 512
+
 
 #define PLATFORM_DEPENDENT_TX_USART_BUFFER_SIZE    (1024 * 4)  // there is one TX for each usart port
 #define PLATFORM_DEPENDENT_RX_USART_BUFFER_SIZE    (1024 * 4) // there is one RX for each usart port
-#define PLATFORM_DEPENDENT_USB_QUEUE_PACKET_COUNT  32  // there is one queue for each pipe of each endpoint and the size of a single packet is sizeof(USB_PACKET64) == 68 bytes
+#define PLATFORM_DEPENDENT_USB_QUEUE_PACKET_COUNT  100  // there is one queue for each pipe of each endpoint and the size of a single packet is sizeof(USB_PACKET64) == 68 bytes
 //
 // communicaiton facilities
 /////////////////////////////////////////////////////////
