@@ -55,7 +55,13 @@ INT32 SOCK_connect(SOCK_SOCKET socket, const struct SOCK_sockaddr* address, INT3
 }
 INT32 SOCK_send(SOCK_SOCKET socket, const char* buf, INT32 len, INT32 flags) 
 { 
-    NATIVE_PROFILE_PAL_COM();    
+    NATIVE_PROFILE_PAL_COM(); 
+
+	//[GHI_CHANGE]
+	if (len > TCP_SND_BUF)
+		len = TCP_SND_BUF;
+	//[GHI_CHANGE]
+	
     return Sockets_LWIP_Driver::Send(socket, buf, len, flags);
 }
 INT32 SOCK_recv(SOCK_SOCKET socket, char* buf, INT32 len, INT32 flags)
