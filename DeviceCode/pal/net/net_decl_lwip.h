@@ -186,7 +186,7 @@
    IP packets across network interfaces. If you are going to run lwIP
    on a device with only one network interface, define this to 0. */
 #ifndef IP_FORWARD
-#define IP_FORWARD              1
+#define IP_FORWARD              0
 #endif
 
 /* If defined to 1, IP options are allowed (but not parsed). If
@@ -219,7 +219,7 @@
 /* 1 if you want to do an ARP check on the offered address
    (recommended). */
 #ifndef DHCP_DOES_ARP_CHECK
-#define DHCP_DOES_ARP_CHECK     0
+#define DHCP_DOES_ARP_CHECK     1
 #endif
 
 /* ---------- UDP options ---------- */
