@@ -219,7 +219,7 @@
 /* 1 if you want to do an ARP check on the offered address
    (recommended). */
 #ifndef DHCP_DOES_ARP_CHECK
-#define DHCP_DOES_ARP_CHECK     1
+#define DHCP_DOES_ARP_CHECK     0
 #endif
 
 /* ---------- UDP options ---------- */
