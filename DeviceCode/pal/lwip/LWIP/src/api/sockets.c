@@ -803,13 +803,19 @@ lwip_send(int s, const void *data, size_t size, int flags)
 
   if ((flags & MSG_DONTWAIT) || netconn_is_nonblocking(sock->conn)) {
     if ((size > TCP_SND_BUF) || ((size / TCP_MSS) > TCP_SND_QUEUELEN)) {
-      //[MS_CHANGE]
-      if(size > netconn_get_sndbufsize(sock->conn)) {
-        // too much data to ever send nonblocking!
-        sock_set_errno(sock, EMSGSIZE);
-        return -1;
+      //[MS/GHI CHANGE]
+	  size_t avail = netconn_get_sndbufsize(sock->conn);
+	  if (size > avail) {
+		if (avail != 0) {
+		  size = avail;
+		}
+		else {
+          // too much data to ever send nonblocking!
+          sock_set_errno(sock, EMSGSIZE);
+          return -1;
+		}
       }
-      //[END_MS_CHANGE]
+      //[END MS/GHI CHANGE]
     }
   }
   
