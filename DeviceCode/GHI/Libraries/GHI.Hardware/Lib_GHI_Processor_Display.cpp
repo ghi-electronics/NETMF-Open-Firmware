@@ -56,10 +56,17 @@ INT8 Display::NativeSetLcdConfiguration( INT8 bootupMessages, UINT8 rotation, UI
 		return FALSE;
 	}
 	
-	if (((Width * Height) > (800 * 600)) || (Width < 64) ||  (Height < 64))
+	if (((Width * Height) > (800 * 600)))
 	{
 		hr = CLR_E_OUT_OF_RANGE;
 		return FALSE;
+	}
+
+	if (Width < 64 || Height < 64)
+	{
+		Width = 64;
+		Height = 64;
+		PixelClockRate = 0;
 	}
 
 	Configuration_LCD_Structure config;
