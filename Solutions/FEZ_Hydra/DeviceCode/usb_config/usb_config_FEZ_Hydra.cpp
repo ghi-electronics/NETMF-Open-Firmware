@@ -21,11 +21,11 @@
 #define     MANUFACTURER_NAME_SIZE  15   /* "GHI Electronics" */
 // NOTE: Having more than (probably) 32 characters causes the MFUSB KERNEL driver
 // to *CRASH* which, of course, causes Windows to crash
-#define     PRODUCT_NAME_SIZE      25   /* "Micro Framework FEZ Hydra" */
+#define     PRODUCT_NAME_SIZE      30   /* "Micro Framework FEZ Hydra" */
 #define     SERIAL_NAME_SIZE      10   /* "Micro Framework FEZ Hydra"" */
 // NOTE: If these two strings are not present, the MFUSB KERNEL driver will *CRASH*
 // which, of course, causes Windows to crash
-#define     DISPLAY_NAME_SIZE       15   /* "FEZ Hydra"*/
+#define     DISPLAY_NAME_SIZE       30   /* "FEZ Hydra"*/
 #define     FRIENDLY_NAME_SIZE      9   /* "Gadgeteer" */
 // index for the strings
 #define     MANUFACTURER_NAME_INDEX 1
@@ -177,7 +177,7 @@ const ADS_PACKED struct GNU_PACKED USB_DYNAMIC_CONFIGURATION
         USB_STRING_DESCRIPTOR_HEADER_LENGTH + (sizeof(USB_STRING_CHAR) * PRODUCT_NAME_SIZE),
         USB_STRING_DESCRIPTOR_TYPE
     },
-    { 'F', 'E', 'Z', ' ', 'H', 'y', 'd', 'r', 'a'},
+	{ 'F', 'E', 'Z', ' ', 'H', 'y', 'd', 'r', 'a', ' ', '(', 'n', 'o', 'n', '-', 'c', 'o', 'm', 'm', 'e', 'r', 'c', 'i', 'a', 'l', ' ', 'u', 's', 'e', ')' },
 	
 	// Serial name string descriptor
     {
@@ -201,7 +201,7 @@ const ADS_PACKED struct GNU_PACKED USB_DYNAMIC_CONFIGURATION
         USB_STRING_DESCRIPTOR_HEADER_LENGTH + (sizeof(USB_STRING_CHAR) * DISPLAY_NAME_SIZE),
         USB_STRING_DESCRIPTOR_TYPE
     },
-    { 'F', 'E', 'Z', ' ', 'H', 'y', 'd', 'r', 'a'},
+	{ 'F', 'E', 'Z', ' ', 'H', 'y', 'd', 'r', 'a', ' ', '(', 'n', 'o', 'n', '-', 'c', 'o', 'm', 'm', 'e', 'r', 'c', 'i', 'a', 'l', ' ', 'u', 's', 'e', ')' },
 
     // String 5 descriptor (friendly name)
     {
