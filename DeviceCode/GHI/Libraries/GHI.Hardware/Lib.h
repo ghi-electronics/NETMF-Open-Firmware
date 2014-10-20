@@ -429,6 +429,7 @@ struct Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction
     TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__SZARRAY_R4);
     TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__SZARRAY_R8);
     TINYCLR_NATIVE_DECLARE(NativeAddArgumentBool___VOID__SZARRAY_BOOLEAN);
+    TINYCLR_NATIVE_DECLARE(NativeAddArgument___VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap);
 
     //--//
 

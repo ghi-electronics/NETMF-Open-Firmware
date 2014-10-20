@@ -171,3 +171,18 @@ void RuntimeLoadableProcedures_NativeFunction::NativeAddArgumentBool( CLR_RT_Hea
 {
 	(((void**)Get_nativeParameterList(pMngObj))[Get_nativeIndex(pMngObj)++]) = param0.GetBuffer();
 }
+
+HRESULT Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_HeapBlock* pMngObj = Interop_Marshal_RetrieveManagedObject( stack );
+
+        FAULT_ON_NULL(pMngObj);
+
+		hr = CLR_E_NOT_SUPPORTED;
+	
+        TINYCLR_CHECK_HRESULT( hr );
+    }
+    TINYCLR_NOCLEANUP();
+}

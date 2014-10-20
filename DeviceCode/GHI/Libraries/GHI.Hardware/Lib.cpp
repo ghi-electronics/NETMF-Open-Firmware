@@ -477,6 +477,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__SZARRAY_R4,
     Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__SZARRAY_R8,
     Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgumentBool___VOID__SZARRAY_BOOLEAN,
+    Library_Lib_GHI_Processor_RuntimeLoadableProcedures__NativeFunction::NativeAddArgument___VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap,
     NULL,
     NULL,
     NULL,
@@ -497,7 +498,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Hardware =
 {
     "GHI.Hardware", 
-    0x650FE414,
+    0x09ED9312,
     method_lookup
 };
 
