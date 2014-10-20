@@ -17,8 +17,16 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
     Library_Lib_GHI_Utilities_Bitmaps::NativeConvert___STATIC__VOID__SZARRAY_U1__SZARRAY_U1__GHIUtilitiesBitmapsBitsPerPixel,
     Library_Lib_GHI_Utilities_Bitmaps::NativeConvertToFile___STATIC__VOID__SZARRAY_U1__I4__I4__SZARRAY_U1,
+    Library_Lib_GHI_Utilities_Bitmaps::NativeGetBuffer___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U1,
+    Library_Lib_GHI_Utilities_Bitmaps::NativeSetBuffer___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U1,
+    Library_Lib_GHI_Utilities_Bitmaps::NativeGetBuffer___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U2,
+    Library_Lib_GHI_Utilities_Bitmaps::NativeSetBuffer___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U2,
     NULL,
     NULL,
     NULL,
@@ -498,7 +506,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Hardware =
 {
     "GHI.Hardware", 
-    0x09ED9312,
+    0xE1617737,
     method_lookup
 };
 
