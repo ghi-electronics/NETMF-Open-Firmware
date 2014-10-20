@@ -21,7 +21,7 @@
 
 using namespace GHI::Utilities;
 
-HRESULT Library_Lib_GHI_Utilities_Bitmaps::NativeConvert___STATIC__VOID__SZARRAY_U1__SZARRAY_U1__GHIUtilitiesBitmapsBitsPerPixel( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Utilities_Bitmaps::NativeConvert___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U1__GHIUtilitiesBitmapsBitsPerPixel( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
@@ -41,7 +41,7 @@ HRESULT Library_Lib_GHI_Utilities_Bitmaps::NativeConvert___STATIC__VOID__SZARRAY
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Utilities_Bitmaps::NativeConvertToFile___STATIC__VOID__SZARRAY_U1__I4__I4__SZARRAY_U1( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Utilities_Bitmaps::NativeConvertToFile___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__I4__I4__SZARRAY_U1( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
