@@ -230,6 +230,14 @@ struct Library_Lib_GHI_Processor_AddressSpace
 
 };
 
+struct Library_Lib_GHI_Processor_ManufacturerUse
+{
+    TINYCLR_NATIVE_DECLARE(NativeConfigure___STATIC__VOID__SZARRAY_U1__SZARRAY_I4);
+
+    //--//
+
+};
+
 struct Library_Lib_GHI_Processor_Power
 {
     TINYCLR_NATIVE_DECLARE(SetEthernetOscillatorState___STATIC__VOID__BOOLEAN);

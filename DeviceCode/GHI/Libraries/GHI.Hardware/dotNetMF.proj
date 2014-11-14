@@ -43,6 +43,9 @@
 <Compile Include="Lib_GHI_Processor_AddressSpace_mshl.cpp" />
 <HFile Include="Lib_GHI_Processor_AddressSpace.h" />
 <Compile Include="Lib_GHI_Processor_AddressSpace.cpp" />
+<Compile Include="Lib_GHI_Processor_ManufacturerUse_mshl.cpp" />
+<HFile Include="Lib_GHI_Processor_ManufacturerUse.h" />
+<Compile Include="Lib_GHI_Processor_ManufacturerUse.cpp" />
 <Compile Include="Lib_GHI_Processor_Power_mshl.cpp" />
 <HFile Include="Lib_GHI_Processor_Power.h" />
 <Compile Include="Lib_GHI_Processor_Power.cpp" />
