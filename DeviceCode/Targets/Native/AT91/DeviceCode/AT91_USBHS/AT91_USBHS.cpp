@@ -324,7 +324,7 @@ void AT91_USBHS_Driver::ClearTxQueue( USB_CONTROLLER_STATE* State, int endpoint 
 }
 
 //--//
-#define USBH_TRANSFER_PACKET_TIMEOUT 400000 // 
+#define USBH_TRANSFER_PACKET_TIMEOUT 4000 // 
 void AT91_USBHS_Driver::TxPacket( USB_CONTROLLER_STATE* State, int endpoint )
 {
     int timeout;
