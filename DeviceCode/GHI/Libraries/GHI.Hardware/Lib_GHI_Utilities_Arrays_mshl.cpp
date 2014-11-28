@@ -13,6 +13,63 @@
 using namespace GHI::Utilities;
 
 
+HRESULT Library_Lib_GHI_Utilities_Arrays::NativeContains___STATIC__I4__SZARRAY_U1__I4__SZARRAY_U1__I4__I4( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_TypedArray_UINT8 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 0, param0 ) );
+
+        INT32 param1;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 1, param1 ) );
+
+        CLR_RT_TypedArray_UINT8 param2;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 2, param2 ) );
+
+        INT32 param3;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 3, param3 ) );
+
+        INT32 param4;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 4, param4 ) );
+
+        INT32 retVal = Arrays::NativeContains( param0, param1, param2, param3, param4, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+        SetResult_INT32( stack, retVal );
+
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Utilities_Arrays::NativeCompare___STATIC__BOOLEAN__SZARRAY_U1__I4__I4__SZARRAY_U1__I4__I4( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        CLR_RT_TypedArray_UINT8 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 0, param0 ) );
+
+        INT32 param1;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 1, param1 ) );
+
+        INT32 param2;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 2, param2 ) );
+
+        CLR_RT_TypedArray_UINT8 param3;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 3, param3 ) );
+
+        INT32 param4;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 4, param4 ) );
+
+        INT32 param5;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 5, param5 ) );
+
+        INT8 retVal = Arrays::NativeCompare( param0, param1, param2, param3, param4, param5, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+        SetResult_INT8( stack, retVal );
+
+    }
+    TINYCLR_NOCLEANUP();
+}
+
 HRESULT Library_Lib_GHI_Utilities_Arrays::NativeInsertString___STATIC__VOID__SZARRAY_U1__I4__STRING__BOOLEAN( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
