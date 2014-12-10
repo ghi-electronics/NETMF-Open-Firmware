@@ -256,6 +256,16 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_Lib_GHI_Processor_AddressSpace::NativeWrite___STATIC__VOID__U4__SZARRAY_U1__I4__I4,
     Library_Lib_GHI_Processor_AddressSpace::NativeRead___STATIC__VOID__U4__SZARRAY_U1__I4__I4,
     NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    Library_Lib_GHI_Processor_Configuration::NativeGetParameters___STATIC__VOID__BYREF_U4__BYREF_U4,
+    Library_Lib_GHI_Processor_Configuration::NativeRead___STATIC__VOID__SZARRAY_U1__I4,
+    Library_Lib_GHI_Processor_Configuration::NativeWrite___STATIC__VOID__SZARRAY_U1__I4,
+    NULL,
     Library_Lib_GHI_Processor_ManufacturerUse::NativeConfigure___STATIC__VOID__SZARRAY_U1__SZARRAY_I4,
     Library_Lib_GHI_Processor_Power::SetEthernetOscillatorState___STATIC__VOID__BOOLEAN,
     NULL,
@@ -510,7 +520,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Hardware =
 {
     "GHI.Hardware", 
-    0x52E49394,
+    0xC185DF9C,
     method_lookup
 };
 

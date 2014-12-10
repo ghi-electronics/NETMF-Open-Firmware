@@ -231,6 +231,19 @@ struct Library_Lib_GHI_Processor_AddressSpace
 
 };
 
+struct Library_Lib_GHI_Processor_Configuration
+{
+    static const int FIELD_STATIC__size = 36;
+    static const int FIELD_STATIC__address = 37;
+
+    TINYCLR_NATIVE_DECLARE(NativeGetParameters___STATIC__VOID__BYREF_U4__BYREF_U4);
+    TINYCLR_NATIVE_DECLARE(NativeRead___STATIC__VOID__SZARRAY_U1__I4);
+    TINYCLR_NATIVE_DECLARE(NativeWrite___STATIC__VOID__SZARRAY_U1__I4);
+
+    //--//
+
+};
+
 struct Library_Lib_GHI_Processor_ManufacturerUse
 {
     TINYCLR_NATIVE_DECLARE(NativeConfigure___STATIC__VOID__SZARRAY_U1__SZARRAY_I4);
@@ -249,7 +262,7 @@ struct Library_Lib_GHI_Processor_Power
 
 struct Library_Lib_GHI_Processor_RealTimeClock
 {
-    static const int FIELD_STATIC__alarm = 36;
+    static const int FIELD_STATIC__alarm = 38;
 
     TINYCLR_NATIVE_DECLARE(NativeSetTime___STATIC__VOID__I4__I4__I4__I4__I4__I4__I4__I4);
     TINYCLR_NATIVE_DECLARE(NativeGetTime___STATIC__VOID__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4);
@@ -276,12 +289,12 @@ struct Library_Lib_GHI_Processor_Register
 
 struct Library_Lib_GHI_Processor_StartupLogo
 {
-    static const int FIELD_STATIC__width = 37;
-    static const int FIELD_STATIC__height = 38;
-    static const int FIELD_STATIC__x = 39;
-    static const int FIELD_STATIC__y = 40;
-    static const int FIELD_STATIC__enabled = 41;
-    static const int FIELD_STATIC__image = 42;
+    static const int FIELD_STATIC__width = 39;
+    static const int FIELD_STATIC__height = 40;
+    static const int FIELD_STATIC__x = 41;
+    static const int FIELD_STATIC__y = 42;
+    static const int FIELD_STATIC__enabled = 43;
+    static const int FIELD_STATIC__image = 44;
 
     TINYCLR_NATIVE_DECLARE(NativeSupportedWidth___STATIC__I4);
     TINYCLR_NATIVE_DECLARE(NativeSupportedHeight___STATIC__I4);
@@ -296,10 +309,10 @@ struct Library_Lib_GHI_Processor_StartupLogo
 
 struct Library_Lib_GHI_Processor_Watchdog
 {
-    static const int FIELD_STATIC__lastResetCause = 43;
-    static const int FIELD_STATIC__maxTimeout = 44;
-    static const int FIELD_STATIC__timeout = 45;
-    static const int FIELD_STATIC__enabled = 46;
+    static const int FIELD_STATIC__lastResetCause = 45;
+    static const int FIELD_STATIC__maxTimeout = 46;
+    static const int FIELD_STATIC__timeout = 47;
+    static const int FIELD_STATIC__enabled = 48;
 
     TINYCLR_NATIVE_DECLARE(NativeLastResetCause___STATIC__U1);
     TINYCLR_NATIVE_DECLARE(NativeGetMaxTimeout___STATIC__U4);
@@ -368,8 +381,8 @@ struct Library_Lib_GHI_Utilities_InternalEvent__InternalEventEventArgs
 
 struct Library_Lib_GHI_Processor_RuntimeLoadableProcedures__Memory
 {
-    static const int FIELD_STATIC__baseAddress = 47;
-    static const int FIELD_STATIC__size = 48;
+    static const int FIELD_STATIC__baseAddress = 49;
+    static const int FIELD_STATIC__size = 50;
 
     TINYCLR_NATIVE_DECLARE(NativeGetRlpInfo___STATIC__VOID__BYREF_U4__BYREF_U4);
 
