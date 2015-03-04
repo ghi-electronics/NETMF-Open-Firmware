@@ -4,7 +4,7 @@
 
 #include "USB.h"
 
-#define USB_FLUSH_RETRY_COUNT 256
+#define USB_FLUSH_RETRY_COUNT 1000
 
 //--//
 
@@ -798,7 +798,7 @@ BOOL USB_Driver::Flush( int UsbStream )
     {
         CPU_USB_StartOutput( State, endpoint );
 
-        HAL_Time_Sleep_MicroSeconds_InterruptEnabled(3); // don't call Events_WaitForEventsXXX because it will turn off interrupts
+        HAL_Time_Sleep_MicroSeconds_InterruptEnabled(100); // don't call Events_WaitForEventsXXX because it will turn off interrupts
 
         int cnt = State->Queues[endpoint]->NumberOfElements();
         retries  = (queueCnt == cnt) ? retries-1: USB_FLUSH_RETRY_COUNT;
