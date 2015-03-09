@@ -245,7 +245,7 @@ struct Library_Lib_GHI_Processor_Configuration
 
 struct Library_Lib_GHI_Processor_ManufacturerUse
 {
-    TINYCLR_NATIVE_DECLARE(NativeConfigure___STATIC__VOID__SZARRAY_U1__SZARRAY_I4);
+    TINYCLR_NATIVE_DECLARE(NativeConfigure___STATIC__VOID__U4__SZARRAY_U1);
 
     //--//
 

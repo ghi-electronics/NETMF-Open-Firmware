@@ -13,15 +13,15 @@
 using namespace GHI::Processor;
 
 
-HRESULT Library_Lib_GHI_Processor_ManufacturerUse::NativeConfigure___STATIC__VOID__SZARRAY_U1__SZARRAY_I4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_ManufacturerUse::NativeConfigure___STATIC__VOID__U4__SZARRAY_U1( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
-        CLR_RT_TypedArray_UINT8 param0;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 0, param0 ) );
+        UINT32 param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT32( stack, 0, param0 ) );
 
-        CLR_RT_TypedArray_INT32 param1;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32_ARRAY( stack, 1, param1 ) );
+        CLR_RT_TypedArray_UINT8 param1;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 1, param1 ) );
 
         ManufacturerUse::NativeConfigure( param0, param1, hr );
         TINYCLR_CHECK_HRESULT( hr );

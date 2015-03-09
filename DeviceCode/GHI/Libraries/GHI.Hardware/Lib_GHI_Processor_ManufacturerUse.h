@@ -22,7 +22,7 @@ namespace GHI
         {
             // Helper Functions to access fields of managed object
             // Declaration of stubs. These functions are implemented by Interop code developers
-            static void NativeConfigure( CLR_RT_TypedArray_UINT8 param0, CLR_RT_TypedArray_INT32 param1, HRESULT &hr );
+            static void NativeConfigure( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, HRESULT &hr );
         };
     }
 }

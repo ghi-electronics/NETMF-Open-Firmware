@@ -16,7 +16,7 @@
 
 using namespace GHI::Processor;
 
-void ManufacturerUse::NativeConfigure( CLR_RT_TypedArray_UINT8 param0, CLR_RT_TypedArray_INT32 param1, HRESULT &hr )
+void ManufacturerUse::NativeConfigure( UINT32 param0, CLR_RT_TypedArray_INT32 param1, HRESULT &hr )
 {
 }
 
