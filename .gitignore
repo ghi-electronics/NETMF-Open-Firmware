@@ -157,12 +157,5 @@ $RECYCLE.BIN/
 .DS_Store
 *.cache
 
-DeviceCode/GHI.Libraries/GHI.System/Stubs/GHI.System.featureproj
-DeviceCode/GHI.Libraries/GHI.Usb/Stubs/GHI.Usb.featureproj
-DeviceCode/GHI.Libraries/GHI.Hardware/Stubs/GHI.Hardware.featureproj
-DeviceCode/GHI.Libraries/GHI.SQLite/Stubs/GHI.SQLite.featureproj
-DeviceCode/GHI.Libraries/GHI.Networking/Stubs/GHI.Networking.featureproj
-DeviceCode/GHI.Libraries/GHI.GameO.LowLevel/Stubs/GHI.GameO.LowLevel.featureproj
-
 tools/make/Feedback/FEZ_Hydra_RVDS4.1.feedback
 tools/make/Feedback/FEZ_Hydra_RVDS4.1_loader.feedback
