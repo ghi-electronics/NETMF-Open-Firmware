@@ -89,15 +89,15 @@
     <DriverLibs Include="GHI_NETMF_Misc.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Libraries\GHI.Networking\dotNetMF.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\Interop\GHI_Networking\dotNetMF.proj" />
     <DriverLibs Include="GHI_Networking.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Libraries\GHI.Hardware\dotNetMF.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\Interop\GHI_Hardware\dotNetMF.proj" />
     <DriverLibs Include="GHI_Hardware.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Libraries\InternalEvent\dotNetMF.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\Interop\GHI_Utilities_InternalEvent\dotNetMF.proj" />
     <DriverLibs Include="GHI_Utilities_InternalEvent.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
