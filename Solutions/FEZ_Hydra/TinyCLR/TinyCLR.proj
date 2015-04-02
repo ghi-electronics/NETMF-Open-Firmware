@@ -112,11 +112,7 @@
     <DriverLibs Include="GHI_OSHW_StorageDev.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\StorageDev\dotNetMF.proj" />
   </ItemGroup>
-  <ItemGroup>
-    <DriverLibs Include="GHI_OSHW_BitmapConverter.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\GHI\Drivers\BitmapConverter\dotNetMF.proj" />
-  </ItemGroup>
-
+  
   <!-- Open SSL ************************** Hail Hydra!! ***************************** -->
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\COM\sockets\openssl\dotnetmf.proj" />

@@ -16,10 +16,10 @@ struct Library_Lib_GHI_Networking_BaseInterface
     static const int FIELD_STATIC__activeInterface = 0;
     static const int FIELD_STATIC__reservations = 1;
 
-    static const int FIELD__networkAvailable = 1;
-    static const int FIELD__type = 2;
-    static const int FIELD__networkInterface = 3;
-    static const int FIELD__disposed = 4;
+    static const int FIELD__disposed = 1;
+    static const int FIELD__networkAvailable = 2;
+    static const int FIELD__type = 3;
+    static const int FIELD__networkInterface = 4;
 
     TINYCLR_NATIVE_DECLARE(NativeConstructor___VOID);
     TINYCLR_NATIVE_DECLARE(NativeDispose___VOID);
