@@ -57,7 +57,7 @@ void ApplicationEntryPoint()
     {
         LCD_Clear();
         
-        hal_fprintf( STREAM_LCD, "TinyBooter v%d.%d.%d.%d\r\n", VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, VERSION_REVISION);
+        hal_fprintf( STREAM_LCD, "TinyBooter v%d.%d.%d.%d\r\n", GHI_VERSION_MAJOR, GHI_VERSION_MINOR, GHI_VERSION_BUILD, GHI_VERSION_REVISION);
         hal_fprintf( STREAM_LCD, "%s Build Date:\r\n\t%s %s\r\n", HalName, __DATE__, __TIME__ );
 
         DebuggerPort_Initialize( HalSystemConfig.DebuggerPorts[ 0 ] );
@@ -65,7 +65,7 @@ void ApplicationEntryPoint()
         TinyBooter_OnStateChange( State_EnterBooterMode, NULL );
 
         DebuggerPort_Flush( HalSystemConfig.DebugTextPort  );
-        hal_printf( "TinyBooter v%d.%d.%d.%d\r\n", VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, VERSION_REVISION);
+        hal_printf( "TinyBooter v%d.%d.%d.%d\r\n", GHI_VERSION_MAJOR, GHI_VERSION_MINOR, GHI_VERSION_BUILD, GHI_VERSION_REVISION);
         hal_printf( "%s Build Date: %s %s\r\n", HalName, __DATE__, __TIME__ );
 #if defined(__GNUC__)
         hal_printf("GNU Compiler version %d\r\n", __GNUC__);
