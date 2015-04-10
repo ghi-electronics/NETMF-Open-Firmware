@@ -6,6 +6,9 @@
 *.sln.docstates
 
 BuildOutput/
+DeviceCode/Targets/Native/Interop/*.dll
+DeviceCode/Targets/Native/Interop/*.pdb
+DeviceCode/Targets/Native/Interop/*.txt
 
 # Build results
 
