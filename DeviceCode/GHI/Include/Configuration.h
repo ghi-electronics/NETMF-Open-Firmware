@@ -8,14 +8,14 @@ struct Configuration_LCD_Structure
 	UINT32 Width;
     UINT32 Height;
 
-	BOOL PriorityEnable; // Not implemented
+	UINT32 PriorityEnable; 
 
-	BOOL OutputEnableIsFixed;
-	BOOL OutputEnablePolarity;
+	UINT32 OutputEnableIsFixed;
+	UINT32 OutputEnablePolarity;
 
-	BOOL HorizontalSyncPolarity;
-	BOOL VerticalSyncPolarity;
-	BOOL PixelPolarity;
+	UINT32 HorizontalSyncPolarity;
+	UINT32 VerticalSyncPolarity;
+	UINT32 PixelPolarity;
 
     UINT8 HorizontalSyncPulseWidth;
     UINT8 HorizontalBackPorch;
@@ -23,13 +23,15 @@ struct Configuration_LCD_Structure
     UINT8 VerticalSyncPulseWidth;
     UINT8 VerticalBackPorch;
     UINT8 VerticalFrontPorch;
-
+	UINT8 reserved;		// not currently used but keeps it aligned
+	UINT8 reserved2;		// not currently used but keeps it aligned
+	
 	UINT32 PixelClockRateKHz;
 
 	UINT32 Magic; //If not 0xdeadbeef, configuration will not load
 
-	UINT8 reserved;		// not currently used but keeps it aligned
-	UINT8 reserved2;		// not currently used but keeps it aligned
+	
+
 };
 
 #define Configurations_Structure_SIZE	128
