@@ -30,8 +30,9 @@ struct Library_Lib_GHI_IO_ControllerAreaNetwork
     static const int FIELD_STATIC__instanceListLock = 1;
     static const int FIELD_STATIC__cerbTimings = 2;
     static const int FIELD_STATIC__emxTimings = 3;
-    static const int FIELD_STATIC__g120Timings = 4;
-    static const int FIELD_STATIC__g400Timings = 5;
+    static const int FIELD_STATIC__g80Timings = 4;
+    static const int FIELD_STATIC__g120Timings = 5;
+    static const int FIELD_STATIC__g400Timings = 6;
 
     static const int FIELD__disposed = 1;
     static const int FIELD__enabled = 2;
@@ -64,30 +65,31 @@ struct Library_Lib_GHI_IO_ControllerAreaNetwork
 
 struct Library_Lib_GHI_Processor_Display
 {
-    static const int FIELD_STATIC__width = 6;
-    static const int FIELD_STATIC__height = 7;
-    static const int FIELD_STATIC__outputEnableIsFixed = 8;
-    static const int FIELD_STATIC__outputEnablePolarity = 9;
-    static const int FIELD_STATIC__pixelPolarity = 10;
-    static const int FIELD_STATIC__pixelClockRateKHz = 11;
-    static const int FIELD_STATIC__horizontalSyncPolarity = 12;
-    static const int FIELD_STATIC__horizontalSyncPulseWidth = 13;
-    static const int FIELD_STATIC__horizontalBackPorch = 14;
-    static const int FIELD_STATIC__horizontalFrontPorch = 15;
-    static const int FIELD_STATIC__verticalSyncPolarity = 16;
-    static const int FIELD_STATIC__verticalSyncPulseWidth = 17;
-    static const int FIELD_STATIC__verticalBackPorch = 18;
-    static const int FIELD_STATIC__verticalFrontPorch = 19;
-    static const int FIELD_STATIC__bootupMessages = 20;
-    static const int FIELD_STATIC__rotation = 21;
-    static const int FIELD_STATIC__spiConfiguration = 22;
-    static const int FIELD_STATIC__controlPin = 23;
-    static const int FIELD_STATIC__bpp = 24;
-    static const int FIELD_STATIC__type = 25;
+    static const int FIELD_STATIC__width = 7;
+    static const int FIELD_STATIC__height = 8;
+    static const int FIELD_STATIC__outputEnableIsFixed = 9;
+    static const int FIELD_STATIC__outputEnablePolarity = 10;
+    static const int FIELD_STATIC__pixelPolarity = 11;
+    static const int FIELD_STATIC__pixelClockRateKHz = 12;
+    static const int FIELD_STATIC__horizontalSyncPolarity = 13;
+    static const int FIELD_STATIC__horizontalSyncPulseWidth = 14;
+    static const int FIELD_STATIC__horizontalBackPorch = 15;
+    static const int FIELD_STATIC__horizontalFrontPorch = 16;
+    static const int FIELD_STATIC__verticalSyncPolarity = 17;
+    static const int FIELD_STATIC__verticalSyncPulseWidth = 18;
+    static const int FIELD_STATIC__verticalBackPorch = 19;
+    static const int FIELD_STATIC__verticalFrontPorch = 20;
+    static const int FIELD_STATIC__bootupMessages = 21;
+    static const int FIELD_STATIC__rotation = 22;
+    static const int FIELD_STATIC__spiConfiguration = 23;
+    static const int FIELD_STATIC__controlPin = 24;
+    static const int FIELD_STATIC__bpp = 25;
+    static const int FIELD_STATIC__type = 26;
 
     TINYCLR_NATIVE_DECLARE(NativeGetLcdConfiguration___STATIC__VOID__BYREF_BOOLEAN__BYREF_U1__BYREF_U4__BYREF_U4__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U4);
     TINYCLR_NATIVE_DECLARE(NativeSetLcdConfiguration___STATIC__BOOLEAN__BOOLEAN__U1__U4__U4__BOOLEAN__BOOLEAN__BOOLEAN__BOOLEAN__BOOLEAN__U1__U1__U1__U1__U1__U1__U4);
     TINYCLR_NATIVE_DECLARE(NativeSetSpiConfiguration___STATIC__BOOLEAN__I4__I4__I4__I4__BOOLEAN__BOOLEAN__BOOLEAN__I4__I4__I4__I4__I4__BOOLEAN);
+    TINYCLR_NATIVE_DECLARE(NativeSetTouchPins___STATIC__BOOLEAN__U4__U4__U4__U4__U4__U4);
 
     //--//
 
@@ -95,7 +97,7 @@ struct Library_Lib_GHI_Processor_Display
 
 struct Library_Lib_GHI_Processor_RuntimeLoadableProcedures
 {
-    static const int FIELD_STATIC__NativeEvent = 26;
+    static const int FIELD_STATIC__NativeEvent = 27;
 
 
     //--//
@@ -128,12 +130,12 @@ struct Library_Lib_GHI_IO_ControllerAreaNetwork__ErrorReceivedEventArgs
 
 struct Library_Lib_GHI_Utilities_InternalEvent
 {
-    static const int FIELD_STATIC__dispatcher = 27;
-    static const int FIELD_STATIC__ControllerAreaNetworkActivity = 28;
-    static const int FIELD_STATIC__RuntimeLoadableProceduresEvent = 29;
-    static const int FIELD_STATIC__UsbDeviceConnected = 30;
-    static const int FIELD_STATIC__UsbDeviceConnectionFailed = 31;
-    static const int FIELD_STATIC__UsbDeviceDisconnected = 32;
+    static const int FIELD_STATIC__dispatcher = 28;
+    static const int FIELD_STATIC__ControllerAreaNetworkActivity = 29;
+    static const int FIELD_STATIC__RuntimeLoadableProceduresEvent = 30;
+    static const int FIELD_STATIC__UsbDeviceConnected = 31;
+    static const int FIELD_STATIC__UsbDeviceConnectionFailed = 32;
+    static const int FIELD_STATIC__UsbDeviceDisconnected = 33;
 
 
     //--//
@@ -142,8 +144,8 @@ struct Library_Lib_GHI_Utilities_InternalEvent
 
 struct Library_Lib_GHI_Processor_InFieldUpdate
 {
-    static const int FIELD_STATIC__initialized = 33;
-    static const int FIELD_STATIC__initializedType = 34;
+    static const int FIELD_STATIC__initialized = 34;
+    static const int FIELD_STATIC__initializedType = 35;
 
     TINYCLR_NATIVE_DECLARE(NativeInitialize___STATIC__BOOLEAN__GHIProcessorInFieldUpdateTypes);
     TINYCLR_NATIVE_DECLARE(NativeLoad___STATIC__BOOLEAN__GHIProcessorInFieldUpdateTypes__SZARRAY_U1__I4);
@@ -232,8 +234,8 @@ struct Library_Lib_GHI_Processor_AddressSpace
 
 struct Library_Lib_GHI_Processor_Configuration
 {
-    static const int FIELD_STATIC__size = 35;
-    static const int FIELD_STATIC__address = 36;
+    static const int FIELD_STATIC__size = 36;
+    static const int FIELD_STATIC__address = 37;
 
     TINYCLR_NATIVE_DECLARE(NativeGetParameters___STATIC__VOID__BYREF_U4__BYREF_U4);
     TINYCLR_NATIVE_DECLARE(NativeRead___STATIC__VOID__SZARRAY_U1__I4);
@@ -261,7 +263,7 @@ struct Library_Lib_GHI_Processor_Power
 
 struct Library_Lib_GHI_Processor_RealTimeClock
 {
-    static const int FIELD_STATIC__alarm = 37;
+    static const int FIELD_STATIC__alarm = 38;
 
     TINYCLR_NATIVE_DECLARE(NativeSetTime___STATIC__VOID__I4__I4__I4__I4__I4__I4__I4__I4);
     TINYCLR_NATIVE_DECLARE(NativeGetTime___STATIC__VOID__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4);
@@ -288,12 +290,12 @@ struct Library_Lib_GHI_Processor_Register
 
 struct Library_Lib_GHI_Processor_StartupLogo
 {
-    static const int FIELD_STATIC__width = 38;
-    static const int FIELD_STATIC__height = 39;
-    static const int FIELD_STATIC__x = 40;
-    static const int FIELD_STATIC__y = 41;
-    static const int FIELD_STATIC__enabled = 42;
-    static const int FIELD_STATIC__image = 43;
+    static const int FIELD_STATIC__width = 39;
+    static const int FIELD_STATIC__height = 40;
+    static const int FIELD_STATIC__x = 41;
+    static const int FIELD_STATIC__y = 42;
+    static const int FIELD_STATIC__enabled = 43;
+    static const int FIELD_STATIC__image = 44;
 
     TINYCLR_NATIVE_DECLARE(NativeSupportedWidth___STATIC__I4);
     TINYCLR_NATIVE_DECLARE(NativeSupportedHeight___STATIC__I4);
@@ -308,10 +310,10 @@ struct Library_Lib_GHI_Processor_StartupLogo
 
 struct Library_Lib_GHI_Processor_Watchdog
 {
-    static const int FIELD_STATIC__lastResetCause = 44;
-    static const int FIELD_STATIC__maxTimeout = 45;
-    static const int FIELD_STATIC__timeout = 46;
-    static const int FIELD_STATIC__enabled = 47;
+    static const int FIELD_STATIC__lastResetCause = 45;
+    static const int FIELD_STATIC__maxTimeout = 46;
+    static const int FIELD_STATIC__timeout = 47;
+    static const int FIELD_STATIC__enabled = 48;
 
     TINYCLR_NATIVE_DECLARE(NativeLastResetCause___STATIC__U1);
     TINYCLR_NATIVE_DECLARE(NativeGetMaxTimeout___STATIC__U4);
@@ -380,8 +382,8 @@ struct Library_Lib_GHI_Utilities_InternalEvent__InternalEventEventArgs
 
 struct Library_Lib_GHI_Processor_RuntimeLoadableProcedures__Memory
 {
-    static const int FIELD_STATIC__baseAddress = 48;
-    static const int FIELD_STATIC__size = 49;
+    static const int FIELD_STATIC__baseAddress = 49;
+    static const int FIELD_STATIC__size = 50;
 
     TINYCLR_NATIVE_DECLARE(NativeGetRlpInfo___STATIC__VOID__BYREF_U4__BYREF_U4);
 

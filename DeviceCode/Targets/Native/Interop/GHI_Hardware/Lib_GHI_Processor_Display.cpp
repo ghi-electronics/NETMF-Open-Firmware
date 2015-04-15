@@ -107,3 +107,10 @@ INT8 Display::NativeSetSpiConfiguration( INT32 param0, INT32 param1, INT32 param
 	
     return 0;
 }
+
+INT8 Display::NativeSetTouchPins( UINT32 yu, UINT32 xl, UINT32 yd, UINT32 xr, UINT32 ya, UINT32 xa, HRESULT &hr )
+{
+	hr = CLR_E_NOT_SUPPORTED;
+	
+    return 0;
+}
