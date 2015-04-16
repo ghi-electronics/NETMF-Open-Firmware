@@ -52,13 +52,14 @@ HRESULT Library_Lib_GHI_Utilities_Bitmaps::NativeConvert___STATIC__VOID__Microso
 		INT32 count = outputArray.GetSize();
 		UINT8* output = outputArray.GetBuffer();
 		UINT8* input = (UINT8*)bitmap->m_palBitmap.data;
-
+		UINT16* input16 = NULL;
+		
 		UINT8 r, g, b;
 
 		switch (bpp)
 		{
 		case BPP1_x128:
-			UINT16* input16 = (UINT16*)input;
+			input16 = (UINT16*)input;
 
 			for (int i = 0; i < bitmap->m_palBitmap.width * bitmap->m_palBitmap.height / 128 / 8; i++)
 			{
