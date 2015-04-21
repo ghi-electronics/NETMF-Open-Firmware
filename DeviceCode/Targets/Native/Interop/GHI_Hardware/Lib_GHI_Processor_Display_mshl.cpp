@@ -163,7 +163,7 @@ HRESULT Library_Lib_GHI_Processor_Display::NativeSetLcdConfiguration___STATIC__B
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_Display::NativeSetSpiConfiguration___STATIC__BOOLEAN__I4__I4__I4__I4__BOOLEAN__BOOLEAN__BOOLEAN__I4__I4__I4__I4__I4__BOOLEAN( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_Display::NativeSetSpiConfiguration___STATIC__BOOLEAN__I4__I4__I4__I4__I4__I4__I4( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
@@ -179,34 +179,16 @@ HRESULT Library_Lib_GHI_Processor_Display::NativeSetSpiConfiguration___STATIC__B
         INT32 param3;
         TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 3, param3 ) );
 
-        INT8 param4;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT8( stack, 4, param4 ) );
+        INT32 param4;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 4, param4 ) );
 
-        INT8 param5;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT8( stack, 5, param5 ) );
+        INT32 param5;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 5, param5 ) );
 
-        INT8 param6;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT8( stack, 6, param6 ) );
+        INT32 param6;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 6, param6 ) );
 
-        INT32 param7;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 7, param7 ) );
-
-        INT32 param8;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 8, param8 ) );
-
-        INT32 param9;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 9, param9 ) );
-
-        INT32 param10;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 10, param10 ) );
-
-        INT32 param11;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 11, param11 ) );
-
-        INT8 param12;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT8( stack, 12, param12 ) );
-
-        INT8 retVal = Display::NativeSetSpiConfiguration( param0, param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11, param12, hr );
+        INT8 retVal = Display::NativeSetSpiConfiguration( param0, param1, param2, param3, param4, param5, param6, hr );
         TINYCLR_CHECK_HRESULT( hr );
         SetResult_INT8( stack, retVal );
 

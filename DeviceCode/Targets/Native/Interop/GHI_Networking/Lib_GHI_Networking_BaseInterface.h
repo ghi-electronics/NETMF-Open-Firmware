@@ -23,7 +23,9 @@ namespace GHI
             // Helper Functions to access fields of managed object
             static INT8& Get_disposed( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT8( pMngObj, Library_Lib_GHI_Networking_BaseInterface::FIELD__disposed ); }
 
-            static INT8& Get_networkAvailable( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT8( pMngObj, Library_Lib_GHI_Networking_BaseInterface::FIELD__networkAvailable ); }
+            static INT8& Get_isAvailable( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT8( pMngObj, Library_Lib_GHI_Networking_BaseInterface::FIELD__isAvailable ); }
+
+            static INT8& Get_hasAddress( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT8( pMngObj, Library_Lib_GHI_Networking_BaseInterface::FIELD__hasAddress ); }
 
             static INT32& Get_type( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT32( pMngObj, Library_Lib_GHI_Networking_BaseInterface::FIELD__type ); }
 
