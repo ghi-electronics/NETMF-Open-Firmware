@@ -50,7 +50,7 @@ INT32 Arrays::NativeContains( CLR_RT_TypedArray_UINT8 searchArrayPara, INT32 sea
 	return -1;
 }
 
-INT8 Arrays::NativeCompare( CLR_RT_TypedArray_UINT8 array1Para, INT32 array1Offset, INT32 array1Count, CLR_RT_TypedArray_UINT8 array2Para, INT32 array2Offset, INT32 array2Count, HRESULT &hr )
+INT32 Arrays::NativeCompare( CLR_RT_TypedArray_UINT8 array1Para, INT32 array1Offset, INT32 array1Count, CLR_RT_TypedArray_UINT8 array2Para, INT32 array2Offset, INT32 array2Count, HRESULT &hr )
 {
 	INT32 count = array1Count < array2Count ? array1Count : array2Count;
     UINT8* array1 = array1Para.GetBuffer();
@@ -58,9 +58,9 @@ INT8 Arrays::NativeCompare( CLR_RT_TypedArray_UINT8 array1Para, INT32 array1Offs
    
 	for (INT32 i = 0; i < count; i++)
 		if (array1[array1Offset + i] != array2[array2Offset + i])
-			return 0;
+			return i;
 
-	return 1;
+	return -1;
 }
 
 void Arrays::NativeInsertString( CLR_RT_TypedArray_UINT8 bytes, INT32 offset, LPCSTR str, INT8 nullTerminate, HRESULT &hr )

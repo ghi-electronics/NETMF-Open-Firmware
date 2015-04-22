@@ -23,7 +23,7 @@ namespace GHI
             // Helper Functions to access fields of managed object
             // Declaration of stubs. These functions are implemented by Interop code developers
             static INT32 NativeContains( CLR_RT_TypedArray_UINT8 param0, INT32 param1, CLR_RT_TypedArray_UINT8 param2, INT32 param3, INT32 param4, HRESULT &hr );
-            static INT8 NativeCompare( CLR_RT_TypedArray_UINT8 param0, INT32 param1, INT32 param2, CLR_RT_TypedArray_UINT8 param3, INT32 param4, INT32 param5, HRESULT &hr );
+            static INT32 NativeCompare( CLR_RT_TypedArray_UINT8 param0, INT32 param1, INT32 param2, CLR_RT_TypedArray_UINT8 param3, INT32 param4, INT32 param5, HRESULT &hr );
             static void NativeInsertString( CLR_RT_TypedArray_UINT8 param0, INT32 param1, LPCSTR param2, INT8 param3, HRESULT &hr );
             static void NativeInsertFloat( CLR_RT_TypedArray_UINT8 param0, INT32 param1, float param2, HRESULT &hr );
             static void NativeInsertInt32( CLR_RT_TypedArray_UINT8 param0, INT32 param1, INT32 param2, HRESULT &hr );

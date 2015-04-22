@@ -40,7 +40,7 @@ HRESULT Library_Lib_GHI_Utilities_Arrays::NativeContains___STATIC__I4__SZARRAY_U
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Utilities_Arrays::NativeCompare___STATIC__BOOLEAN__SZARRAY_U1__I4__I4__SZARRAY_U1__I4__I4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Utilities_Arrays::NativeCompare___STATIC__I4__SZARRAY_U1__I4__I4__SZARRAY_U1__I4__I4( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
@@ -62,9 +62,9 @@ HRESULT Library_Lib_GHI_Utilities_Arrays::NativeCompare___STATIC__BOOLEAN__SZARR
         INT32 param5;
         TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 5, param5 ) );
 
-        INT8 retVal = Arrays::NativeCompare( param0, param1, param2, param3, param4, param5, hr );
+        INT32 retVal = Arrays::NativeCompare( param0, param1, param2, param3, param4, param5, hr );
         TINYCLR_CHECK_HRESULT( hr );
-        SetResult_INT8( stack, retVal );
+        SetResult_INT32( stack, retVal );
 
     }
     TINYCLR_NOCLEANUP();
