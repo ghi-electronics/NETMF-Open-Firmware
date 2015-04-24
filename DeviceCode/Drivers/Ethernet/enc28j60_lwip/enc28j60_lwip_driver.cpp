@@ -71,7 +71,7 @@ void enc28j60_status_callback(struct netif *netif)
     }
 	if (enc28j60_WasRaisedCableConnectionEvent == false && raiseEvent)  // Incase event is raised internally, not from completion, we want the cable connection is raised 
     {
-      if (EMAC_LwipNetworkStatus == 0 && connectionStatus == 1)
+      if (enc28j60_LwipNetworkStatus == 0 && connectionStatus == 1)
       {
           Network_PostEvent( NETWORK_EVENT_TYPE__AVAILABILITY_CHANGED, NETWORK_EVENT_FLAGS_IS_AVAILABLE  | ((1<< g_enc28j60_index)<<1));          
       }
