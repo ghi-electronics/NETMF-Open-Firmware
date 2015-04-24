@@ -33,7 +33,7 @@ static int g_enc28j60_index = -1;
 
 extern unsigned short enc28j60_lwip_read_phy_register(SPI_CONFIGURATION *spiConf, UINT8 registerAddress);
 extern BOOL enc28j60_get_link_status(SPI_CONFIGURATION* spiConf);
-
+bool enc28j60_WasRaisedCableConnectionEvent = false;
 
 void enc28j60_status_callback(struct netif *netif)
 {
@@ -69,6 +69,13 @@ void enc28j60_status_callback(struct netif *netif)
             raiseEvent = TRUE;
         }
     }
+	if (enc28j60_WasRaisedCableConnectionEvent == false && raiseEvent)  // Incase event is raised internally, not from completion, we want the cable connection is raised 
+    {
+      if (EMAC_LwipNetworkStatus == 0 && connectionStatus == 1)
+      {
+          Network_PostEvent( NETWORK_EVENT_TYPE__AVAILABILITY_CHANGED, NETWORK_EVENT_FLAGS_IS_AVAILABLE  | ((1<< g_LPC24XX_EMAC_iface_index)<<1));          
+      }
+    } 
     if (raiseEvent)
     {
         Network_PostEvent( NETWORK_EVENT_TYPE_ADDRESS_CHANGED, 0 | ((1<< g_enc28j60_index)<<1));
@@ -170,7 +177,7 @@ void lwip_network_uptime_completion(void *arg)
 					tcpip_timeout(100, (sys_timeout_handler)netif_set_link_up, (void*)pNetIf);
 					tcpip_timeout(100, (sys_timeout_handler)netif_set_up, (void*)pNetIf);
 				}
-
+				enc28j60_WasRaisedCableConnectionEvent = true;
 				Network_PostEvent( NETWORK_EVENT_TYPE__AVAILABILITY_CHANGED, NETWORK_EVENT_FLAGS_IS_AVAILABLE| ((1<< g_enc28j60_index)<<1) );
 			}
 			else
@@ -299,7 +306,7 @@ int ENC28J60_LWIP_Driver::Open(ENC28J60_LWIP_DRIVER_CONFIG* config, int index )
 
     enc28j60_LwipLastIpAddress = 0; // Reset IP
     enc28j60_LwipNetworkStatus = 0; // Reset connection   
-
+	enc28j60_WasRaisedCableConnectionEvent = false;
     /* Apply network configuration */
     g_enc28j60_index = index;
     g_enc28j60_iface = &g_NetworkConfig.NetworkInterfaces[index];
