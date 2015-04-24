@@ -263,7 +263,7 @@ void  ENC28J60_Network_Interface_ForceUpdateActivationStatus(bool activate)
 
 void InitContinuations( struct netif* pNetIf )
 {
-    enc28j60_InterruptTaskContinuation.InitializeCallback( (HAL_CALLBACK_FPN)enc28j60_lwip_interrupt, &g_ENC28J60_NetIF );
+    enc28j60_InterruptTaskContinuation.InitializeCallback( (HAL_CALLBACK_FPN)enc28j60_lwip_interrupt, pNetIf );
 
     enc28j60_LwipUpTimeCompletion.InitializeForUserMode( (HAL_CALLBACK_FPN)lwip_network_uptime_completion, pNetIf );
     

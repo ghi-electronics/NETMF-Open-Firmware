@@ -72,7 +72,7 @@ short   enc28j60_lwip_read_phy_register(SPI_CONFIGURATION *spiConf,
 static unsigned short s_ENC28J60_TRANSMIT_BUFFER_START = ENC28J60_TRANSMIT_BUFFER_START;
 static unsigned short s_ENC28J60_RECEIVE_BUFFER_START  = ENC28J60_RECEIVE_BUFFER_START;
 
-HAL_COMPLETION      enc28j60_Lwip_pre_interrupt_completion;
+HAL_CONTINUATION      enc28j60_Lwip_pre_interrupt_completion;
 void  enc28j60_lwip_pre_interrupt_completion  (void* pArg );
 
 
@@ -89,7 +89,7 @@ bool enc28j60_lwip_open( struct netif *pNetIF )
     
 {
     NATIVE_PROFILE_HAL_DRIVERS_ETHERNET();
-	enc28j60_Lwip_pre_interrupt_completion.InitializeForUserMode( (HAL_CALLBACK_FPN)enc28j60_lwip_pre_interrupt_completion, pNetIF );
+	enc28j60_Lwip_pre_interrupt_completion.InitializeCallback( (HAL_CALLBACK_FPN)enc28j60_lwip_pre_interrupt_completion, pNetIF );
     return enc28j60_lwip_setup_device( pNetIF );
 }
 
@@ -235,7 +235,7 @@ void  enc28j60_lwip_pre_interrupt  (GPIO_PIN Pin, BOOL PinState, void* pArg )
 {
 	 NATIVE_PROFILE_HAL_DRIVERS_ETHERNET();
 	 if (!enc28j60_Lwip_pre_interrupt_completion.IsLinked())
-		enc28j60_Lwip_pre_interrupt_completion.EnqueueDelta64(1); //1
+		enc28j60_Lwip_pre_interrupt_completion.Enqueue();//1
 #if 0
     NATIVE_PROFILE_HAL_DRIVERS_ETHERNET();
 
