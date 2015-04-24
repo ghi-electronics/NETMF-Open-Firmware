@@ -73,7 +73,7 @@ void enc28j60_status_callback(struct netif *netif)
     {
       if (EMAC_LwipNetworkStatus == 0 && connectionStatus == 1)
       {
-          Network_PostEvent( NETWORK_EVENT_TYPE__AVAILABILITY_CHANGED, NETWORK_EVENT_FLAGS_IS_AVAILABLE  | ((1<< g_LPC24XX_EMAC_iface_index)<<1));          
+          Network_PostEvent( NETWORK_EVENT_TYPE__AVAILABILITY_CHANGED, NETWORK_EVENT_FLAGS_IS_AVAILABLE  | ((1<< g_enc28j60_index)<<1));          
       }
     } 
     if (raiseEvent)
