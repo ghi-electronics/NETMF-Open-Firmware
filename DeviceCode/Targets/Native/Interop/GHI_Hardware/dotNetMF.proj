@@ -28,6 +28,9 @@
 <Compile Include="Lib_GHI_IO_Audio_mshl.cpp" />
 <HFile Include="Lib_GHI_IO_Audio.h" />
 <Compile Include="Lib_GHI_IO_Audio.cpp" />
+<Compile Include="Lib_GHI_IO_PulseCapture_mshl.cpp" />
+<HFile Include="Lib_GHI_IO_PulseCapture.h" />
+<Compile Include="Lib_GHI_IO_PulseCapture.cpp" />
 <Compile Include="Lib_GHI_IO_SignalCapture_mshl.cpp" />
 <HFile Include="Lib_GHI_IO_SignalCapture.h" />
 <Compile Include="Lib_GHI_IO_SignalCapture.cpp" />
@@ -49,9 +52,6 @@
 <Compile Include="Lib_GHI_Processor_ManufacturerUse_mshl.cpp" />
 <HFile Include="Lib_GHI_Processor_ManufacturerUse.h" />
 <Compile Include="Lib_GHI_Processor_ManufacturerUse.cpp" />
-<Compile Include="Lib_GHI_Processor_Power_mshl.cpp" />
-<HFile Include="Lib_GHI_Processor_Power.h" />
-<Compile Include="Lib_GHI_Processor_Power.cpp" />
 <Compile Include="Lib_GHI_Processor_RealTimeClock_mshl.cpp" />
 <HFile Include="Lib_GHI_Processor_RealTimeClock.h" />
 <Compile Include="Lib_GHI_Processor_RealTimeClock.cpp" />

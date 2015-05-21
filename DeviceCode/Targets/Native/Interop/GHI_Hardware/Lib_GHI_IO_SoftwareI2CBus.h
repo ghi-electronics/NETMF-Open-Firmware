@@ -25,9 +25,9 @@ namespace GHI
 
             static INT8& Get_disposed( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT8( pMngObj, Library_Lib_GHI_IO_SoftwareI2CBus::FIELD__disposed ); }
 
-            static UNSUPPORTED_TYPE& Get_clockPin( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UNSUPPORTED_TYPE( pMngObj, Library_Lib_GHI_IO_SoftwareI2CBus::FIELD__clockPin ); }
+            static UINT8& Get_clockPin( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UINT8( pMngObj, Library_Lib_GHI_IO_SoftwareI2CBus::FIELD__clockPin ); }
 
-            static UNSUPPORTED_TYPE& Get_dataPin( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UNSUPPORTED_TYPE( pMngObj, Library_Lib_GHI_IO_SoftwareI2CBus::FIELD__dataPin ); }
+            static UINT8& Get_dataPin( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_UINT8( pMngObj, Library_Lib_GHI_IO_SoftwareI2CBus::FIELD__dataPin ); }
 
             // Declaration of stubs. These functions are implemented by Interop code developers
             static INT8 NativeWriteRead( INT32 param0, INT32 param1, UINT8 param2, CLR_RT_TypedArray_UINT8 param3, INT32 param4, INT32 param5, CLR_RT_TypedArray_UINT8 param6, INT32 param7, INT32 param8, INT32 * param9, INT32 * param10, HRESULT &hr );

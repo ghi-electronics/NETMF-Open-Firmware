@@ -168,6 +168,19 @@ struct Library_Lib_GHI_IO_Audio
 
 };
 
+struct Library_Lib_GHI_IO_PulseCapture
+{
+    static const int FIELD__timeout = 1;
+    static const int FIELD__pulse = 2;
+    static const int FIELD__echo = 3;
+
+    TINYCLR_NATIVE_DECLARE(NativeMeasureDrain___I8__BOOLEAN__I4);
+    TINYCLR_NATIVE_DECLARE(NativeMeasureEcho___I8__BOOLEAN__I4__BOOLEAN);
+
+    //--//
+
+};
+
 struct Library_Lib_GHI_IO_SignalCapture
 {
     static const int FIELD__timeout = 1;
@@ -251,14 +264,6 @@ struct Library_Lib_GHI_Processor_Configuration
 struct Library_Lib_GHI_Processor_ManufacturerUse
 {
     TINYCLR_NATIVE_DECLARE(NativeConfigure___STATIC__VOID__U4__SZARRAY_U1);
-
-    //--//
-
-};
-
-struct Library_Lib_GHI_Processor_Power
-{
-    TINYCLR_NATIVE_DECLARE(SetEthernetOscillatorState___STATIC__VOID__BOOLEAN);
 
     //--//
 
