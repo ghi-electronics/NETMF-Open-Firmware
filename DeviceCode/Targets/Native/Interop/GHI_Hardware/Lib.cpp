@@ -200,8 +200,6 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
-    NULL,
-    NULL,
     Library_Lib_GHI_IO_PulseFeedback::NativeReadDrainTime___I8,
     Library_Lib_GHI_IO_PulseFeedback::NativeReadEcho___I8__BOOLEAN,
     Library_Lib_GHI_IO_PulseFeedback::NativeFinalize___VOID,
@@ -546,7 +544,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Hardware =
 {
     "GHI.Hardware", 
-    0x1F56B57B,
+    0x4A90D463,
     method_lookup
 };
 
