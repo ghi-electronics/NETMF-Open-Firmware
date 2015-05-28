@@ -12,18 +12,22 @@
 
 
 #include "Lib.h"
-#include "Lib_GHI_IO_PulseCapture.h"
+#include "Lib_GHI_IO_PulseFeedback.h"
 
 using namespace GHI::IO;
 
-INT64 PulseCapture::NativeMeasureDrain(CLR_RT_HeapBlock* pMngObj, INT8 initialValue, INT32 chargeTime, HRESULT &hr) {
+INT64 PulseFeedback::NativeReadDrainTime(CLR_RT_HeapBlock* pMngObj, HRESULT &hr) {
     hr = CLR_E_NOT_SUPPORTED;
 	
     return 0;
 }
 
-INT64 PulseCapture::NativeMeasureEcho(CLR_RT_HeapBlock* pMngObj, INT8 pulseState, INT32 pulseTime, INT8 expectedEchoState, HRESULT &hr) {
+INT64 PulseFeedback::NativeReadEchoDuration(CLR_RT_HeapBlock* pMngObj, INT8 readUntil, HRESULT &hr) {
     hr = CLR_E_NOT_SUPPORTED;
 	
     return 0;
+}
+
+void PulseFeedback::NativeFinalize(CLR_RT_HeapBlock* pMngObj, HRESULT &hr) {
+
 }

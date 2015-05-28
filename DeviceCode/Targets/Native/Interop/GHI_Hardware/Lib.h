@@ -168,14 +168,19 @@ struct Library_Lib_GHI_IO_Audio
 
 };
 
-struct Library_Lib_GHI_IO_PulseCapture
+struct Library_Lib_GHI_IO_PulseFeedback
 {
-    static const int FIELD__timeout = 1;
-    static const int FIELD__pulse = 2;
-    static const int FIELD__echo = 3;
+    static const int FIELD__disposed = 1;
+    static const int FIELD__timeout = 2;
+    static const int FIELD__pulseLength = 3;
+    static const int FIELD__pulseState = 4;
+    static const int FIELD__echoState = 5;
+    static const int FIELD__pulsePin = 6;
+    static const int FIELD__echoPin = 7;
 
-    TINYCLR_NATIVE_DECLARE(NativeMeasureDrain___I8__BOOLEAN__I4);
-    TINYCLR_NATIVE_DECLARE(NativeMeasureEcho___I8__BOOLEAN__I4__BOOLEAN);
+    TINYCLR_NATIVE_DECLARE(NativeReadDrainTime___I8);
+    TINYCLR_NATIVE_DECLARE(NativeReadEcho___I8__BOOLEAN);
+    TINYCLR_NATIVE_DECLARE(NativeFinalize___VOID);
 
     //--//
 
