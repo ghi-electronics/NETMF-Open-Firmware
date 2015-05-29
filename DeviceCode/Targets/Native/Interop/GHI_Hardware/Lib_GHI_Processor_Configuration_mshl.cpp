@@ -33,34 +33,83 @@ HRESULT Library_Lib_GHI_Processor_Configuration::NativeGetParameters___STATIC__V
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_Configuration::NativeRead___STATIC__VOID__SZARRAY_U1__I4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_Configuration::NativeRead___STATIC__BOOLEAN__SZARRAY_U1( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
         CLR_RT_TypedArray_UINT8 param0;
         TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 0, param0 ) );
 
-        INT32 param1;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 1, param1 ) );
-
-        Configuration::NativeRead( param0, param1, hr );
+        INT8 retVal = Configuration::NativeRead( param0, hr );
         TINYCLR_CHECK_HRESULT( hr );
+        SetResult_INT8( stack, retVal );
+
     }
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_Lib_GHI_Processor_Configuration::NativeWrite___STATIC__VOID__SZARRAY_U1__I4( CLR_RT_StackFrame& stack )
+HRESULT Library_Lib_GHI_Processor_Configuration::NativeWrite___STATIC__BOOLEAN__SZARRAY_U1( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER(); hr = S_OK;
     {
         CLR_RT_TypedArray_UINT8 param0;
         TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 0, param0 ) );
 
-        INT32 param1;
-        TINYCLR_CHECK_HRESULT( Interop_Marshal_INT32( stack, 1, param1 ) );
-
-        Configuration::NativeWrite( param0, param1, hr );
+        INT8 retVal = Configuration::NativeWrite( param0, hr );
         TINYCLR_CHECK_HRESULT( hr );
+        SetResult_INT8( stack, retVal );
+
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Processor_Configuration::NativeGetEntrySize___STATIC__I4__STRING( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        LPCSTR param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_LPCSTR( stack, 0, param0 ) );
+
+        INT32 retVal = Configuration::NativeGetEntrySize( param0, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+        SetResult_INT32( stack, retVal );
+
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Processor_Configuration::NativeReadEntry___STATIC__BOOLEAN__STRING__SZARRAY_U1( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        LPCSTR param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_LPCSTR( stack, 0, param0 ) );
+
+        CLR_RT_TypedArray_UINT8 param1;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 1, param1 ) );
+
+        INT8 retVal = Configuration::NativeReadEntry( param0, param1, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+        SetResult_INT8( stack, retVal );
+
+    }
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_Lib_GHI_Processor_Configuration::NativeWriteEntry___STATIC__BOOLEAN__STRING__SZARRAY_U1( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER(); hr = S_OK;
+    {
+        LPCSTR param0;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_LPCSTR( stack, 0, param0 ) );
+
+        CLR_RT_TypedArray_UINT8 param1;
+        TINYCLR_CHECK_HRESULT( Interop_Marshal_UINT8_ARRAY( stack, 1, param1 ) );
+
+        INT8 retVal = Configuration::NativeWriteEntry( param0, param1, hr );
+        TINYCLR_CHECK_HRESULT( hr );
+        SetResult_INT8( stack, retVal );
+
     }
     TINYCLR_NOCLEANUP();
 }

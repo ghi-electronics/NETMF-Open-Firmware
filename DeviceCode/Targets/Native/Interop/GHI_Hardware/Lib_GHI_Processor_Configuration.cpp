@@ -22,13 +22,35 @@ void Configuration::NativeGetParameters( UINT32 * param0, UINT32 * param1, HRESU
 	*param1 = 0;
 }
 
-void Configuration::NativeRead( CLR_RT_TypedArray_UINT8 param0, INT32 param1, HRESULT &hr )
+INT8 Configuration::NativeRead( CLR_RT_TypedArray_UINT8 param0, HRESULT &hr )
 {
 	hr = CLR_E_NOT_SUPPORTED;
+	
+    return 0;
 }
 
-void Configuration::NativeWrite( CLR_RT_TypedArray_UINT8 param0, INT32 param1, HRESULT &hr )
+INT8 Configuration::NativeWrite( CLR_RT_TypedArray_UINT8 param0, HRESULT &hr )
 {
 	hr = CLR_E_NOT_SUPPORTED;
+	
+    return 0;
 }
 
+INT32 Configuration::NativeGetEntrySize( LPCSTR param0, HRESULT &hr )
+{
+    return 0;
+}
+
+INT8 Configuration::NativeReadEntry( LPCSTR param0, CLR_RT_TypedArray_UINT8 param1, HRESULT &hr )
+{
+	hr = CLR_E_NOT_SUPPORTED;
+	
+    return 0;
+}
+
+INT8 Configuration::NativeWriteEntry( LPCSTR param0, CLR_RT_TypedArray_UINT8 param1, HRESULT &hr )
+{
+	hr = CLR_E_NOT_SUPPORTED;
+	
+    return 0;
+}

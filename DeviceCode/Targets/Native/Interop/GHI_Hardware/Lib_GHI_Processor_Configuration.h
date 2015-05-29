@@ -23,8 +23,11 @@ namespace GHI
             // Helper Functions to access fields of managed object
             // Declaration of stubs. These functions are implemented by Interop code developers
             static void NativeGetParameters( UINT32 * param0, UINT32 * param1, HRESULT &hr );
-            static void NativeRead( CLR_RT_TypedArray_UINT8 param0, INT32 param1, HRESULT &hr );
-            static void NativeWrite( CLR_RT_TypedArray_UINT8 param0, INT32 param1, HRESULT &hr );
+            static INT8 NativeRead( CLR_RT_TypedArray_UINT8 param0, HRESULT &hr );
+            static INT8 NativeWrite( CLR_RT_TypedArray_UINT8 param0, HRESULT &hr );
+            static INT32 NativeGetEntrySize( LPCSTR param0, HRESULT &hr );
+            static INT8 NativeReadEntry( LPCSTR param0, CLR_RT_TypedArray_UINT8 param1, HRESULT &hr );
+            static INT8 NativeWriteEntry( LPCSTR param0, CLR_RT_TypedArray_UINT8 param1, HRESULT &hr );
         };
     }
 }

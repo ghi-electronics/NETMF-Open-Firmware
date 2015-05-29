@@ -22,7 +22,7 @@ INT64 PulseFeedback::NativeReadDrainTime(CLR_RT_HeapBlock* pMngObj, HRESULT &hr)
     return 0;
 }
 
-INT64 PulseFeedback::NativeReadEchoDuration(CLR_RT_HeapBlock* pMngObj, INT8 readUntil, HRESULT &hr) {
+INT64 PulseFeedback::NativeReadEcho(CLR_RT_HeapBlock* pMngObj, INT8 param0, HRESULT &hr) {
     hr = CLR_E_NOT_SUPPORTED;
 	
     return 0;
