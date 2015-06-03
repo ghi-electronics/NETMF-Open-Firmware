@@ -37,6 +37,8 @@ namespace GHI
 
             static INT32& Get_mode( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT32( pMngObj, Library_Lib_GHI_IO_PulseFeedback::FIELD__mode ); }
 
+            static INT32& Get_resistorMode( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT32( pMngObj, Library_Lib_GHI_IO_PulseFeedback::FIELD__resistorMode ); }
+
             // Declaration of stubs. These functions are implemented by Interop code developers
             static INT64 NativeReadDrainTime( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
             static INT64 NativeReadEcho( CLR_RT_HeapBlock* pMngObj, INT8 param0, HRESULT &hr );

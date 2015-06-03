@@ -178,6 +178,7 @@ struct Library_Lib_GHI_IO_PulseFeedback
     static const int FIELD__pulsePin = 6;
     static const int FIELD__echoPin = 7;
     static const int FIELD__mode = 8;
+    static const int FIELD__resistorMode = 9;
 
     TINYCLR_NATIVE_DECLARE(NativeReadDrainTime___I8);
     TINYCLR_NATIVE_DECLARE(NativeReadEcho___I8__BOOLEAN);
