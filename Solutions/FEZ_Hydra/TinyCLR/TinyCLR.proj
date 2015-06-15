@@ -29,8 +29,8 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
-    <IncludePaths Include="DeviceCode\pal\OpenSSL" />
-    <IncludePaths Include="DeviceCode\pal\OpenSSL\OpenSSL_1_0" />
+    <!--<IncludePaths Include="DeviceCode\pal\OpenSSL" />
+    <IncludePaths Include="DeviceCode\pal\OpenSSL\OpenSSL_1_0" />-->
     <Compile Include="allocator.cpp" />
     <Compile Include="tinyclr.cpp" />
     <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_application.h" />
@@ -40,7 +40,7 @@
     <ScatterFileReferences Include="$(SRC_DIR)\scatterfile_tinyclr_ram_functions.$(SCATTER_EXT)" />
   </ItemGroup>
   <Import Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Crypto.featureproj" />
+  <!--<Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Crypto.featureproj" />-->
   <Import Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\NativeEventDispatcher.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\Graphics.featureproj" />
@@ -70,11 +70,11 @@
   <Import Project="$(SPOCLIENT)\Framework\Features\TimeService.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\SOCKETS_Port.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\Network_LWIP.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\SSL_Open.featureproj" />
+  <!--<Import Project="$(SPOCLIENT)\Framework\Features\SSL_Open.featureproj" />-->
 
   <ItemGroup>
-    <InteropFeature Include="GHI_Hardware" />
-    <InteropFeature Include="GHI_Networking" />
+	<InteropFeature Include="GHI_Networking" />
+    <InteropFeature Include="GHI_Hardware" />    
     <InteropFeature Include="GHI_Utilities_InternalEvent" />
   </ItemGroup>
 
@@ -114,14 +114,15 @@
   </ItemGroup>
   
   <!-- Open SSL ************************** Hail Hydra!! ***************************** -->
-  <ItemGroup>
+  <!--<ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\COM\sockets\openssl\dotnetmf.proj" />
     <DriverLibs Include="openssl_pal.$(LIB_EXT)" />
-  </ItemGroup>
-  <!--<ItemGroup>
+  </ItemGroup>-->
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\COM\sockets\openssl\stubs\dotnetmf.proj" />
     <DriverLibs Include="openssl_pal_stubs.$(LIB_EXT)" />
-  </ItemGroup>-->
+  </ItemGroup>
+  <!--
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\ssl\dotnetmf.proj" />
     <DriverLibs Include="libssl_openssl.$(LIB_EXT)" />
@@ -130,11 +131,12 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\tinyclr\dotnetmf.proj" />
     <DriverLibs Include="ssl_types.$(LIB_EXT)" />
   </ItemGroup>
-
+-->
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\SimpleStorage\dotNetMF.proj" />
     <DriverLibs Include="SimpleStorage_PAL.$(LIB_EXT)" />
   </ItemGroup>
+  <!--
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\PKCS11\dotNetMF.proj" />
     <DriverLibs Include="PKCS11_Engine.$(LIB_EXT)" />
@@ -151,16 +153,17 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\dotnetmf.proj" />
     <DriverLibs Include="crypto_openssl.$(LIB_EXT)" />
   </ItemGroup>
+  -->
   <!-- ****************************************************************************** -->
 
   <ItemGroup>
     <DriverLibs Include="MFUpdate_PAL_stub.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\MFUpdate\stubs\dotnetmf.proj" />
   </ItemGroup>
-  <!--<ItemGroup>
+  <ItemGroup>
     <DriverLibs Include="ssl_pal_stubs.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\ssl\stubs\dotNetMF.proj" />
-  </ItemGroup>-->
+  </ItemGroup>
   <ItemGroup>
     <PlatformIndependentLibs Include="Core.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Core\dotNetMF.proj" />
@@ -556,10 +559,12 @@
     <PlatformIndependentLibs Include="SPOT_Hardware_OneWire.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT_Hardware\SPOT_OneWire\dotNetMF.proj" />
   </ItemGroup>
+  <!--
   <ItemGroup>
     <PlatformIndependentLibs Include="SecurityPkcs11.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SecurityPkcs11\dotNetMF.proj" />
   </ItemGroup>
+  -->
   <ItemGroup>
     <PlatformIndependentLibs Include="SPOT_Update.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT_Update\dotNetMF.proj" />
@@ -619,11 +624,12 @@
     <DriverLibs Include="sockets_pal_lwip.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets_lwip\dotNetMF.proj" />
   </ItemGroup>
-
+<!--
   <ItemGroup>
     <PlatformIndependentLibs Include="SPOT_Net_Security.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\CLR\libraries\spot_net_security\dotNetMF.proj" />
   </ItemGroup>
+  -->
   <ItemGroup>
     <DriverLibs Include="AT91_I2C.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\AT91\DeviceCode\AT91_I2C\dotNetMF.proj" />
