@@ -66,7 +66,7 @@
       <LoadRegion Name="HEAP" Base="%Heap_Begin%" Size="%Heap_End - Heap_Begin% + 1"/>
       <LoadRegion Name="STACK" Base="%Stack_Bottom%" Size="%Stack_Top - Stack_Bottom% + 1"/>
      <!--64Kbyte SRAM -->
-      <LoadRegion Name="RELOC_RAM" Base="0x20300000" Size="0x20000"/>
+      <LoadRegion Name="RELOC_RAM" Base="0x20300000" Size="0x80000"/>
       <LoadRegion Name="RELOC_SDRAM" Base="0x21000000" Size="0x1000000"/>
 
     </NamedGroup>
