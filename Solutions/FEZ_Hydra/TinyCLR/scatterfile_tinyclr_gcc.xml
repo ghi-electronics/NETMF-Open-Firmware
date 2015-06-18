@@ -32,17 +32,7 @@
 <!--    <Set Name="Data_Size"            Value="%Deploy_BaseAddress - Data_BaseAddress%"/> -->
     </If>
 
-    <If Name="TARGETLOCATION" In="RAM">
-<!--
-        <Set Name="ProfileBuffer_Begin" Value="0x22000000"/>
-        <Set Name="ProfileBuffer_End"   Value="0x2200FFF8"/>
--->        
-        <Set Name="Code_BaseAddress"    Value="0x20100000"/>
-        <Set Name="Code_Size"           Value="0x00200000"/>
-        <!-- RAM with FLASH config is not needed -->
-        <Set Name="Valid"               Value="true"/>
-
-    </If>
+    
 
 
     <!-- ################################################################################ -->
@@ -66,8 +56,8 @@
       <LoadRegion Name="HEAP" Base="%Heap_Begin%" Size="%Heap_End - Heap_Begin% + 1"/>
       <LoadRegion Name="STACK" Base="%Stack_Bottom%" Size="%Stack_Top - Stack_Bottom% + 1"/>
      <!--64Kbyte SRAM -->
-      <LoadRegion Name="RELOC_RAM" Base="0x20300000" Size="0x80000"/>
-      <LoadRegion Name="RELOC_SDRAM" Base="0x21000000" Size="0x1000000"/>
+      <LoadRegion Name="RELOC_RAM" Base="0x20300000" Size="0x60000"/>
+      
 
     </NamedGroup>
 
@@ -127,43 +117,55 @@
 
         <FileMapping Name="LONG(0xE12FFF1E);" />
       </ExecRegion>
+	  
       <ExecRegion Name="ER_RAM_RO" Align="0x10" Options="&gt;RELOC_RAM AT&gt;LR_%TARGETLOCATION%">
+		 <If Name="TARGETLOCATION" In="FLASH">     
+                <FileMapping Name="*" Options="(SectionForFlashOperations)" />       
+            </If>
         <FileMapping Name="*" Options="(VectorsTrampolines)" />
-        <Include File="%SPOCLIENT%\Solutions\%PLATFORM%\TinyCLR\scatterfile_ram_functions.xml"/>
-        <Include File="%SPOCLIENT%\Solutions\%PLATFORM%\TinyCLR\scatterfile_tinyclr_ram_functions.xml"/>
-        <FileMapping Name="*" Options="(SectionForBootstrapInRam)" />
-        
+ 
+        <FileMapping Name="*" Options="(SectionForBootstrapInRam)" />        
       </ExecRegion>      
+	  
       <ExecRegion Name="ER_RAM_RW" Align="0x10" Options="&gt;RELOC_RAM AT&gt;LR_%TARGETLOCATION%">
         <FileMapping Name="*" Options="(rwdata)" />
         <FileMapping Name="*" Options="(.data*)" />
+		<FileMapping Name="*" Options="(+RW-DATA, +ZI)" />
       </ExecRegion>      
-      <ExecRegion Name=".bss" Align="0x10" Options="&gt;RELOC_RAM">
+	  
+      <ExecRegion Name=".bss" Align="0x10" Options="&gt;RELOC_RAM AT&gt;LR_%TARGETLOCATION%">
         <FileMapping Name="*" Options="(.bss*)" />
         <FileMapping Name="*" Options="(.zidata*)" />
         <FileMapping Name="PROVIDE(__exidx_start = .);" />
         <FileMapping Name="PROVIDE(__exidx_end = .);" />
       </ExecRegion>
+	  
       <ExecRegion Name="/DISCARD/">
         <FileMapping Name="*" Options="(.ARM.exidx*)" />
         <FileMapping Name="*" Options="(.ARM.extab*)" />
       </ExecRegion>
-      <ExecRegion Name="ER_HEAP_BEGIN" Base="%Heap_Begin%">
+      
+	  <ExecRegion Name="ER_HEAP_BEGIN" Base="%Heap_Begin%">
         <FileMapping Name="*" Options="(SectionForHeapBegin)" />
       </ExecRegion>
-      <ExecRegion Name="ER_HEAP_END" Base="%Heap_End%">
+      
+	  <ExecRegion Name="ER_HEAP_END" Base="%Heap_End%">
         <FileMapping Name="*" Options="(SectionForHeapEnd)" />
       </ExecRegion>
-      <ExecRegion Name="ER_STACK_BOTTOM" Base="%Stack_Bottom%">
+      
+	  <ExecRegion Name="ER_STACK_BOTTOM" Base="%Stack_Bottom%">
         <FileMapping Name="*" Options="(SectionForStackBottom)" />
       </ExecRegion>
-      <ExecRegion Name="ER_STACK_TOP" Base="%Stack_Top%">
+      
+	  <ExecRegion Name="ER_STACK_TOP" Base="%Stack_Top%">
         <FileMapping Name="*" Options="(SectionForStackTop)" />
       </ExecRegion>
-    <ExecRegion Name="ER_CUSTOM_HEAP_BEGIN" Base="%Custom_Heap_Begin%">
+    
+	<ExecRegion Name="ER_CUSTOM_HEAP_BEGIN" Base="%Custom_Heap_Begin%">
       <FileMapping Name="*" Options="(SectionForCustomHeapBegin)" />
     </ExecRegion>
-    <ExecRegion Name="ER_CUSTOM_HEAP_END" Base="%Custom_Heap_End%">
+    
+	<ExecRegion Name="ER_CUSTOM_HEAP_END" Base="%Custom_Heap_End%">
       <FileMapping Name="*" Options="(SectionForCustomHeapEnd)" />
     </ExecRegion>
 
