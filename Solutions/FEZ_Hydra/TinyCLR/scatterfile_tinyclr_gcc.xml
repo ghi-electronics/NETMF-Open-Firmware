@@ -12,24 +12,15 @@
     <Set Name="Stack_Top"           Value="0x30FFF0"/>
 
     <If Name="TARGETLOCATION" In="FLASH">
-
         <Set Name="Code_BaseAddress"     Value="0x20100000"/>
         <Set Name="Code_Size"            Value="0x00200000"/>
-
 <!-- Config_BaseAddress it the NAND address -->
-
-
         <Set Name="Config_BaseAddress"   Value="0x0041df00"/>    
-
 <!-- ERConfig_BaseAddress is in RW -->
         <Set Name="ERConfig_BaseAddress" Value="0x203F0000"/>    
         <Set Name="Config_Size"          Value="0x0002100"/>
-<!--
-        <Set Name="Data_BaseAddress"     Value="0x001C0000"/>
-        <Set Name="Deploy_BaseAddress"   Value="0x00300000"/>
--->        
         <Set Name="Valid"                Value="true"/>
-<!--    <Set Name="Data_Size"            Value="%Deploy_BaseAddress - Data_BaseAddress%"/> -->
+
     </If>
 
     
@@ -43,23 +34,16 @@
 
     <!-- we start at 0x10080000 since PortBooter lives at 0x10000000 -->
 
-    <NamedGroup Name="MEMORY">
-      <LoadRegion Name="LR_%TARGETLOCATION%" Base="%Code_BaseAddress%" Size="%Code_Size%"/>
-      <IfDefined Name="Config_BaseAddress">
-        <LoadRegion Name="LR_CONFIG" Base="%Config_BaseAddress%" Size="%Config_Size%"/>
-        <LoadRegion Name="ER_CONFIG_AREA" Base="%ERConfig_BaseAddress%" Size="%Config_Size%"/>
-	
-      </IfDefined>
-      <!--<IfDefined Name="Data_BaseAddress">
-        <LoadRegion Name="LR_DAT" Base="%Data_BaseAddress%" Size="%Data_Size%"/>
-      </IfDefined>-->
-      <LoadRegion Name="HEAP" Base="%Heap_Begin%" Size="%Heap_End - Heap_Begin% + 1"/>
-      <LoadRegion Name="STACK" Base="%Stack_Bottom%" Size="%Stack_Top - Stack_Bottom% + 1"/>
-     <!--64Kbyte SRAM -->
-      <LoadRegion Name="RELOC_RAM" Base="0x20300000" Size="0x60000"/>
-      
-
-    </NamedGroup>
+	<NamedGroup Name="MEMORY">
+		<LoadRegion Name="LR_%TARGETLOCATION%" Base="%Code_BaseAddress%" Size="%Code_Size%"/>
+		<IfDefined Name="Config_BaseAddress">
+		<LoadRegion Name="LR_CONFIG" Base="%Config_BaseAddress%" Size="%Config_Size%"/>
+		<LoadRegion Name="ER_CONFIG_AREA" Base="%ERConfig_BaseAddress%" Size="%Config_Size%"/>
+		</IfDefined>
+		<LoadRegion Name="HEAP" Base="%Heap_Begin%" Size="%Heap_End - Heap_Begin% + 1"/>
+		<LoadRegion Name="STACK" Base="%Stack_Bottom%" Size="%Stack_Top - Stack_Bottom% + 1"/>
+		<LoadRegion Name="RELOC_RAM" Base="0x20300000" Size="0x60000"/>
+	</NamedGroup>
 
     <EntryPoint Name="EntryPoint"/>
 
