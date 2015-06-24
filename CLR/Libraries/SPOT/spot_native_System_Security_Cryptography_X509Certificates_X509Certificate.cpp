@@ -46,7 +46,7 @@ HRESULT Library_spot_native_System_Security_Cryptography_X509Certificates_X509Ce
 
     certBytes = arrData->GetFirstElement();
 
-    //if(!SSL_ParseCertificate( (const char*)certBytes, arrData->m_numOfElements, szPwd, &cert )) TINYCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
+    if(!SSL_ParseCertificate( (const char*)certBytes, arrData->m_numOfElements, szPwd, &cert )) TINYCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
 
     TINYCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance( hbIssuer, cert.Issuer ));
     TINYCLR_CHECK_HRESULT(hbIssuer.StoreToReference( stack.Arg2(), 0 ));

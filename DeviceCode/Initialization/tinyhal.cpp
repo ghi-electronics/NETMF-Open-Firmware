@@ -381,7 +381,7 @@ void HAL_Initialize()
 
     FileSystemVolumeList::InitializeVolumes();
 	
-	//OSHW_GHAL_Initialize_Startup();
+	OSHW_GHAL_Initialize_Startup();
 
     LCD_Initialize();
     
@@ -490,7 +490,7 @@ extern "C"
 {
 void HAL_ResetCLR()
 {
-   //GHI_OSHW_ResetCLR();
+   GHI_OSHW_ResetCLR();
 }
 void BootEntry()
 {
