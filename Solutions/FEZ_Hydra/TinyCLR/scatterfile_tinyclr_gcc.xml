@@ -122,6 +122,7 @@
         <FileMapping Name="*" Options="(.zidata*)" />
         <FileMapping Name="PROVIDE(__exidx_start = .);" />
         <FileMapping Name="PROVIDE(__exidx_end = .);" />
+		<FileMapping Name="*" Options="(g_SSL_SeedData)" />
       </ExecRegion>
 	  
       <ExecRegion Name="/DISCARD/">
