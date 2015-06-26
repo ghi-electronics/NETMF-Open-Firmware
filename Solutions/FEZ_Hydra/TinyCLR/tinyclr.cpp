@@ -12,7 +12,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 void ApplicationEntryPoint()
 {
-    CLR_SETTINGS clrSettings;
+	CLR_SETTINGS clrSettings;
 
     memset(&clrSettings, 0, sizeof(CLR_SETTINGS));
 
