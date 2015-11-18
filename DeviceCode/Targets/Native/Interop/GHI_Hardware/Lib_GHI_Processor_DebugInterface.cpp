@@ -11,19 +11,21 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef _LIB_GHI_IO_AUDIO_H_
-#define _LIB_GHI_IO_AUDIO_H_
+#include "Lib.h"
+#include "Lib_GHI_Processor_DebugInterface.h"
 
-namespace GHI
+using namespace GHI::Processor;
+
+void DebugInterface::NativeLoad( INT32 * param0, INT32 * param1, HRESULT &hr )
 {
-    namespace IO
-    {
-        struct Audio
-        {
-            // Helper Functions to access fields of managed object
-            // Declaration of stubs. These functions are implemented by Interop code developers
-            static void NativePlayPCM( UINT8 param0, CLR_RT_TypedArray_UINT8 param1, INT32 param2, INT32 param3, INT32 param4, HRESULT &hr );
-        };
-    }
+    *param0 = 0;
+    *param1 = 1;
 }
-#endif  //_LIB_GHI_IO_AUDIO_H_
+
+INT8 DebugInterface::NativeSave( INT32 param0, INT32 param1, HRESULT &hr )
+{
+	hr = CLR_E_NOT_SUPPORTED;
+	
+    return 0;
+}
+

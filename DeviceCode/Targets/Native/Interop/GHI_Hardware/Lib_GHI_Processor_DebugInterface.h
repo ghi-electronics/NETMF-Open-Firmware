@@ -11,19 +11,20 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef _LIB_GHI_PROCESSOR_MANUFACTURERUSE_H_
-#define _LIB_GHI_PROCESSOR_MANUFACTURERUSE_H_
+#ifndef _LIB_GHI_PROCESSOR_DEBUGINTERFACE_H_
+#define _LIB_GHI_PROCESSOR_DEBUGINTERFACE_H_
 
 namespace GHI
 {
     namespace Processor
     {
-        struct ManufacturerUse
+        struct DebugInterface
         {
             // Helper Functions to access fields of managed object
             // Declaration of stubs. These functions are implemented by Interop code developers
-            static void NativeConfigure( UINT32 param0, CLR_RT_TypedArray_UINT8 param1, HRESULT &hr );
+            static void NativeLoad( INT32 * param0, INT32 * param1, HRESULT &hr );
+            static INT8 NativeSave( INT32 param0, INT32 param1, HRESULT &hr );
         };
     }
 }
-#endif  //_LIB_GHI_PROCESSOR_MANUFACTURERUSE_H_
+#endif  //_LIB_GHI_PROCESSOR_DEBUGINTERFACE_H_

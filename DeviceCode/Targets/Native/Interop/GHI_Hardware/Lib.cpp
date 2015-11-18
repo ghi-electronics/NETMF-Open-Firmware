@@ -297,6 +297,14 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_Lib_GHI_Processor_Configuration::NativeReadEntry___STATIC__BOOLEAN__STRING__SZARRAY_U1,
     Library_Lib_GHI_Processor_Configuration::NativeWriteEntry___STATIC__BOOLEAN__STRING__SZARRAY_U1,
     NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    Library_Lib_GHI_Processor_DebugInterface::NativeLoad___STATIC__VOID__BYREF_I4__BYREF_I4,
+    Library_Lib_GHI_Processor_DebugInterface::NativeSave___STATIC__BOOLEAN__I4__I4,
+    NULL,
     Library_Lib_GHI_Processor_ManufacturerUse::NativeConfigure___STATIC__VOID__U4__SZARRAY_U1,
     NULL,
     NULL,
@@ -552,7 +560,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Hardware =
 {
     "GHI.Hardware", 
-    0x9E02C59C,
+    0x7DFB8F54,
     method_lookup
 };
 
