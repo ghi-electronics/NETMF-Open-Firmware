@@ -22,8 +22,8 @@ namespace GHI
         {
             // Helper Functions to access fields of managed object
             // Declaration of stubs. These functions are implemented by Interop code developers
-            static void NativeLoad( INT32 * param0, INT32 * param1, HRESULT &hr );
-            static INT8 NativeSave( INT32 param0, INT32 param1, HRESULT &hr );
+            static void NativeLoad( INT32 * param0, INT32 * param1, INT8 * param2, HRESULT &hr );
+            static INT8 NativeSave( INT32 param0, INT32 param1, INT8 param2, HRESULT &hr );
         };
     }
 }

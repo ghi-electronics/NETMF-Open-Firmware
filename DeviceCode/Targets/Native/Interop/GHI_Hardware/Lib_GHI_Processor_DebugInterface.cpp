@@ -16,13 +16,14 @@
 
 using namespace GHI::Processor;
 
-void DebugInterface::NativeLoad( INT32 * param0, INT32 * param1, HRESULT &hr )
+void DebugInterface::NativeLoad( INT32 * param0, INT32 * param1, INT8 * param2, HRESULT &hr )
 {
     *param0 = 0;
     *param1 = 1;
+    *param2 = 1;
 }
 
-INT8 DebugInterface::NativeSave( INT32 param0, INT32 param1, HRESULT &hr )
+INT8 DebugInterface::NativeSave( INT32 param0, INT32 param1, INT8 param2, HRESULT &hr )
 {
 	hr = CLR_E_NOT_SUPPORTED;
 	
