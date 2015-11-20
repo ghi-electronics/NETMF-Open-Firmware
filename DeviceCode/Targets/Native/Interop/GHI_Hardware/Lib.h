@@ -11,19 +11,6 @@
 #define _LIB_H_
 
 #include <TinyCLR_Interop.h>
-struct Library_Lib_GHI_Utilities_Bitmaps
-{
-    TINYCLR_NATIVE_DECLARE(NativeConvert___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U1__GHIUtilitiesBitmapsBitsPerPixel);
-    TINYCLR_NATIVE_DECLARE(NativeConvertToFile___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U1);
-    TINYCLR_NATIVE_DECLARE(NativeGetBuffer___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U1);
-    TINYCLR_NATIVE_DECLARE(NativeSetBuffer___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U1);
-    TINYCLR_NATIVE_DECLARE(NativeGetBuffer___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U2);
-    TINYCLR_NATIVE_DECLARE(NativeSetBuffer___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U2);
-
-    //--//
-
-};
-
 struct Library_Lib_GHI_IO_ControllerAreaNetwork
 {
     static const int FIELD_STATIC__instanceList = 0;
@@ -86,7 +73,7 @@ struct Library_Lib_GHI_Processor_Display
     static const int FIELD_STATIC__controlPin = 25;
     static const int FIELD_STATIC__backlightPin = 26;
     static const int FIELD_STATIC__resetPin = 27;
-    static const int FIELD_STATIC__bpp = 28;
+    static const int FIELD_STATIC__bitmapFormat = 28;
     static const int FIELD_STATIC__type = 29;
 
     TINYCLR_NATIVE_DECLARE(NativeGetLcdConfiguration___STATIC__VOID__BYREF_BOOLEAN__BYREF_U1__BYREF_U4__BYREF_U4__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U4);
@@ -155,6 +142,19 @@ struct Library_Lib_GHI_Processor_InFieldUpdate
     TINYCLR_NATIVE_DECLARE(NativeFlashAndReset___STATIC__BOOLEAN);
     TINYCLR_NATIVE_DECLARE(NativeAbort___STATIC__BOOLEAN);
     TINYCLR_NATIVE_DECLARE(NativeCalculateCRC16___STATIC__U2__GHIProcessorInFieldUpdateTypes);
+
+    //--//
+
+};
+
+struct Library_Lib_GHI_Utilities_Bitmaps
+{
+    TINYCLR_NATIVE_DECLARE(NativeConvert___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U1__GHIUtilitiesBitmapsFormat);
+    TINYCLR_NATIVE_DECLARE(NativeConvertToFile___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U1);
+    TINYCLR_NATIVE_DECLARE(NativeGetBuffer___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U1);
+    TINYCLR_NATIVE_DECLARE(NativeSetBuffer___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U1);
+    TINYCLR_NATIVE_DECLARE(NativeGetBuffer___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U2);
+    TINYCLR_NATIVE_DECLARE(NativeSetBuffer___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U2);
 
     //--//
 

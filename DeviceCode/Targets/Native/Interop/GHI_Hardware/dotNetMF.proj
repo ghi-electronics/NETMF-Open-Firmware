@@ -10,9 +10,6 @@
 <ItemGroup>
 <HFile Include="Lib.h" />
 <Compile Include="Lib.cpp" />
-<Compile Include="Lib_GHI_Utilities_Bitmaps_mshl.cpp" />
-<HFile Include="Lib_GHI_Utilities_Bitmaps.h" />
-<Compile Include="Lib_GHI_Utilities_Bitmaps.cpp" />
 <Compile Include="Lib_GHI_IO_ControllerAreaNetwork_mshl.cpp" />
 <HFile Include="Lib_GHI_IO_ControllerAreaNetwork.h" />
 <Compile Include="Lib_GHI_IO_ControllerAreaNetwork.cpp" />
@@ -25,6 +22,9 @@
 <Compile Include="Lib_GHI_Processor_InFieldUpdate_mshl.cpp" />
 <HFile Include="Lib_GHI_Processor_InFieldUpdate.h" />
 <Compile Include="Lib_GHI_Processor_InFieldUpdate.cpp" />
+<Compile Include="Lib_GHI_Utilities_Bitmaps_mshl.cpp" />
+<HFile Include="Lib_GHI_Utilities_Bitmaps.h" />
+<Compile Include="Lib_GHI_Utilities_Bitmaps.cpp" />
 <Compile Include="Lib_GHI_IO_Audio_mshl.cpp" />
 <HFile Include="Lib_GHI_IO_Audio.h" />
 <Compile Include="Lib_GHI_IO_Audio.cpp" />

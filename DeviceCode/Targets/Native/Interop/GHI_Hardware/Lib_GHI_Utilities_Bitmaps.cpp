@@ -36,7 +36,7 @@ enum BPP_Type
 	BPP16_BGR_LE,
 };
 
-HRESULT Library_Lib_GHI_Utilities_Bitmaps::NativeConvert___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U1__GHIUtilitiesBitmapsBitsPerPixel(CLR_RT_StackFrame& stack)
+HRESULT Library_Lib_GHI_Utilities_Bitmaps::NativeConvert___STATIC__VOID__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap__SZARRAY_U1__GHIUtilitiesBitmapsFormat(CLR_RT_StackFrame& stack)
 {
 	TINYCLR_HEADER(); hr = S_OK;
 	{
