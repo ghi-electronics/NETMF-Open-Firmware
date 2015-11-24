@@ -53,6 +53,8 @@ namespace GHI
 
             static INT32& Get_timeout( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT32( pMngObj, Library_Lib_GHI_Networking_WiFiRS9110::FIELD__timeout ); }
 
+            static INT8& Get_initialized( CLR_RT_HeapBlock* pMngObj )    { return Interop_Marshal_GetField_INT8( pMngObj, Library_Lib_GHI_Networking_WiFiRS9110::FIELD__initialized ); }
+
             // Declaration of stubs. These functions are implemented by Interop code developers
             static INT8 NativeExecuteCompletion( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );
             static UINT16 NativeGetLastJoinError( CLR_RT_HeapBlock* pMngObj, HRESULT &hr );

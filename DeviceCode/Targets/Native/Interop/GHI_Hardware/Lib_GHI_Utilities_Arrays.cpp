@@ -25,25 +25,21 @@ void ResetArray( char* arr, int len );
 void InsertValueIntoArray_helper(CLR_RT_TypedArray_UINT8 array, void* value, INT32 offset, INT32 valueSize, HRESULT &hr);
 void ExtractValueFromArray_helper(CLR_RT_TypedArray_UINT8 array, void* value, INT32 offset, INT32 valueSize, HRESULT &hr);
 
-INT32 Arrays::NativeContains( CLR_RT_TypedArray_UINT8 searchArrayPara, INT32 searchOffset, CLR_RT_TypedArray_UINT8 toFindPara, INT32 findOffset, INT32 findLength, HRESULT &hr )
+INT32 Arrays::NativeContains(CLR_RT_TypedArray_UINT8 searchArrayPara, INT32 searchOffset, INT32 searchLength, CLR_RT_TypedArray_UINT8 toFindPara, INT32 findOffset, INT32 findLength, HRESULT &hr)
 {
-    UINT8* searchArray = searchArrayPara.GetBuffer();
-    UINT8* toFind = toFindPara.GetBuffer();
-	
-	for (INT32 i = searchOffset; i < searchOffset + findLength; i++)
-	{
-		if (searchArray[i] == toFind[findOffset])
-		{
-			INT32 matched = 0;
+	UINT8* search = searchArrayPara.GetBuffer() + searchOffset;
+	UINT8* find = toFindPara.GetBuffer() + findOffset;
 
-			for (INT32 j = 0; j < findLength; j++)
-			{
-				if (searchArray[i + j] != toFind[findOffset + j])
+	for (INT32 i = 0; i <= searchLength - findLength; i++) {
+		if (search[i] == find[0]) {
+			INT32 j;
+
+			for (j = 0; j < findLength; j++)
+				if (search[i + j] != find[j])
 					break;
 
-				if (++matched == findLength)
-					return i;
-			}
+			if (j == findLength)
+				return i;
 		}
 	}
 

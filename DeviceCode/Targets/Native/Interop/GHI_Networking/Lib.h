@@ -66,6 +66,7 @@ struct Library_Lib_GHI_Networking_WiFiRS9110
     static const int FIELD__externalInterrupt = 19;
     static const int FIELD__clockRate = 20;
     static const int FIELD__timeout = 21;
+    static const int FIELD__initialized = 22;
 
     TINYCLR_NATIVE_DECLARE(NativeExecuteCompletion___BOOLEAN);
     TINYCLR_NATIVE_DECLARE(NativeGetLastJoinError___U2);
