@@ -101,7 +101,7 @@ INT8 Display::NativeSetLcdConfiguration( INT8 bootupMessages, UINT8 rotation, UI
 	return didChange;
 }
 
-INT8 Display::NativeSetSpiConfiguration(INT32 bpp, INT32 orientation, INT32 rsPin, INT32 backlightPin, INT32 resetPin, INT32 chipSelectPin, INT32 spiModule, HRESULT &hr)
+INT8 Display::NativeSetSpiConfiguration(INT32 bpp, INT32 orientation, INT32 rsPin, INT32 backlightPin, INT32 resetPin, INT32 chipSelectPin, INT32 spiModule, INT32 width, INT32 height, HRESULT &hr)
 {
 	hr = CLR_E_NOT_SUPPORTED;
 	

@@ -121,7 +121,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     Library_Lib_GHI_Processor_Display::NativeGetLcdConfiguration___STATIC__VOID__BYREF_BOOLEAN__BYREF_U1__BYREF_U4__BYREF_U4__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_BOOLEAN__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U1__BYREF_U4,
     Library_Lib_GHI_Processor_Display::NativeSetLcdConfiguration___STATIC__BOOLEAN__BOOLEAN__U1__U4__U4__BOOLEAN__BOOLEAN__BOOLEAN__BOOLEAN__BOOLEAN__U1__U1__U1__U1__U1__U1__U4,
-    Library_Lib_GHI_Processor_Display::NativeSetSpiConfiguration___STATIC__BOOLEAN__I4__I4__I4__I4__I4__I4__I4,
+    Library_Lib_GHI_Processor_Display::NativeSetSpiConfiguration___STATIC__BOOLEAN__I4__I4__I4__I4__I4__I4__I4__I4__I4,
     Library_Lib_GHI_Processor_Display::NativeSetTouchPins___STATIC__BOOLEAN__U4__U4__U4__U4__U4__U4,
     NULL,
     NULL,
@@ -563,7 +563,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_GHI_Hardware =
 {
     "GHI.Hardware", 
-    0x36E4BCA5,
+    0x1317D1BC,
     method_lookup
 };
 
