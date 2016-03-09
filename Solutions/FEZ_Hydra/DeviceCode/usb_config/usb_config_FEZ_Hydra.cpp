@@ -56,24 +56,25 @@
 
 const ADS_PACKED struct GNU_PACKED USB_DYNAMIC_CONFIGURATION
 {
-    USB_DEVICE_DESCRIPTOR        device;
-    USB_CONFIGURATION_DESCRIPTOR config;
-      USB_INTERFACE_DESCRIPTOR   itfc0;
-        USB_ENDPOINT_DESCRIPTOR  ep1;
-        USB_ENDPOINT_DESCRIPTOR  ep2;
-    USB_STRING_DESCRIPTOR_HEADER manHeader;
-      USB_STRING_CHAR            manString[MANUFACTURER_NAME_SIZE];
-    USB_STRING_DESCRIPTOR_HEADER prodHeader;
-      USB_STRING_CHAR            prodString[PRODUCT_NAME_SIZE];
+	USB_DEVICE_DESCRIPTOR        device;
+	USB_CONFIGURATION_DESCRIPTOR config;
+	USB_INTERFACE_DESCRIPTOR   itfc0;
+	USB_ENDPOINT_DESCRIPTOR  ep1;
+	USB_ENDPOINT_DESCRIPTOR  ep2;
+	USB_STRING_DESCRIPTOR_HEADER manHeader;
+	USB_STRING_CHAR            manString[MANUFACTURER_NAME_SIZE];
+	USB_STRING_DESCRIPTOR_HEADER prodHeader;
+	USB_STRING_CHAR            prodString[PRODUCT_NAME_SIZE];
 	USB_STRING_DESCRIPTOR_HEADER serialHeader;
-      USB_STRING_CHAR            serialString[SERIAL_NAME_SIZE];
-    USB_STRING_DESCRIPTOR_HEADER string4;
-      USB_STRING_CHAR            displayString[DISPLAY_NAME_SIZE];
-    USB_STRING_DESCRIPTOR_HEADER string5;
-      USB_STRING_CHAR            friendlyString[FRIENDLY_NAME_SIZE];
-    USB_OS_STRING_DESCRIPTOR     OS_String;
-    USB_XCOMPATIBLE_OS_ID        OS_XCompatible_ID;
-    USB_DESCRIPTOR_HEADER        endList;
+	USB_STRING_CHAR            serialString[SERIAL_NAME_SIZE];
+	USB_STRING_DESCRIPTOR_HEADER string4;
+	USB_STRING_CHAR            displayString[DISPLAY_NAME_SIZE];
+	USB_STRING_DESCRIPTOR_HEADER string5;
+	USB_STRING_CHAR            friendlyString[FRIENDLY_NAME_SIZE];
+	USB_OS_STRING_DESCRIPTOR     OS_String;
+	USB_XCOMPATIBLE_OS_ID        OS_XCompatible_ID;
+	USB_XPROPERTIES_OS_WINUSB 	 OS_XProperty;
+	USB_DESCRIPTOR_HEADER        endList;
 } UsbDefaultConfiguration =
 {
     // Device descriptor
@@ -214,8 +215,7 @@ const ADS_PACKED struct GNU_PACKED USB_DYNAMIC_CONFIGURATION
         USB_STRING_DESCRIPTOR_TYPE
     },
     { 'G', 'a', 'd', 'g', 'e', 't', 'e', 'e', 'r' },
-/*
-    // OS Descriptor string for Sideshow
+	// OS Descriptor string for Extended OS Compat ID
     {
         {
             USB_STRING_DESCRIPTOR_MARKER,
@@ -229,7 +229,7 @@ const ADS_PACKED struct GNU_PACKED USB_DYNAMIC_CONFIGURATION
         0x00
     },
 
-    // OS Extended Compatible ID for Sideshow
+    // OS Extended Compatible ID for WinUSB
     {
         // Generic Descriptor header
         {
@@ -251,12 +251,39 @@ const ADS_PACKED struct GNU_PACKED USB_DYNAMIC_CONFIGURATION
         // Extended Compatible OS ID function record
         0,                                                  // Interface 0
         1,                                                  // (reserved)
-        { 'S', 'I', 'D', 'E', 'S', 'H', 'W', 0 },           // Compatible ID
-       // { 'E', 'N', 'H', 'V', '1',  0,   0,  0 },           // Sub-compatible ID
-		{ 'E', 'N', 'H', 'V', '2',  0,   0,  0 },           // Sub-compatible ID
+        { 'W', 'I', 'N', 'U', 'S', 'B',  0,  0 },           // Compatible ID
+        {  0,   0,   0,   0,   0,   0,   0,  0 },           // Sub-compatible ID
         { 0, 0, 0, 0, 0, 0 }                                // Padding
     },
-*/
+	
+	// OS Extended Property 
+    {
+        // Generic Descriptor header
+        {
+            {
+                USB_GENERIC_DESCRIPTOR_MARKER,
+                0,
+                sizeof(USB_GENERIC_DESCRIPTOR_HEADER) + USB_XPROPERTY_OS_SIZE_WINUSB
+            },
+            USB_REQUEST_TYPE_IN | USB_REQUEST_TYPE_VENDOR | USB_REQUEST_TYPE_INTERFACE,
+            OS_DESCRIPTOR_STRING_VENDOR_CODE,
+            0,                                              // Intfc # << 8 + Page #
+            USB_XPROPERTY_OS_REQUEST                        // Extended Property OS ID request
+        },
+        USB_XPROPERTY_OS_SIZE_WINUSB,                       // Size of this descriptor (78 bytes for guid + 40 bytes for the property name + 24 bytes for other fields = 142 bytes)
+        OS_DESCRIPTOR_EX_VERSION,                           // Version 1.00 (BCD)
+        USB_XPROPERTY_OS_REQUEST,                           // Extended Compatible OS ID response
+        1,                                                  // Only 1 ex property record
+        // Extended Property OS ID function record
+        0x00000084,                                         // size in bytes 
+        EX_PROPERTY_DATA_TYPE__REG_SZ,                      // data type (unicode string)
+        40,                                             // name length
+        // property name (null -terminated unicode string: 'DeviceInterfaceGuid\0') 
+        { 'D','\0', 'e','\0', 'v','\0', 'i','\0', 'c','\0', 'e','\0', 'I','\0', 'n','\0', 't','\0', 'e','\0', 'r','\0', 'f','\0', 'a','\0', 'c','\0', 'e','\0', 'G','\0', 'u','\0', 'i','\0', 'd','\0', '\0','\0' },
+        78,                                         // data length
+        // data ({D32D1D64-963D-463E-874A-8EC8C8082CBF})
+        { '{','\0', 'D','\0', '3','\0', '2','\0', 'D','\0', '1','\0', 'D','\0', '6','\0', '4','\0', '-','\0', '9','\0', '6','\0', '3','\0', 'D','\0', '-','\0', '4','\0', '6','\0', '3','\0', 'E','\0', '-','\0', '8','\0', '7','\0', '4','\0', 'A','\0', '-','\0', '8','\0', 'E','\0', 'C','\0', '8','\0', 'C','\0', '8','\0', '0','\0', '8','\0', '2','\0', 'C','\0', 'B','\0', 'F','\0', '}','\0', '\0','\0' }
+    },
     // End of configuration marker
     {
         USB_END_DESCRIPTOR_MARKER,
