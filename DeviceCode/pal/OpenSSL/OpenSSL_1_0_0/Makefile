@@ -4,7 +4,7 @@
 ## Makefile for OpenSSL
 ##
 
-VERSION=1.0.0
+VERSION=1.0.0d
 MAJOR=1
 MINOR=0.0
 SHLIB_VERSION_NUMBER=1.0.0
@@ -12,9 +12,9 @@ SHLIB_VERSION_HISTORY=
 SHLIB_MAJOR=1
 SHLIB_MINOR=0.0
 SHLIB_EXT=
-PLATFORM=VC-WIN32
-OPTIONS=--prefix=c:/openssl-1.0.0 no-asm no-gmp no-idea no-jpake no-krb5 no-md2 no-mdc2 no-rc5 no-rfc3779 no-shared no-store no-threads no-zlib no-zlib-dynamic
-CONFIGURE_ARGS=VC-WIN32 no-asm no-threads no-shared no-idea no-mdc2 no-rc5 --prefix=c:/openssl-1.0.0
+PLATFORM=dist
+OPTIONS= no-gmp no-jpake no-krb5 no-md2 no-rc5 no-rfc3779 no-shared no-store no-zlib no-zlib-dynamic static-engine
+CONFIGURE_ARGS=dist
 SHLIB_TARGET=
 
 # HERE indicates where this Makefile lives.  This can be used to indicate
@@ -26,10 +26,10 @@ HERE=.
 # for, say, /usr/ and yet have everything installed to /tmp/somedir/usr/.
 # Normally it is left empty.
 INSTALL_PREFIX=
-INSTALLTOP=c:/openssl-1.0.0
+INSTALLTOP=/usr/local/ssl
 
 # Do not edit this manually. Use Configure --openssldir=DIR do change this!
-OPENSSLDIR=c:/openssl-1.0.0/ssl
+OPENSSLDIR=/usr/local/ssl
 
 # NO_IDEA - Define to build without the IDEA algorithm
 # NO_RC4  - Define to build without the RC4 algorithm
@@ -59,17 +59,17 @@ OPENSSLDIR=c:/openssl-1.0.0/ssl
 # equal 4.
 # PKCS1_CHECK - pkcs1 tests.
 
-CC= cl
-CFLAG= -DDSO_WIN32 -W3 -WX -Gs0 -GF -Gy -nologo -DOPENSSL_SYSNAME_WIN32 -DWIN32_LEAN_AND_MEAN -DL_ENDIAN -D_CRT_SECURE_NO_DEPRECATE
-DEPFLAG= -DOPENSSL_NO_GMP -DOPENSSL_NO_IDEA -DOPENSSL_NO_JPAKE -DOPENSSL_NO_MD2 -DOPENSSL_NO_MDC2 -DOPENSSL_NO_RC5 -DOPENSSL_NO_RFC3779 -DOPENSSL_NO_STORE
+CC= cc
+CFLAG= -O
+DEPFLAG= -DOPENSSL_NO_GMP -DOPENSSL_NO_JPAKE -DOPENSSL_NO_MD2 -DOPENSSL_NO_RC5 -DOPENSSL_NO_RFC3779 -DOPENSSL_NO_STORE
 PEX_LIBS= 
 EX_LIBS= 
 EXE_EXT= 
 ARFLAGS= 
 AR= ar $(ARFLAGS) r
-RANLIB= true
+RANLIB= /usr/bin/ranlib
 NM= nm
-PERL= C:\depot_l\tools\x86\perl\bin
+PERL= /usr/bin/perl
 TAR= tar
 TARFLAGS= --no-recursion
 MAKEDEPPROG=makedepend
@@ -101,7 +101,7 @@ SHA1_ASM_OBJ=
 RMD160_ASM_OBJ= 
 WP_ASM_OBJ= wp_block.o
 CMLL_ENC= camellia.o cmll_misc.o cmll_cbc.o
-PERLASM_SCHEME= win32n
+PERLASM_SCHEME= 
 
 # KRB5 stuff
 KRB5_INCLUDES=
@@ -118,8 +118,8 @@ SHLIBDIRS= crypto ssl
 # dirs in crypto to build
 SDIRS=  \
 	objects \
-	md4 md5 sha hmac ripemd whrlpool \
-	des aes rc2 rc4 bf cast camellia seed modes \
+	md4 md5 sha mdc2 hmac ripemd whrlpool \
+	des aes rc2 rc4 idea bf cast camellia seed modes \
 	bn ec rsa dsa ecdsa dh ecdh dso engine \
 	buffer bio stack lhash rand err \
 	evp asn1 pem x509 x509v3 conf txt_db pkcs7 pkcs12 comp ocsp ui krb5 \

@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <AssemblyName>SH7216_hwsetup</AssemblyName>
@@ -41,6 +42,8 @@
   <ItemGroup>
     <Compile Include="hwsetup.cpp" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\devicecode\targets\native\sh7216\devicecode\include\iodefine.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

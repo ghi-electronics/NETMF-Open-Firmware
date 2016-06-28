@@ -30,8 +30,8 @@
             <ReplaceWith>$(VSIP_DIR)</ReplaceWith>
         </ComponentReplacements>
 
-        <ComponentReplacements Include="Component_Targets_v4_1">
-            <ReplaceWith>%SPOCLIENT%\Framework\IDE\Targets\v4.1</ReplaceWith>
+        <ComponentReplacements Include="Component_Targets_v4_2">
+            <ReplaceWith>%SPOCLIENT%\Framework\IDE\Targets\v4.2</ReplaceWith>
         </ComponentReplacements>
 
         <ComponentReplacements Include="ToolsDir">
@@ -82,6 +82,25 @@
 
         <ComponentReplacements Include="AssembliesDir_V4_0">
             <ReplaceWith>%SPOCLIENT%\Framework\IDE\Targets\v4.0\Assemblies</ReplaceWith>
+        </ComponentReplacements>
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- v4.1 backcompat components -->
+        <ComponentReplacements Include="VERSIONDIR_v4_1">
+            <ReplaceWith>%SPOCLIENT%\Framework\IDE\Targets\v4.1</ReplaceWith>
+        </ComponentReplacements>
+
+        <ComponentReplacements Include="ToolsDir_v4_1">
+            <ReplaceWith>%SPOCLIENT%\Framework\IDE\Targets\v4.1\Tools\</ReplaceWith>
+        </ComponentReplacements>
+
+        <ComponentReplacements Include="Component_Targets_v4_1">
+            <ReplaceWith>%SPOCLIENT%\Framework\IDE\Targets\v4.1</ReplaceWith>
+        </ComponentReplacements>
+
+        <ComponentReplacements Include="AssembliesDir_V4_1">
+            <ReplaceWith>%SPOCLIENT%\Framework\IDE\Targets\v4.1\Assemblies</ReplaceWith>
         </ComponentReplacements>
     </ItemGroup>
 

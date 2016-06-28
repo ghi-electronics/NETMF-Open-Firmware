@@ -20,8 +20,20 @@ namespace Ws.Services.Binding
         /// <param name="serviceUrn">The service Urn.</param>
         /// <param name="port">The servce port.</param>
         public HttpTransportBindingConfig( string serviceUrn, int port )
+            : this(serviceUrn, port, false)
         {
-            this.ServiceUrn = new Uri(serviceUrn);
+        }
+
+        /// <summary>
+        /// Creates an instance of the configuration for the HTTP transport
+        /// </summary>
+        /// <param name="serviceUrn">The service Urn.</param>
+        /// <param name="port">The servce port.</param>
+        /// <param name="persistConnection">Persists the connection for client contexts.</param>
+        public HttpTransportBindingConfig( string serviceUrn, int port, bool persistConnection )
+        {
+            this.ServiceUrn           = new Uri(serviceUrn);
+            this.PersistentConnection = persistConnection;
 
             string transport = "http://" + WsNetworkServices.GetLocalIPV4Address() + ":" + port + "/";
             if(serviceUrn.IndexOf("urn:uuid:") == 0)
@@ -39,9 +51,20 @@ namespace Ws.Services.Binding
         /// </summary>
         /// <param name="remoteEndpoint">The remote Endpoint for this service.</param>
         public HttpTransportBindingConfig( Uri remoteEndpoint )
+            : this(remoteEndpoint, false)
         {
-            this.ServiceUrn      = null;
-            this.EndpointAddress = remoteEndpoint;
+        }
+
+        /// <summary>
+        /// Creates an instance of the configuration for the HTTP transport
+        /// </summary>
+        /// <param name="remoteEndpoint">The remote Endpoint for this service.</param>
+        /// <param name="persistConnection">Persists the connection for client contexts.</param>
+        public HttpTransportBindingConfig( Uri remoteEndpoint, bool persistConnection )
+        {
+            this.ServiceUrn           = null;
+            this.EndpointAddress      = remoteEndpoint;
+            this.PersistentConnection = persistConnection;
         }
 
         /// <summary>
@@ -52,6 +75,10 @@ namespace Ws.Services.Binding
         /// Retrieves the endpoint for this service
         /// </summary>
         public readonly Uri EndpointAddress;
+        /// <summary>
+        /// Keeps the connection alive until the channel is closed (for client contexts only)
+        /// </summary>
+        public readonly bool PersistentConnection;
     }
     
     /// <summary>
@@ -59,7 +86,8 @@ namespace Ws.Services.Binding
     /// </summary>
     public class HttpTransportBindingElement : TransportBindingElement
     {
-        HttpListener               m_httpListener;
+        HttpListener m_httpListener;
+        bool         m_persistConn;             
 
         private const int ReadPayload = 0x800;
         private static int MaxReadPayload = 0x20000;
@@ -71,7 +99,10 @@ namespace Ws.Services.Binding
         public HttpTransportBindingElement( HttpTransportBindingConfig cfg )
         {
             m_endpointUri= cfg.EndpointAddress;
+            m_transportUri = cfg.EndpointAddress;
             m_serviceUrn = cfg.ServiceUrn;
+            m_persistConn = cfg.PersistentConnection;
+            
         }
 
         /// <summary>
@@ -85,7 +116,9 @@ namespace Ws.Services.Binding
             if(config != null)
             {
                 m_endpointUri= config.EndpointAddress;
+                m_transportUri = config.EndpointAddress;
                 m_serviceUrn = config.ServiceUrn;
+                m_persistConn = config.PersistentConnection;
             }
         }
 
@@ -116,23 +149,41 @@ namespace Ws.Services.Binding
         {
             if (ctx is ServerBindingContext)
             {
-                if (ctx.ContextObject != null)
+                if (ctx.ContextObject != null && ctx.ContextObject is HttpListenerContext)
                 {
-                    ((HttpListenerContext)ctx.ContextObject).Close();
+                    try
+                    {
+                        ((HttpListenerContext)ctx.ContextObject).Close(ctx.CloseTimeout.Seconds);
+                    }
+                    catch
+                    {
+                    }
                     ctx.ContextObject = null;
                 }
 
                 if (m_httpListener != null)
                 {
-                    m_httpListener.Close();
+                    try
+                    {
+                        m_httpListener.Close();
+                    }
+                    catch
+                    {
+                    }
                     m_httpListener = null;
                 }
             }
             else
             {
-                if(ctx.ContextObject != null)
+                if(ctx.ContextObject != null && ctx.ContextObject is IDisposable)
                 {
-                    ((HttpWebRequest)ctx.ContextObject).Dispose();
+                    try
+                    {
+                        ((IDisposable)ctx.ContextObject).Dispose();
+                    }
+                    catch
+                    {
+                    }
                     ctx.ContextObject = null;
                 }
             }
@@ -179,7 +230,10 @@ namespace Ws.Services.Binding
             
                     if (resp.StatusCode != HttpStatusCode.OK && resp.StatusCode != HttpStatusCode.Accepted)
                     {
-                        throw new IOException(); // Bad status code in response
+                        if (resp.ContentType.IndexOf("application/soap+xml") == -1)
+                        {
+                            throw new IOException(); // Bad status code in response
+                        }
                     }
             
                     if (resp.ContentLength > 0)
@@ -226,93 +280,112 @@ namespace Ws.Services.Binding
             }
             else // server waits for messages
             {
-                if (m_httpListener == null)
+                HttpListenerContext listenerContext;
+
+                try
                 {
-                    msg = null;
-                    return ChainResult.Abort;
-                }
-
-                HttpListenerContext listenerContext = m_httpListener.GetContext();
-
-                if (listenerContext == null)
-                {
-                    msg = null;
-                    return ChainResult.Abort;
-                }
-
-                ctx.ContextObject = listenerContext;
-
-                // The context returned by m_httpListener.GetContext(); can be null in case the service was stopped.
-                HttpListenerRequest listenerRequest = listenerContext.Request;
-
-                HttpListenerResponse listenerResponse = listenerContext.Response;
-
-                listenerRequest.InputStream.ReadTimeout = (int)(ctx.ReceiveTimeout.Ticks / TimeSpan.TicksPerMillisecond);
-                listenerResponse.OutputStream.WriteTimeout = (int)(ctx.SendTimeout.Ticks / TimeSpan.TicksPerMillisecond);
-
-                headers = (System.Net.WebHeaderCollection)listenerRequest.Headers;
-
-                System.Ext.Console.Write("Request From: " + listenerRequest.RemoteEndPoint.ToString());
-
-                // Checks and process headers important for DPWS
-                if (!ProcessKnownHeaders(listenerContext))
-                {
-                    msg = null;
-                    return ChainResult.Abort;
-                }
-
-                soapResponse = null;
-
-                int messageLength = (int)listenerRequest.ContentLength64;
-                if (messageLength > 0)
-                {
-                    // If there is content length for the message, we read it complete.
-                    soapResponse = new byte[messageLength];
-
-                    for (int offset = 0; offset < messageLength; )
+                    if(m_persistConn && ctx.ContextObject != null)
                     {
-                        int noRead = listenerRequest.InputStream.Read(soapResponse, offset, messageLength - offset);
-                        if (noRead == 0)
+                        listenerContext = (HttpListenerContext)ctx.ContextObject;
+
+                        listenerContext.Reset();
+                    }
+                    else
+                    {
+                        if (m_httpListener == null)
                         {
-                            throw new IOException("Http server got only " + offset + " bytes. Expected to read " + messageLength + " bytes.");
+                            msg = null;
+                            return ChainResult.Abort;
                         }
 
-                        offset += noRead;
+                        listenerContext = m_httpListener.GetContext();
                     }
-                }
-                else
-                {
-                    // In this case the message is chunk encoded, but m_httpRequest.InputStream actually does processing.
-                    // So we we read until zero bytes are read.
-                    bool readComplete = false;
-                    int bufferSize = ReadPayload;
-                    soapResponse = new byte[bufferSize];
-                    int offset = 0;
-                    while (!readComplete)
+
+                    if (listenerContext == null)
                     {
-                        while (offset < ReadPayload)
+                        msg = null;
+                        return ChainResult.Abort;
+                    }
+
+                    ctx.ContextObject = listenerContext;
+
+                    // The context returned by m_httpListener.GetContext(); can be null in case the service was stopped.
+                    HttpListenerRequest listenerRequest = listenerContext.Request;
+
+                    HttpListenerResponse listenerResponse = listenerContext.Response;
+
+                    listenerRequest.InputStream.ReadTimeout = (int)(ctx.ReceiveTimeout.Ticks / TimeSpan.TicksPerMillisecond);
+                    listenerResponse.OutputStream.WriteTimeout = (int)(ctx.SendTimeout.Ticks / TimeSpan.TicksPerMillisecond);
+
+                    headers = (System.Net.WebHeaderCollection)listenerRequest.Headers;
+
+                    System.Ext.Console.Write("Request From: " + listenerRequest.RemoteEndPoint.ToString());
+
+                    // Checks and process headers important for DPWS
+                    if (!ProcessKnownHeaders(listenerContext))
+                    {
+                        msg = null;
+                        return ChainResult.Abort;
+                    }
+
+                    soapResponse = null;
+
+                    int messageLength = (int)listenerRequest.ContentLength64;
+                    if (messageLength > 0)
+                    {
+                        // If there is content length for the message, we read it complete.
+                        soapResponse = new byte[messageLength];
+
+                        for (int offset = 0; offset < messageLength; )
                         {
                             int noRead = listenerRequest.InputStream.Read(soapResponse, offset, messageLength - offset);
-                            // If we read zero bytes - means this is end of message. This is how InputStream.Read for chunked encoded data.
                             if (noRead == 0)
                             {
-                                readComplete = true;
-                                break;
+                                throw new IOException("Http server got only " + offset + " bytes. Expected to read " + messageLength + " bytes.");
                             }
 
                             offset += noRead;
                         }
-
-                        // If read was not complete - increase the buffer.
-                        if (!readComplete)
-                        {
-                            bufferSize += ReadPayload;
-                            byte[] newMessageBuf = new byte[bufferSize];
-                            Array.Copy(soapResponse, newMessageBuf, offset);
-                            soapResponse = newMessageBuf;
-                        }
                     }
-                }                
+                    else
+                    {
+                        // In this case the message is chunk encoded, but m_httpRequest.InputStream actually does processing.
+                        // So we we read until zero bytes are read.
+                        bool readComplete = false;
+                        int bufferSize = ReadPayload;
+                        soapResponse = new byte[bufferSize];
+                        int offset = 0;
+                        while (!readComplete)
+                        {
+                            while (offset < ReadPayload)
+                            {
+                                int noRead = listenerRequest.InputStream.Read(soapResponse, offset, messageLength - offset);
+                                // If we read zero bytes - means this is end of message. This is how InputStream.Read for chunked encoded data.
+                                if (noRead == 0)
+                                {
+                                    readComplete = true;
+                                    break;
+                                }
+
+                                offset += noRead;
+                            }
+
+                            // If read was not complete - increase the buffer.
+                            if (!readComplete)
+                            {
+                                bufferSize += ReadPayload;
+                                byte[] newMessageBuf = new byte[bufferSize];
+                                Array.Copy(soapResponse, newMessageBuf, offset);
+                                soapResponse = newMessageBuf;
+                            }
+                        }
+                    }                
+                }
+                catch
+                {
+                    ctx.ContextObject = null;
+                    throw;
+                }
             }
 
             if(headers != null)
@@ -326,7 +399,10 @@ namespace Ws.Services.Binding
                 {
                     string key = keys[i];
                     
-                    props.Add( new BindingProperty( "header", key, headers[key] ) );
+                    if(!WebHeaderCollection.IsRestricted(key))
+                    {
+                        props.Add( new BindingProperty( "header", key, headers[key] ) );
+                    }
                 }
             }
 
@@ -442,67 +518,88 @@ namespace Ws.Services.Binding
             if(ctx is ClientBindingContext)
             {
                 if (message == null) return ChainResult.Abort;
-                
-                HttpWebRequest request   = HttpWebRequest.Create(new Uri(m_endpointUri.AbsoluteUri)) as HttpWebRequest;
-                request.Timeout          = (int)(ctx.OpenTimeout.Ticks / TimeSpan.TicksPerMillisecond);
-                request.ReadWriteTimeout = (int)(ctx.ReceiveTimeout.Ticks / TimeSpan.TicksPerMillisecond);
 
-                ctx.ContextObject = request;
+                HttpWebRequest request;
 
-                // Post method
-                request.Method = "POST";
-
-                WebHeaderCollection headers = request.Headers;
-
-                request.ContentType = contentType;
-                request.UserAgent   = "MFWsAPI";
-
-                request.Headers.Add(HttpKnownHeaderNames.CacheControl, "no-cache");
-                request.Headers.Add(HttpKnownHeaderNames.Pragma      , "no-cache");
-
-                if (props != null)
+                try
                 {
-                    int len = props.Count;
-                    for (int i = 0; i < len; i++)
+                    if(!m_persistConn || ctx.ContextObject == null)
                     {
-                        BindingProperty prop = (BindingProperty)props[i];
-                        string container = prop.Container;
+                        request = HttpWebRequest.Create(new Uri(m_transportUri.AbsoluteUri)) as HttpWebRequest;
+                        request.Timeout          = (int)(ctx.OpenTimeout.Ticks / TimeSpan.TicksPerMillisecond);
+                        request.ReadWriteTimeout = (int)(ctx.ReceiveTimeout.Ticks / TimeSpan.TicksPerMillisecond);
 
-                        if (container == "header")
+                        ctx.ContextObject = request;
+                    }
+                    else
+                    {
+                        request = (HttpWebRequest)ctx.ContextObject;
+
+                        request.Reset();
+                    }
+                    
+
+                    // Post method
+                    request.Method = "POST";
+
+                    WebHeaderCollection headers = request.Headers;
+
+                    request.ContentType = contentType;
+                    request.UserAgent   = "MFWsAPI";
+
+                    request.Headers.Add(HttpKnownHeaderNames.CacheControl, "no-cache");
+                    request.Headers.Add(HttpKnownHeaderNames.Pragma      , "no-cache");
+
+                    if (props != null)
+                    {
+                        int len = props.Count;
+                        for (int i = 0; i < len; i++)
                         {
-                            headers.Add(prop.Name, (string)prop.Value);
+                            BindingProperty prop = (BindingProperty)props[i];
+                            string container = prop.Container;
+
+                            if (container == "header")
+                            {
+                                headers.Add(prop.Name, (string)prop.Value);
+                            }
+                            else if (container == null || container == "")
+                            {
+                                string name = prop.Name;
+
+                                if (name == HttpKnownHeaderNames.ContentType)
+                                {
+                                    request.ContentType = (string)prop.Value;
+                                }
+                                else if (name == HttpKnownHeaderNames.UserAgent)
+                                {
+                                    request.UserAgent = (string)prop.Value;
+                                }
+                            }
                         }
-                        else if (container == null || container == "")
-                        {
-                            string name = prop.Name;
+                    }
 
-                            if (name == HttpKnownHeaderNames.ContentType)
-                            {
-                                request.ContentType = (string)prop.Value;
-                            }
-                            else if (name == HttpKnownHeaderNames.UserAgent)
-                            {
-                                request.UserAgent = (string)prop.Value;
-                            }
+                    if (message != null)
+                    {
+                        System.Ext.Console.Write("Http message sent: ");
+                        System.Ext.Console.Write(message);
+
+                        request.ContentLength = message.Length;
+
+                        using (Stream stream = request.GetRequestStream())
+                        {
+                            // Write soap message
+                            stream.Write(message, 0, message.Length);
+
+                            // Flush the stream and force a write
+                            stream.Flush();
                         }
                     }
                 }
-
-                if (message != null)
+                catch
                 {
-                    System.Ext.Console.Write("Http message sent: ");
-                    System.Ext.Console.Write(message);
+                    ctx.ContextObject = null;
 
-                    request.ContentLength = message.Length;
-
-                    using (Stream stream = request.GetRequestStream())
-                    {
-                        // Write soap message
-                        stream.Write(message, 0, message.Length);
-
-                        // Flush the stream and force a write
-                        stream.Flush();
-                    }
+                    throw;
                 }
             }
             else
@@ -513,118 +610,122 @@ namespace Ws.Services.Binding
                 
                 HttpListenerResponse listenerResponse = listenerContext.Response;
 
-                if(listenerResponse == null || listenerResponse.OutputStream == null) return ChainResult.Abort;
+                if (listenerResponse == null || listenerResponse.OutputStream == null)
+                {
+                    ctx.ContextObject = null;
+                    return ChainResult.Abort;
+                }
 
                 try
                 {
-                    using (StreamWriter streamWriter = new StreamWriter(listenerResponse.OutputStream))
+                    StreamWriter streamWriter = new StreamWriter(listenerResponse.OutputStream);
+
+                    // Write Header, if message is null write accepted
+                    if (message == null || (msg != null && msg.Header != null && msg.Header.IsFaultMessage))
+                        listenerResponse.StatusCode = 202;
+                    else
+                        listenerResponse.StatusCode = 200;
+
+                    // Check to see it the hosted service is sending mtom
+                    WebHeaderCollection headers = listenerResponse.Headers;
+
+                    listenerResponse.ContentType = contentType;
+
+                    bool isChunked = false;
+
+                    if (props != null)
                     {
-                        // Write Header, if message is null write accepted
-                        if (message == null)
-                            listenerResponse.StatusCode = 202;
-                        else
-                            listenerResponse.StatusCode = 200;
-
-                        // Check to see it the hosted service is sending mtom
-                        WebHeaderCollection headers = listenerResponse.Headers;
-
-                        listenerResponse.ContentType = contentType;
-
-                        bool isChunked = false;
-
-                        if (props != null)
+                        int len = props.Count;
+                        for (int i = 0; i < len; i++)
                         {
-                            int len = props.Count;
-                            for (int i = 0; i < len; i++)
+                            BindingProperty prop = (BindingProperty)props[i];
+                            string container = prop.Container;
+                            string name = prop.Name;
+                            string value = (string)prop.Value;
+
+                            if (container == "header")
                             {
-                                BindingProperty prop = (BindingProperty)props[i];
-                                string container = prop.Container;
-                                string name = prop.Name;
-                                string value = (string)prop.Value;
-
-                                if (container == "header")
+                                if (!isChunked && name == HttpKnownHeaderNames.TransferEncoding && value.ToLower() == "chunked")
                                 {
-                                    if (!isChunked && name == HttpKnownHeaderNames.TransferEncoding && value.ToLower() == "chunked")
-                                    {
-                                        isChunked = true;
-                                    }
-
-                                    headers.Add(name, (string)prop.Value);
+                                    isChunked = true;
                                 }
-                                else if (container == null || container == "")
+
+                                headers.Add(name, (string)prop.Value);
+                            }
+                            else if (container == null || container == "")
+                            {
+                                if (name == HttpKnownHeaderNames.ContentType)
                                 {
-                                    if (name == HttpKnownHeaderNames.ContentType)
-                                    {
-                                        listenerResponse.ContentType = (string)prop.Value;
-                                        System.Ext.Console.Write(HttpKnownHeaderNames.ContentType + ": " + listenerResponse.ContentType);
-                                    }
+                                    listenerResponse.ContentType = (string)prop.Value;
+                                    System.Ext.Console.Write(HttpKnownHeaderNames.ContentType + ": " + listenerResponse.ContentType);
                                 }
                             }
                         }
-
-                        // If chunked encoding is enabled write chunked message else write Content-Length
-                        if (isChunked)
-                        {
-                            // Chunk message
-                            int bufferIndex = 0;
-                            int chunkSize = 0;
-                            int defaultChunkSize = 0xff;
-#if DEBUG
-                        byte[] displayBuffer = new byte[defaultChunkSize];
-#endif
-                            while (bufferIndex < message.Length)
-                            {
-
-                                // Calculate chunk size and write to stream
-                                chunkSize = message.Length - bufferIndex < defaultChunkSize ? message.Length - bufferIndex : defaultChunkSize;
-                                streamWriter.WriteLine(chunkSize.ToString("{0:X}"));
-                                System.Ext.Console.Write(chunkSize.ToString("{0:X}"));
-
-                                // Write chunk
-                                streamWriter.WriteBytes(message, bufferIndex, chunkSize);
-                                streamWriter.WriteLine();
-#if DEBUG
-                                Array.Copy(message, bufferIndex, displayBuffer, 0, chunkSize);
-                                System.Ext.Console.Write(displayBuffer, bufferIndex, chunkSize);
-#endif
-
-                                // Adjust buffer index
-                                bufferIndex = bufferIndex + chunkSize;
-                            }
-
-                            // Write 0 length and blank line
-                            streamWriter.WriteLine("0");
-                            streamWriter.WriteLine();
-                            System.Ext.Console.Write("0");
-                            System.Ext.Console.Write("");
-
-                        }
-                        else
-                        {
-                            if (message == null)
-                            {
-                                listenerResponse.ContentLength64 = 0;
-                            }
-                            else
-                            {
-                                listenerResponse.ContentLength64 = message.Length;
-                            }
-
-                            System.Ext.Console.Write("Content Length: " + listenerResponse.ContentLength64);
-
-                            // If an empty message is returned (i.e. oneway request response) don't send
-                            if (message != null && message.Length > 0)
-                            {
-                                System.Ext.Console.Write(message);
-
-                                // Write soap message
-                                streamWriter.WriteBytes(message, 0, message.Length);
-                            }
-                        }
-
-                        // Flush the stream and return
-                        streamWriter.Flush();
                     }
+
+                    // If chunked encoding is enabled write chunked message else write Content-Length
+                    if (isChunked)
+                    {
+                        // Chunk message
+                        int bufferIndex = 0;
+                        int chunkSize = 0;
+                        int defaultChunkSize = 0xff;
+#if DEBUG
+                    byte[] displayBuffer = new byte[defaultChunkSize];
+#endif
+                        while (bufferIndex < message.Length)
+                        {
+
+                            // Calculate chunk size and write to stream
+                            chunkSize = message.Length - bufferIndex < defaultChunkSize ? message.Length - bufferIndex : defaultChunkSize;
+                            streamWriter.WriteLine(chunkSize.ToString("{0:X}"));
+                            System.Ext.Console.Write(chunkSize.ToString("{0:X}"));
+
+                            // Write chunk
+                            streamWriter.WriteBytes(message, bufferIndex, chunkSize);
+                            streamWriter.WriteLine();
+#if DEBUG
+                            Array.Copy(message, bufferIndex, displayBuffer, 0, chunkSize);
+                            System.Ext.Console.Write(displayBuffer, bufferIndex, chunkSize);
+#endif
+
+                            // Adjust buffer index
+                            bufferIndex = bufferIndex + chunkSize;
+                        }
+
+                        // Write 0 length and blank line
+                        streamWriter.WriteLine("0");
+                        streamWriter.WriteLine();
+                        System.Ext.Console.Write("0");
+                        System.Ext.Console.Write("");
+
+                    }
+                    else
+                    {
+                        if (message == null)
+                        {
+                            listenerResponse.ContentLength64 = 0;
+                        }
+                        else
+                        {
+                            listenerResponse.ContentLength64 = message.Length;
+                        }
+
+                        System.Ext.Console.Write("Content Length: " + listenerResponse.ContentLength64);
+
+                        // If an empty message is returned (i.e. oneway request response) don't send
+                        if (message != null && message.Length > 0)
+                        {
+                            System.Ext.Console.Write(message);
+
+                            // Write soap message
+                            streamWriter.WriteBytes(message, 0, message.Length);
+                        }
+                    }
+
+                    // Flush the stream and return
+                    streamWriter.Flush();
+
                 }
                 catch
                 {
@@ -632,7 +733,15 @@ namespace Ws.Services.Binding
                 }
                 finally
                 {
-                    listenerContext.Close();
+                    if (m_persistConn)
+                    {
+                        listenerResponse.Detach();
+                    }
+                    else
+                    {
+                        listenerContext.Close( ctx.CloseTimeout.Seconds );
+                        ctx.ContextObject = null;
+                    }
                 }
             }
             return ChainResult.Handled;

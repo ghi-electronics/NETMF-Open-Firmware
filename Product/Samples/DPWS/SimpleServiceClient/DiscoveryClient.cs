@@ -87,7 +87,7 @@ namespace Interop.SimpleService
             DpwsServiceTypes searchTypes = new DpwsServiceTypes();
 
             // Build a SimpleDeviceType search type
-            DpwsServiceType searchType1 = new DpwsServiceType("SimpleDeviceType", "http://schemas.example.org/SimpleService");
+            DpwsServiceType searchType1 = new DpwsServiceType("SimpleService", "http://schemas.example.org/SimpleService");
             searchTypes.Add(searchType1);
             
             // Get the SimpleDeviceType service details

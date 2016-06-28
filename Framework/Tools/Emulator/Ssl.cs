@@ -20,6 +20,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.Win32.SafeHandles;
 using Microsoft.SPOT.Emulator.Com;
 using Microsoft.SPOT.Emulator.Sockets;
+using Microsoft.SPOT.Emulator.PKCS11;
 
 namespace Microsoft.SPOT.Emulator.Sockets.Security
 {
@@ -29,8 +30,8 @@ namespace Microsoft.SPOT.Emulator.Sockets.Security
         {
             internal SslProtocols    m_sslVersion;
             internal SslVerification m_sslVerify;
-            internal X509Certificate m_cert;
-            internal X509CertificateCollection m_caCollection = new X509CertificateCollection();
+            internal X509Certificate2 m_cert;
+            internal X509Certificate2Collection m_caCollection = new X509Certificate2Collection();
 
             internal IntPtr  m_hSecCtx = IntPtr.Zero;
             internal IntPtr  m_hCred   = IntPtr.Zero;
@@ -103,9 +104,9 @@ namespace Microsoft.SPOT.Emulator.Sockets.Security
             return true;
         }
 
-        internal X509Certificate CreateCert(IntPtr certificate, int cert_len, string pwd)
+        internal X509Certificate2 CreateCert(IntPtr certificate, int cert_len, string pwd)
         {
-            X509Certificate cert = null;
+            X509Certificate2 cert = null;
 
             unsafe
             {
@@ -115,11 +116,11 @@ namespace Microsoft.SPOT.Emulator.Sockets.Security
 
                 if(string.IsNullOrEmpty(pwd))
                 {
-                    cert = new X509Certificate(data);
+                    cert = new X509Certificate2(data);
                 }
                 else
                 {
-                    cert = new X509Certificate(data, pwd);
+                    cert = new X509Certificate2(data, pwd, X509KeyStorageFlags.Exportable);
                 }
             }
 
@@ -152,7 +153,22 @@ namespace Microsoft.SPOT.Emulator.Sockets.Security
             data.m_sslVerify  = (SslVerification)sslVerify;
             if (certificate != IntPtr.Zero)
             {
-                data.m_cert = CreateCert(certificate, cert_len, Marshal.PtrToStringAnsi(szCertPwd));
+                if (cert_len == 4)
+                {
+                    SessionData ctx = ((SessionDriver)this.Hal.Session).GetSessionCtx(sslContextHandle);
+
+                    if (ctx == null) return false;
+
+                    CryptokiObject obj = ctx.ObjectCtx.GetObject(Marshal.ReadInt32(certificate));
+
+                    if (obj == null || obj.Type != CryptokiObjectType.Cert) return false;
+
+                    data.m_cert = obj.Data as X509Certificate2;
+                }
+                else
+                {
+                    data.m_cert = CreateCert(certificate, cert_len, Marshal.PtrToStringAnsi(szCertPwd));
+                }
             }
 
             lock (this)

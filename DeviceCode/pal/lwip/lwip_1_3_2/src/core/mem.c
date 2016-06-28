@@ -181,7 +181,8 @@ static struct mem *ram_end;
 static struct mem *lfree;
 
 /** concurrent access protection */
-static sys_sem_t mem_sem;
+static u32_t s_tempSem = 1;
+static sys_sem_t mem_sem = &s_tempSem;
 
 #if LWIP_ALLOW_MEM_FREE_FROM_OTHER_CONTEXT
 

@@ -42,6 +42,9 @@ using namespace Microsoft::SPOT::Emulator::FS;
 using namespace Microsoft::SPOT::Emulator::TouchPanel;
 using namespace Microsoft::SPOT::Emulator::BlockStorage;
 using namespace Microsoft::SPOT::Emulator::Watchdog;
+using namespace Microsoft::SPOT::Emulator::PKCS11;
+using namespace Microsoft::SPOT::Emulator::Update;
+
 
 namespace Microsoft
 {
@@ -74,8 +77,22 @@ namespace Microsoft
                 ITouchPanelDriver^ m_touchPanelDriver;
                 IWatchdogDriver^ m_watchdogDriver;
 
+                ISessionDriver^ m_sessionDriver;
+                IEncryptionDriver^ m_encryptionDriver;
+                IDigestDriver^ m_digestDriver;
+                ISignatureDriver^ m_signatureDriver;
+                IKeyManagementDriver^ m_keyManagementDriver;
+                ICryptokiObjectDriver^ m_crypokiObjectMgrDriver;
+                IRandomDriver^ m_randomDriver;
+
+                IUpdateDriver^ m_updateProvider;
+                IUpdateStorageDriver^ m_updateStorage;
+                IUpdateBackupDriver^ m_updateBackup;
+                IUpdateValidationDriver^ m_updateValidation;
+
                 Settings* settings;
                 bool m_fShuttingDown;
+                bool m_isClrStarted;
 
             public:
                 EmulatorNative();
@@ -121,6 +138,19 @@ namespace Microsoft
                 static IBlockStorageDriver^ GetIBlockStorageDriver();
                 static ITouchPanelDriver^ GetITouchPanelDriver();
                 static IWatchdogDriver^ GetIWatchdogDriver();
+
+                static ISessionDriver^ GetISessionDriver();
+                static IEncryptionDriver^ GetIEncryptionDriver();
+                static IDigestDriver^ GetIDigestDriver();
+                static ISignatureDriver^ GetISignatureDriver();
+                static IKeyManagementDriver^ GetIKeyManagementDriver();
+                static ICryptokiObjectDriver^ GetICryptokiObjectDriver();
+                static IRandomDriver^ GetIRandomDriver();
+
+                static IUpdateDriver^ GetIUpdateProvider();
+                static IUpdateStorageDriver^ GetIUpdateStorage();
+                static IUpdateBackupDriver^ GetIUpdateBackup();
+                static IUpdateValidationDriver^ GetIUpdateValidation();
 
                 void DisableInterrupts();
                 void EnableInterrupts();

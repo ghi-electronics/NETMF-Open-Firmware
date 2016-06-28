@@ -55,6 +55,34 @@ namespace Microsoft.SPOT.Platform.Tests
         }
 
         [TestMethod]
+        public MFTestResults Number_ToString_Test()
+        {
+            bool bRet = true;
+
+            // if the negative number can not be truncated to the range specified it
+            // will display its full hex value
+            bRet &=               "FE" == ((sbyte )                -2).ToString("x02");
+            bRet &=               "36" == ((byte  )              0x36).ToString("x02");
+            bRet &=             "FFFD" == ((short )                -3).ToString("x04");
+            bRet &=             "3049" == ((ushort)            0x3049).ToString("x4");
+            bRet &=             "FC00" == ((short )             -1024).ToString("x02");
+            bRet &=         "FFFFFFFC" == ((int   )                -4).ToString("x8");
+            bRet &=         "00004494" == ((uint  )            0x4494).ToString("x8");
+            bRet &=         "FFFFFFFC" == ((int   )                -4).ToString("x04");
+            bRet &= "FFFFFFFFFFFFFFFB" == ((long  )                -5).ToString("x016");
+            bRet &= "1234567890123456" == ((ulong )0x1234567890123456).ToString("x16");
+            // you should not be able to truncate the value only leading zeros
+            bRet &= "1234567890123456" == ((ulong )0x1234567890123456).ToString("x06");
+            bRet &=   "34567890123456" == ((ulong )0x0034567890123456).ToString("x14");
+            
+            if (bRet)
+            {
+                return MFTestResults.Pass;
+            }
+            return MFTestResults.Fail;
+        }
+
+        [TestMethod]
         public MFTestResults SystemType1_GetType_Test()
         {
             /// <summary>

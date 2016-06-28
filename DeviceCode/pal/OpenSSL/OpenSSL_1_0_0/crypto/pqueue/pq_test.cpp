@@ -57,7 +57,7 @@
  *
  */
 
-#include <openssl/pqueue.h>
+#include "pqueue.h"
 #include <tinyclr/ssl_types.h>
 
 int
@@ -66,28 +66,24 @@ main(void)
 	pitem *item;
 	pqueue pq;
 
-	int one = 1;
-	int two = 2;
-	int three = 3;
-
 	pq = pqueue_new();
 
-	item = pitem_new((unsigned char*)&three, NULL);
+	item = pitem_new(3, NULL);
 	pqueue_insert(pq, item);
 
-	item = pitem_new((unsigned char*)&one, NULL);
+	item = pitem_new(1, NULL);
 	pqueue_insert(pq, item);
 
-	item = pitem_new((unsigned char*)&two, NULL);
+	item = pitem_new(2, NULL);
 	pqueue_insert(pq, item);
 
-	item = pqueue_find(pq, (unsigned char*)&one);
+	item = pqueue_find(pq, 1);
 	TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR, "found %ld\n", item->priority);
 
-	item = pqueue_find(pq, (unsigned char*)&two);
+	item = pqueue_find(pq, 2);
 	TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR, "found %ld\n", item->priority);
 
-	item = pqueue_find(pq, (unsigned char*)&three);
+	item = pqueue_find(pq, 3);
 	TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR, "found %ld\n", item ? item->priority: 0);
 
 	pqueue_print(pq);

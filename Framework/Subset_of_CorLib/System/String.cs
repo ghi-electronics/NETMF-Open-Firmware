@@ -24,7 +24,7 @@ namespace System
      * @version
      */
     [Serializable]
-    public sealed class String
+    public sealed class String : IComparable
     {
         public static readonly String Empty = "";
         public override bool Equals(object obj)

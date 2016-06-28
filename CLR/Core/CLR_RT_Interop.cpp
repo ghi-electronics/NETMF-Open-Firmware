@@ -743,10 +743,15 @@ INT64 &Interop_Marshal_GetField_double( CLR_RT_HeapBlock *pThis, UINT32 fieldInd
 
 #endif
 
-
+#if defined(__arm)
+#pragma push
+#pragma diag_suppress 284
+#endif
 UNSUPPORTED_TYPE &Interop_Marshal_GetField_UNSUPPORTED_TYPE( CLR_RT_HeapBlock *pThis, UINT32 fieldIndex )
 {
     return (UNSUPPORTED_TYPE &)(*((UNSUPPORTED_TYPE *)NULL));
 }
-
+#if defined(__arm)
+#pragma pop
+#endif
 

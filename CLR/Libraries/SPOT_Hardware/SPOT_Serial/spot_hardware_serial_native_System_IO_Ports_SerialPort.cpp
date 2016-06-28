@@ -177,6 +177,8 @@ HRESULT Library_spot_hardware_serial_native_System_IO_Ports_SerialPort::Read___I
             ptr     += read;
             totRead += read;
             count   -= read;
+
+            break;
         }
     }
 
@@ -188,7 +190,7 @@ HRESULT Library_spot_hardware_serial_native_System_IO_Ports_SerialPort::Read___I
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_spot_hardware_serial_native_System_IO_Ports_SerialPort::Write___I4__SZARRAY_U1__I4__I4( CLR_RT_StackFrame& stack )
+HRESULT Library_spot_hardware_serial_native_System_IO_Ports_SerialPort::Write___VOID__SZARRAY_U1__I4__I4( CLR_RT_StackFrame& stack )
 {
     NATIVE_PROFILE_CLR_HARDWARE();
     TINYCLR_HEADER();
@@ -359,7 +361,7 @@ HRESULT Library_spot_hardware_serial_native_System_IO_Ports_SerialPort::BytesInB
     }
 
     config = pThis[ FIELD__m_config ].Dereference(); FAULT_ON_NULL(config);
-    fInput = (TRUE == stack.Arg1().NumericByRef().u1);
+    fInput = stack.Arg1().NumericByRef().u1 == 0 ? FALSE : TRUE;
 
     portId = config[ Library_spot_hardware_serial_native_System_IO_Ports_SerialPort__Configuration::FIELD__PortIndex ].NumericByRef().u4;
 
@@ -394,7 +396,7 @@ HRESULT Library_spot_hardware_serial_native_System_IO_Ports_SerialPort::DiscardB
     }
 
     config = pThis[ FIELD__m_config ].Dereference(); FAULT_ON_NULL(config);
-    fInput = (TRUE == stack.Arg1().NumericByRef().u1);
+    fInput = stack.Arg1().NumericByRef().u1 == 0 ? FALSE : TRUE;
 
     portId = config[ Library_spot_hardware_serial_native_System_IO_Ports_SerialPort__Configuration::FIELD__PortIndex ].NumericByRef().u4;
 

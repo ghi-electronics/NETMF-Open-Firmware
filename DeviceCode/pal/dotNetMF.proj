@@ -35,6 +35,10 @@
   <ItemGroup>
     <SubDirectories Include="SimpleHeap"/>
   </ItemGroup>
+ 
+  <ItemGroup Condition="'$(PLATFORM_EMULATED_FLOATINGPOINT)'!='true'"> 
+    <SubDirectories Include="Double" />    <!-- Support Double precison floating point -->
+  </ItemGroup>
 
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 

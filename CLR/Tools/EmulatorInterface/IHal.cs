@@ -19,6 +19,8 @@ using Microsoft.SPOT.Emulator.TouchPanel;
 using Microsoft.SPOT.Emulator.BlockStorage;
 using Microsoft.SPOT.Emulator.Watchdog;
 using Microsoft.SPOT.Emulator.Sockets.Security;
+using Microsoft.SPOT.Emulator.PKCS11;
+using Microsoft.SPOT.Emulator.Update;
 
 
 namespace Microsoft.SPOT.Emulator
@@ -42,6 +44,19 @@ namespace Microsoft.SPOT.Emulator
         IFSDriver FileSystem { get; }
         IBlockStorageDriver BlockStorage { get; }
         ISslDriver Ssl { get; }
+
+        ISessionDriver Session { get; }
+        IKeyManagementDriver KeyManagement { get; }
+        IEncryptionDriver Encryption { get; }
+        IDigestDriver Digest { get; }
+        ISignatureDriver Signature { get; }
+        ICryptokiObjectDriver CryptokiObjectMgr { get; }
+        IRandomDriver Random { get; }
+
+        IUpdateDriver UpdateProvider { get; }
+        IUpdateStorageDriver UpdateStorage { get; }
+        IUpdateBackupDriver UpdateBackup { get; }
+        IUpdateValidationDriver UpdateValidation { get; }
 
         //random other stuff
         void EnableInterrupts();

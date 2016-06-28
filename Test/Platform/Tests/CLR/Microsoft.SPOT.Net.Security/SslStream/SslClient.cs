@@ -7,6 +7,7 @@ using System.Threading;
 using Microsoft.SPOT.Net;
 using Microsoft.SPOT.Net.Security;
 using Microsoft.SPOT.Platform.Test;
+using System.Security.Cryptography.X509Certificates;
 
 
 namespace Microsoft.SPOT.Platform.Tests

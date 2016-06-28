@@ -24,6 +24,27 @@
     <LINK    Condition="'$(COMPILER_TOOL_VERSION)'=='MDK3.80a'">"$(MDK_TOOL_PATH)\bin40\armlink.exe"</LINK>
     <AR      Condition="'$(COMPILER_TOOL_VERSION)'=='MDK3.80a'">"$(MDK_TOOL_PATH)\bin40\armar.exe"</AR>
     <FROMELF Condition="'$(COMPILER_TOOL_VERSION)'=='MDK3.80a'">"$(MDK_TOOL_PATH)\bin40\fromelf.exe"</FROMELF>
+
+    <CC      Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.12'">"$(MDK_TOOL_PATH)\bin40\armcc.exe"</CC>
+    <CPP     Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.12'">"$(MDK_TOOL_PATH)\bin40\armcc.exe"</CPP>
+    <AS      Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.12'">"$(MDK_TOOL_PATH)\bin40\armasm.exe"</AS>
+    <LINK    Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.12'">"$(MDK_TOOL_PATH)\bin40\armlink.exe"</LINK>
+    <AR      Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.12'">"$(MDK_TOOL_PATH)\bin40\armar.exe"</AR>
+    <FROMELF Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.12'">"$(MDK_TOOL_PATH)\bin40\fromelf.exe"</FROMELF>
+
+    <CC      Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.13'">"$(MDK_TOOL_PATH)\bin40\armcc.exe"</CC>
+    <CPP     Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.13'">"$(MDK_TOOL_PATH)\bin40\armcc.exe"</CPP>
+    <AS      Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.13'">"$(MDK_TOOL_PATH)\bin40\armasm.exe"</AS>
+    <LINK    Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.13'">"$(MDK_TOOL_PATH)\bin40\armlink.exe"</LINK>
+    <AR      Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.13'">"$(MDK_TOOL_PATH)\bin40\armar.exe"</AR>
+    <FROMELF Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.13'">"$(MDK_TOOL_PATH)\bin40\fromelf.exe"</FROMELF>
+
+    <CC      Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.54'">"$(MDK_TOOL_PATH)\bin40\armcc.exe"</CC>
+    <CPP     Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.54'">"$(MDK_TOOL_PATH)\bin40\armcc.exe"</CPP>
+    <AS      Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.54'">"$(MDK_TOOL_PATH)\bin40\armasm.exe"</AS>
+    <LINK    Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.54'">"$(MDK_TOOL_PATH)\bin40\armlink.exe"</LINK>
+    <AR      Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.54'">"$(MDK_TOOL_PATH)\bin40\armar.exe"</AR>
+    <FROMELF Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.54'">"$(MDK_TOOL_PATH)\bin40\fromelf.exe"</FROMELF>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -47,10 +68,18 @@
     <CC_CPP_COMMON_FLAGS Condition="'$(reducesize)'!='true'">$(CC_CPP_COMMON_FLAGS) $(SWTC)feedback $(SPO_SDK)\tools\make\Feedback\$(TARGETPLATFORM)_$(COMPILER_TOOL_VERSION).feedback</CC_CPP_COMMON_FLAGS>
     <CC_CPP_COMMON_FLAGS Condition="'$(reducesize)'=='true'">$(CC_CPP_COMMON_FLAGS) $(SWTC)feedback $(SPO_SDK)\tools\make\Feedback\$(TARGETPLATFORM)_$(COMPILER_TOOL_VERSION)_loader.feedback</CC_CPP_COMMON_FLAGS>
 
-    <CC_CPP_TARGETTYPE_FLAGS Condition="'$(FLAVOR)'=='RTM'"         >$(CC_CPP_TARGETTYPE_FLAGS) $(SWTC)no_debug $(SWTC)dwarf2 $(SWTC)no_debug_macros -O3  $(SWTC)inline -Otime $(SWTC)no_autoinline</CC_CPP_TARGETTYPE_FLAGS>
-    <CC_CPP_TARGETTYPE_FLAGS Condition="'$(FLAVOR)'=='Debug'"       >$(CC_CPP_TARGETTYPE_FLAGS) $(SWTC)debug    $(SWTC)dwarf2 $(SWTC)debug_macros    -O0         $(SWTC)inline </CC_CPP_TARGETTYPE_FLAGS>
-    <CC_CPP_TARGETTYPE_FLAGS Condition="'$(FLAVOR)'=='Instrumented'">$(CC_CPP_TARGETTYPE_FLAGS) $(SWTC)debug    $(SWTC)dwarf2 $(SWTC)debug_macros    -O0         $(SWTC)inline </CC_CPP_TARGETTYPE_FLAGS>
-    <CC_CPP_TARGETTYPE_FLAGS Condition="'$(FLAVOR)'=='Release'"     >$(CC_CPP_TARGETTYPE_FLAGS) $(SWTC)no_debug $(SWTC)dwarf2 $(SWTC)no_debug_macros -O2 -Ospace $(SWTC)inline -Otime $(SWTC)no_autoinline</CC_CPP_TARGETTYPE_FLAGS>
+    <CC_CPP_ASM_INTERLEAVE Condition="'$(COMPILER_TOOL_VERSION)'=='MDK3.1'"  > $(SWTC)asm $(SWTC)interleave </CC_CPP_ASM_INTERLEAVE>
+    <CC_CPP_ASM_INTERLEAVE Condition="'$(COMPILER_TOOL_VERSION)'=='MDK3.80a'"> $(SWTC)asm $(SWTC)interleave </CC_CPP_ASM_INTERLEAVE>
+    <CC_CPP_ASM_INTERLEAVE Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.12'" > $(SWTC)asm $(SWTC)interleave </CC_CPP_ASM_INTERLEAVE>
+    <CC_CPP_ASM_INTERLEAVE Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.13'" > $(SWTC)asm $(SWTC)interleave </CC_CPP_ASM_INTERLEAVE>
+    <CC_CPP_ASM_INTERLEAVE Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.22'" > $(SWTC)asm $(SWTC)interleave </CC_CPP_ASM_INTERLEAVE>
+    <CC_CPP_ASM_INTERLEAVE Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.23'" > $(SWTC)asm $(SWTC)interleave </CC_CPP_ASM_INTERLEAVE>
+    <CC_CPP_ASM_INTERLEAVE Condition="'$(COMPILER_TOOL_VERSION)'=='MDK4.54'" >                              </CC_CPP_ASM_INTERLEAVE>
+
+    <CC_CPP_TARGETTYPE_FLAGS Condition="'$(FLAVOR)'=='RTM'"         >$(CC_CPP_TARGETTYPE_FLAGS) $(SWTC)no_debug $(SWTC)dwarf2 $(SWTC)no_debug_macros -O3 $(SWTC)inline -Otime $(SWTC)no_autoinline $(CC_CPP_ASM_INTERLEAVE) </CC_CPP_TARGETTYPE_FLAGS>
+    <CC_CPP_TARGETTYPE_FLAGS Condition="'$(FLAVOR)'=='Debug'"       >$(CC_CPP_TARGETTYPE_FLAGS) $(SWTC)debug    $(SWTC)dwarf2 $(SWTC)debug_macros    -O0 $(SWTC)inline                             $(CC_CPP_ASM_INTERLEAVE) </CC_CPP_TARGETTYPE_FLAGS>
+    <CC_CPP_TARGETTYPE_FLAGS Condition="'$(FLAVOR)'=='Instrumented'">$(CC_CPP_TARGETTYPE_FLAGS) $(SWTC)debug    $(SWTC)dwarf2 $(SWTC)debug_macros    -O0 $(SWTC)inline                             $(CC_CPP_ASM_INTERLEAVE) </CC_CPP_TARGETTYPE_FLAGS>
+    <CC_CPP_TARGETTYPE_FLAGS Condition="'$(FLAVOR)'=='Release'"     >$(CC_CPP_TARGETTYPE_FLAGS) $(SWTC)no_debug $(SWTC)dwarf2 $(SWTC)no_debug_macros -O2 $(SWTC)inline -Otime $(SWTC)no_autoinline $(CC_CPP_ASM_INTERLEAVE) </CC_CPP_TARGETTYPE_FLAGS>
 
 
     <AS_FLAGS>$(AS_FLAGS) $(SWTC)diag_suppress A1658</AS_FLAGS>
@@ -58,7 +87,6 @@
     <CC_FLAGS  >$(CC_FLAGS) $(SWTC)c90 $(STRICT) $(SWTC)diag_suppress 2874,111,161,550,C3011 $(SWTC)diag_warning 40,187 $(SWTC)split_sections</CC_FLAGS>
     <CPP_FLAGS >$(CPP_FLAGS) $(SWTC)cpp $(STRICT) $(SWTC)diag_suppress 2874,111,161,550,C3011 $(SWTC)diag_suppress 66,161,230,1293 $(SWTC)split_sections</CPP_FLAGS>
     <LINK_FLAGS>$(LINK_FLAGS) $(SWTC)no_keep_init_arrays $(SWTC)feedback $(BIN_DIR)\$(AssemblyName)_$(TARGETPLATFORM)_$(TARGETLOCATION)_$(FLAVOR)_$(COMPILER_TOOL_VERSION).feedback</LINK_FLAGS>
-    <LINK_FLAGS Condition="'$(DEVICE_TYPE)'!=''">$(LINK_FLAGS) $(SWTC)device $(DEVICE_TYPE)</LINK_FLAGS>
 
   </PropertyGroup>
 
@@ -66,10 +94,15 @@
   <PropertyGroup>
     <!--Common flags for Assembler/CC/CPP  -->
 
-    <!-- ONLY USE CPU specification for platform specific code (HAL) -->
-    <ARM_TYPE_FLAGS Condition="'$(DEVICE_TYPE)'!=''">$(SWTC)device $(DEVICE_TYPE)</ARM_TYPE_FLAGS>
+    <!-- Find out whether DEVICE_TYPE is an old style ('device' option) name -->
+    <OLD_STYLE_DEVICE_TYPE_NAME Condition="'$(DEVICE_TYPE)'=='DARMAD' OR '$(DEVICE_TYPE)'=='DARMAT' OR '$(DEVICE_TYPE)'=='DARMATS' OR '$(DEVICE_TYPE)'=='DARMMAC7' OR '$(DEVICE_TYPE)'=='DARMO' OR '$(DEVICE_TYPE)'=='DARMP' OR '$(DEVICE_TYPE)'=='DARMS' OR '$(DEVICE_TYPE)'=='DARMSH' OR '$(DEVICE_TYPE)'=='DARMSSC' OR '$(DEVICE_TYPE)'=='DARMST' OR '$(DEVICE_TYPE)'=='DARMTMS' OR '$(DEVICE_TYPE)'=='DARMSSC9' OR '$(DEVICE_TYPE)'=='DARMATS9' OR '$(DEVICE_TYPE)'=='DARMO9' OR '$(DEVICE_TYPE)'=='DARMP3' OR '$(DEVICE_TYPE)'=='DARMP9' OR '$(DEVICE_TYPE)'=='DARMSS9' OR '$(DEVICE_TYPE)'=='DARMST9' OR '$(DEVICE_TYPE)'=='DARMCM1' OR '$(DEVICE_TYPE)'=='DARMCP3' OR '$(DEVICE_TYPE)'=='DLM' OR '$(DEVICE_TYPE)'=='DARMSTM' OR '$(DEVICE_TYPE)'=='DARMSAM3' OR '$(DEVICE_TYPE)'=='DARMP1' OR '$(DEVICE_TYPE)'=='DARMT3' OR '$(DEVICE_TYPE)'=='DARMP0' OR '$(DEVICE_TYPE)'=='DARMTMS5'">true</OLD_STYLE_DEVICE_TYPE_NAME>
 
-    <FLOATING_POINT_FLAG Condition="'$(PLATFORM_EMULATED_FLOATINGPOINT)'!='true'"> $(SWTC)fpu softvfp </FLOATING_POINT_FLAG>
+    <!-- Use 'cpu' or 'device' option depending on the given name -->
+    <ARM_TYPE_FLAGS Condition="'$(OLD_STYLE_DEVICE_TYPE_NAME)'!='true' AND '$(DEVICE_TYPE)'!=''">$(SWTC)cpu $(DEVICE_TYPE)</ARM_TYPE_FLAGS>
+    <ARM_TYPE_FLAGS Condition="'$(OLD_STYLE_DEVICE_TYPE_NAME)'=='true'">$(SWTC)device $(DEVICE_TYPE)</ARM_TYPE_FLAGS>
+
+    <!-- Use default fpu specification for Cortex-M4F -->
+    <FLOATING_POINT_FLAG Condition="'$(PLATFORM_EMULATED_FLOATINGPOINT)'!='true' AND '$(DEVICE_TYPE)'!='Cortex-M4.fp'"> $(SWTC)fpu softvfp </FLOATING_POINT_FLAG>
     <FLOATING_POINT_FLAG Condition="'$(PLATFORM_EMULATED_FLOATINGPOINT)'=='true'"> $(SWTC)fpu none </FLOATING_POINT_FLAG>
 
     <AS_CC_CPP_COMMON_FLAGS>$(AS_CC_CPP_COMMON_FLAGS) $(FLOATING_POINT_FLAG) $(ARM_TYPE_FLAGS)</AS_CC_CPP_COMMON_FLAGS>
@@ -103,6 +136,8 @@
     <AS_FLAGS Condition="'$(reducesize)'=='true'">$(AS_FLAGS) $(SWTC)PD "HAL_REDUCESIZE SETS \"1\""</AS_FLAGS>
     <AS_FLAGS Condition="'$(reducesize)'!='true'">$(AS_FLAGS) $(SWTC)PD "HAL_REDUCESIZE SETS \"0\""</AS_FLAGS>
 
+    <AS_FLAGS>$(AS_FLAGS) @(AS_Defines->'$(SWTC)PD %(filename) SETS \"1\"',' ')</AS_FLAGS>
+
     <AS_FLAGS>$(AS_FLAGS) $(AS_CC_CPP_COMMON_FLAGS) $(AS_TARGETTYPE_FLAGS) $(AS_INCS) -g $(SWTC)keep</AS_FLAGS>
 
     <AS_SUBDIR>RVD_S</AS_SUBDIR>
@@ -110,8 +145,6 @@
     <!-- These would have to be conditional for non-Ollie support -->
   </PropertyGroup>
 
-
-  <!-- common cc/cpp flags for ARM compiler ADS1.2, RVDS3.0 and RVDS3.1 for c/cpp -->
   <PropertyGroup>
     <!-- CPP/CC flags depands on the target build -->
     <CC_CPP_TARGETTYPE_FLAGS Condition="'$(FLAVOR)'=='RTM'"         >$(CC_CPP_TARGETTYPE_FLAGS) -DBUILD_RTM</CC_CPP_TARGETTYPE_FLAGS>
@@ -145,11 +178,10 @@
     <CC_CPP_COMMON_FLAGS Condition="'$(ENDIANNESS)'=='be'">$(CC_CPP_COMMON_FLAGS) -DBIG_ENDIAN </CC_CPP_COMMON_FLAGS>
     <CC_CPP_COMMON_FLAGS Condition="'$(PATCH_BUILD)'=='Active'">$(CC_CPP_COMMON_FLAGS) -DPATCH_BUILD </CC_CPP_COMMON_FLAGS>
     <CC_CPP_COMMON_FLAGS Condition="'$(OS_PLATFORM)'=='true'"  >$(CC_CPP_COMMON_FLAGS) -DPLATFORM_ARM_OS_PORT </CC_CPP_COMMON_FLAGS>
-    <CC_CPP_COMMON_FLAGS Condition="'$(PLATFORM_NO_APPDOMAINS)'=='true'"  >$(CC_CPP_COMMON_FLAGS) -DTINYCLR_NO_APPDOAMINS </CC_CPP_COMMON_FLAGS>
-    <CC_CPP_COMMON_FLAGS Condition="'$(PLATFORM_EMULATED_FLOATINGPOINT)'=='true'"  >$(CC_CPP_COMMON_FLAGS) -DPLATFORM_EMULATED_FLOATINGPOINT </CC_CPP_COMMON_FLAGS>
 
-    <CC_CPP_COMMON_FLAGS Condition="'$(PLATFORM_HEAP_SIZE_THRESHOLD)'!=''"  >$(CC_CPP_COMMON_FLAGS) -DPLATFORM_DEPENDENT_HEAP_SIZE_THRESHOLD=$(PLATFORM_HEAP_SIZE_THRESHOLD)</CC_CPP_COMMON_FLAGS>
-    <CC_CPP_COMMON_FLAGS Condition="'$(PLATFORM_HEAP_SIZE_THRESHOLD_UPPER)'!=''"  >$(CC_CPP_COMMON_FLAGS) -DPLATFORM_DEPENDENT_HEAP_SIZE_THRESHOLD_UPPER=$(PLATFORM_HEAP_SIZE_THRESHOLD_UPPER)</CC_CPP_COMMON_FLAGS>
+    <CC_CPP_COMMON_FLAGS>$(CC_CPP_COMMON_FLAGS) @(TinyCLR_Defines->'-D%(filename)',' ')</CC_CPP_COMMON_FLAGS>
+
+    <CC_CPP_COMMON_FLAGS>$(CC_CPP_COMMON_FLAGS) @(CC_CPP_Defines->'-D%(filename)',' ')</CC_CPP_COMMON_FLAGS>
 
     <CC_CPP_INCS>$(CC_CPP_INCS) -I$(RVCT31INC)</CC_CPP_INCS>
     <CC_CPP_INCS>$(CC_CPP_INCS) -I$(CLRROOT)\$(Directory)</CC_CPP_INCS>
@@ -231,7 +263,7 @@
   </Target>
 
 
-  <Target Name="ArmCompileC" Condition="'@(CFiles)'!='' or '@(FastCompileCFile)'==''" Inputs="@(FastCompileCFile);@(CFiles);@(HFiles)" Outputs="@(ObjFiles)">
+  <Target Name="ArmCompileC" Condition="'@(CFiles)'!='' or '@(FastCompileCFile)'==''" Inputs="@(FastCompileCFile);@(CFiles);@(HFiles)" Outputs="@(CFiles->'$(OBJ_DIR)\%(filename).$(OBJ_EXT)')">
 <!--
     <ADSCompileCC Tool="WrappedTool="$(CC)" InputFiles="@(CFiles->'%(FullPath)')" OutputPath="$(OBJ_DIR)" Flags="$(CC_FLAGS) $(POS_DEPENDENT)" IncludePaths="@(IncludeDirs)"/>
 -->
@@ -252,7 +284,7 @@
   </Target>
 
   <Target Name="ArmBuildLib" Condition="'$(OutputType)'=='Library'" DependsOnTargets="FindCompileFilesExistence;FindFastCompileFilesExistence;DelBuildLib;ArmCompileC;ArmCompileCPP;ArmAssemble;CreateLibManifest;$(ExtraTargets);" Inputs="@(ObjFiles);@(LIB_FIRSTENTRY_OBJ);@(OEM_TARGETS);@(OEM_TARGETS_OBJ);@(PlatformIndependentLibs->'$(PLATFORM_INDEPENDENT_LIB_DIR)\%(FileName)%(Extension)')" Outputs="@(TargetLib);@(TargetLib->'%(FullPath).manifest')">
-    <Exec Condition="'@(FilesExist)'!='' " Command="$(AR) $(ARFLAGS) @(TargetLib) @(ObjFiles,' ') @(LIB_FIRSTENTRY_OBJ,' ') @(OEM_TARGETS,' ') @(OEM_TARGETS_OBJ,' ')  @(PlatformIndependentLibs->'$(PLATFORM_INDEPENDENT_LIB_DIR)\%(FileName)%(Extension)', ' ')"/>
+    <Exec WorkingDirectory="$(OBJ_DIR)" Condition="'@(FilesExist)'!='' " Command="$(AR) $(ARFLAGS) @(TargetLib) @(ObjFiles->'%(FileName)%(Extension)',' ') @(LIB_FIRSTENTRY_OBJ,' ') @(OEM_TARGETS,' ') @(OEM_TARGETS_OBJ,' ') @(DriverLibs->'$(LIB_DIR)\%(FileName)%(Extension)',' ') @(PlatformIndependentLibs->'$(PLATFORM_INDEPENDENT_LIB_DIR)\%(FileName)%(Extension)', ' ')"/>
   </Target>
 
   <Target Name="BuildAXF" Condition="'$(OutputType)'=='Executable'" DependsOnTargets="ArmCompileCPP;ArmCompileC;ArmAssemble;$(ExtraEXETargets);BuildScatterfile;" Inputs="@(EXEInputs);@(InputLibs);@(PlatformIndependentLibs->'$(PLATFORM_INDEPENDENT_LIB_DIR)\%(FileName)%(Extension)');@(DriverLibs->'$(LIB_DIR)\%(FileName)%(Extension)');@(EXEScatterFile)" Outputs="@(EXEOutput)">
@@ -261,12 +293,15 @@
     -->
 
     <!-- TOO MANY INPUTS FOR LINKER/COMMAND WINDOW, SO BREAK THE LINKER STAGE UP BY ARCHIVING ALL DRIVER FILES INTO ONE LIB THEN LINKING CLR LIBS AND COMBINED DRIVER LIB -->
-    <Exec Command="$(AR) $(ARFLAGS) $(LIB_DIR)\tmp_$(AssemblyName).$(LIB_EXT) @(PlatformIndependentLibs->'$(PLATFORM_INDEPENDENT_LIB_DIR)\%(FileName)%(Extension)',' ')"/>
+    <Exec WorkingDirectory="$(PLATFORM_INDEPENDENT_LIB_DIR)" Command="$(AR) $(ARFLAGS) $(LIB_DIR)\tmp_$(AssemblyName).$(LIB_EXT) @(PlatformIndependentLibs->'%(FileName)%(Extension)',' ')"/>
     <Exec Command="$(LINK) $(LINK_FLAGS) $(SWTC)symdefs $(EXEName).symdefs $(SWTC)list $(EXEName).map $(SWTC)output @(EXEOutput) $(SCATTER_FLAG) @(EXEScatterFile,' ') @(EXEInputs,' ') @(InputLibs,' ') @(DriverLibs, ' ') $(LIB_DIR)\tmp_$(AssemblyName).$(LIB_EXT)" />
     <Exec Command="del /q $(LIB_DIR)\tmp_$(AssemblyName).$(LIB_EXT)"/>
-    <Exec Command="$(FROMELF) $(FROMELF_FLAGS) $(SWTC)text -o $(EXEName).axfdump @(EXEOutput)" />
+    <Exec Command="$(FROMELF) $(FROMELF_FLAGS) $(SWTC)text -c -o $(EXEName).axfdump @(EXEOutput)" />
     <Exec Command="$(FROMELF) $(FROMELF_FLAGS) $(SWTC)bin  -o $(EXEName).bin     @(EXEOutput)" />
     <Exec Command="$(FROMELF) $(FROMELF_FLAGS) $(SWTC)m32  -o $(EXEName).hex     @(EXEOutput)" />
+    <!-- generating intel hex fromat -->
+    <Exec  Condition="$(IntelHexFormat)=='true'" Command="$(FROMELF) $(FROMELF_FLAGS) $(SWTC)i32  -o $(EXEName).ihex     @(EXEOutput)" />
+
     <!--     echo adding LOAD_IMAGE_CRC value to $*.symdefs -->
     <Exec Condition="'$(ADD_LOAD_IMAGE_CRC)'=='true'" Command="$(TOOLS_DIR)\BuildHelper -hashBuild $(EXEName).bin$(ImageLocation) $(EXEName).symdefs" />
 
@@ -310,6 +345,13 @@
 
   </Target>
 
+  <Target Name="CompressBin" Inputs="@(CompressBinAsm);@(CompressBinFile);@(CompressBinFile->'%(RootDir)%(Directory)%(FileName).symdefs')" Outputs="@(CompressBinOutput);@(CompressBinComp)" >
+    <Message Text="Compressing @(CompressBinFile)"/>
+    <Exec Command="$(TOOLS_DIR)\buildhelper -symdef @(CompressBinFile->'%(RootDir)%(Directory)%(FileName).symdefs') EntryPoint -compress @(CompressBinFile) @(CompressBinComp)"/>
+    <Exec Command="$(AS) $(AS_FLAGS) -I$(OBJ_DIR) $(POS_DEPENDENT) $(SWTC)list @(CompressBinOutput->'%(RootDir)%(Directory)%(FileName).txt') $(SWTC)xref -o @(CompressBinOutput) @(CompressBinAsm)"/>
+    <Exec Command="del /q @(CompressBinFile->'%(RootDir)%(Directory)%(FileName).hex')" ContinueOnError="true"/>
+  </Target>
+
   <Target Name="BuildSigFiles"
             Inputs="@(AllSigFiles)"
             Outputs="@(AllSigFiles->'%(OutputDir)%(FileName).sig')"
@@ -343,14 +385,6 @@
 		DefinitionFile="@(EXEScatterfileDefinition)"
 		OutputFile="@(EXEScatterFile)"
     	/>
-  </Target>
-
-
-  <Target Name="CompressBin" Inputs="@(CompressBinFile);@(CompressBinFile->'%(RootDir)%(Directory)%(FileName).symdefs')" Outputs="@(CompressBinOutput);@(CompressBinComp)" >
-    <Message Text="Compressing @(CompressBinFile)"/>
-    <Exec Command="$(TOOLS_DIR)\buildhelper -symdef @(CompressBinFile->'%(RootDir)%(Directory)%(FileName).symdefs') EntryPoint -compress @(CompressBinFile) @(CompressBinComp)"/>
-    <Exec Command="$(AS) $(AS_FLAGS) -I$(OBJ_DIR) $(POS_DEPENDENT) $(SWTC)list @(CompressBinOutput->'%(RootDir)%(Directory)%(FileName).txt') $(SWTC)xref -o @(CompressBinOutput) @(CompressBinAsm)"/>
-    <Exec Command="del /q @(CompressBinFile->'%(RootDir)%(Directory)%(FileName).hex')" ContinueOnError="true"/>
   </Target>
 
   <Target Name="TinyClrDat" Inputs="$(BIN_DIR)\tinyclr.dat;$(AS_SUBDIR)\tinyclr_dat.s" Outputs="$(OBJ_DIR)\tinyclr_dat.$(OBJ_EXT)">

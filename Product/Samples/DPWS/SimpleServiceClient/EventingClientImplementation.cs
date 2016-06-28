@@ -12,7 +12,7 @@ namespace schemas.example.org.EventingService
         public void SimpleEvent(SimpleEventRequest req)
         {
             System.Ext.Console.Write("");
-            System.Ext.Console.Write("!SimpleEvent received.");
+            System.Ext.Console.Write("!SimpleEvent received. Size: " + (req.Param != null ? req.Param.Length.ToString() : "null"));
         }
 
         public void IntegerEvent(IntegerEventRequest req)

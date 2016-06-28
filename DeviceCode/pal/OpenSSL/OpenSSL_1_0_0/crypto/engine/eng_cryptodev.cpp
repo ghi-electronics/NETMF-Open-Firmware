@@ -906,7 +906,7 @@ bn2crparam(const BIGNUM *a, struct crparam *crp)
 	bits = BN_num_bits(a);
 	bytes = (bits + 7) / 8;
 
-	b = TINYCLR_SSL_MALLOC(bytes);
+	b = OPENSSL_malloc(bytes);
 	if (b == NULL)
 		return (1);
 	TINYCLR_SSL_MEMSET(b, 0, bytes);
@@ -937,14 +937,14 @@ crparam2bn(struct crparam *crp, BIGNUM *a)
 	if (bytes == 0)
 		return (-1);
 
-	if ((pd = (u_int8_t *) TINYCLR_SSL_MALLOC(bytes)) == NULL)
+	if ((pd = (u_int8_t *) OPENSSL_malloc(bytes)) == NULL)
 		return (-1);
 
 	for (i = 0; i < bytes; i++)
 		pd[i] = crp->crp_p[bytes - i - 1];
 
 	BN_bin2bn(pd, bytes, a);
-	TINYCLR_SSL_FREE(pd);
+	OPENSSL_free(pd);
 
 	return (0);
 }
@@ -956,7 +956,7 @@ zapparams(struct crypt_kop *kop)
 
 	for (i = 0; i < kop->crk_iparams + kop->crk_oparams; i++) {
 		if (kop->crk_param[i].crp_p)
-			TINYCLR_SSL_FREE(kop->crk_param[i].crp_p);
+			OPENSSL_free(kop->crk_param[i].crp_p);
 		kop->crk_param[i].crp_p = NULL;
 		kop->crk_param[i].crp_nbits = 0;
 	}

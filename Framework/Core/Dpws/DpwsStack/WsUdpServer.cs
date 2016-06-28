@@ -36,6 +36,7 @@ namespace Ws.Services.Transport.UDP
         private WsThreadManager    m_threadManager;
         private WsServiceEndpoints m_serviceEndpoints;
         private int                m_refcount;
+        private static object      s_lock = new object();
 
         // private
         private WsUdpServiceHost()
@@ -51,29 +52,45 @@ namespace Ws.Services.Transport.UDP
             m_binding = new CustomBinding(transport);
         }
 
+        /// <summary>
+        /// Gets the singleton UDP service host
+        /// </summary>
         public static WsUdpServiceHost Instance
         {
             get
             {
                 if (m_instance == null)
                 {
-                    m_instance = new WsUdpServiceHost();
+                    lock (s_lock)
+                    {
+                        if (m_instance == null)
+                        {
+                            m_instance = new WsUdpServiceHost();
+                        }
+                    }
                 }
 
                 return m_instance;
             }
         }
 
+        /// <summary>
+        /// Adds a service endpoint to the service host
+        /// </summary>
+        /// <param name="ep">The service endpoint to be added</param>
         public void AddServiceEndpoint(IWsServiceEndpoint ep)
         {
             m_serviceEndpoints.Add(ep);
         }
 
+        /// <summary>
+        /// Removes a service endpoint from the service host
+        /// </summary>
+        /// <param name="ep">The service endpoint to be removed</param>
         public void RemoveServiceEndpoint(IWsServiceEndpoint ep)
         {
             m_serviceEndpoints.Remove(ep);
         }
-
 
         /// <summary>
         /// Property controls whether discovery request originating from this IP will be ignored.
@@ -105,7 +122,6 @@ namespace Ws.Services.Transport.UDP
         /// </remarks>
         private void Listen()
         {
-            // Create a duplicate message tester.
             WsMessageCheck messageCheck = new WsMessageCheck(40);
 
             while (!m_requestStop)
@@ -115,34 +131,24 @@ namespace Ws.Services.Transport.UDP
                     // If threads ara availble receive next message. If we are waiting on threads let the socket
                     // buffer request until we get a thread. This will work until the reveice buffer is depleted
                     // at which time request will be dropped
-                    if (m_threadManager.ThreadsAvailable == true)
+                    RequestContext req = m_replyChannel.ReceiveRequest();
+
+                    if (req != null)
                     {
-                        RequestContext req = m_replyChannel.ReceiveRequest();
+                        WsWsaHeader header = req.Message.Header;
 
-                        if (req != null)
+                        if (header.MessageID != null &&
+                            messageCheck.IsDuplicate(header.MessageID, header.From != null ? header.From.Address.AbsoluteUri : ""))
                         {
-                            WsWsaHeader header = req.Message.Header;
-
-                            if (header.MessageID != null &&
-                                messageCheck.IsDuplicate(header.MessageID,header.From != null ? header.From.Address.AbsoluteUri : ""))
-                            {
-                                continue;
-                            }
-
-                            // Try to get a processing thread and process the request
-                            m_threadManager.StartNewThread(new WsUdpMessageProcessor(m_serviceEndpoints, req));
+                            continue;
                         }
-                        else
-                        {
-                            System.Ext.Console.Write("UDP Receive returned 0 bytes");
-                        }
-                        
+
+                        // Try to get a processing thread and process the request
+                        m_threadManager.StartNewThread(new WsUdpMessageProcessor(m_serviceEndpoints), req);
                     }
                     else
                     {
-                        System.Ext.Console.Write("Udp service host waiting for a thread...");
-
-                        m_threadManager.ThreadEvent.WaitOne();
+                        System.Ext.Console.Write("UDP Receive returned 0 bytes");
                     }
                 }
                 catch (SocketException se)
@@ -198,8 +204,9 @@ namespace Ws.Services.Transport.UDP
                 m_requestStop = true;
                 m_threadManager.ThreadEvent.Set();
 
-                m_replyChannel.Close();
+                WsUdpMessageProcessor.StopProcessing();
 
+                m_replyChannel.Close();
                 m_thread.Join();
             }
         }
@@ -211,44 +218,112 @@ namespace Ws.Services.Transport.UDP
     /// </summary>
     sealed class WsUdpMessageProcessor : IWsTransportMessageProcessor
     {
-        private WsServiceEndpoints m_serviceEndpoints;
-        private RequestContext m_request;
+        private WsServiceEndpoints    m_serviceEndpoints;
+        private static Queue          s_requests     = new Queue();
+        private static AutoResetEvent s_requestEvent = new AutoResetEvent(false);
+        private static int            s_threadCnt    = 0;
+        private static bool           s_exit         = false;
 
         /// <summary>
         /// Creates an empty instance of the UdpProcess class.
         /// </summary>
-        public WsUdpMessageProcessor(WsServiceEndpoints serviceEndpoints, RequestContext request) 
+        public WsUdpMessageProcessor(WsServiceEndpoints serviceEndpoints)
         {
             m_serviceEndpoints = serviceEndpoints;
-            m_request = request;
         }
 
         /// <summary>
-        /// This method is called by the process manager to process a request.
+        /// Adds a request object to be processed
+        /// </summary>
+        public int AddRequest(object request)
+        {
+            lock(s_requests)
+            {
+                s_requests.Enqueue(request);
+            }
+
+            s_requestEvent.Set();
+            
+            return s_requests.Count;
+        }
+
+        /// <summary>
+        /// Stop all threads so that the server can shut down.
+        /// </summary>
+        public static void StopProcessing()
+        {
+            s_exit = true;
+            lock(WsUdpMessageProcessor.s_requests)
+            {
+                WsUdpMessageProcessor.s_requests.Clear();
+            }
+            
+            while(s_threadCnt > 0)
+            {
+                WsUdpMessageProcessor.s_requestEvent.Set();
+                Thread.Sleep(0);
+            }
+        }
+        
+
+        /// <summary>
+        /// Method prototype that defines a transports message processing method.
         /// </summary>
         public void ProcessRequest()
         {
+            RequestContext request;
 
-            // Performance debuging
-            DebugTiming timeDebuger = new DebugTiming();
-            timeDebuger.ResetStartTime("***Request Debug timer started");
+            Interlocked.Increment(ref s_threadCnt);
+        
+            while(true)
+            {
+                if (s_exit || (s_requests.Count == 0 && !s_requestEvent.WaitOne(1000, false))) break;
+        
+                lock (s_requests)
+                {
+                    if (s_requests.Count == 0)
+                    {
+                        continue;
+                    }
+        
+                    request = (RequestContext)s_requests.Dequeue();
+                }
 
-            // Process the message
-            WsMessage response = ProcessRequestMessage(m_request.Message);
-
-            // If response is null the requested service is not implemented so just ignore this request
-            if (response == null)
-                return;
-
-            // Performance debuging
-            timeDebuger.PrintElapsedTime("***ProcessMessage Took");
-
-            // Send the response
-            m_request.Reply(response);
-
-            // Performance Debuging
-            timeDebuger.PrintElapsedTime("***Send Message Took");
+                if(request.Message != null)
+                {
+                    // Performance debuging
+                    DebugTiming timeDebuger = new DebugTiming();
+                    timeDebuger.ResetStartTime("***Request Debug timer started");
+                    
+                    // Process the message
+                    WsMessage response = ProcessRequestMessage(request);
+                    
+                    // If response is null the requested service is not implemented so just ignore this request
+                    if (response != null)
+                    {
+                        // Performance debuging
+                        timeDebuger.PrintElapsedTime("***ProcessMessage Took");
+                    
+                        // Send the response
+                        request.Reply(response);
+                    
+                        // Performance Debuging
+                        timeDebuger.PrintElapsedTime("***Send Message Took");
+                    }
+                }
+            }
+            
+            Interlocked.Decrement(ref s_threadCnt);
         }
+
+        /// <summary>
+        /// Gets the current number of threads currently processing the given message transport
+        /// </summary>
+        public int ThreadCount
+        {
+            get { return s_threadCnt; }
+        }
+
 
         /// <summary>
         /// Parses a Udp transport message and builds a header object and envelope document then calls processRequest
@@ -258,10 +333,11 @@ namespace Ws.Services.Transport.UDP
         /// <param name="messageCheck">A WsMessageCheck objct used to test for duplicate request.</param>
         /// <param name="remoteEP">The remote endpoint address of the requestor.</param>
         /// <returns>A byte array containing a soap response message returned from a service endpoint.</returns>
-        public WsMessage ProcessRequestMessage(WsMessage message)
+        public WsMessage ProcessRequestMessage(RequestContext request)
         {
             // Parse and validate the soap message
-            WsWsaHeader header = message.Header;
+            WsMessage   message = request.Message;
+            WsWsaHeader header  = message.Header;
 
             // Check Udp service endpoints collection for a target service.
             int count = m_serviceEndpoints.Count;
@@ -284,12 +360,12 @@ namespace Ws.Services.Transport.UDP
                         }
                         catch (WsFaultException e)
                         {
-                            return WsFault.GenerateFaultResponse(e, m_request.Version);
+                            return WsFault.GenerateFaultResponse(e, request.Version);
                         }
                         catch
                         {
                             // If a valid Action is not found, fault
-                            return WsFault.GenerateFaultResponse(header, WsFaultType.WsaDestinationUnreachable, "To: " + header.To + " Action: " + header.Action, m_request.Version);
+                            return WsFault.GenerateFaultResponse(header, WsFaultType.WsaDestinationUnreachable, "To: " + header.To + " Action: " + header.Action, request.Version);
                         }
                     }
                 }

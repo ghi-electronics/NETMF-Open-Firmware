@@ -9,6 +9,13 @@
 
 //--//
 
+void FAT_SectorCache::OnFlushCallback(void* arg)
+{
+    FAT_SectorCache* pThis = (FAT_SectorCache*)arg;
+
+    pThis->FlushAll();
+}
+
 /////////////////////////////////////////////////////////
 //    IO buffer scenario
 //          buffer size: one block size in hardware device
@@ -30,17 +37,32 @@ void FAT_SectorCache::Initialize( BlockStorageDevice* blockStorageDevice, UINT32
     m_sectorsPerLine     = SECTORCACHE_LINESIZE / bytesPerSector;
     m_LRUCounter         = 1;
 
-    for(int i = 0; i < SECTORCACHE_MAXSIZE; i++)
+    if((FAT_FS__CACHE_FLUSH_TIMEOUT_USEC) != 0)
+    {
+        m_flushCompletion.InitializeForUserMode((HAL_CALLBACK_FPN)FAT_SectorCache::OnFlushCallback, this);
+    }
+
+    for(int i = 0; i < ARRAYSIZE(m_cacheLines); i++)
     {
         m_cacheLines[i].m_buffer = NULL;
         m_cacheLines[i].m_flags  = 0;
+        m_cacheLines[i].m_begin  = 0;
+        m_cacheLines[i].m_bsByteAddress = 0;
+#ifdef FAT_FS__VALIDATE_READONLY_CACHELINE
+        m_cacheLines[i].m_crc    = 0;
+#endif
     }
 }
 
 void FAT_SectorCache::Uninitialize()
 {
+    if(FAT_FS__CACHE_FLUSH_TIMEOUT_USEC != 0 && m_flushCompletion.IsLinked())
+    {
+        m_flushCompletion.Abort();
+    }
+    
     FAT_CacheLine* cacheLine;
-    for(int i = 0; i < SECTORCACHE_MAXSIZE; i++)
+    for(int i = 0; i < ARRAYSIZE(m_cacheLines); i++)
     {
         cacheLine = &m_cacheLines[i];
         
@@ -51,11 +73,22 @@ void FAT_SectorCache::Uninitialize()
             private_free( cacheLine->m_buffer );
 
             cacheLine->m_buffer = NULL;
+            cacheLine->m_flags  = 0;
+            cacheLine->m_begin  = 0;
+            cacheLine->m_bsByteAddress = 0;
+#ifdef FAT_FS__VALIDATE_READONLY_CACHELINE
+            cacheLine->m_crc    = 0;
+#endif
         }
     }
 }
 
 BYTE* FAT_SectorCache::GetSector( UINT32 sectorIndex, BOOL forWrite )
+{
+    return GetSector(sectorIndex, TRUE, forWrite);
+}
+
+BYTE* FAT_SectorCache::GetSector( UINT32 sectorIndex, BOOL useLRU, BOOL forWrite )
 {
     if(sectorIndex > m_sectorCount)  //sectorIndex out of range of this device
         return NULL;
@@ -64,7 +97,7 @@ BYTE* FAT_SectorCache::GetSector( UINT32 sectorIndex, BOOL forWrite )
 
     if(!cacheLine)
     {
-        cacheLine = GetUnusedCacheLine();
+        cacheLine = GetUnusedCacheLine(useLRU);
 
         if(!cacheLine->m_buffer)
         {
@@ -76,6 +109,7 @@ BYTE* FAT_SectorCache::GetSector( UINT32 sectorIndex, BOOL forWrite )
         cacheLine->m_begin         = sectorIndex - (sectorIndex % m_sectorsPerLine);
         cacheLine->m_bsByteAddress = m_baseByteAddress + cacheLine->m_begin * m_bytesPerSector;
         cacheLine->m_flags         = 0;
+        cacheLine->SetLRUCOunter( ++m_LRUCounter );
 
         if(!m_blockStorageDevice->Read( cacheLine->m_bsByteAddress, SECTORCACHE_LINESIZE, cacheLine->m_buffer ))
         {
@@ -85,9 +119,22 @@ BYTE* FAT_SectorCache::GetSector( UINT32 sectorIndex, BOOL forWrite )
             
             return NULL;
         }
+#ifdef FAT_FS__VALIDATE_READONLY_CACHELINE
+        cacheLine->m_crc = SUPPORT_ComputeCRC(cacheLine->m_buffer, SECTORCACHE_LINESIZE, 0);
+#endif
     }
 
-    if(forWrite) cacheLine->SetDirty( TRUE );
+    cacheLine->SetReadWrite( forWrite );
+
+    if(forWrite)
+    {
+        cacheLine->SetDirty( TRUE );
+
+        if((FAT_FS__CACHE_FLUSH_TIMEOUT_USEC) != 0 && !m_flushCompletion.IsLinked())
+        {
+            m_flushCompletion.EnqueueDelta(FAT_FS__CACHE_FLUSH_TIMEOUT_USEC);
+        }
+    }
 
     if((cacheLine->GetLRUCounter()) != m_LRUCounter)
     {
@@ -110,12 +157,12 @@ void FAT_SectorCache::MarkSectorDirty( UINT32 sectorIndex )
     }
 }
 
-FAT_SectorCache::FAT_CacheLine* FAT_SectorCache::GetUnusedCacheLine()
+FAT_SectorCache::FAT_CacheLine* FAT_SectorCache::GetUnusedCacheLine(BOOL useLRU)
 {
     FAT_CacheLine* cacheLine;
     FAT_CacheLine* topCandidate = NULL;
     UINT32 counter;
-    UINT32 minLRUCounter = 0x7FFFFFFF;
+    UINT32 minLRUCounter = useLRU ? 0x7FFFFFFF : 0;
     
     for(int i = 0; i < SECTORCACHE_MAXSIZE; i++)
     {
@@ -128,7 +175,8 @@ FAT_SectorCache::FAT_CacheLine* FAT_SectorCache::GetUnusedCacheLine()
 
         counter = cacheLine->GetLRUCounter();
         
-        if(counter < minLRUCounter)
+        if(( useLRU && (counter < minLRUCounter)) ||
+           (!useLRU && (counter > minLRUCounter)))
         {
             minLRUCounter = counter;
             topCandidate  = cacheLine;
@@ -149,7 +197,7 @@ FAT_SectorCache::FAT_CacheLine* FAT_SectorCache::GetCacheLine( UINT32 sectorInde
     {
         cacheLine = &m_cacheLines[i];
 
-        if(cacheLine->m_buffer && (sectorIndex >= cacheLine->m_begin) && (sectorIndex < cacheLine->m_begin + m_sectorsPerLine))
+        if(cacheLine->m_buffer && (sectorIndex >= cacheLine->m_begin) && (sectorIndex < (cacheLine->m_begin + m_sectorsPerLine)))
         {
             return cacheLine;
         }
@@ -181,13 +229,38 @@ void FAT_SectorCache::FlushSector( UINT32 sectorIndex )
     }
 }
 
-void FAT_SectorCache::FlushSector( FAT_CacheLine* cacheLine )
+void FAT_SectorCache::FlushSector( FAT_CacheLine* cacheLine, BOOL fClearDirtyBit )
 {
-    if(cacheLine->m_buffer && cacheLine->IsDirty())
-    {        
-        m_blockStorageDevice->Write( cacheLine->m_bsByteAddress, SECTORCACHE_LINESIZE, cacheLine->m_buffer, TRUE );
+    if(cacheLine->m_buffer)
+    {
+#ifdef FAT_FS__VALIDATE_READONLY_CACHELINE
+        UINT32 crc = SUPPORT_ComputeCRC(cacheLine->m_buffer, SECTORCACHE_LINESIZE, 0);
+#endif
 
-        cacheLine->SetDirty( FALSE );
+        if(cacheLine->IsDirty())
+        {        
+            m_blockStorageDevice->Write( cacheLine->m_bsByteAddress, SECTORCACHE_LINESIZE, cacheLine->m_buffer, TRUE );
+
+            if(fClearDirtyBit)
+            {
+                cacheLine->SetDirty( FALSE );
+            }
+
+#ifdef FAT_FS__VALIDATE_READONLY_CACHELINE
+            cacheLine->m_crc = crc;
+#endif
+        }
+#ifdef FAT_FS__VALIDATE_READONLY_CACHELINE
+        else
+        {
+            ASSERT(cacheLine->m_crc == crc);
+
+            if(cacheLine->m_crc != crc)
+            {
+                m_blockStorageDevice->Write( cacheLine->m_bsByteAddress, SECTORCACHE_LINESIZE, cacheLine->m_buffer, TRUE );    
+            }
+        }
+#endif
     }
 }
 
@@ -195,7 +268,7 @@ void FAT_SectorCache::FlushAll()
 {
     for(int i = 0; i < SECTORCACHE_MAXSIZE; i++)
     {
-        FlushSector( &m_cacheLines[i] );
+        FlushSector( &m_cacheLines[i], FALSE );
     }
 }
 
@@ -213,7 +286,7 @@ void FAT_SectorCache::FlushAll()
 // Returns:
 void FAT_SectorCache::EraseSector( UINT32 sectorIndex )
 {
-    BYTE* sector = GetSector( sectorIndex, TRUE );
+    BYTE* sector = GetSector( sectorIndex, TRUE, TRUE );
 
     if(sector)
     {

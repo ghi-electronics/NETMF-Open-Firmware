@@ -9,6 +9,29 @@
 #include <TinyCLR_Interop.h>
 #include <TinyCLR_Stream.h>
 
+struct Library_spot_io_native_System_IO_FileSystemManager
+{
+    static const int FIELD_STATIC__m_openFiles = 0;
+    static const int FIELD_STATIC__m_lockedDirs = 1;
+    static const int FIELD_STATIC__CurrentDirectory = 2;
+    static const int FIELD_STATIC__m_currentDirectoryRecord = 3;
+
+
+    //--//
+
+};
+
+struct Library_spot_io_native_System_IO_FileSystemManager__FileRecord
+{
+    static const int FIELD__FullName = 1;
+    static const int FIELD__NativeFileStream = 2;
+    static const int FIELD__Share = 3;
+
+
+    //--//
+
+};
+
 struct Library_spot_io_native_Microsoft_SPOT_IO_MediaEventArgs
 {
     static const int FIELD__Time   = 1;
@@ -71,7 +94,7 @@ struct Library_spot_io_native_Microsoft_SPOT_IO_NativeFindFile
 
 struct Library_spot_io_native_Microsoft_SPOT_IO_NativeIO
 {
-    TINYCLR_NATIVE_DECLARE(Format___STATIC__VOID__STRING__STRING__U4);
+    TINYCLR_NATIVE_DECLARE(Format___STATIC__VOID__STRING__STRING__STRING__U4);
     TINYCLR_NATIVE_DECLARE(Delete___STATIC__VOID__STRING);
     TINYCLR_NATIVE_DECLARE(Move___STATIC__BOOLEAN__STRING__STRING);
     TINYCLR_NATIVE_DECLARE(CreateDirectory___STATIC__VOID__STRING);

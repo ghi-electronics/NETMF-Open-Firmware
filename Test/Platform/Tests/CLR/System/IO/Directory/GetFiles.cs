@@ -24,6 +24,20 @@ namespace Microsoft.SPOT.Platform.Tests
             try
             {
                 IOTests.IntializeVolume();
+                ArrayList list = new ArrayList();
+                list.Add(IOTests.Volume.RootDirectory + "\\" + TestDir + "\\" + Mid1);
+                list.Add(IOTests.Volume.RootDirectory + "\\" + TestDir + "\\" + Mid2);
+                validDirMap[TestDir] = list;
+
+                list = new ArrayList();
+                list.Add(IOTests.Volume.RootDirectory + "\\" + TestDir + "\\" + Mid1 + "\\" + Tail1);
+                list.Add(IOTests.Volume.RootDirectory + "\\" + TestDir + "\\" + Mid1 + "\\" + Tail2);
+                validDirMap[TestDir + "\\" + Mid1] = list;
+
+                list = new ArrayList();
+                list.Add(IOTests.Volume.RootDirectory + "\\" + TestDir + "\\" + Mid2 + "\\" + Tail1);
+                validDirMap[TestDir + "\\" + Mid2] = list;
+
                 Directory.CreateDirectory(TestDir + "\\" + Mid1 + "\\" + Tail1);
                 Directory.CreateDirectory(TestDir + "\\" + Mid1 + "\\" + Tail2);
                 Directory.CreateDirectory(TestDir + "\\" + Mid2 + "\\" + Tail1);
@@ -34,6 +48,26 @@ namespace Microsoft.SPOT.Platform.Tests
                 // Mid1/Tail2 1
                 // Mid2 3
                 // Mid2/Tail1 2
+
+                list = new ArrayList();
+                list.Add(IOTests.Volume.RootDirectory + "\\" + TestDir);
+                validDirMap[IOTests.Volume.RootDirectory] = list;
+
+                list = new ArrayList();
+                list.Add(IOTests.Volume.RootDirectory + "\\" + TestDir + "\\" + Mid1);
+                list.Add(IOTests.Volume.RootDirectory + "\\" + TestDir + "\\" + Mid2);
+                validDirMap[IOTests.Volume.RootDirectory + "\\" + TestDir] = list;
+
+                list = new ArrayList();
+                list.Add(IOTests.Volume.RootDirectory + "\\" + TestDir + "\\" + Mid1 + "\\" + Tail1);
+                list.Add(IOTests.Volume.RootDirectory + "\\" + TestDir + "\\" + Mid1 + "\\" + Tail2);
+                validDirMap[IOTests.Volume.RootDirectory + "\\" + TestDir + "\\" + Mid1] = list;
+
+                list = new ArrayList();
+                list.Add(IOTests.Volume.RootDirectory + "\\" + TestDir + "\\" + Mid2 + "\\" + Tail1);
+                validDirMap[IOTests.Volume.RootDirectory + "\\" + TestDir + "\\" + Mid2] = list;
+
+
                 AddFile(IOTests.Volume.RootDirectory + "\\" + TestDir + "\\" + Mid1 + "\\" + Tail1 + "\\TestFile1.txt");
                 AddFile(IOTests.Volume.RootDirectory + "\\" + TestDir + "\\" + Mid1 + "\\" + Tail1 + "\\TestFile2.txt");
                 AddFile(IOTests.Volume.RootDirectory + "\\" + TestDir + "\\" + Mid1 + "\\" + Tail1 + "\\FileTest1.txt");
@@ -61,6 +95,7 @@ namespace Microsoft.SPOT.Platform.Tests
 
         #region local vars
         private ArrayList validFiles = new ArrayList();
+        private Hashtable validDirMap = new Hashtable();
         private const string TestDir = "GetFiles";
         private const string Mid1 = "Mid1";
         private const string Mid2 = "Mid2";
@@ -91,6 +126,56 @@ namespace Microsoft.SPOT.Platform.Tests
                 result += item + ", ";
             }
             return result.TrimEnd(',', ' ');
+        }
+
+        private bool TestGetFilesAndDirsEnum(int expected, params string[] nodes)
+        {
+            return VerifyFilesAndDirsEnum(expected, GetPath(nodes), Directory.EnumerateFileSystemEntries(GetPath(nodes)));
+        }
+
+        private bool VerifyFilesAndDirsEnum(int expected, string path, IEnumerable results)
+        {
+            bool valid = true;
+            int cnt = 0;
+            path = Path.GetFullPath(path);
+
+            ArrayList list = validDirMap[path] as ArrayList;
+
+            foreach (string file in results)
+            {
+                if (!(validFiles.Contains(file) || (list != null && list.Contains(file))))
+                {
+                    Log.Exception("Unexpected file found: " + file);
+                    valid = false;
+                }
+                cnt++;
+            }
+            valid &= cnt == expected;
+
+            return valid;
+        }
+
+        private bool TestGetFilesEnum(int expected, params string[] nodes)
+        {
+            return VerifyEnum(expected, Directory.EnumerateFiles(GetPath(nodes)));
+        }
+
+        private bool VerifyEnum(int expected, IEnumerable results)
+        {
+            int cnt = 0;
+            bool valid = true;
+            foreach (string file in results)
+            {
+                if (!validFiles.Contains(file))
+                {
+                    Log.Exception("Unexpected file found: " + file);
+                    valid = false;
+                }
+                cnt++;
+            }
+
+            valid &= cnt == expected;
+            return valid;
         }
 
         private bool TestGetFiles(int expected, params string[] nodes)
@@ -306,6 +391,151 @@ namespace Microsoft.SPOT.Platform.Tests
 
             return result;
         }
+
+        [TestMethod]
+        public MFTestResults GetFilesEnum()
+        {
+            MFTestResults result = MFTestResults.Pass;
+            try
+            {
+                // relative
+                Directory.SetCurrentDirectory(IOTests.Volume.RootDirectory);
+
+                if (!TestGetFilesEnum(0, "."))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesEnum(0, TestDir))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesEnum(0, TestDir, Mid1))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesEnum(4, TestDir, Mid1, Tail1))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesEnum(1, TestDir, Mid1, Tail2))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesEnum(3, TestDir, Mid2))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesEnum(2, TestDir, Mid2, Tail1))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesEnum(2, TestDir, Mid1, ".", Tail1, "..", Tail1, "..", "..", Mid2, Tail1))
+                    result = MFTestResults.Fail;
+
+                // Move up tree where there is more directories
+                Directory.SetCurrentDirectory(TestDir + "\\" + Mid2);
+                if (!TestGetFilesEnum(3, "."))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesEnum(0, ".."))
+                    result = MFTestResults.Fail;
+
+                // absolute
+                if (!TestGetFilesEnum(4, IOTests.Volume.RootDirectory, TestDir, Mid1, Tail1))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesEnum(2, IOTests.Volume.RootDirectory, TestDir, Mid2, Tail1))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesEnum(3, IOTests.Volume.RootDirectory, TestDir, Mid2))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesEnum(0, IOTests.Volume.RootDirectory, TestDir, Mid1))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesEnum(0, IOTests.Volume.RootDirectory, TestDir))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesEnum(0, IOTests.Volume.RootDirectory))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesEnum(2, IOTests.Volume.RootDirectory, TestDir, Mid1, ".", Tail1, "..", Tail1, "..", "..", Mid2, Tail1, "."))
+                    result = MFTestResults.Fail;
+            }
+            catch (Exception ex)
+            {
+                Log.Exception("Unexpected exception: " + ex.Message);
+                result = MFTestResults.Fail;
+            }
+
+            return result;
+        }
+
+        [TestMethod]
+        public MFTestResults GetFilesAndDirectoriesEnum()
+        {
+            MFTestResults result = MFTestResults.Pass;
+            try
+            {
+                // relative
+                Directory.SetCurrentDirectory(IOTests.Volume.RootDirectory);
+
+                if (!TestGetFilesAndDirsEnum(1, "."))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesAndDirsEnum(2, TestDir))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesAndDirsEnum(2, TestDir, Mid1))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesAndDirsEnum(4, TestDir, Mid1, Tail1))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesAndDirsEnum(1, TestDir, Mid1, Tail2))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesAndDirsEnum(4, TestDir, Mid2))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesAndDirsEnum(2, TestDir, Mid2, Tail1))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesAndDirsEnum(2, TestDir, Mid1, ".", Tail1, "..", Tail1, "..", "..", Mid2, Tail1))
+                    result = MFTestResults.Fail;
+
+                // Move up tree where there is more directories
+                Directory.SetCurrentDirectory(TestDir + "\\" + Mid2);
+                if (!TestGetFilesAndDirsEnum(4, "."))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesAndDirsEnum(2, ".."))
+                    result = MFTestResults.Fail;
+
+                // absolute
+                if (!TestGetFilesAndDirsEnum(4, IOTests.Volume.RootDirectory, TestDir, Mid1, Tail1))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesAndDirsEnum(2, IOTests.Volume.RootDirectory, TestDir, Mid2, Tail1))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesAndDirsEnum(4, IOTests.Volume.RootDirectory, TestDir, Mid2))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesAndDirsEnum(2, IOTests.Volume.RootDirectory, TestDir, Mid1))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesAndDirsEnum(2, IOTests.Volume.RootDirectory, TestDir))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesAndDirsEnum(1, IOTests.Volume.RootDirectory))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetFilesAndDirsEnum(2, IOTests.Volume.RootDirectory, TestDir, Mid1, ".", Tail1, "..", Tail1, "..", "..", Mid2, Tail1, "."))
+                    result = MFTestResults.Fail;
+            }
+            catch (Exception ex)
+            {
+                Log.Exception("Unexpected exception: " + ex.Message);
+                result = MFTestResults.Fail;
+            }
+
+            return result;
+        }
+
 
         [TestMethod]
         private MFTestResults RandomFileNames()

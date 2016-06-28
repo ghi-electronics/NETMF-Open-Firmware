@@ -20,7 +20,7 @@ namespace Microsoft.SPOT.Platform.Tests
             string[] args = { 
                 "X509CertificateTests",
                 "SslStreamTests",
-                "CertificateStoreTests", 
+                //"CertificateStoreTests", 
             };
 
             MFTestRunner runner = new MFTestRunner(args);

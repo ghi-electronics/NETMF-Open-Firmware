@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectPath>$(SPOCLIENT)\DeviceCode\Drivers\BlockStorage\Flash\SST39WF_16\dotNetMF.proj</ProjectPath>
@@ -40,9 +41,10 @@
   <Import Project="$(SPOCLIENT)\Framework\features\BlockStorageConfig_HAL.libcatproj" />
   <PropertyGroup />
   <ItemGroup>
-    <HFiles Include="SST39WF_16.h" />
     <Compile Include="SST39WF_16_driver.cpp" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="sst39wf_16.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

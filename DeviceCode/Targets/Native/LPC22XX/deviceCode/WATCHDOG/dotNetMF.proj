@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectPath>$(SPOCLIENT)\DeviceCode\Targets\Native\LPC22XX\deviceCode\WATCHDOG\dotNetMF.proj</ProjectPath>
     <AssemblyName>LPC22XX_WATCHDOG</AssemblyName>
@@ -55,9 +56,14 @@
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
   <PropertyGroup />
   <ItemGroup>
-    <HFiles Include="..\LPC22XX.h" />
     <Compile Include="LPC22XX__WATCHDOG.cpp" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\arm_util.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\cpu.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\cpu_definitions.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\smartptr_fiq_arm.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\targets\native\lpc22xx\devicecode\lpc22xx.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

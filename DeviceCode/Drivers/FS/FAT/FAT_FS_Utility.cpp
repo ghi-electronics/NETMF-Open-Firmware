@@ -93,9 +93,11 @@ void FAT_Utility::GetCurrentFATTime( UINT16* date, UINT16* time, UINT8* timeTent
     
     if(time)
     {
-        *time = (st.wHour                               ) << FAT_TIME_HOUR_SHIFT   |
-                (st.wMinute                             ) << FAT_TIME_MINUTE_SHIFT |
-                (st.wSecond / FAT_TIME_SECOND_MULTIPLIER) << FAT_TIME_SECOND_SHIFT ;
+        INT16 sec = FAT_TIME_SECOND_CALC_GRANULARITY(st.wSecond);
+        
+        *time = (st.wHour                        ) << FAT_TIME_HOUR_SHIFT   |
+                (st.wMinute                      ) << FAT_TIME_MINUTE_SHIFT |
+                (sec / FAT_TIME_SECOND_MULTIPLIER) << FAT_TIME_SECOND_SHIFT ;
     }
 
     if(timeTenth)

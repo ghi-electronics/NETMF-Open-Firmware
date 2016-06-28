@@ -129,7 +129,7 @@ HRESULT FS__STUB_SetAttributes( const VOLUME_ID* volume, LPCWSTR path, UINT32 at
     return CLR_E_NOT_SUPPORTED;
 }
 
-HRESULT FS__STUB_Format( const VOLUME_ID* volume, UINT32 parameter )
+HRESULT FS__STUB_Format( const VOLUME_ID* volume, LPCSTR volumeLabel, UINT32 parameter )
 {
     return CLR_E_NOT_SUPPORTED;
 }
@@ -145,6 +145,11 @@ HRESULT FS__STUB_GetSizeInfo( const VOLUME_ID* /*volume*/, INT64* /*totalSize*/,
 }
 
 HRESULT FS__STUB_FlushAll( const VOLUME_ID* /*volume*/ )
+{
+    return CLR_E_NOT_SUPPORTED;
+}
+
+HRESULT FS__STUB_GetVolumeLabel( const VOLUME_ID* /*volume*/, LPSTR /*volumeLabel*/, INT32 /*volumeLabelLen*/ )
 {
     return CLR_E_NOT_SUPPORTED;
 }
@@ -168,6 +173,7 @@ FILESYSTEM_DRIVER_INTERFACE g_FS__STUB_FILE_SYSTEM_DriverInterface =
     &FS__STUB_IsLoadableMedia,
     &FS__STUB_GetSizeInfo,  /****/
     &FS__STUB_FlushAll,     /****/
+    &FS__STUB_GetVolumeLabel,
     
     "FS__STUB",
     0,

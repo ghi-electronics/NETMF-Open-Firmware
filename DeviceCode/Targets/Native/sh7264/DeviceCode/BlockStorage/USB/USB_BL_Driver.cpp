@@ -149,7 +149,7 @@ BOOL USB_BS_Driver::CPU_USB_Global_ISR(void *Param)
                     MemCapacity =   (s_sectorBuff[0x13] | s_sectorBuff[0x14] << 8)* BytesPerSector;;
                     if (MemCapacity == 0)
                     {
-                        MemCapacity         = (s_sectorBuff[0x23] | s_sectorBuff[0x22] << 8 | s_sectorBuff[0x21] << 16 | s_sectorBuff[0x20] << 24) //Sector per 1 partition
+                        MemCapacity         = (s_sectorBuff[0x20] | s_sectorBuff[0x21] << 8 | s_sectorBuff[0x22] << 16 | s_sectorBuff[0x23] << 24) //Sector per 1 partition
                                               * BytesPerSector;
                     }   
                 }

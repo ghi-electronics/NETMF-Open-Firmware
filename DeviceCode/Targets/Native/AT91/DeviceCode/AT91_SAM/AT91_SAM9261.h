@@ -50,6 +50,17 @@
 #define AT91C_BASE_CKGR         0xFFFFFC20 // (CKGR) Base Address
 #define AT91C_BASE_PMC          0xFFFFFC00 // (PMC) Base Address
 #define AT91C_BASE_RSTC         0xFFFFFD00 // (RSTC) Base Address
+    #define AT91C_RTSC__PROCRST     0x01         // processor reset bit
+    #define AT91C_RTSC__PERRST      0x04         // Peripheral reset bit
+    #define AT91C_RTSC__EXTRST      0x08         // asserts NRST pin
+    #define AT91C_RSTC__RESET_KEY   0xA5000000   // reset key
+#define AT91C_BASE_RSTC_SR      0xFFFFFD04 
+    #define AT91C_RTSC_SR__SRCMP    (1ul < 17)   // Software Reset Command in progress
+    #define AT91C_RTSC_SR__NRSTL    (1ul < 16)   // Registers the NRST Pin Level at Master Clock (MCK)
+    #define AT91C_RTSC_SR__RSTTYP   (7ul <  8)   // Reset Type mask
+    #define AT91C_RTSC_SR__BODSTS   (1ul <  1)   // Brownout Detection Status
+    #define AT91C_RTSC_SR__URSTS    (1ul <  0)   // User Reset Status
+#define AT91C_BASE_RSTC_MR      0xFFFFFD08 
 #define AT91C_BASE_SHDWC        0xFFFFFD10 // (SHDWC) Base Address
 #define AT91C_BASE_RTTC         0xFFFFFD20 // (RTTC) Base Address
 #define AT91C_BASE_PITC         0xFFFFFD30 // (PITC) Base Address
@@ -78,12 +89,6 @@
 #define AT91C_BASE_SPI0         0xFFFC8000 // (SPI0) Base Address
 #define AT91C_BASE_PDC_SPI1     0xFFFCC100 // (PDC_SPI1) Base Address
 #define AT91C_BASE_SPI1         0xFFFCC000 // (SPI1) Base Address
-#define AT91C_BASE_RSTC         0xFFFFFD00 // (RSTC) Base Address - Reset controller
-#define AT91C_RTSC__PROCRST     0x01         // processor reset bit
-#define AT91C_RTSC__PERRST      0x04         // Peripheral reset bit
-#define AT91C_RTSC__EXTRST      0x08         // asserts NRST pin
-#define AT91C_RSTC__RESET_KEY   0xA5000000   // reset key
-
 #define AT91C_BASE_SHDWC        0xFFFFFD10 // (SHDWC) shutdown controller
 #define AT91C_SHDWC__SHUTDOWN_KEY   0xA5000000   // reset key
 #define AT91C_SHDWC__SHDW           0x01         // processor reset bit
@@ -106,7 +111,7 @@
 #define AT91_DTXD   AT91_GPIO_Driver::PA10
 #define AT91_TXD0   AT91_GPIO_Driver::PC8
 #define AT91_RXD0   AT91_GPIO_Driver::PC9
-#define AT91_RST0   AT91_GPIO_Driver::PC10
+#define AT91_RTS0   AT91_GPIO_Driver::PC10
 #define AT91_CTS0   AT91_GPIO_Driver::PC11    
 #define AT91_TXD1   AT91_GPIO_Driver::PC12
 #define AT91_RXD1   AT91_GPIO_Driver::PC13

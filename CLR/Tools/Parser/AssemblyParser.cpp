@@ -1582,6 +1582,11 @@ HRESULT MetaData::Parser::GetTypeField( mdFieldDef fd )
             {
                 len = chValue * sizeof(WCHAR);
             }
+            // enable const object fields
+            else if(db.m_attr == ELEMENT_TYPE_CLASS && IsFdLiteral(db.m_flags) && IsFdStatic(db.m_flags))
+            {
+                len = 4;
+            }
             else
             {
                 len = SizeFromElementType( (CorElementType)db.m_attr );

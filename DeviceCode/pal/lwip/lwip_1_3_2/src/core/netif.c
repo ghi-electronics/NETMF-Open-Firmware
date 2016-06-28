@@ -106,7 +106,7 @@ netif_add(struct netif *netif, struct ip_addr *ipaddr, struct ip_addr *netmask,
   // lines below. Since we set this flag to 
   // enable multicast we will clear all bits
   // except this one
-  netif->flags &= NETIF_FLAG_IGMP;
+  netif->flags &= (NETIF_FLAG_IGMP | NETIF_FLAG_BROADCAST | NETIF_FLAG_DYNAMIC_DNS);
 #if LWIP_DHCP
   /* netif not under DHCP control by default */
   netif->dhcp = NULL;

@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>backlight_hal_stubs</AssemblyName>
     <ProjectGuid>{5da5b4da-c054-4ee8-9651-696bda4ae923}</ProjectGuid>
@@ -43,6 +44,5 @@
     <Compile Include="backlight_stubs_config.cpp" />
     <Compile Include="Backlight_stubs_functions.cpp" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

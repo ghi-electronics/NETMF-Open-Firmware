@@ -154,6 +154,13 @@ void CLR_RT_HeapBlock_NativeEventDispatcher::SaveToHALQueue( UINT32 data1, UINT3
     ASSERT_IRQ_MUST_BE_OFF();
 
     CLR_HW_Hardware::HalInterruptRecord* rec = g_CLR_HW_Hardware.m_interruptData.m_HalQueue.Push();
+
+    if(rec == NULL)
+    {
+        g_CLR_HW_Hardware.m_interruptData.m_HalQueue.Pop(); // remove the oldest interrupt to make room for the newest
+        rec = g_CLR_HW_Hardware.m_interruptData.m_HalQueue.Push();
+    }
+    
     if(rec)
     {
         rec->m_data1   = data1;
@@ -184,6 +191,7 @@ HRESULT CLR_RT_HeapBlock_NativeEventDispatcher::StartDispatch( CLR_RT_Applicatio
     CLR_RT_HeapBlock*  args;
     CLR_RT_HeapBlock_Delegate* dlg;
     CLR_RT_HeapBlock* port;
+    const CLR_UINT64 c_UTCMask = 0x8000000000000000ULL;
 
     InterruptPortInterrupt& interrupt = appInterrupt->m_interruptPortInterrupt;
 
@@ -204,10 +212,11 @@ HRESULT CLR_RT_HeapBlock_NativeEventDispatcher::StartDispatch( CLR_RT_Applicatio
     //
     // set values for delegate arguments
     //
-    args[0].SetInteger    ( interrupt.m_data1         );
-    args[1].SetInteger    ( interrupt.m_data2         );
-    args[2].SetInteger    ( interrupt.m_time          );
-    args[2].ChangeDataType( DATATYPE_DATETIME         );
+    args[0].SetInteger    ( interrupt.m_data1                        );
+    args[1].SetInteger    ( interrupt.m_data2                        );
+    args[2].SetInteger    ( (CLR_UINT64)interrupt.m_time | c_UTCMask );
+    args[2].ChangeDataType( DATATYPE_DATETIME                        );
+    
 
     th->m_terminationCallback  = CLR_RT_HeapBlock_NativeEventDispatcher::ThreadTerminationCallback;
     th->m_terminationParameter = appInterrupt;

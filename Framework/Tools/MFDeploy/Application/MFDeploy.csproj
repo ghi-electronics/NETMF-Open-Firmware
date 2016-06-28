@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <AssemblyName>MFDeploy</AssemblyName>
@@ -31,6 +32,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgumentParser.cs" />
+    <Compile Include="EraseDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EraseDialog.Designer.cs">
+      <DependentUpon>EraseDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="UsbXmlConfig.cs" />
     <Compile Include="DeploymentStatusDialog.cs">
       <SubType>Form</SubType>
@@ -74,6 +81,9 @@
       <SubType>Designer</SubType>
       <DependentUpon>DeploymentStatusDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="EraseDialog.resx">
+      <DependentUpon>EraseDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MFDeployForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>MFDeployForm.cs</DependentUpon>
@@ -84,6 +94,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="App.config" />
+    <None Include="NetMFDeviceCert.pfx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

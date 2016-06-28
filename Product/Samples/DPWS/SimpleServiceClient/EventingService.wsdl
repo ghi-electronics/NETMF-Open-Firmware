@@ -10,7 +10,11 @@
     <schema targetNamespace="http://schemas.example.org/EventingService" xmlns="http://www.w3.org/2001/XMLSchema">
       <element name="SimpleEventRequest" type="tns:SimpleEventRequestType" />
       <complexType name="SimpleEventRequestType">
-        <sequence />
+        <sequence>
+            <element minOccurs="1" maxOccurs="1" name="Param" nillable="true" type="base64Binary" />
+            <any minOccurs="0" maxOccurs="unbounded" namespace="##other" processContents="lax" />
+        </sequence>
+        <anyAttribute namespace="##any" processContents="lax" />
       </complexType>
       <element name="IntegerEventRequest" type="tns:IntegerEventRequestType" />
       <complexType name="IntegerEventRequestType">

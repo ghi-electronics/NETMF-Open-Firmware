@@ -554,6 +554,10 @@
 				>
 			</File>
 			<File
+				RelativePath="corlib_native_System_Double.cpp"
+				>
+			</File>
+			<File
 				RelativePath="corlib_native_System_Diagnostics_Debugger.cpp"
 				>
 			</File>

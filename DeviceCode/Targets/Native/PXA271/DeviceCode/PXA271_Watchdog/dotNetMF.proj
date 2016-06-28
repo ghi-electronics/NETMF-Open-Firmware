@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>PXA271_Watchdog</AssemblyName>
     <Size>
@@ -51,10 +52,14 @@
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
   <PropertyGroup />
   <ItemGroup>
-    <HFiles Include="..\PXA271.h" />
     <Compile Include="PXA271_WatchDog_functions.cpp" />
     <Compile Include="PXA271__WATCHDOG.cpp" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\arm_util.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\cpu.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\cpu_definitions.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\smartptr_fiq_arm.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

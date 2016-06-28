@@ -83,6 +83,10 @@
     <DriverLibs Include="COM_pal.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
+    <DriverLibs Include="DebuggerPort_SSL_config_stubs.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Config\dotnetmf.proj" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Configuration\dotNetMF_loader.proj" />
     <DriverLibs Include="config_pal_loader.$(LIB_EXT)" />
   </ItemGroup>

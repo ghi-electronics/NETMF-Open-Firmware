@@ -301,7 +301,7 @@ int RAND_poll(void)
 
 		while (rc == ERROR_MORE_DATA)
 			{
-			buf = realloc(buf,bufsz+8192);
+			buf = TINYCLR_SSL_REALLOC(buf,bufsz+8192);
 			if (!buf)
 				break;
 			bufsz += 8192;

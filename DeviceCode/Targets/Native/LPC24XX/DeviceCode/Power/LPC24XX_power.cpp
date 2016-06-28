@@ -15,9 +15,8 @@
 #include "..\LPC24XX.h"
 
 
-//void PrepareImageRegions_IRAM();
-//void  PrepareImageRegions_IRAM_TC();
-void PrepareVectors();
+void PrepareImageRegions_IRAM();
+void  PrepareImageRegions_IRAM_TC();
 
 extern void Initialize_SyncOn();
 
@@ -35,14 +34,14 @@ LPC24XX_Driver g_LPC24XX_Driver;
 
 // Copy vector table from External FLASH/RAM to LPC24XX internal RAM
 
-/*extern UINT32 Load$$ER_IRAM$$Base;
+extern UINT32 Load$$ER_IRAM$$Base;
 extern UINT32 Image$$ER_IRAM$$Base;
 extern UINT32 Image$$ER_IRAM$$Length;
 
 extern UINT32 Load$$ER_IRAM_TC$$Base;
 extern UINT32 Image$$ER_IRAM_TC$$Base;
 extern UINT32 Image$$ER_IRAM_TC$$Length;
-*/
+
 
 
 BOOL CPU_Initialize()
@@ -125,15 +124,14 @@ BOOL CPU_IsSoftRebootSupported ()
 BOOL LPC24XX_Driver::Initialize()
 {
     // Copy Vector table to internal RAM
-	PrepareVectors();
-   // PrepareImageRegions_IRAM(); // extra image copy for Internal RAM    
+    PrepareImageRegions_IRAM(); // extra image copy for Internal RAM    
 
 //    // Remap Interrupt vectors to internal RAM
 //    // Vector table is copied by PrepareImageRegions() (HAL\ARM\Configuration\tinyhal.cpp)
     Initialize_SyncOn();
 
     // Copy TimeCritical code/data to internal SRAM
-   // PrepareImageRegions_IRAM_TC();
+    PrepareImageRegions_IRAM_TC();
     
     CPU_INTC_Initialize();
     // Debug Uart channel is initialized by HAL Init
@@ -151,7 +149,7 @@ void LPC24XX_Driver::Sleep()
 {
     //LPC22XX::SYSCON().INTWAKE = 
     //LPC22XX::SYSCON().PCON = 0x81;
-    //while(LPC24XX_VIC::c_MaxInterruptIndex == LPC24XX::VIC().NormalInterruptPending());
+    while(LPC24XX_VIC::c_MaxInterruptIndex == LPC24XX::VIC().NormalInterruptPending());
 }
 
 void LPC24XX_Driver::Halt()
@@ -166,7 +164,7 @@ void LPC24XX_Driver::Halt()
 
 void LPC24XX_Driver::Reset()
 {
-   // LPC24XX_WATCHDOG_Driver::ResetCpu();
+    LPC24XX_WATCHDOG_Driver::ResetCpu();
 }
 
 void LPC24XX_Driver::Shutdown()
@@ -216,28 +214,7 @@ void __section(SectionForBootstrapOperations) BootstrapCode_Dummy()
 {
 }
 
-void __section(SectionForBootstrapOperations) PrepareVectors()
-{
-
-    /*UINT32  len = (UINT32 )&Image$$ER_IRAM$$Length; 
-    volatile UINT32* src = (volatile UINT32*)&Load$$ER_IRAM$$Base; 
-    volatile UINT32* dst = (volatile UINT32*)&Image$$ER_IRAM$$Base;
-
-    if(dst == src) return;
-    
-    while(len )
-    {
-        *dst++ = *src++;
-
-        len -= 4;
-    }
-	*/
-        
-}
-
-
-
-/*void __section(SectionForBootstrapOperations) PrepareImageRegions_IRAM()
+void __section(SectionForBootstrapOperations) PrepareImageRegions_IRAM()
 {
 
     UINT32  len = (UINT32 )&Image$$ER_IRAM$$Length; 
@@ -272,6 +249,6 @@ void __section(SectionForBootstrapOperations) PrepareImageRegions_IRAM_TC()
 
 }
 
-*/
+
 #pragma arm section code
 

@@ -1076,6 +1076,8 @@ public:
     void GenerateSkeletonStubFieldsDef( const CLR_RECORD_TYPEDEF *pClsType, FILE *pFileStubHead, std::string strIndent, std::string strMngClassName );
     void GenerateSkeletonStubCode( LPCWSTR szFilePath, FILE *pFileDotNetProj );
 
+    void BuildMethodName_Legacy( const CLR_RECORD_METHODDEF* md, std::string& name, CLR_RT_StringMap& mapMethods );
+    void GenerateSkeleton_Legacy( LPCWSTR szFileName, LPCWSTR szProjectName );
 
 
     void BuildMethodName( const CLR_RECORD_METHODDEF* md, std::string& name    , CLR_RT_StringMap& mapMethods );
@@ -1288,6 +1290,14 @@ struct CLR_RT_WellKnownTypes
     CLR_RT_TypeDef_Index m_XmlReader_XmlAttribute;
     CLR_RT_TypeDef_Index m_XmlReader_NamespaceEntry;
 
+    CLR_RT_TypeDef_Index m_CryptoKey;
+    CLR_RT_TypeDef_Index m_CryptokiObject;
+    CLR_RT_TypeDef_Index m_CryptokiSession;
+    CLR_RT_TypeDef_Index m_CryptokiSlot;
+    CLR_RT_TypeDef_Index m_CryptokiMechanismType;
+    CLR_RT_TypeDef_Index m_CryptoException;
+    CLR_RT_TypeDef_Index m_CryptokiCertificate;
+
     PROHIBIT_COPY_CONSTRUCTORS(CLR_RT_WellKnownTypes);
 };
 
@@ -1296,6 +1306,7 @@ extern CLR_RT_WellKnownTypes g_CLR_RT_WellKnownTypes;
 struct CLR_RT_WellKnownMethods
 {
     CLR_RT_MethodDef_Index m_ResourceManager_GetObjectFromId;
+    CLR_RT_MethodDef_Index m_ResourceManager_GetObjectChunkFromId;
 
     PROHIBIT_COPY_CONSTRUCTORS(CLR_RT_WellKnownMethods);
 };
@@ -1728,7 +1739,7 @@ struct CLR_RT_HeapCluster : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELO
 
     //--//
 
-    void HeapCluster_Initialize( CLR_UINT32 size ); // Memory is not erased by the caller.
+    void HeapCluster_Initialize( CLR_UINT32 size, CLR_UINT32 blockSize ); // Memory is not erased by the caller.
 
     CLR_RT_HeapBlock* ExtractBlocks( CLR_UINT32 dataType, CLR_UINT32 flags, CLR_UINT32 length );
 
@@ -1753,6 +1764,29 @@ struct CLR_RT_HeapCluster : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELO
 
 //--//
 
+#ifndef TINYCLR_NO_IL_INLINE
+struct CLR_RT_InlineFrame
+{
+    CLR_RT_HeapBlock*         m_locals;     
+    CLR_RT_HeapBlock*         m_args;
+    CLR_RT_HeapBlock*         m_evalStack;
+    CLR_RT_HeapBlock*         m_evalPos;
+    CLR_RT_MethodDef_Instance m_call;
+    CLR_PMETADATA             m_IP;         
+    CLR_PMETADATA             m_IPStart;         
+};
+
+struct CLR_RT_InlineBuffer
+{
+    union
+    {
+        CLR_RT_InlineBuffer* m_pNext;
+
+        CLR_RT_InlineFrame   m_frame;
+    };
+};
+#endif
+
 struct CLR_RT_StackFrame : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOCATION -
 {
     static const int c_OverheadForNewObjOrInteropMethod      =  2; // We need to have more slots in the stack to process a 'newobj' opcode.
@@ -1765,7 +1799,7 @@ struct CLR_RT_StackFrame : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOC
     static const CLR_UINT32 c_MethodKind_Mask                = 0x00000003;
 
     static const CLR_UINT32 c_NativeProfiled                 = 0x00000004;
-    static const CLR_UINT32 c_UNUSED_00000008                = 0x00000008;
+    static const CLR_UINT32 c_MethodKind_Inlined             = 0x00000008;
 
     static const CLR_UINT32 c_ExecutingConstructor           = 0x00000010;
     static const CLR_UINT32 c_CompactAndRestartOnOutOfMemory = 0x00000020;
@@ -1787,7 +1821,7 @@ struct CLR_RT_StackFrame : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOC
     static const CLR_UINT32 c_CallerIsCompatibleForRet       = 0x00040000;
     static const CLR_UINT32 c_PseudoStackFrameForFilter      = 0x00080000;
 
-    static const CLR_UINT32 c_UNUSED_00100000                = 0x00100000;
+    static const CLR_UINT32 c_InlineMethodHasReturnValue     = 0x00100000;
     static const CLR_UINT32 c_UNUSED_00200000                = 0x00200000;
     static const CLR_UINT32 c_UNUSED_00400000                = 0x00400000;
     static const CLR_UINT32 c_UNUSED_00800000                = 0x00800000;
@@ -1836,6 +1870,11 @@ struct CLR_RT_StackFrame : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOC
         void*                 m_customPointer;
     };
 
+
+#ifndef TINYCLR_NO_IL_INLINE
+    CLR_RT_InlineBuffer*      m_inlineFrame;
+#endif
+
 #if defined(TINYCLR_ENABLE_SOURCELEVELDEBUGGING)
     CLR_UINT32                m_depth;
 #endif //#if defined(TINYCLR_ENABLE_SOURCELEVELDEBUGGING)
@@ -1860,6 +1899,16 @@ struct CLR_RT_StackFrame : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOC
 
     void Pop();
 
+#ifndef TINYCLR_NO_IL_INLINE
+    bool PushInline( CLR_PMETADATA& ip, CLR_RT_Assembly*& assm, CLR_RT_HeapBlock*& evalPos, CLR_RT_MethodDef_Instance& calleeInst, CLR_RT_HeapBlock* pThis);
+    void PopInline  ( );
+
+    void RestoreFromInlineStack();
+    void RestoreStack(CLR_RT_InlineFrame& frame);
+    void SaveStack(CLR_RT_InlineFrame& frame);
+#endif 
+    
+
 #if defined(TINYCLR_APPDOMAINS)
     static HRESULT PushAppDomainTransition( CLR_RT_Thread* th, const CLR_RT_MethodDef_Instance& callInst, CLR_RT_HeapBlock* pThis, CLR_RT_HeapBlock* pArgs );
            HRESULT  PopAppDomainTransition(                                                                                                                );
@@ -1878,10 +1927,10 @@ struct CLR_RT_StackFrame : public CLR_RT_HeapBlock_Node // EVENT HEAP - NO RELOC
 
 #if !defined(TINYCLR_EMULATED_FLOATINGPOINT)
     void    SetResult_R4     ( float             val                        );
-    void    SetResult_R8     ( double&           val                        );
+    void    SetResult_R8     ( double            val                        );
 #else
     void    SetResult_R4     ( CLR_INT32         val                        );
-    void    SetResult_R8     ( CLR_INT64&        val                        );
+    void    SetResult_R8     ( CLR_INT64         val                        );
 #endif
 
     void    SetResult_Boolean( bool              val                        );
@@ -2119,7 +2168,7 @@ struct CLR_RT_GarbageCollector
     void Thread_Mark( CLR_RT_Thread*        thread  );
 
     void Heap_Compact                ();
-    void Heap_ComputeAliveVsDeadRatio();
+    CLR_UINT32 Heap_ComputeAliveVsDeadRatio();
 
     void RecoverEventsFromGC();
 
@@ -2346,6 +2395,7 @@ struct CLR_RT_Thread : public CLR_RT_ObjectToEvent_Destination // EVENT HEAP - N
         static const CLR_UINT8 p_3_RunningHandler                         = 0x06;
         static const CLR_UINT8 p_4_NormalCleanup                          = 0x07;
 
+        static const CLR_UINT8 c_MagicCatchForInline                      = 0x20;
         static const CLR_UINT8 c_MagicCatchForInteceptedException         = 0x40;
         static const CLR_UINT8 c_ContinueExceptionHandler                 = 0x80;
 
@@ -2526,11 +2576,18 @@ extern size_t LinkArraySize   ();
 extern size_t LinkMRUArraySize();
 extern size_t PayloadArraySize();
 extern size_t InterruptRecords();
+#ifndef TINYCLR_NO_IL_INLINE
+extern size_t InlineBufferCount();
+#endif
+
 
 extern CLR_UINT32 g_scratchVirtualMethodTableLink     [];
 extern CLR_UINT32 g_scratchVirtualMethodTableLinkMRU  [];
 extern CLR_UINT32 g_scratchVirtualMethodPayload       [];
 extern CLR_UINT32 g_scratchInterruptDispatchingStorage[];
+#ifndef TINYCLR_NO_IL_INLINE
+extern CLR_UINT32 g_scratchInlineBuffer               [];
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2646,20 +2703,22 @@ struct CLR_RT_EventCache
 
         static void MoveEntryToTop( Link* entries, CLR_UINT32 slot, CLR_UINT32 idx );
     };
-
 #endif
 
     //--//
 
-    static const CLR_UINT16 c_maxFastLists = 32;
+    static const CLR_UINT16 c_maxFastLists = 40;
 
     // the scratch array is used to avoid bringing in arm ABI methods (for semihosting)
     // struct arrays require initialization with the v3.0 compiler and this is done with ABI methods,
     // unless of course you provide a work around lik this ;-)
-    char                    m_scratch[ sizeof(BoundedList) * c_maxFastLists / sizeof(char) ];
+    UINT32                  m_scratch[ (sizeof(BoundedList) * c_maxFastLists + 3) / sizeof(UINT32) ];
     BoundedList*            m_events;
 
     VirtualMethodTable      m_lookup_VirtualMethod;
+#ifndef TINYCLR_NO_IL_INLINE
+    CLR_RT_InlineBuffer*    m_inlineBufferStart;
+#endif
 
     //--//
 
@@ -2673,6 +2732,11 @@ struct CLR_RT_EventCache
     CLR_RT_HeapBlock* Extract_Node      ( CLR_UINT32 dataType, CLR_UINT32 flags, CLR_UINT32 blocks );
 
     bool FindVirtualMethod( const CLR_RT_TypeDef_Index& cls, const CLR_RT_MethodDef_Index& mdVirtual, CLR_RT_MethodDef_Index& md );
+
+#ifndef TINYCLR_NO_IL_INLINE
+    bool GetInlineFrameBuffer(CLR_RT_InlineBuffer** ppBuffer);
+    bool FreeInlineBuffer(CLR_RT_InlineBuffer* pBuffer);
+#endif
 
     //--//
 
@@ -2858,7 +2922,7 @@ struct CLR_RT_ExecutionEngine
 #define CLR_EE_REBOOT_SET( Cond )       g_CLR_RT_ExecutionEngine.m_iReboot_Options |=  CLR_RT_ExecutionEngine::c_fReboot_##Cond
 #define CLR_EE_REBOOT_CLR( Cond )       g_CLR_RT_ExecutionEngine.m_iReboot_Options &= ~CLR_RT_ExecutionEngine::c_fReboot_##Cond
 
-#define CLR_EE_DBG_EVENT_SEND( cmd, size, payload, flags ) g_CLR_DBG_Debuggers[ DEBUGGER_PORT_INDEX ].m_messaging->SendEvent( cmd, size, (UINT8*)payload, flags )
+#define CLR_EE_DBG_EVENT_SEND( cmd, size, payload, flags ) (g_CLR_DBG_Debuggers[ DEBUGGER_PORT_INDEX ].m_messaging != NULL) ? g_CLR_DBG_Debuggers[ DEBUGGER_PORT_INDEX ].m_messaging->SendEvent( cmd, size, (UINT8*)payload, flags ) : false 
 
 #if NUM_MESSAGING == 1
     #define CLR_EE_MSG_EVENT_RPC( cmd, size, payload, flags ) g_CLR_Messaging[ 0 ].SendEvent( cmd, size, (UINT8*)payload, flags )
@@ -3031,8 +3095,9 @@ struct CLR_RT_ExecutionEngine
     CLR_RT_HeapBlock*      ExtractHeapBlocksForObjects          ( CLR_UINT32 dataType, CLR_UINT32 flags, CLR_UINT32 length );
     CLR_RT_HeapBlock_Node* ExtractHeapBlocksForEvents           ( CLR_UINT32 dataType, CLR_UINT32 flags, CLR_UINT32 length );
 
-    HRESULT NewThread      ( CLR_RT_Thread*& th, CLR_RT_HeapBlock_Delegate* pDelegate, int priority, CLR_UINT32 flags=0 );
-    void    PutInProperList( CLR_RT_Thread*  th                                                                         );
+    HRESULT   NewThread      ( CLR_RT_Thread*& th, CLR_RT_HeapBlock_Delegate* pDelegate, int priority, CLR_INT32 id, CLR_UINT32 flags = 0 );
+    void      PutInProperList( CLR_RT_Thread*  th                                                                                         );
+    CLR_INT32 GetNextThreadId(                                                                                                            );
 
     HRESULT InitializeReference( CLR_RT_HeapBlock& ref, CLR_RT_SignatureParser&    parser                        );
     HRESULT InitializeReference( CLR_RT_HeapBlock& ref, const CLR_RECORD_FIELDDEF* target, CLR_RT_Assembly* assm );
@@ -3198,10 +3263,10 @@ CT_ASSERT( sizeof(CLR_RT_HeapBlock_Raw)  == sizeof(CLR_RT_HeapBlock) )
 #elif defined(ARM_V1_2)
     CT_ASSERT( sizeof(CLR_RT_DataTypeLookup) == 16 + TINYCLR_TRACE_MEMORY_STATS_EXTRA_SIZE )
 
-#elif defined(GCC_V4_2)  // Gcc4.2.compiler uses 8 bytes for a function pointer
+#elif defined(GCC)  // Gcc compiler uses 8 bytes for a function pointer
     CT_ASSERT( sizeof(CLR_RT_DataTypeLookup) == 20 + TINYCLR_TRACE_MEMORY_STATS_EXTRA_SIZE )
 
-#elif defined(GCCOP_V4_2)  // Gcc4.2.compiler uses 8 bytes for a function pointer
+#elif defined(GCCOP)  // GccOP compiler uses 8 bytes for a function pointer
     CT_ASSERT( sizeof(CLR_RT_DataTypeLookup) == 20 + TINYCLR_TRACE_MEMORY_STATS_EXTRA_SIZE )
 
 #elif defined(PLATFORM_BLACKFIN) // 8 bytes for function pointer

@@ -64,6 +64,7 @@ unsigned
 short   enc28j60_lwip_read_phy_register(SPI_CONFIGURATION *spiConf, 
                                               UINT8 registerAddress);
 
+
 /* keep track of the receive pointer */    
 static unsigned short s_ENC28J60_TRANSMIT_BUFFER_START = ENC28J60_TRANSMIT_BUFFER_START;
 static unsigned short s_ENC28J60_RECEIVE_BUFFER_START  = ENC28J60_RECEIVE_BUFFER_START;
@@ -1019,6 +1020,7 @@ void enc28j60_lwip_soft_reset(SPI_CONFIGURATION* spiConf)
 {
     NATIVE_PROFILE_HAL_DRIVERS_ETHERNET();
     UINT8 byteData;
+    UINT16 shortData;
     int timeout = 10000; // 1 second
 
     /* First turn off RX/TX */
@@ -1049,15 +1051,15 @@ void enc28j60_lwip_soft_reset(SPI_CONFIGURATION* spiConf)
     enc28j60_lwip_write_spi(spiConf, ENC28J60_SPI_BIT_FIELD_CLEAR_OPCODE, ENC28J60_ECON2, (UINT8)(1 << ENC28J60_ECON2_VRPS_BIT));
 
     /* Reset PHY */
-    enc28j60_lwip_write_spi(spiConf, ENC28J60_SPI_BIT_FIELD_SET_OPCODE, ENC28J60_PHCON1, (UINT8)(1 << ENC28J60_PHCON1_PRST));
+    enc28j60_lwip_write_phy_register(spiConf, ENC28J60_PHCON1, (UINT16)(1ul << ENC28J60_PHCON1_PRST));
 
     timeout = 10000; 
     do
     {
         HAL_Time_Sleep_MicroSeconds(100);
 
-        enc28j60_lwip_read_spi(spiConf, ENC28J60_SPI_READ_CONTROL_REGISTER_OPCODE, ENC28J60_PHCON1, &byteData, 1, 0);
-    } while(timeout-- && (byteData & (1 << ENC28J60_PHCON1_PRST)) != 0);    
+        shortData = enc28j60_lwip_read_phy_register(spiConf, ENC28J60_PHCON1);
+    } while(timeout-- && (shortData & (1ul << ENC28J60_PHCON1_PRST)) != 0);    
 
 
     enc28j60_lwip_write_spi(spiConf, ENC28J60_SPI_BIT_FIELD_CLEAR_OPCODE, ENC28J60_EIE, (UINT8)((1 << ENC28J60_EIE_INTIE_BIT) | (1 << ENC28J60_EIE_PKTIE_BIT) | (1 << ENC28J60_EIE_TXIE_BIT) |(1 << ENC28J60_EIE_TXERIE_BIT)));    

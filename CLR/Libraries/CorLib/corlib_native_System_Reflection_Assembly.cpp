@@ -216,7 +216,7 @@ HRESULT Library_corlib_native_System_Reflection_Assembly::LoadInternal___STATIC_
     build      = pArgs[ 4 ].NumericByRef().s4;
     rev        = pArgs[ 5 ].NumericByRef().s4;
 
-    if(fVersion && (maj < 0 || min < 0 || build < 0 || rev < 0))
+    if(fVersion && (maj == -1 || min == -1 || build == -1 || rev == -1))
     {
         TINYCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
     }

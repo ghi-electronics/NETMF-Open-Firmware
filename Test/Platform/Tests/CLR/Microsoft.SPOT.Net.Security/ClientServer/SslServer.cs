@@ -8,6 +8,7 @@ using Microsoft.SPOT.Net;
 using Microsoft.SPOT.Net.Security;
 using Microsoft.SPOT.Platform.Test;
 using Microsoft.SPOT.Net.NetworkInformation;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Microsoft.SPOT.Platform.Tests
 {

@@ -45,7 +45,11 @@
 #define NETWORK_MEMORY_PROFILE__medium      1
 
 #define NETWORK_MEMORY_POOL__INCLUDE_SSL    1
+#if defined(TCPIP_LWIP)
+#include <pal\net\Network_defines_lwip.h>
+#else
 #include <pal\net\Network_Defines.h>
+#endif
 
 #define NETWORK_USE_LOOPBACK                1
 #define NETWORK_USE_DHCP                    1

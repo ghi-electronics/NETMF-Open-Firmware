@@ -2,6 +2,7 @@
 #define SSL_FUNCTIONS_H
 
 #include <tinyhal.h>
+#include <ossl_typ.h>
 
 #define TINYCLR_SSL_MODE_TLS1 0x10
 #define TINYCLR_SSL_MODE_SSL3 0x08
@@ -21,11 +22,10 @@
 #define FORMAT_PKCS12   5
 #define FORMAT_SMIME    6
 #define FORMAT_ENGINE   7
-#define FORMAT_IISSGC	8	/* XXX this stupid macro helps us to avoid
-				 * adding yet another param to load_*key() */
-//PAL SSL_ParseCertificate will call this TODO: possible rename
+#define FORMAT_IISSGC   8  
 
-BOOL ssl_parse_certificate_internal(void* buf, size_t size, void* pwd, void* x509, int format=FORMAT_PEM );
+X509* ssl_parse_certificate(void* pCert, size_t certLen, LPCSTR pwd, EVP_PKEY** privateKey);
+BOOL ssl_parse_certificate_internal(void* buf, size_t size, void* pwd, void* x509 );
 int ssl_connect_internal(int sd, const char* szTargetHost, int sslContextHandle);
 int ssl_accept_internal( int socket, int sslContextHandle );
 int ssl_read_internal( int socket, char* Data, size_t size );
@@ -33,7 +33,7 @@ int ssl_write_internal( int socket, const char* Data, size_t size);
 int ssl_closesocket_internal( int sd );
 int ssl_pending_internal( int sd );
 BOOL ssl_exit_context_internal(int sslContextHandle );
-BOOL ssl_generic_init_internal( int sslMode, int sslVerify, const char* certificate, int cert_len, int& sslContextHandle, BOOL isServer );
+BOOL ssl_generic_init_internal( int sslMode, int sslVerify, const char* certificate, int cert_len, const char* pwd, int& sslContextHandle, BOOL isServer );
 BOOL ssl_initialize_internal();
 BOOL ssl_uninitialize_internal();
 void ssl_clear_cert_auth_internal(int sslContextHandle );

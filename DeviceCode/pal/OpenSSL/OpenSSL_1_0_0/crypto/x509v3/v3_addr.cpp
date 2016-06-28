@@ -152,7 +152,7 @@ static void addr_expand(unsigned char *addr,
 			const int length,
 			const unsigned char fill)
 {
-  OPENSSL_assert(bs->length >= 0 && bs->length <= length);
+  TINYCLR_SSL_ASSERT(bs->length >= 0 && bs->length <= length);
   if (bs->length > 0) {
     TINYCLR_SSL_MEMCPY(addr, bs->data, bs->length);
     if ((bs->flags & 7) != 0) {
@@ -182,12 +182,18 @@ static int i2r_address(BIO *out,
   unsigned char addr[ADDR_RAW_BUF_LEN];
   int i, n;
 
+  if (bs->length < 0)
+    return 0;
   switch (afi) {
   case IANA_AFI_IPV4:
+    if (bs->length > 4)
+      return 0;
     addr_expand(addr, bs, 4, fill);
     BIO_printf(out, "%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
     break;
   case IANA_AFI_IPV6:
+    if (bs->length > 16)
+      return 0;
     addr_expand(addr, bs, 16, fill);
     for (n = 16; n > 1 && addr[n-1] == 0x00 && addr[n-2] == 0x00; n -= 2)
       ;
@@ -459,7 +465,7 @@ static int make_addressRange(IPAddressOrRange **result,
   if ((aor = IPAddressOrRange_new()) == NULL)
     return 0;
   aor->type = IPAddressOrRange_addressRange;
-  OPENSSL_assert(aor->u.addressRange == NULL);
+  TINYCLR_SSL_ASSERT(aor->u.addressRange == NULL);
   if ((aor->u.addressRange = IPAddressRange_new()) == NULL)
     goto err;
   if (aor->u.addressRange->min == NULL &&
@@ -528,7 +534,7 @@ static IPAddressFamily *make_IPAddressFamily(IPAddrBlocks *addr,
 
   for (i = 0; i < sk_IPAddressFamily_num(addr); i++) {
     f = sk_IPAddressFamily_value(addr, i);
-    OPENSSL_assert(f->addressFamily->data != NULL);
+    TINYCLR_SSL_ASSERT(f->addressFamily->data != NULL);
     if (f->addressFamily->length == keylen &&
 	!TINYCLR_SSL_MEMCMP(f->addressFamily->data, key, keylen))
       return f;
@@ -660,7 +666,7 @@ static void extract_min_max(IPAddressOrRange *aor,
 			    unsigned char *max,
 			    int length)
 {
-  OPENSSL_assert(aor != NULL && min != NULL && max != NULL);
+  TINYCLR_SSL_ASSERT(aor != NULL && min != NULL && max != NULL);
   switch (aor->type) {
   case IPAddressOrRange_addressPrefix:
     addr_expand(min, aor->u.addressPrefix, length, 0x00);
@@ -886,7 +892,7 @@ int v3_addr_canonize(IPAddrBlocks *addr)
   }
   sk_IPAddressFamily_set_cmp_func(addr, IPAddressFamily_cmp);
   sk_IPAddressFamily_sort(addr);
-  OPENSSL_assert(v3_addr_is_canonical(addr));
+  TINYCLR_SSL_ASSERT(v3_addr_is_canonical(addr));
   return 1;
 }
 
@@ -1173,9 +1179,9 @@ static int v3_addr_validate_path_internal(X509_STORE_CTX *ctx,
   int i, j, ret = 1;
   X509 *x;
 
-  OPENSSL_assert(chain != NULL && sk_X509_num(chain) > 0);
-  OPENSSL_assert(ctx != NULL || ext != NULL);
-  OPENSSL_assert(ctx == NULL || ctx->verify_cb != NULL);
+  TINYCLR_SSL_ASSERT(chain != NULL && sk_X509_num(chain) > 0);
+  TINYCLR_SSL_ASSERT(ctx != NULL || ext != NULL);
+  TINYCLR_SSL_ASSERT(ctx == NULL || ctx->verify_cb != NULL);
 
   /*
    * Figure out where to start.  If we don't have an extension to
@@ -1188,7 +1194,7 @@ static int v3_addr_validate_path_internal(X509_STORE_CTX *ctx,
   } else {
     i = 0;
     x = sk_X509_value(chain, i);
-    OPENSSL_assert(x != NULL);
+    TINYCLR_SSL_ASSERT(x != NULL);
     if ((ext = x->rfc3779_addr) == NULL)
       goto done;
   }
@@ -1207,7 +1213,7 @@ static int v3_addr_validate_path_internal(X509_STORE_CTX *ctx,
    */
   for (i++; i < sk_X509_num(chain); i++) {
     x = sk_X509_value(chain, i);
-    OPENSSL_assert(x != NULL);
+    TINYCLR_SSL_ASSERT(x != NULL);
     if (!v3_addr_is_canonical(x->rfc3779_addr))
       validation_err(X509_V_ERR_INVALID_EXTENSION);
     if (x->rfc3779_addr == NULL) {
@@ -1247,7 +1253,7 @@ static int v3_addr_validate_path_internal(X509_STORE_CTX *ctx,
   /*
    * Trust anchor can't inherit.
    */
-  OPENSSL_assert(x != NULL);
+  TINYCLR_SSL_ASSERT(x != NULL);
   if (x->rfc3779_addr != NULL) {
     for (j = 0; j < sk_IPAddressFamily_num(x->rfc3779_addr); j++) {
       IPAddressFamily *fp = sk_IPAddressFamily_value(x->rfc3779_addr, j);

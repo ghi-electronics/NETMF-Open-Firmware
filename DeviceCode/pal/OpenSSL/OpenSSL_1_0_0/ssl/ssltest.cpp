@@ -726,7 +726,7 @@ bad:
 			TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR, "Warning: For accurate timings, use more connections (e.g. -num 1000)\n");
 		}
 
-/*	if (cipher == NULL) cipher=getenv("SSL_CIPHER"); */
+/*	if (cipher == NULL) cipher=TINYCLR_SSL_GETENV("SSL_CIPHER"); */
 
 	SSL_library_init();
 	SSL_load_error_strings();
@@ -891,7 +891,7 @@ bad:
 		(!SSL_CTX_load_verify_locations(c_ctx,CAfile,CApath)) ||
 		(!SSL_CTX_set_default_verify_paths(c_ctx)))
 		{
-		/* TINYCLR_SSL_FPRINTF(stderr,"SSL_load_verify_locations\n"); */
+		/* TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR,"SSL_load_verify_locations\n"); */
 		ERR_print_errors(bio_err);
 		/* goto end; */
 		}
@@ -1431,7 +1431,6 @@ int doit(SSL *s_ssl, SSL *c_ssl, long count)
 	BIO *c_bio=NULL;
 	BIO *s_bio=NULL;
 	int c_r,c_w,s_r,s_w;
-	int c_want,s_want;
 	int i,j;
 	int done=0;
 	int c_write,s_write;
@@ -1466,8 +1465,6 @@ int doit(SSL *s_ssl, SSL *c_ssl, long count)
 
 	c_r=0; s_r=1;
 	c_w=1; s_w=0;
-	c_want=W_WRITE;
-	s_want=0;
 	c_write=1,s_write=0;
 
 	/* We can always do writes */

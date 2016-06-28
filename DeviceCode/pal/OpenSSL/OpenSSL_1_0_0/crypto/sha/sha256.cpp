@@ -155,7 +155,7 @@ static void sha256_block_data_order (SHA256_CTX *ctx, const void *in, size_t num
 	unsigned MD32_REG_T a,b,c,d,e,f,g,h,s0,s1,T1,T2;
 	SHA_LONG	X[16],l;
 	int i;
-	const unsigned char *data=in;
+	const unsigned char *data=(const unsigned char *)in;
 
 			while (num--) {
 

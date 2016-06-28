@@ -44,7 +44,7 @@ BOOL UART::Execute( LOG_STREAM Stream )
 
 UART::UART( int com, int baud, int parity, int stop, int data, int flow )
 {
-    m_com     = com;
+    m_com     = ConvertCOM_ComPort(com);
     m_baud    = baud;
     m_parity  = parity;
     m_stop    = stop;

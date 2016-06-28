@@ -113,7 +113,6 @@
 #define HEADER_APPS_H
 
 #include "e_os.h"
-#include <tinyclr/ssl_types.h>
 
 #include <openssl/bio.h>
 #include <openssl/x509.h>

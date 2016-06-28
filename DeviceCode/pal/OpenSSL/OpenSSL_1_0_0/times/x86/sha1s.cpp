@@ -72,7 +72,7 @@ void main(int argc,char *argv[])
 			sha1_block_x86(&ctx,buffer,num);
 			}
 
-		printf("sha1 (%d bytes) %d %d (%.2f)\n",num,
+		TINYCLR_SSL_PRINTF("sha1 (%d bytes) %d %d (%.2f)\n",num,
 			e1-s1,e2-s2,(double)((e1-s1)-(e2-s2))/2);
 		}
 	}

@@ -60,7 +60,7 @@ void main(int argc,char *argv[])
 			des_encrypt(&data[0],key,1);
 			}
 
-		printf("des %d %d (%d)\n",
+		TINYCLR_SSL_PRINTF("des %d %d (%d)\n",
 			e1-s1,e2-s2,((e2-s2)-(e1-s1)));
 		}
 	}

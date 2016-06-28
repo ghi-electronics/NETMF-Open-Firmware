@@ -175,7 +175,7 @@ static void acpt_close_socket(BIO *bio)
 	if (c->accept_sock != INVALID_SOCKET)
 		{
 		TINYCLR_SSL_SHUTDOWN(c->accept_sock,2);
-		closesocket(c->accept_sock);
+		TINYCLR_SSL_CLOSESOCKET(c->accept_sock);
 		c->accept_sock=INVALID_SOCKET;
 		bio->num=INVALID_SOCKET;
 		}
@@ -222,7 +222,7 @@ again:
 			{
 			if (!BIO_socket_nbio(s,1))
 				{
-				closesocket(s);
+				TINYCLR_SSL_CLOSESOCKET(s);
 				BIOerr(BIO_F_ACPT_STATE,BIO_R_ERROR_SETTING_NBIO_ON_ACCEPT_SOCKET);
 				return(-1);
 				}
@@ -284,7 +284,7 @@ err:
 		if (bio != NULL)
 			BIO_free(bio);
 		else if (s >= 0)
-			closesocket(s);
+			TINYCLR_SSL_CLOSESOCKET(s);
 		return(0);
 		/* break; */
 	case ACPT_S_OK:
@@ -342,7 +342,6 @@ static int acpt_write(BIO *b, const char *in, int inl)
 
 static long acpt_ctrl(BIO *b, int cmd, long num, void *ptr)
 	{
-	BIO *dbio;
 	int *ip;
 	long ret=1;
 	BIO_ACCEPT *data;
@@ -439,8 +438,8 @@ static long acpt_ctrl(BIO *b, int cmd, long num, void *ptr)
 		ret=(long)data->bind_mode;
 		break;
 	case BIO_CTRL_DUP:
-		dbio=(BIO *)ptr;
-/*		if (data->param_port) EAY EAY
+/*		dbio=(BIO *)ptr;
+		if (data->param_port) EAY EAY
 			BIO_set_port(dbio,data->param_port);
 		if (data->param_hostname)
 			BIO_set_hostname(dbio,data->param_hostname);

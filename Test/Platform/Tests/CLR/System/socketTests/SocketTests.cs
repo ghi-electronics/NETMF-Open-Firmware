@@ -174,9 +174,10 @@ namespace Microsoft.SPOT.Platform.Tests
             ///</summary>
 
             bool testResult = true;
+            SocketPair testSockets = null;
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -214,8 +215,6 @@ namespace Microsoft.SPOT.Platform.Tests
                     cBytes = sock.Receive(testSockets.bufReceive);
                 }
                 testSockets.AssertDataReceived(cBytes);
-                testSockets.TearDown();
-                testSockets = null;
 
             }
             catch (Exception e)
@@ -224,6 +223,14 @@ namespace Microsoft.SPOT.Platform.Tests
                 if (e.GetType() == Type.GetType("System.Net.Sockets.SocketException"))
                     Log.Comment("ErrorCode: " + ((SocketException)e).ErrorCode);
                 testResult = false;
+            }
+            finally
+            {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
             }
 
             return (testResult ? MFTestResults.Pass : MFTestResults.Fail);
@@ -245,50 +252,52 @@ namespace Microsoft.SPOT.Platform.Tests
 
             MFTestResults testResult = MFTestResults.Pass;
 
-            IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Loopback, 3054);
-
+            IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Loopback, 3053);
+            IPEndPoint clientEndPoint = new IPEndPoint(IPAddress.Loopback, 3054);
+            SocketServer server = null;
             try
             {
-                for (int i = 0; i < 5; ++i)
+                server = new SocketServer(TestType.Linger, AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                server.LingerValue = false;
+                server.Bind(serverEndPoint);
+                server.Listen(1);
+                server.Start();
+
+                for (int i = 0; i < 2; ++i)
                 {
-                    SocketServer server = new SocketServer(TestType.Linger, AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     try
                     {
                         client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger, false);
 
                         Log.Comment("Testing with port 0");
-                        server.Bind(serverEndPoint);
-
-                        server.Listen(1);
-                        server.Start();
 
                         Log.Comment("For linger verify that we can reuse the ipEndPoint multiple times");
+
+                        client.Bind(clientEndPoint);
 
                         client.Connect(server.LocalEndPoint);
 
                         int bytesSent = client.Send(new byte[200]);
 
                         Log.Comment("Create another client to connect to the server endpoint directly after this client closes.");
-
-                        Thread.Sleep(3000);
                     }
                     catch (SocketException e)
                     {
                         Log.Comment("Exception " + e);
                         Log.Comment("ErrorCode: " + e.ErrorCode);
                         testResult = MFTestResults.Fail;
+                        break;
                     }
                     catch (Exception e)
                     {
                         Log.Comment("Exception " + e);
                         testResult = MFTestResults.Fail;
+                        break;
                     }
                     finally
                     {
                         client.Close();
-                        server.Stop();
-                        server.Close();
                     }
                 }
             }
@@ -302,6 +311,14 @@ namespace Microsoft.SPOT.Platform.Tests
             {
                 Log.Comment("Caught exception: " + e.Message);
                 testResult = MFTestResults.Fail;
+            }
+            finally
+            {
+                if (server != null)
+                {
+                    server.Stop();
+                    server.Close();
+                }
             }
 
             return testResult;
@@ -324,25 +341,30 @@ namespace Microsoft.SPOT.Platform.Tests
             MFTestResults testResult = MFTestResults.Fail;
 
             IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Loopback, 3055);
+            IPEndPoint clientEndPoint = new IPEndPoint(IPAddress.Loopback, 3056);
+
+            SocketServer server = null;
 
             try
             {
-                for (int i = 0; i < 5; ++i)
+                server = new SocketServer(TestType.Linger, AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+                server.LingerValue = true;
+                server.Bind(serverEndPoint);
+                server.Listen(1);
+                server.Start();
+
+                for (int i = 0; i < 2; ++i)
                 {
-                    SocketServer server = new SocketServer(TestType.Linger, AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     try
                     {
-                        client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger, 10000);
-
                         Log.Comment("Testing with port 0");
-                        server.Bind(serverEndPoint);
-
-                        server.Listen(1);
-                        server.Start();
+                        client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger, 3000);
 
                         Log.Comment("For linger verify that we can reuse the ipEndPoint multiple times");
 
+                        client.Bind(clientEndPoint);
                         client.Connect(server.LocalEndPoint);
 
                         int bytesSent = client.Send(new byte[200]);
@@ -360,12 +382,11 @@ namespace Microsoft.SPOT.Platform.Tests
                     {
                         Log.Comment("Exception " + e);
                         testResult = MFTestResults.Fail;
+                        break;
                     }
                     finally
                     {
                         client.Close();
-                        server.Stop();
-                        server.Close();
                     }
                 }
             }
@@ -379,6 +400,14 @@ namespace Microsoft.SPOT.Platform.Tests
             {
                 Log.Comment("Caught exception: " + e.Message);
                 testResult = MFTestResults.Fail;
+            }
+            finally
+            {
+                if (server != null)
+                {
+                    server.Stop();
+                    server.Close();
+                }
             }
 
             return testResult;
@@ -425,7 +454,7 @@ namespace Microsoft.SPOT.Platform.Tests
                     Log.Comment("send lots of small packets.");
                     int bytesSent = 0;
 
-                    for (int i = 0; i < 486; ++i)
+                    for (int i = 0; i < 140; ++i)
                     {
                         bytesSent += testSockets.socketClient.Send(testSockets.bufSend);
                     }
@@ -541,9 +570,16 @@ namespace Microsoft.SPOT.Platform.Tests
             }
             catch (SocketException e)
             {
-                Log.Comment("Caught exception: " + e.Message);
-                Log.Comment("ErrorCode: " + e.ErrorCode.ToString());
-                testResult = MFTestResults.Fail;
+                if (e.ErrorCode == (int)SocketError.ProtocolOption)
+                {
+                    testResult = MFTestResults.Skip;
+                }
+                else
+                {
+                    Log.Comment("Caught exception: " + e.Message);
+                    Log.Comment("ErrorCode: " + e.ErrorCode.ToString());
+                    testResult = MFTestResults.Fail;
+                }
             }
             catch (Exception e)
             {
@@ -629,9 +665,16 @@ namespace Microsoft.SPOT.Platform.Tests
             }
             catch (SocketException e)
             {
-                Log.Comment("Caught exception: " + e.Message);
-                Log.Comment("ErrorCode: " + e.ErrorCode.ToString());
-                testResult = MFTestResults.Fail;
+                if (e.ErrorCode == (int)SocketError.ProtocolOption)
+                {
+                    testResult = MFTestResults.Skip;
+                }
+                else
+                {
+                    Log.Comment("Caught exception: " + e.Message);
+                    Log.Comment("ErrorCode: " + e.ErrorCode.ToString());
+                    testResult = MFTestResults.Fail;
+                }
             }
             catch (Exception e)
             {
@@ -656,9 +699,10 @@ namespace Microsoft.SPOT.Platform.Tests
             /// </summary>
             ///
             bool testResult = true;
+            SocketPair testSockets = null;
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Udp, SocketType.Dgram);
+                testSockets = new SocketPair(ProtocolType.Udp, SocketType.Dgram);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -673,9 +717,6 @@ namespace Microsoft.SPOT.Platform.Tests
 
                 if (testSockets.epClient.Address.ToString() != ((IPEndPoint)epFrom).Address.ToString())
                     throw new Exception("Bad address");
-
-                testSockets.TearDown();
-                testSockets = null;
             }
             catch (SocketException e)
             {
@@ -697,6 +738,14 @@ namespace Microsoft.SPOT.Platform.Tests
                     Log.Comment("ErrorCode: " + ((SocketException)e).ErrorCode);
                 testResult = false;
             }
+            finally
+            {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
+            }
             return (testResult ? MFTestResults.Pass : MFTestResults.Fail);
         }
 
@@ -709,9 +758,10 @@ namespace Microsoft.SPOT.Platform.Tests
             /// </summary>
             ///
             bool testResult = true;
+            SocketPair testSockets = null;
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Udp, SocketType.Dgram);
+                testSockets = new SocketPair(ProtocolType.Udp, SocketType.Dgram);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -736,18 +786,22 @@ namespace Microsoft.SPOT.Platform.Tests
                 bool fSet = true;
                 bool fGet;
 
-                testSockets.socketClient.SetSocketOption(
-                    SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, fSet);
+                try
+                {
+                    testSockets.socketClient.SetSocketOption(
+                        SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, fSet);
 
-                fGet = ((int)testSockets.socketClient.GetSocketOption(
-                    SocketOptionLevel.Socket,
-                    SocketOptionName.ReuseAddress) == 0x1);
+                    fGet = ((int)testSockets.socketClient.GetSocketOption(
+                        SocketOptionLevel.Socket,
+                        SocketOptionName.ReuseAddress) == 0x1);
 
-                if (fSet != fGet)
-                    throw new Exception("Socket option flag bools differ");
-
-                testSockets.TearDown();
-                testSockets = null;
+                    if (fSet != fGet)
+                        throw new Exception("Socket option flag bools differ");
+                }
+                catch (SocketException se)
+                {
+                    if (se.ErrorCode != (int)SocketError.ProtocolOption) throw;
+                }
             }
             catch (Exception e)
             {
@@ -755,6 +809,14 @@ namespace Microsoft.SPOT.Platform.Tests
                 if (e.GetType() == Type.GetType("System.Net.Sockets.SocketException"))
                     Log.Comment("ErrorCode: " + ((SocketException)e).ErrorCode);
                 testResult = false;
+            }
+            finally
+            {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
             }
             return (testResult ? MFTestResults.Pass : MFTestResults.Fail);
         }
@@ -769,9 +831,10 @@ namespace Microsoft.SPOT.Platform.Tests
             /// </summary>
             ///
             bool testResult = true;
+            SocketPair testSockets = null;
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Raw, SocketType.Raw);
+                testSockets = new SocketPair(ProtocolType.Raw, SocketType.Raw);
                 testSockets.Startup(0, 0);
                 testSockets.socketServer.Listen(1);
                 testSockets.socketClient.Connect(testSockets.epServer);
@@ -804,8 +867,6 @@ namespace Microsoft.SPOT.Platform.Tests
                 }
 
                 testSockets.AssertDataReceived(cBytes);
-                testSockets.TearDown();
-                testSockets = null;
             }
             catch (SocketException e)
             {
@@ -818,6 +879,14 @@ namespace Microsoft.SPOT.Platform.Tests
                 if (e.GetType() == Type.GetType("System.Net.Sockets.SocketException"))
                     Log.Comment("ErrorCode: " + ((SocketException)e).ErrorCode);
                 testResult = false;
+            }
+            finally
+            {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
             }
 
             return (testResult ? MFTestResults.Pass : MFTestResults.Fail);
@@ -836,9 +905,11 @@ namespace Microsoft.SPOT.Platform.Tests
             /// </summary>
             ///
             bool testResult = true;
+            SocketPair testSockets = null;
+
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -852,8 +923,6 @@ namespace Microsoft.SPOT.Platform.Tests
                 }
 
                 testSockets.AssertDataReceived(cBytes);
-                testSockets.TearDown();
-                testSockets = null;
             }
             catch (Exception e)
             {
@@ -863,10 +932,18 @@ namespace Microsoft.SPOT.Platform.Tests
                     Log.Comment("ErrorCode: " + ((SocketException)e).ErrorCode);
                 testResult = false;
             }
+            finally
+            {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
+            }
 
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -881,8 +958,6 @@ namespace Microsoft.SPOT.Platform.Tests
                 }
 
                 testSockets.AssertDataReceived(cBytes);
-                testSockets.TearDown();
-                testSockets = null;
             }
             catch (Exception e)
             {
@@ -892,11 +967,19 @@ namespace Microsoft.SPOT.Platform.Tests
                     Log.Comment("ErrorCode: " + ((SocketException)e).ErrorCode);
                 testResult = false;
             }
+            finally
+            {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
+            }
 
             bool subResult = false;
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -911,8 +994,6 @@ namespace Microsoft.SPOT.Platform.Tests
                 }
 
                 testSockets.AssertDataReceived(cBytes);
-                testSockets.TearDown();
-                testSockets = null;
             }
             catch (System.IndexOutOfRangeException)
             {
@@ -930,6 +1011,11 @@ namespace Microsoft.SPOT.Platform.Tests
             }
             finally
             {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
                 if (!subResult)
                     Log.Comment("Erroneously succeeded with bad Int-Size parameter");
                 testResult &= subResult;
@@ -937,7 +1023,7 @@ namespace Microsoft.SPOT.Platform.Tests
 
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
                 testSockets.socketServer.Listen(1);
@@ -952,8 +1038,6 @@ namespace Microsoft.SPOT.Platform.Tests
                 }
 
                 testSockets.AssertDataReceived(cBytes);
-                testSockets.TearDown();
-                testSockets = null;
             }
             catch (Exception e)
             {
@@ -963,11 +1047,19 @@ namespace Microsoft.SPOT.Platform.Tests
                     Log.Comment("ErrorCode: " + ((SocketException)e).ErrorCode);
                 testResult = false;
             }
+            finally
+            {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
+            }
 
             subResult = false;
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -983,8 +1075,6 @@ namespace Microsoft.SPOT.Platform.Tests
                 }
 
                 testSockets.AssertDataReceived(cBytes);
-                testSockets.TearDown();
-                testSockets = null;
             }
             catch (System.IndexOutOfRangeException)
             {
@@ -1002,6 +1092,11 @@ namespace Microsoft.SPOT.Platform.Tests
             }
             finally
             {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
                 if (!subResult)
                     Log.Comment("Erroneously succeeded with bad Int-Offset parameter");
                 testResult &= subResult;
@@ -1009,7 +1104,7 @@ namespace Microsoft.SPOT.Platform.Tests
 
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -1033,8 +1128,6 @@ namespace Microsoft.SPOT.Platform.Tests
                 }
 
                 testSockets.AssertDataReceived(cBytes);
-                testSockets.TearDown();
-                testSockets = null;
             }
             catch (Exception e)
             {
@@ -1043,6 +1136,14 @@ namespace Microsoft.SPOT.Platform.Tests
                 if (e.GetType() == Type.GetType("System.Net.Sockets.SocketException"))
                     Log.Comment("ErrorCode: " + ((SocketException)e).ErrorCode);
                 testResult = false;
+            }
+            finally
+            {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
             }
             return (testResult ? MFTestResults.Pass : MFTestResults.Fail);
         }
@@ -1060,9 +1161,10 @@ namespace Microsoft.SPOT.Platform.Tests
             /// </summary>
             ///
             bool testResult = true;
+            SocketPair testSockets = null;
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -1077,8 +1179,6 @@ namespace Microsoft.SPOT.Platform.Tests
                 }
 
                 testSockets.AssertDataReceived(cBytes);
-                testSockets.TearDown();
-                testSockets = null;
             }
             catch (Exception e)
             {
@@ -1088,10 +1188,18 @@ namespace Microsoft.SPOT.Platform.Tests
                     Log.Comment("ErrorCode: " + ((SocketException)e).ErrorCode);
                 testResult = false;
             }
+            finally
+            {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
+            }
 
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -1107,8 +1215,6 @@ namespace Microsoft.SPOT.Platform.Tests
                 }
 
                 testSockets.AssertDataReceived(cBytes);
-                testSockets.TearDown();
-                testSockets = null;
             }
             catch (Exception e)
             {
@@ -1118,11 +1224,19 @@ namespace Microsoft.SPOT.Platform.Tests
                     Log.Comment("ErrorCode: " + ((SocketException)e).ErrorCode);
                 testResult = false;
             }
+            finally
+            {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
+            }
 
             bool subResult = false;
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -1138,8 +1252,6 @@ namespace Microsoft.SPOT.Platform.Tests
                 }
 
                 testSockets.AssertDataReceived(cBytes);
-                testSockets.TearDown();
-                testSockets = null;
             }
             catch (System.IndexOutOfRangeException)
             {
@@ -1157,6 +1269,11 @@ namespace Microsoft.SPOT.Platform.Tests
             }
             finally
             {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
                 if (!subResult)
                     Log.Comment("Erroneously succeeded with bad Int-Size parameter");
                 testResult &= subResult;
@@ -1164,7 +1281,7 @@ namespace Microsoft.SPOT.Platform.Tests
 
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -1180,8 +1297,6 @@ namespace Microsoft.SPOT.Platform.Tests
                 }
 
                 testSockets.AssertDataReceived(cBytes);
-                testSockets.TearDown();
-                testSockets = null;
             }
             catch (Exception e)
             {
@@ -1191,11 +1306,19 @@ namespace Microsoft.SPOT.Platform.Tests
                     Log.Comment("ErrorCode: " + ((SocketException)e).ErrorCode);
                 testResult = false;
             }
+            finally
+            {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
+            }
 
             subResult = false;
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -1211,8 +1334,6 @@ namespace Microsoft.SPOT.Platform.Tests
                 }
 
                 testSockets.AssertDataReceived(cBytes);
-                testSockets.TearDown();
-                testSockets = null;
             }
             catch (System.IndexOutOfRangeException)
             {
@@ -1230,6 +1351,12 @@ namespace Microsoft.SPOT.Platform.Tests
             }
             finally
             {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
+
                 if (!subResult)
                     Log.Comment("Erroneously succeeded with bad Int-Offset parameter");
                 testResult &= subResult;
@@ -1251,10 +1378,11 @@ namespace Microsoft.SPOT.Platform.Tests
             /// </summary>
             ///
             MFTestResults testResult = MFTestResults.Pass;
+            SocketPair testSockets = null;
 
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -1277,6 +1405,14 @@ namespace Microsoft.SPOT.Platform.Tests
                     + " Int, SocketFlags: " + e.Message);
                 testResult = MFTestResults.Fail;
             }
+            finally
+            {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
+            }
             return testResult;
         }
 
@@ -1293,10 +1429,12 @@ namespace Microsoft.SPOT.Platform.Tests
             ///  bad Offset or Size parameters
             /// </summary>
             ///
+            SocketPair testSockets = null;
             bool testResult = true;
+
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -1313,8 +1451,6 @@ namespace Microsoft.SPOT.Platform.Tests
                 }
 
                 testSockets.AssertDataReceived(cBytes);
-                testSockets.TearDown();
-                testSockets = null;
             }
             catch (Exception e)
             {
@@ -1324,10 +1460,18 @@ namespace Microsoft.SPOT.Platform.Tests
                     Log.Comment("ErrorCode: " + ((SocketException)e).ErrorCode);
                 testResult = false;
             }
+            finally
+            {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
+            }
 
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -1345,8 +1489,6 @@ namespace Microsoft.SPOT.Platform.Tests
                 }
 
                 testSockets.AssertDataReceived(cBytes);
-                testSockets.TearDown();
-                testSockets = null;
             }
             catch (Exception e)
             {
@@ -1356,11 +1498,19 @@ namespace Microsoft.SPOT.Platform.Tests
                     Log.Comment("ErrorCode: " + ((SocketException)e).ErrorCode);
                 testResult = false;
             }
+            finally
+            {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
+            }
 
             bool subResult = false;
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -1378,8 +1528,6 @@ namespace Microsoft.SPOT.Platform.Tests
                 }
 
                 testSockets.AssertDataReceived(cBytes);
-                testSockets.TearDown();
-                testSockets = null;
             }
             catch (System.IndexOutOfRangeException)
             {
@@ -1397,6 +1545,11 @@ namespace Microsoft.SPOT.Platform.Tests
             }
             finally
             {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
                 if (!subResult)
                     Log.Comment("Erroneously succeeded with bad Int-Size parameter");
                 testResult &= subResult;
@@ -1404,7 +1557,7 @@ namespace Microsoft.SPOT.Platform.Tests
 
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -1422,8 +1575,6 @@ namespace Microsoft.SPOT.Platform.Tests
                 }
 
                 testSockets.AssertDataReceived(cBytes);
-                testSockets.TearDown();
-                testSockets = null;
             }
             catch (Exception e)
             {
@@ -1433,11 +1584,19 @@ namespace Microsoft.SPOT.Platform.Tests
                     Log.Comment("ErrorCode: " + ((SocketException)e).ErrorCode);
                 testResult = false;
             }
+            finally
+            {
+                if (testSockets != null)
+                {
+                    testSockets.TearDown();
+                    testSockets = null;
+                }
+            }
 
             subResult = false;
             try
             {
-                SocketPair testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
+                testSockets = new SocketPair(ProtocolType.Tcp, SocketType.Stream);
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
@@ -1639,6 +1798,16 @@ namespace Microsoft.SPOT.Platform.Tests
                     testSockets.socketClient.SetSocketOption(SocketOptionLevel.IP,
                         SocketOptionName.AddMembership, multicastOpt);
                 }
+                catch (SocketException se)
+                {
+                    if (se.ErrorCode != (int)SocketError.ProtocolOption)
+                    {
+                        Log.Comment("Caught exception: " + se.Message);
+                        if (se.GetType() == Type.GetType("System.Net.Sockets.SocketException"))
+                            Log.Comment("ErrorCode: " + se.ErrorCode);
+                        testResult = false;
+                    }
+                }
                 catch (Exception e)
                 {
                     Log.Comment("Caught exception: " + e.Message);
@@ -1650,6 +1819,16 @@ namespace Microsoft.SPOT.Platform.Tests
                 {
                     testSockets.socketClient.SetSocketOption(SocketOptionLevel.Socket,
                         SocketOptionName.ReuseAddress, true);
+                }
+                catch (SocketException se)
+                {
+                    if (se.ErrorCode != (int)SocketError.ProtocolOption)
+                    {
+                        Log.Comment("Caught exception: " + se.Message);
+                        if (se.GetType() == Type.GetType("System.Net.Sockets.SocketException"))
+                            Log.Comment("ErrorCode: " + se.ErrorCode);
+                        testResult = false;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -1667,6 +1846,16 @@ namespace Microsoft.SPOT.Platform.Tests
                         SocketOptionName.MulticastInterface,
                         bytes);
                 }
+                catch (SocketException se)
+                {
+                    if (se.ErrorCode != (int)SocketError.ProtocolOption)
+                    {
+                        Log.Comment("Caught exception: " + se.Message);
+                        if (se.GetType() == Type.GetType("System.Net.Sockets.SocketException"))
+                            Log.Comment("ErrorCode: " + se.ErrorCode);
+                        testResult = false;
+                    }
+                }
                 catch (Exception e)
                 {
                     Log.Comment("Caught exception: " + e.Message);
@@ -1678,6 +1867,16 @@ namespace Microsoft.SPOT.Platform.Tests
                 {
                     testSockets.socketClient.SetSocketOption(SocketOptionLevel.IP,
                         SocketOptionName.DontFragment, true);
+                }
+                catch (SocketException se)
+                {
+                    if (se.ErrorCode != (int)SocketError.ProtocolOption)
+                    {
+                        Log.Comment("Caught exception: " + se.Message);
+                        if (se.GetType() == Type.GetType("System.Net.Sockets.SocketException"))
+                            Log.Comment("ErrorCode: " + se.ErrorCode);
+                        testResult = false;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -1691,6 +1890,16 @@ namespace Microsoft.SPOT.Platform.Tests
                     testSockets.socketClient.SetSocketOption(SocketOptionLevel.Socket,
                         SocketOptionName.Broadcast, false);
                 }
+                catch (SocketException se)
+                {
+                    if (se.ErrorCode != (int)SocketError.ProtocolOption)
+                    {
+                        Log.Comment("Caught exception: " + se.Message);
+                        if (se.GetType() == Type.GetType("System.Net.Sockets.SocketException"))
+                            Log.Comment("ErrorCode: " + se.ErrorCode);
+                        testResult = false;
+                    }
+                }
                 catch (Exception e)
                 {
                     Log.Comment("Caught exception: " + e.Message);
@@ -1702,6 +1911,16 @@ namespace Microsoft.SPOT.Platform.Tests
                 {
                     testSockets.socketClient.SetSocketOption(SocketOptionLevel.Udp,
                         SocketOptionName.ExclusiveAddressUse, true);
+                }
+                catch (SocketException se)
+                {
+                    if (se.ErrorCode != (int)SocketError.ProtocolOption)
+                    {
+                        Log.Comment("Caught exception: " + se.Message);
+                        if (se.GetType() == Type.GetType("System.Net.Sockets.SocketException"))
+                            Log.Comment("ErrorCode: " + se.ErrorCode);
+                        testResult = false;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -1716,6 +1935,16 @@ namespace Microsoft.SPOT.Platform.Tests
                         SocketOptionLevel.Socket, SocketOptionName.Error);
                     Log.Comment("Current error: " + error.ToString());
                 }
+                catch (SocketException se)
+                {
+                    if (se.ErrorCode != (int)SocketError.ProtocolOption)
+                    {
+                        Log.Comment("Caught exception: " + se.Message);
+                        if (se.GetType() == Type.GetType("System.Net.Sockets.SocketException"))
+                            Log.Comment("ErrorCode: " + se.ErrorCode);
+                        testResult = false;
+                    }
+                }
                 catch (Exception e)
                 {
                     Log.Comment("Caught exception: " + e.Message);
@@ -1729,6 +1958,16 @@ namespace Microsoft.SPOT.Platform.Tests
                         (int)testSockets.socketClient.GetSocketOption(SocketOptionLevel.Socket,
                         SocketOptionName.Type));
                     Log.Comment("Current error: " + type.ToString());
+                }
+                catch (SocketException se)
+                {
+                    if (se.ErrorCode != (int)SocketError.ProtocolOption)
+                    {
+                        Log.Comment("Caught exception: " + se.Message);
+                        if (se.GetType() == Type.GetType("System.Net.Sockets.SocketException"))
+                            Log.Comment("ErrorCode: " + se.ErrorCode);
+                        testResult = false;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -1744,6 +1983,16 @@ namespace Microsoft.SPOT.Platform.Tests
                         SocketOptionName.Error);
                     Log.Comment("Current error: " + error.ToString());
                 }
+                catch (SocketException se)
+                {
+                    if (se.ErrorCode != (int)SocketError.ProtocolOption)
+                    {
+                        Log.Comment("Caught exception: " + se.Message);
+                        if (se.GetType() == Type.GetType("System.Net.Sockets.SocketException"))
+                            Log.Comment("ErrorCode: " + se.ErrorCode);
+                        testResult = false;
+                    }
+                }
                 catch (Exception e)
                 {
                     Log.Comment("Caught exception: " + e.Message);
@@ -1757,6 +2006,16 @@ namespace Microsoft.SPOT.Platform.Tests
                         (int)testSockets.socketClient.GetSocketOption(SocketOptionLevel.Socket,
                         SocketOptionName.Type));
                     Log.Comment("Current error: " + type.ToString());
+                }
+                catch (SocketException se)
+                {
+                    if (se.ErrorCode != (int)SocketError.ProtocolOption)
+                    {
+                        Log.Comment("Caught exception: " + se.Message);
+                        if (se.GetType() == Type.GetType("System.Net.Sockets.SocketException"))
+                            Log.Comment("ErrorCode: " + se.ErrorCode);
+                        testResult = false;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -1776,6 +2035,16 @@ namespace Microsoft.SPOT.Platform.Tests
                     testSockets.socketClient.SetSocketOption(SocketOptionLevel.IP,
                         SocketOptionName.DropMembership, multicastOpt);
                 }
+                catch (SocketException se)
+                {
+                    if (se.ErrorCode != (int)SocketError.ProtocolOption)
+                    {
+                        Log.Comment("Caught exception: " + se.Message);
+                        if (se.GetType() == Type.GetType("System.Net.Sockets.SocketException"))
+                            Log.Comment("ErrorCode: " + se.ErrorCode);
+                        testResult = false;
+                    }
+                }
                 catch (Exception e)
                 {
                     Log.Comment("Caught exception: " + e.Message);
@@ -1788,6 +2057,16 @@ namespace Microsoft.SPOT.Platform.Tests
                     testSockets.socketClient.SetSocketOption(SocketOptionLevel.Socket,
                         SocketOptionName.ReuseAddress, true);
                 }
+                catch (SocketException se)
+                {
+                    if (se.ErrorCode != (int)SocketError.ProtocolOption)
+                    {
+                        Log.Comment("Caught exception: " + se.Message);
+                        if (se.GetType() == Type.GetType("System.Net.Sockets.SocketException"))
+                            Log.Comment("ErrorCode: " + se.ErrorCode);
+                        testResult = false;
+                    }
+                }
                 catch (Exception e)
                 {
                     Log.Comment("Caught exception: " + e.Message);
@@ -1799,6 +2078,16 @@ namespace Microsoft.SPOT.Platform.Tests
                 {
                     testSockets.socketClient.SetSocketOption(SocketOptionLevel.Socket,
                         SocketOptionName.ReceiveBuffer, 0x1024);
+                }
+                catch (SocketException se)
+                {
+                    if (se.ErrorCode != (int)SocketError.ProtocolOption)
+                    {
+                        Log.Comment("Caught exception: " + se.Message);
+                        if (se.GetType() == Type.GetType("System.Net.Sockets.SocketException"))
+                            Log.Comment("ErrorCode: " + se.ErrorCode);
+                        testResult = false;
+                    }
                 }
                 catch (Exception e)
                 {

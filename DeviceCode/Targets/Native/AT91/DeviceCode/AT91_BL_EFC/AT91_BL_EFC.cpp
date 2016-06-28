@@ -255,7 +255,7 @@ BOOL __section(SectionForFlashOperations) SAM7X_BS_Driver::WriteX( void* context
         {
             GLOBAL_LOCK(irq);
 
-            efc.EFC_FMR = (efc.EFC_FMR & ~(AT91_BL_EFC::MC_FMCN)) | (((SYSTEM_CYCLE_CLOCK_HZ / 2000000) * 3) << 16);      
+            efc.EFC_FMR = AT91_BL_EFC::MC_NEBP | (efc.EFC_FMR & ~(AT91_BL_EFC::MC_FMCN)) | (((SYSTEM_CYCLE_CLOCK_HZ / 2000000) * 3) << 16);      
 
             volatile CHIP_WORD *pageAddr = (CHIP_WORD *)pageAddress;
             CHIP_WORD * pageBuf = (CHIP_WORD*)&pageBuffer[0];
@@ -315,7 +315,7 @@ BOOL __section(SectionForFlashOperations) SAM7X_BS_Driver::IsBlockErased( void* 
     // 1st or 2nd FLASH controller 
     if (!deviceInfo->FindRegionFromAddress( Address, iRegion, iRange )) return FALSE;
 
-    Address = CPU_GetCachableAddress(Address);
+    Address = CPU_GetUncachableAddress(Address);
 
     chipAddress = (CHIP_WORD *) Address;
     endAddress  = (CHIP_WORD *)(Address + BlockLength);
@@ -344,6 +344,8 @@ BOOL __section(SectionForFlashOperations) SAM7X_BS_Driver::EraseBlock( void* con
    
     // 1st or 2nd FLASH controller 
     if (!deviceInfo->FindRegionFromAddress( address, iRegion, iRange )) return FALSE;
+
+    if (IsBlockErased( context, address, deviceInfo->Regions[iRegion].BytesPerBlock )) return TRUE;
 
     address     = CPU_GetUncachableAddress(address);
     baseAddress = CPU_GetCachableAddress(deviceInfo->Regions[iRegion].Start);

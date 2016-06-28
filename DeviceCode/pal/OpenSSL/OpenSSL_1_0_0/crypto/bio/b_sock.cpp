@@ -498,7 +498,7 @@ int BIO_sock_init(void)
 		 * at run-time with DSO_global_lookup. */
 		if (WSAStartup(0x0202,&wsa_state)!=0)
 			{
-			err=WSAGetLastError();
+			err=TINYCLR_SSL_GETLASTSOCKETERROR();
 			SYSerr(SYS_F_WSASTARTUP,err);
 			BIOerr(BIO_F_BIO_SOCK_INIT,BIO_R_WSASTARTUP);
 			return(-1);
@@ -507,7 +507,7 @@ int BIO_sock_init(void)
 #endif /* OPENSSL_SYS_WINDOWS */
 #ifdef WATT32
 	extern int _watt_do_exit;
-	_watt_do_exit = 0;    /* don't make sock_init() call exit() */
+	_watt_do_exit = 0;    /* don't make sock_init() call TINYCLR_SSL_EXIT() */
 	if (sock_init())
 		return (-1);
 #endif
@@ -745,7 +745,14 @@ again:
 #ifdef SO_REUSEADDR
 		err_num=get_last_socket_error();
 		if ((bind_mode == BIO_BIND_REUSEADDR_IF_UNUSED) &&
+#ifdef OPENSSL_SYS_WINDOWS
+			/* Some versions of Windows define EADDRINUSE to
+			 * a dummy value.
+			 */
+			(err_num == WSAEADDRINUSE))
+#else
 			(err_num == EADDRINUSE))
+#endif
 			{
 			client = server;
 			if (h == NULL || TINYCLR_SSL_STRCMP(h,"*") == 0)
@@ -769,11 +776,11 @@ again:
 				{
 				int ii;
 				ii=TINYCLR_SSL_CONNECT(cs,&client.sa,addrlen);
-				closesocket(cs);
+				TINYCLR_SSL_CLOSESOCKET(cs);
 				if (ii == INVALID_SOCKET)
 					{
 					bind_mode=BIO_BIND_REUSEADDR;
-					closesocket(s);
+					TINYCLR_SSL_CLOSESOCKET(s);
 					goto again;
 					}
 				/* else error */
@@ -798,7 +805,7 @@ err:
 	if (str != NULL) OPENSSL_free(str);
 	if ((ret == 0) && (s != INVALID_SOCKET))
 		{
-		closesocket(s);
+		TINYCLR_SSL_CLOSESOCKET(s);
 		s= INVALID_SOCKET;
 		}
 	return(s);
@@ -828,7 +835,7 @@ int BIO_accept(int sock, char **addr)
 	 * won't prevent it from filling in the address structure. The
 	 * trouble of course would be if accept returns more data than
 	 * actual buffer can accomodate and overwrite stack... That's
-	 * where early OPENSSL_assert comes into picture. Besides, the
+	 * where early TINYCLR_SSL_ASSERT comes into picture. Besides, the
 	 * only 64-bit big-endian platform found so far that expects
 	 * size_t* is HP-UX, where stack grows towards higher address.
 	 * <appro>
@@ -853,7 +860,7 @@ int BIO_accept(int sock, char **addr)
 #endif
 	if (sizeof(sa.len.i)!=sizeof(sa.len.s) && sa.len.i==0)
 		{
-		OPENSSL_assert(sa.len.s<=sizeof(sa.from));
+		TINYCLR_SSL_ASSERT(sa.len.s<=sizeof(sa.from));
 		sa.len.i = (int)sa.len.s;
 		/* use sa.len.i from this point */
 		}

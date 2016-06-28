@@ -106,7 +106,7 @@ void do_fp(TINYCLR_SSL_FILE *f)
 	int i;
 	static unsigned char buf[BUFSIZE];
 
-	fd=fileno(f);
+	fd=TINYCLR_SSL_FILENO(f);
 	MD4_Init(&c);
 	for (;;)
 		{

@@ -399,7 +399,7 @@ namespace System.Net
         /// </summary>
         /// <returns>The length of the data available on the stream. 
         /// Add data cached in the stream buffer to available on socket</returns>
-        public override long Length { get { return m_Stream.Length + m_dataEnd - m_dataStart; } }
+        public override long Length { get { return m_EnableChunkedDecoding && m_chunk != null ? m_chunk.m_Size : m_Stream.Length + m_dataEnd - m_dataStart; } }
 
         /// <summary>
         /// Position is not supported for NetworkStream
@@ -568,11 +568,12 @@ namespace System.Net
                 UTF8decoder.Convert(m_lineBuf, 0, curPos - 2, charBuf, 0, charBuf.Length, true, out byteUsed, out charUsed, out completed);
                 return new string(charBuf);
             }
-            else
+            else if(curPos == 0)
             {
-                return "";
-            }                                                      
+                throw new SocketException(SocketError.ConnectionAborted);
+            }               
 
+            return "";
         }
 
         /// <summary>

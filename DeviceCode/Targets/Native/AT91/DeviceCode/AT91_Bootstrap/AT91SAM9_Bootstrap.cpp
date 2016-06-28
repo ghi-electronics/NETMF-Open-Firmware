@@ -1,7 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) Microsoft Corporation.  All rights reserved.
-//
-// Portions Copyright (c) GHI Electronics, LLC.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <tinyhal.h>
@@ -16,10 +14,6 @@ static const UINT32  c_Bootstrap_SRAM_End       =   SRAM_MEMORY_Base + SRAM_MEMO
 static const UINT32  c_Bootstrap_FLASH_Begin    =   FLASH_MEMORY_Base;
 static const UINT32  c_Bootstrap_FLASH_End      =   FLASH_MEMORY_Base + FLASH_MEMORY_Size;
 static UINT32* const c_Bootstrap_BaseOfTTBs     =   (UINT32*)(c_Bootstrap_SDRAM_End);
-
-static const UINT32	 c_RLP_Physical_Address		=	0x20E00000; // Added for RLP Support of Memory MMU
-static const UINT32  c_RLP_Virtual_Address_Cached =	0xA0000000; // Added for RLP Support of Memory MMU
-static const UINT32  c_RLP_Virtual_Address_Uncached = 0xB0000000; // Added for RLP Support of Memory MMU
 
 
 extern void AT91_SAM_SdramInit();
@@ -146,6 +140,18 @@ void BootstrapCode_MMU()
         FALSE,                                                  // Buffered
         FALSE);                                                 // Extended
 
+        // DM9000 DM9000 ETHERNET
+    	ARM9_MMU::GenerateL1_Sections( 
+        c_Bootstrap_BaseOfTTBs,                                 // base of TTBs
+        0x30000000,                                             // mapped address
+        0x30000000,                                             // physical address
+        ARM9_MMU::c_MMU_L1_size,                                // length to be mapped
+        ARM9_MMU::c_AP__Manager,                                // AP
+        0,                                                      // Domain
+        FALSE,                                                  // Cacheable
+        FALSE,                                                  // Buffered
+        FALSE);                                                 // Extended
+
 #ifdef PLATFORM_ARM_SAM9RL64_ANY
 
 		// Direct map for the USBHS buffer registers(0x00600000~0x006FFFFF)
@@ -189,53 +195,9 @@ void BootstrapCode_MMU()
     //    FALSE);                                                 // Extended
     // 
 
-    // Direct map for RLP in SDRAM (cachable)
-    ARM9_MMU::GenerateL1_Sections( 
-        c_Bootstrap_BaseOfTTBs,                                 // base of TTBs
-        c_RLP_Virtual_Address_Cached,                           // mapped address
-        c_RLP_Physical_Address,									// physical address
-        (1024 * 1024),											// length to be mapped
-        ARM9_MMU::c_AP__Manager,                                // AP
-        0,                                                      // Domain
-        TRUE,                                                   // Cacheable
-        FALSE,                                                  // Buffered
-        FALSE);                                                 // Extended   
-
-    // Direct map for RLP in SDRAM (uncachable)
-    ARM9_MMU::GenerateL1_Sections( 
-        c_Bootstrap_BaseOfTTBs,                                 // base of TTBs
-        c_RLP_Virtual_Address_Uncached,                         // mapped address
-        c_RLP_Physical_Address,									// physical address
-        (1024 * 1024),											// length to be mapped
-        ARM9_MMU::c_AP__Manager,                                // AP
-        0,                                                      // Domain
-        FALSE,                                                  // Cacheable
-        FALSE,                                                  // Buffered
-        FALSE);                                                 // Extended   
-
-	CPU_FlushCaches();
+    CPU_FlushCaches();
     CPU_EnableMMU( c_Bootstrap_BaseOfTTBs );
 }
-
-
-static void __section(SectionForBootstrapOperations) GPrepare_Copy( UINT32* src, UINT32* dst, UINT32 len )
-{
-    if(dst != src)
-    {
-        while(len)
-        {
-            *dst++ = *src++;
-
-            len -= 4;
-        }
-    }
-}
-
-#define IMAGE_RAM_RO_BASE   Image$$ER_RAM_RO$$Base
-extern UINT32 IMAGE_RAM_RO_BASE;
-
-#define IMAGE_RAM_RO_LENGTH Image$$ER_RAM_RO$$Length
-extern UINT32 IMAGE_RAM_RO_LENGTH;
 
 void BootstrapCode ()
 {
@@ -255,25 +217,12 @@ void BootstrapCode ()
     CPU_ARM9_BootstrapCode();
 
 #if !defined(TARGETLOCATION_RAM)
-    //AT91_SAM_SdramInit();
+    AT91_SAM_SdramInit();
 #endif
 
     BootstrapCode_MMU();    
 
     PrepareImageRegions();
-//*
-
-     UINT32* RObase = (UINT32*)&IMAGE_RAM_RO_BASE;
-     UINT32  ROlen = (UINT32)&IMAGE_RAM_RO_LENGTH;
-     if(RObase != 0)
-     {
-          UINT32* src = (UINT32*)RObase; //0x20000000;
-          UINT32* dst = (UINT32*)0x000000; //0x000000;
-          UINT32  len =  44; 
-          
-          GPrepare_Copy( src, dst, len );
-     }
-//*/
 
     CPU_EnableCaches();
 }

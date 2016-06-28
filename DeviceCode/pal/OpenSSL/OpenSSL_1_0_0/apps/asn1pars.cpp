@@ -60,12 +60,10 @@
  * add the -strparse option which parses nested binary structures
  */
 
-#include "apps.h"
-#ifdef OPENSSL_SYS_WINDOWS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#endif
+#include "apps.h"
 #include <openssl/err.h>
 #include <openssl/evp.h>
 #include <openssl/x509.h>
@@ -82,7 +80,7 @@
 #undef PROG
 #define PROG	asn1parse_main
 
-extern "C" int MAIN(int, char **);
+int MAIN(int, char **);
 
 static int do_generate(BIO *bio, char *genstr, char *genconf, BUF_MEM *buf);
 

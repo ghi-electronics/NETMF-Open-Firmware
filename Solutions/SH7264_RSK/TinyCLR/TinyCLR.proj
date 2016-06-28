@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>tinyclr</AssemblyName>
@@ -16,57 +17,51 @@
     <MFSettingsFile>$(SPOCLIENT)\Solutions\SH7264_RSK\SH7264_RSK.settings</MFSettingsFile>
     <IsSolutionWizardVisible>True</IsSolutionWizardVisible>
   </PropertyGroup>
-
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
   <!-- no standard sh scatterfile, our own version of scatterfile  -->
   <Import Project="Scatterfile_definition.proj" />
-
   <Import Project="$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.Build.Targets" />
   <PropertyGroup>
     <OutputType>Executable</OutputType>
-
     <ADD_LOAD_IMAGE_CRC>true</ADD_LOAD_IMAGE_CRC>
-<!--
+    <!--
     <ExtraTargets>BuildSigFiles</ExtraTargets>
 -->
-
     <ExtraEXETargets>MetaDataProcessorDat;TinyClrDat</ExtraEXETargets>
     <ImageLocation Condition="'$(MEMORY)'=='FLASH'">\ER_FLASH</ImageLocation>
-
     <!-- this is the part to make the ER_DAT included in the final images -->
     <ExtraLinkFlags> -binary=$(BIN_DIR)\tinyclr.dat(ER_DATA_ADDR:4)</ExtraLinkFlags>
-
     <MMP_DAT_SKIP>false</MMP_DAT_SKIP>
     <MMP_DAT_CreateDatabaseFile>$(BIN_DIR)\tinyclr.dat</MMP_DAT_CreateDatabaseFile>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="tinyclr.cpp" />
-    <Compile Include="tinyclr_dat.cpp"/> 
-    <ExtraCleanFiles Include="$(OBJ_DIR)\tinyclr_dat.*"/>
+    <Compile Include="tinyclr_dat.cpp" />
+    <ExtraCleanFiles Include="$(OBJ_DIR)\tinyclr_dat.*" />
     <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2a\DeviceCode\bootstrap\intprg.c" />
     <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2a\DeviceCode\bootstrap\resetprg.c" />
     <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2a\DeviceCode\bootstrap\dbsct.c" />
     <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2a\DeviceCode\bootstrap\sbrk.c" />
-    <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2a\DeviceCode\bootstrap\vecttbl.c" /> 
+    <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2a\DeviceCode\bootstrap\vecttbl.c" />
+    <IncludePaths Include="DeviceCode\PAL" />
+    <IncludePaths Include="DeviceCode\PAL\OpenSSL" />
+    <IncludePaths Include="DeviceCode\PAL\OpenSSL\OpenSSL_1_0" />
   </ItemGroup>
-
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\hardware.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\NativeEventDispatcher.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\DataStorage.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\BlockStorage.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Crypto.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Debugger.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Diagnostics.featureproj" />
   <Import Condition="'$(EnableTCPIP)'=='true'" Project="$(SPOCLIENT)\Framework\Features\SOCKETS_Port.featureproj" />
   <Import Condition="'$(EnableTCPIP)'=='true' and '$(TCP_IP_STACK)'!='LWIP'" Project="$(SPOCLIENT)\Framework\Features\Network.featureproj" />
   <Import Condition="'$(EnableTCPIP)'=='true' and '$(TCP_IP_STACK)'=='LWIP'" Project="$(SPOCLIENT)\Framework\Features\Network_LWIP.featureproj" />
-  <Import Condition="'$(EnableTCPIP)'=='true' and '$(TCP_IP_STACK)'!='LWIP'" Project="$(SPOCLIENT)\Framework\Features\SSL.featureproj" />  
+  <Import Condition="'$(EnableTCPIP)'=='true' and '$(TCP_IP_STACK)'!='LWIP'" Project="$(SPOCLIENT)\Framework\Features\SSL.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\InterruptHandler.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\serial_port.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\SerialPort.featureproj" />
-
+  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Crypto.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Graphics.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\TinyCore.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\I2C.featureproj" />
@@ -74,9 +69,85 @@
   <Import Condition="'$(EnableTCPIP)'=='true'" Project="$(SPOCLIENT)\Framework\Features\TimeService.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\Stream.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\FileSystem.featureproj" />
-
+  <Import Condition="'$(TOUCHPANEL)'=='true'" Project="$(SPOCLIENT)\Framework\Features\TouchScreen.featureproj" />
+  <Import Condition="'$(TOUCHPANEL)'=='true'" Project="$(SPOCLIENT)\Framework\Features\Ink.featureproj" />
+  <Import Condition="'$(TOUCHPANEL)'=='true'" Project="$(SPOCLIENT)\Framework\Features\Gesture.featureproj" />
+  <Import Project="$(SPOCLIENT)\Framework\Features\XML.featureproj" />
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Interop.Settings" />
-
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\MFUpdate\stubs\dotnetMF.proj" />
+    <DriverLibs Include="MFUpdate_PAL_stub.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\PKCS11\dotNetMF.proj" />
+    <DriverLibs Include="PKCS11_Engine.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\Solutions\SH7264_RSK\DeviceCode\Crypto\dotnetmf.proj" />
+    <DriverLibs Include="Crypto_Config_SH7264_RSK.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\tinyclr\dotnetmf.proj" />
+    <DriverLibs Include="ssl_types.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\SimpleStorage\dotNetMF.proj" />
+    <DriverLibs Include="SimpleStorage_PAL.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\PKCS11\Tokens\OpenSSL\dotNetMF.proj" />
+    <DriverLibs Include="OpenSSL_PKCS11_Crypto.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\dotnetmf.proj" />
+    <DriverLibs Include="crypto_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="aes_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="asn1_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="asn1pt2_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="bf_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="bio_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="buffer_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="bn_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="cast_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="comp_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="conf_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="des_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="dh_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="dsa_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="dso_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ecdh_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ec_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ecdsa_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="engine_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="err_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="evp_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="hmac_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="lhash_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="md2_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="md4_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="md5_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="modes_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ocsp_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="objects_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="pem_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="pkcs7_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="pkcs12_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="pqueue_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="rand_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="rc2_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="rc4_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ripemd_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="rsa_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="seed_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="sha_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="stack_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ts_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="txt_db_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ui_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="whrlpool_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="x509_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="x509v3_openssl.$(LIB_EXT)" />
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Core\dotNetMF.proj" />
     <PlatformIndependentLibs Include="Core.$(LIB_EXT)" />
@@ -109,7 +180,7 @@
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Debugger\dotnetmf_full.proj" Condition="'$(FLAVOR)'!='rtm'" />
     <PlatformIndependentLibs Include="Debugger_full.$(LIB_EXT)" Condition="'$(FLAVOR)'!='rtm'" />
   </ItemGroup>
-  <ItemGroup Condition="'$(EnableTCPIP)'=='true' " >
+  <ItemGroup Condition="'$(EnableTCPIP)'=='true' ">
     <RequiredProjects Include="$(SPOCLIENT)\CLR\libraries\spot_net\dotNetMF.proj" />
     <PlatformIndependentLibs Include="SPOT_Net.$(LIB_EXT)" />
   </ItemGroup>
@@ -120,14 +191,10 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Diagnostics\dotNetMF_stub.proj" Condition="'$(FLAVOR)'=='rtm'" />
     <PlatformIndependentLibs Include="Diagnostics_stub.$(LIB_EXT)" Condition="'$(FLAVOR)'=='rtm'" />
-  </ItemGroup>  
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Graphics\dotNetMF.proj" />
     <PlatformIndependentLibs Include="Graphics.$(LIB_EXT)" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(EnableTCPIP)'=='true' " >
-    <RequiredProjects Include="$(SPOCLIENT)\CLR\libraries\spot_net_security\dotNetMF_Stub.proj" />
-    <PlatformIndependentLibs Include="SPOT_Net_Security_stub.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\BatteryCharger\stubs\dotNetMF.proj" />
@@ -150,10 +217,6 @@
     <PlatformIndependentLibs Include="IOPort.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT\SPOT_Crypto\dotNetMF_Stub.proj" />
-    <PlatformIndependentLibs Include="SPOT_Crypto_stub.$(LIB_EXT)" />
-  </ItemGroup>
-  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Messaging\dotNetMF.proj" />
     <PlatformIndependentLibs Include="Messaging.$(LIB_EXT)" />
   </ItemGroup>
@@ -173,7 +236,7 @@
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT_IO\dotNetMF.proj" />
     <PlatformIndependentLibs Include="SPOT_IO.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition ="'$(EnableTCPIP)'=='true'">
+  <ItemGroup Condition="'$(EnableTCPIP)'=='true'">
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT_TimeService\dotnetmf.proj" />
     <PlatformIndependentLibs Include="SPOT_TimeService.$(LIB_EXT)" />
   </ItemGroup>
@@ -217,15 +280,14 @@
     <RequiredProjects Include="$(SPOCLIENT)\Support\WireProtocol\dotNetMF.proj" />
     <PlatformIndependentLibs Include="WireProtocol.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(EnableTCPIP)'=='true' and '$(TCP_IP_STACK)'!='LWIP'" >
+  <ItemGroup Condition="'$(EnableTCPIP)'=='true' and '$(TCP_IP_STACK)'!='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\TimeService\dotNetMF.proj" />
     <DriverLibs Include="TimeService_pal.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup Condition="'$(EnableTCPIP)'!='true' or '$(TCP_IP_STACK)'=='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\TimeService\stubs\dotNetMF.proj" />
     <DriverLibs Include="TimeService_pal_stubs.$(LIB_EXT)" />
-  </ItemGroup>  
-  
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\core\RPC\dotNetMF_Stub.proj" />
     <PlatformIndependentLibs Include="RPC_stub.$(LIB_EXT)" />
@@ -259,6 +321,10 @@
     <DriverLibs Include="COM_pal.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
+    <DriverLibs Include="DebuggerPort_SSL_config_stubs.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Config\dotnetmf.proj" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\USART\dotNetMF.proj" />
     <DriverLibs Include="usart_pal.$(LIB_EXT)" />
   </ItemGroup>
@@ -269,6 +335,10 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\USB\dotNetMF.proj" />
     <DriverLibs Include="usb_pal.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_DA\dotnetmf.proj" />
+    <DriverLibs Include="cpu_DA_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_usb\dotNetMF.proj" />
@@ -314,17 +384,13 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\SH7264\DeviceCode\BlockStorage\USB\dotNetMF.proj" />
     <DriverLibs Include="USB_BL_Driver.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup >
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\SH7264_RSK\DeviceCode\Blockstorage\addDevices\dotnetmf.proj" />
     <DriverLibs Include="BlockStorage_AddDevices_SH7264_RSK.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Configuration\dotNetMF.proj" />
     <DriverLibs Include="config_pal.$(LIB_EXT)" />
-  </ItemGroup>
-  <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\Crypto\stubs\dotNetMF.proj" />
-    <DriverLibs Include="Crypto_stub.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Events\dotNetMF.proj" />
@@ -349,7 +415,7 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\SH7264_RSK\DeviceCode\HWSetup\dotNetMF.proj" />
     <DriverLibs Include="SH7264_RSK_hwsetup.$(LIB_EXT)" />
-  </ItemGroup>  
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\Time\dotNetMF.proj" />
     <DriverLibs Include="Time_pal.$(LIB_EXT)" />
@@ -358,12 +424,10 @@
     <RequiredProjects Include="$(SPOCLIENT)\devicecode\pal\TinyCRT\dotNetMF.proj" />
     <DriverLibs Include="tinycrt_pal.$(LIB_EXT)" />
   </ItemGroup>
-
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\SimpleHeap_config\dotNetMF.proj" />
     <DriverLibs Include="SimpleHeap_config.$(LIB_EXT)" />
-  </ItemGroup>  
- 
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\SH7264_RSK\DeviceCode\VirtualKey_HAL\dotNetMF.proj" />
     <DriverLibs Include="VirtualKey_HAL_SH7264_RSK.$(LIB_EXT)" />
@@ -401,8 +465,8 @@
     <DriverLibs Include="SH7264_Timer.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\native\sh2A\DeviceCode\ConfigSector\dotnetmf.proj"/>
-    <DriverLibs  Include="SH2A_configsector.$(LIB_EXT)"/>     
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\native\sh2A\DeviceCode\ConfigSector\dotnetmf.proj" />
+    <DriverLibs Include="SH2A_configsector.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Display\TextFonts\Font8x8\dotNetMF.proj" />
@@ -411,7 +475,7 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\SH7264\DeviceCode\VDC3\dotNetMF.proj" />
     <DriverLibs Include="SH7264_VDC3.$(LIB_EXT)" />
-  </ItemGroup>    
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\SH7264_RSK\DeviceCode\Display\SH7264VDC3\dotnetmf.proj" />
     <DriverLibs Include="SH7264VDC3_config_SH7264_RSK.$(LIB_EXT)" />
@@ -421,26 +485,23 @@
     <DriverLibs Include="SH7264VDC3.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\stubs\processor\stubs_I2C\dotNetMF.proj" />
-    <DriverLibs Include="cpu_i2c_stubs.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\SH7264\DeviceCode\I2C\dotNetMF.proj" />
+    <DriverLibs Include="SH7264_I2C.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh7264\DeviceCode\Keypad\dotNetMF.proj" />
     <DriverLibs Include="SH7264_Keypad.$(LIB_EXT)" />
   </ItemGroup>
-
-  <ItemGroup Condition="'$(EnableTCPIP)'=='true'" >
+  <ItemGroup Condition="'$(EnableTCPIP)'=='true'">
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\SH7264_RSK\DeviceCode\Ethernet_Config\dotnetmf.proj" />
     <DriverLibs Include="Network_config_SH7264_RSK.$(LIB_EXT)" />
   </ItemGroup>
-
-
   <!-- RTIP Stack Libraries -->
-  <ItemGroup Condition="'$(EnableTCPIP)'=='true' and '$(TCP_IP_STACK)'!='LWIP'" >
+  <ItemGroup Condition="'$(EnableTCPIP)'=='true' and '$(TCP_IP_STACK)'!='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh7264\DeviceCode\Ethernet\dotNetMF.proj" />
     <DriverLibs Include="SH7264_ETHERNET.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'" >
+  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\devicecode\drivers\timeservice\rtip\dotNetMF.proj" />
     <DriverLibs Include="timeservice_hal_rtip.$(LIB_EXT)" />
   </ItemGroup>
@@ -448,45 +509,44 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\dotNetMF.proj" />
     <DriverLibs Include="sockets_pal.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'" >
+  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\ssl\dotNetMF.proj" />
     <DriverLibs Include="Ssl_pal.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'" >
+  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\rtip\lib\dotNetMF_sockets.proj" />
     <DriverLibs Include="sockets_hal.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'" >
+  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\devicecode\pal\rtip\lib\dotNetMF_dhcp.proj" />
     <DriverLibs Include="sockets_dhcp.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'" >
+  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\rtip\lib\dotNetMF_udp.proj" />
     <DriverLibs Include="sockets_hal_udp.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'" >
+  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\rtip\SocketsDriver\dotnetmf.proj" />
     <DriverLibs Include="sockets_rtip_pal.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'" >
+  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\rtip\TinyCLR\dotnetmf.proj" />
     <DriverLibs Include="sockets_hal_async.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'" >
+  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\rtip\lib\dotNetMF_ssl.proj" />
     <DriverLibs Include="sockets_ssl.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'" >
+  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\rtip\lib\dotNetMF_sntp.proj" />
     <DriverLibs Include="sockets_sntp.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'" >
+  <ItemGroup Condition="'$(EnableTCPIP)'=='true'  and '$(TCP_IP_STACK)'!='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\rtip\lib\dotNetMF_tcp.proj" />
     <DriverLibs Include="sockets_hal_tcp.$(LIB_EXT)" />
-  </ItemGroup>  
-
+  </ItemGroup>
   <!-- LWIP Stack Libraries -->
-  <ItemGroup Condition="'$(EnableTCPIP)'=='true' and '$(TCP_IP_STACK)'=='LWIP'" >
+  <ItemGroup Condition="'$(EnableTCPIP)'=='true' and '$(TCP_IP_STACK)'=='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh7264\DeviceCode\Ethernet_lwip\dotNetMF.proj" />
     <DriverLibs Include="SH7264_ETHERNET_LWIP.$(LIB_EXT)" />
   </ItemGroup>
@@ -494,7 +554,7 @@
     <RequiredProjects Include="$(SPOCLIENT)\devicecode\drivers\timeservice\stubs\dotNetMF.proj" />
     <DriverLibs Include="timeservice_hal_stubs.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup  Condition="'$(EnableTCPIP)'=='true' and '$(TCP_IP_STACK)'=='LWIP'">
+  <ItemGroup Condition="'$(EnableTCPIP)'=='true' and '$(TCP_IP_STACK)'=='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets_lwip\dotNetMF.proj" />
     <DriverLibs Include="sockets_pal_lwip.$(LIB_EXT)" />
   </ItemGroup>
@@ -530,8 +590,10 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\ssl\stubs\dotNetMF.proj" />
     <DriverLibs Include="ssl_pal_stubs.$(LIB_EXT)" />
   </ItemGroup>
-
-
+  <ItemGroup Condition="'$(EnableTCPIP)'!='true'">
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\ssl\stubs\dotNetMF.proj" />
+    <DriverLibs Include="ssl_pal_stubs.$(LIB_EXT)" />
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\Watchdog\stubs\dotNetMF.proj" />
     <DriverLibs Include="Watchdog_pal_stubs.$(LIB_EXT)" />
@@ -543,10 +605,6 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\stubs\processor\stubs_EBIU\dotNetMF.proj" />
     <DriverLibs Include="cpu_ebiu_stubs.$(LIB_EXT)" />
-  </ItemGroup>
-  <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\drivers\stubs\processor\stubs_security\dotNetMF.proj" />
-    <DriverLibs Include="cpu_security_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\drivers\stubs\processor\stubs_spi\dotNetMF.proj" />
@@ -561,21 +619,71 @@
     <DriverLibs Include="backlight_hal_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\Gesture\stubs\dotNetMF.proj" />
-    <DriverLibs Include="Gesture_pal_stubs.$(LIB_EXT)" />
-  </ItemGroup>
-  <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\Ink\stubs\dotNetMF.proj" />
-    <DriverLibs Include="Ink_pal_stubs.$(LIB_EXT)" />
-  </ItemGroup>
-  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Piezo\stubs\dotNetMF.proj" />
     <DriverLibs Include="piezo_pal_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\stubs\Processor\stubs_PWM\dotnetmf.proj" />
+    <DriverLibs Include="cpu_pwm_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\stubs\Processor\stubs_analog\dotnetmf.proj" />
+    <DriverLibs Include="cpu_analog_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Buttons\dotNetMF.proj" />
     <DriverLibs Include="Buttons_pal.$(LIB_EXT)" />
   </ItemGroup>
-
+  <ItemGroup Condition="'$(TOUCHPANEL)'=='true'">
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\Gesture\dotNetMF.proj" />
+    <DriverLibs Include="Gesture_pal.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TOUCHPANEL)'!='true'">
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\Gesture\stubs\dotNetMF.proj" />
+    <DriverLibs Include="Gesture_pal_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TOUCHPANEL)'=='true'">
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\Ink\dotNetMF.proj" />
+    <DriverLibs Include="Ink_pal.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TOUCHPANEL)'!='true'">
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\Ink\stubs\dotNetMF.proj" />
+    <DriverLibs Include="Ink_pal_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TOUCHPANEL)'=='true'">
+    <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT_Touch\dotnetmf.proj" />
+    <PlatformIndependentLibs Include="SPOT_Touch.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TOUCHPANEL)'=='true'">
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\TouchPanel\dotNetMF.proj" />
+    <DriverLibs Include="TouchPanel_pal.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TOUCHPANEL)'=='true'">
+    <RequiredProjects Include="$(SPOCLIENT)\Solutions\SH7264_RSK\DeviceCode\TouchPanel\dotNetMF.proj" />
+    <DriverLibs Include="SH7264RSK_TouchPanel_Config.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TOUCHPANEL)'=='true'">
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh7264\DeviceCode\TouchPanel\dotNetMF.proj" />
+    <DriverLibs Include="SH7264_TouchPanel.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TOUCHPANEL)'!='true'">
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\TouchPanel\stubs\dotNetMF.proj" />
+    <DriverLibs Include="touchpanel_pal_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\CLR\libraries\System_Xml\dotNetMF.proj" />
+    <PlatformIndependentLibs Include="System_Xml.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\CLR\Core\Xml\dotNetMF.proj" />
+    <PlatformIndependentLibs Include="Xml.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Double\dotNetMF.proj" />
+    <DriverLibs Include="native_double_pal.$(LIB_EXT)" />
+  </ItemGroup>  
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_application.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

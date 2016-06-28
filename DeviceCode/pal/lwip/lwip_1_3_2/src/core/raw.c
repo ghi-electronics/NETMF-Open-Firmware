@@ -55,7 +55,8 @@
 #include <string.h>
 
 /** The list of RAW PCBs */
-static struct raw_pcb *raw_pcbs;
+//[MS_CHANGE] - make global so that we can re-initialize it during soft reboot
+struct raw_pcb *raw_pcbs;
 
 /**
  * Determine if in incoming IP packet is covered by a RAW PCB

@@ -133,6 +133,8 @@ struct USB_Driver
     static UINT32 SetEvent  ( int Controller, UINT32 Event );
     static UINT32 ClearEvent( int Controller, UINT32 Event );
     static UINT8  GetStatus ( int Controller               );
+
+    static void DiscardData( int UsbStream, BOOL fTx );
 };
 
 //--//

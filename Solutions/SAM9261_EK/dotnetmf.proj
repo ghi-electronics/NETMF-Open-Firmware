@@ -5,8 +5,9 @@
   </PropertyGroup>
   <ItemGroup>
     <RequiredProjects Include="NativeSample\NativeSample.proj" />
-    <RequiredProjects Include="PortBooter\portBooter.proj" Condition="'$(COMPILER_TOOL)'!='GCC' or '$(FLAVOR)'!='DEBUG'"/>
-    <RequiredProjects Include="TinyBooter\TinyBooter.proj" Condition="'$(COMPILER_TOOL)'!='GCC' or '$(FLAVOR)'!='DEBUG'"/>
+    <RequiredProjects Include="MicroBooter\MicroBooter.proj" Condition="'$(COMPILER_TOOL)'=='RVDS'"/>
+    <RequiredProjects Include="PortBooter\portBooter.proj"   Condition="'$(COMPILER_TOOL)'!='GCC' or '$(FLAVOR)'!='DEBUG'"/>
+    <RequiredProjects Include="TinyBooter\TinyBooter.proj"   Condition="'$(COMPILER_TOOL)'!='GCC' or '$(FLAVOR)'!='DEBUG'"/>
     <RequiredProjects Include="TinyCLR\TinyCLR.proj" />
   </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />

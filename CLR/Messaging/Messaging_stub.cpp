@@ -64,5 +64,25 @@ void CLR_Messaging::ReplyToCommand( WP_Message* msg, bool fSuccess, bool fCritic
 void CLR_Messaging::Cleanup()
 {
     NATIVE_PROFILE_CLR_MESSAGING();
-
 }
+
+#if defined(BIG_ENDIAN)
+
+UINT32 CLR_Messaging::SwapEndianPattern( UINT8* &buffer, UINT32 size, UINT32 count )
+{
+    NATIVE_PROFILE_CLR_MESSAGING();
+    return 0;
+}
+
+void CLR_Messaging::SwapDebuggingValue( UINT8* &payload, UINT32 payloadSize )
+{
+    NATIVE_PROFILE_CLR_MESSAGING();
+}
+
+void CLR_Messaging::SwapEndian( WP_Message* msg, void* ptr, int size, bool fReply )
+{
+    NATIVE_PROFILE_CLR_MESSAGING();
+}
+
+#endif
+

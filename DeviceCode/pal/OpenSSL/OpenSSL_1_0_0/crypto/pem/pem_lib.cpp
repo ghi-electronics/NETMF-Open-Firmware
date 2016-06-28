@@ -117,7 +117,7 @@ int PEM_def_callback(char *buf, int num, int w, void *key)
 		j=TINYCLR_SSL_STRLEN(buf);
 		if (j < MIN_LENGTH)
 			{
-			TINYCLR_SSL_PRINTF("phrase is too short, needs to be at least %d chars\n",MIN_LENGTH);
+			TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR,"phrase is too short, needs to be at least %d chars\n",MIN_LENGTH);
 			}
 		else
 			break;
@@ -391,7 +391,7 @@ int PEM_ASN1_write_bio(i2d_of_void *i2d, const char *name, BIO *bp,
 			kstr=(unsigned char *)buf;
 			}
 		RAND_add(data,i,0);/* put in the RSA key. */
-		OPENSSL_assert(enc->iv_len <= (int)sizeof(iv));
+		TINYCLR_SSL_ASSERT(enc->iv_len <= (int)sizeof(iv));
 		if (RAND_pseudo_bytes(iv,enc->iv_len) < 0) /* Generate a salt */
 			goto err;
 		/* The 'iv' is used as the iv and as a salt.  It is
@@ -400,7 +400,7 @@ int PEM_ASN1_write_bio(i2d_of_void *i2d, const char *name, BIO *bp,
 
 		if (kstr == (unsigned char *)buf) OPENSSL_cleanse(buf,PEM_BUFSIZE);
 
-		OPENSSL_assert(TINYCLR_SSL_STRLEN(objstr)+23+2*enc->iv_len+13 <= sizeof buf);
+		TINYCLR_SSL_ASSERT(TINYCLR_SSL_STRLEN(objstr)+23+2*enc->iv_len+13 <= sizeof buf);
 
 		buf[0]='\0';
 		PEM_proc_type(buf,PEM_TYPE_ENCRYPTED);
@@ -484,7 +484,6 @@ int PEM_do_header(EVP_CIPHER_INFO *cipher, unsigned char *data, long *plen,
 
 int PEM_get_EVP_CIPHER_INFO(char *header, EVP_CIPHER_INFO *cipher)
 	{
-	int o;
 	const EVP_CIPHER *enc=NULL;
 	char *p,c;
 	char **header_pp = &header;
@@ -524,7 +523,6 @@ int PEM_get_EVP_CIPHER_INFO(char *header, EVP_CIPHER_INFO *cipher)
 		header++;
 		}
 	*header='\0';
-	o=OBJ_sn2nid(p);
 	cipher->cipher=enc=EVP_get_cipherbyname(p);
 	*header=c;
 	header++;

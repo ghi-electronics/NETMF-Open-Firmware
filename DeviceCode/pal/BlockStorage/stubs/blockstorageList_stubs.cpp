@@ -109,7 +109,7 @@ BOOL BlockStorageStream::Read( UINT8** ppBuffer, UINT32 length )
 
 //--// 
 
-SectorAddress BlockDeviceInfo::PhysicalToSectorAddress( const BlockRegionInfo* pRegion, UINT32 phyAddress ) const
+SectorAddress BlockDeviceInfo::PhysicalToSectorAddress( const BlockRegionInfo* pRegion, ByteAddress phyAddress ) const
 {
     return phyAddress;
 }

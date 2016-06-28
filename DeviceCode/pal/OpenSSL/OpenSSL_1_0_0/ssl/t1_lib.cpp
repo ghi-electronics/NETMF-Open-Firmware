@@ -717,12 +717,21 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 				switch (servname_type)
 					{
 				case TLSEXT_NAMETYPE_host_name:
-					if (s->session->tlsext_hostname == NULL)
+					if (!s->hit)
 						{
-						if (len > TLSEXT_MAXLEN_host_name || 
-							((s->session->tlsext_hostname = (char*)OPENSSL_malloc(len+1)) == NULL))
+						if(s->session->tlsext_hostname)
+							{
+							*al = SSL_AD_DECODE_ERROR;
+							return 0;
+							}
+						if (len > TLSEXT_MAXLEN_host_name)
 							{
 							*al = TLS1_AD_UNRECOGNIZED_NAME;
+							return 0;
+							}
+						if ((s->session->tlsext_hostname = (char*)OPENSSL_malloc(len+1)) == NULL)
+							{
+							*al = TLS1_AD_INTERNAL_ERROR;
 							return 0;
 							}
 						TINYCLR_SSL_MEMCPY(s->session->tlsext_hostname, sdata, len);
@@ -737,7 +746,8 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 
 						}
 					else 
-						s->servername_done = TINYCLR_SSL_STRLEN(s->session->tlsext_hostname) == len 
+						s->servername_done = s->session->tlsext_hostname
+							&& TINYCLR_SSL_STRLEN(s->session->tlsext_hostname) == len 
 							&& TINYCLR_SSL_STRNCMP(s->session->tlsext_hostname, (char *)sdata, len) == 0;
 					
 					break;
@@ -768,15 +778,22 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 				*al = TLS1_AD_DECODE_ERROR;
 				return 0;
 				}
-			s->session->tlsext_ecpointformatlist_length = 0;
-			if (s->session->tlsext_ecpointformatlist != NULL) OPENSSL_free(s->session->tlsext_ecpointformatlist);
-			if ((s->session->tlsext_ecpointformatlist = (unsigned char*)OPENSSL_malloc(ecpointformatlist_length)) == NULL)
+			if (!s->hit)
 				{
-				*al = TLS1_AD_INTERNAL_ERROR;
-				return 0;
+				if(s->session->tlsext_ecpointformatlist)
+					{
+					OPENSSL_free(s->session->tlsext_ecpointformatlist);
+					s->session->tlsext_ecpointformatlist = NULL;
+					}
+				s->session->tlsext_ecpointformatlist_length = 0;
+			if ((s->session->tlsext_ecpointformatlist = (unsigned char*)OPENSSL_malloc(ecpointformatlist_length)) == NULL)
+					{
+					*al = TLS1_AD_INTERNAL_ERROR;
+					return 0;
+					}
+				s->session->tlsext_ecpointformatlist_length = ecpointformatlist_length;
+				TINYCLR_SSL_MEMCPY(s->session->tlsext_ecpointformatlist, sdata, ecpointformatlist_length);
 				}
-			s->session->tlsext_ecpointformatlist_length = ecpointformatlist_length;
-			TINYCLR_SSL_MEMCPY(s->session->tlsext_ecpointformatlist, sdata, ecpointformatlist_length);
 #if 0
 			TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR,"ssl_parse_clienthello_tlsext s->session->tlsext_ecpointformatlist (length=%i) ", s->session->tlsext_ecpointformatlist_length);
 			sdata = s->session->tlsext_ecpointformatlist;
@@ -797,15 +814,22 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 				*al = TLS1_AD_DECODE_ERROR;
 				return 0;
 				}
-			s->session->tlsext_ellipticcurvelist_length = 0;
-			if (s->session->tlsext_ellipticcurvelist != NULL) OPENSSL_free(s->session->tlsext_ellipticcurvelist);
-			if ((s->session->tlsext_ellipticcurvelist = (unsigned char*)OPENSSL_malloc(ellipticcurvelist_length)) == NULL)
+			if (!s->hit)
 				{
-				*al = TLS1_AD_INTERNAL_ERROR;
-				return 0;
+				if(s->session->tlsext_ellipticcurvelist)
+					{
+					*al = TLS1_AD_DECODE_ERROR;
+					return 0;
+					}
+				s->session->tlsext_ellipticcurvelist_length = 0;
+				if ((s->session->tlsext_ellipticcurvelist = (unsigned char*)OPENSSL_malloc(ellipticcurvelist_length)) == NULL)
+					{
+					*al = TLS1_AD_INTERNAL_ERROR;
+					return 0;
+					}
+				s->session->tlsext_ellipticcurvelist_length = ellipticcurvelist_length;
+				TINYCLR_SSL_MEMCPY(s->session->tlsext_ellipticcurvelist, sdata, ellipticcurvelist_length);
 				}
-			s->session->tlsext_ellipticcurvelist_length = ellipticcurvelist_length;
-			TINYCLR_SSL_MEMCPY(s->session->tlsext_ellipticcurvelist, sdata, ellipticcurvelist_length);
 #if 0
 			TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR,"ssl_parse_clienthello_tlsext s->session->tlsext_ellipticcurvelist (length=%i) ", s->session->tlsext_ellipticcurvelist_length);
 			sdata = s->session->tlsext_ellipticcurvelist;
@@ -896,6 +920,7 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 						}
 					n2s(data, idsize);
 					dsize -= 2 + idsize;
+					size -= 2 + idsize;
 					if (dsize < 0)
 						{
 						*al = SSL_AD_DECODE_ERROR;
@@ -934,9 +959,14 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 					}
 
 				/* Read in request_extensions */
+				if (size < 2)
+					{
+					*al = SSL_AD_DECODE_ERROR;
+					return 0;
+					}
 				n2s(data,dsize);
 				size -= 2;
-				if (dsize > size) 
+				if (dsize != size)
 					{
 					*al = SSL_AD_DECODE_ERROR;
 					return 0;
@@ -945,7 +975,7 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 				if (dsize > 0)
 					{
 					s->tlsext_ocsp_exts =
-						(X509_extension_st*)d2i_X509_EXTENSIONS(NULL,
+						(X509_EXTENSIONS*)d2i_X509_EXTENSIONS(NULL,
 							&sdata, dsize);
 					if (!s->tlsext_ocsp_exts
 						|| (data + dsize != sdata))
@@ -986,9 +1016,9 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 
 int ssl_parse_serverhello_tlsext(SSL *s, unsigned char **p, unsigned char *d, int n, int *al)
 	{
+	unsigned short length;
 	unsigned short type;
 	unsigned short size;
-	unsigned short len;  
 	unsigned char *data = *p;
 	int tlsext_servername = 0;
 	int renegotiate_seen = 0;
@@ -996,7 +1026,12 @@ int ssl_parse_serverhello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 	if (data >= (d+n-2))
 		goto ri_check;
 
-	n2s(data,len);
+	n2s(data,length);
+	if (data+length != d+n)
+		{
+		*al = SSL_AD_DECODE_ERROR;
+		return 0;
+		}
 
 	while(data <= (d+n-4))
 		{
@@ -1426,23 +1461,20 @@ int ssl_check_serverhello_tlsext(SSL *s)
 	int al = SSL_AD_UNRECOGNIZED_NAME;
 
 #ifndef OPENSSL_NO_EC
-	/* If we are client and using an elliptic curve cryptography cipher suite, then server
-	 * must return a an EC point formats lists containing uncompressed.
+	/* If we are client and using an elliptic curve cryptography cipher
+	 * suite, then if server returns an EC point formats lists extension
+	 * it must contain uncompressed.
 	 */
 	unsigned long alg_k = s->s3->tmp.new_cipher->algorithm_mkey;
 	unsigned long alg_a = s->s3->tmp.new_cipher->algorithm_auth;
 	if ((s->tlsext_ecpointformatlist != NULL) && (s->tlsext_ecpointformatlist_length > 0) && 
+	    (s->session->tlsext_ecpointformatlist != NULL) && (s->session->tlsext_ecpointformatlist_length > 0) && 
 	    ((alg_k & (SSL_kEECDH|SSL_kECDHr|SSL_kECDHe)) || (alg_a & SSL_aECDSA)))
 		{
 		/* we are using an ECC cipher */
 		size_t i;
 		unsigned char *list;
 		int found_uncompressed = 0;
-		if ((s->session->tlsext_ecpointformatlist == NULL) || (s->session->tlsext_ecpointformatlist_length == 0))
-			{
-			SSLerr(SSL_F_SSL_CHECK_SERVERHELLO_TLSEXT,SSL_R_TLS_INVALID_ECPOINTFORMAT_LIST);
-			return -1;
-			}
 		list = s->session->tlsext_ecpointformatlist;
 		for (i = 0; i < s->session->tlsext_ecpointformatlist_length; i++)
 			{

@@ -22,8 +22,8 @@ struct LWIP_DRIVER_INTERFACE_DATA
 };
 
 #define SOCK_SOCKADDR_TO_SOCKADDR(ssa, sa, addrLen) \
-  sa.sin_len         = sizeof(sa); \
-  sa.sin_family      = ((SOCK_sockaddr_in*)ssa)->sin_family; \
+  sa.sin_len         = (u8_t)sizeof(sa); \
+  sa.sin_family      = (u8_t)((SOCK_sockaddr_in*)ssa)->sin_family; \
   sa.sin_port        = ((SOCK_sockaddr_in*)ssa)->sin_port; \
   sa.sin_addr.s_addr = ((SOCK_sockaddr_in*)ssa)->sin_addr.S_un.S_addr; \
   memcpy(sa.sin_zero, ((SOCK_sockaddr_in*)ssa)->sin_zero, sizeof(sa.sin_zero)); \

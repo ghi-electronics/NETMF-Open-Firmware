@@ -3,6 +3,7 @@ using System.Collections;
 using System.Xml;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using Dpws.Client.Discovery;
@@ -71,18 +72,17 @@ namespace Dpws.Client
             WsUdpServiceHost.Instance.IgnoreRequestFromThisIP = m_ignoreRequestFromThisIP;
             WsUdpServiceHost.Instance.MaxThreadCount = 5;
             WsUdpServiceHost.Instance.Start(new ServerBindingContext(v));
+        }
 
-            // Add eventing SubscriptionEnd ServiceOperations. By default Subscription End call back
-            // to this client
-            ServiceOperations.Add(new WsServiceOperation(WsWellKnownUri.WseNamespaceUri, "SubscriptionEnd"));
-
+        protected void StartEventListeners()
+        {
             // Add callbacks implemented by this client
             m_callbackServiceEndpoints.Add(this);
 
             // Start the Http service host
             m_httpServiceHost = new WsHttpServiceHost(m_localBinding, m_callbackServiceEndpoints);
-            m_httpServiceHost.MaxThreadCount = m_callbackServiceEndpoints.Count;
-            m_httpServiceHost.Start(new ServerBindingContext(v));
+            m_httpServiceHost.MaxThreadCount = 5;
+            m_httpServiceHost.Start(new ServerBindingContext(m_version));
             System.Ext.Console.Write("Http service host started...");
         }
 
@@ -165,7 +165,7 @@ namespace Dpws.Client
         {
             get
             {
-                return this.m_localBinding.Transport.EndpointAddress.AbsoluteUri; // m_address;
+                return this.m_localBinding.Transport.EndpointAddress.AbsoluteUri;
             }
 
             set
@@ -173,8 +173,35 @@ namespace Dpws.Client
                 if(!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException();
 
                 this.m_localBinding.Transport.EndpointAddress = new Uri(value);
+
+                // set the default transport to match the endpoint address make the user override the value
+                this.m_localBinding.Transport.TransportAddress = new Uri(value);
             }
         }
+
+
+        /// <summary>
+        /// Gets or sets a Dpws compliant transport address.
+        /// </summary>
+        /// <remarks>
+        /// The only transport address format supportd by this stack is:
+        /// http://(device ip address):(device port)/(device.address - urn:uuid prefix)
+        /// </remarks>
+        public string TransportAddress
+        {
+            get
+            {
+                return this.m_localBinding.Transport.TransportAddress.AbsoluteUri;
+            }
+
+            set
+            {
+                if(!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException();
+
+                this.m_localBinding.Transport.TransportAddress = new Uri(value);
+            }
+        }
+        
 
         /// <summary>
         /// Method used by the discovery callback methods to raise a Hello event
@@ -200,21 +227,6 @@ namespace Dpws.Client
             }
         }
 
-        /// <summary>
-        /// Read only property containing a Dpws compliant transport address.
-        /// </summary>
-        /// <remarks>
-        /// The only transport address format supportd by this stack is:
-        /// http://(device ip address):(device port)/(device.address - urn:uuid prefix)
-        /// </remarks>
-        public string TransportAddress
-        {
-            get
-            {
-                return m_localBinding.Transport.EndpointAddress.AbsoluteUri;
-            }
-        }
-
         ~DpwsClient()
         {
             Dispose(false);
@@ -231,13 +243,13 @@ namespace Dpws.Client
         }
 
         /// <summary>
-        /// Stop tranport services and releases the managed resources used by this class.
+        /// Stop transport services and releases the managed resources used by this class.
         /// </summary>
         /// <param name="disposing">True to release managed resources</param>
         internal void Dispose(bool disposing)
         {
             // Stop the transport services
-            m_httpServiceHost.Stop();
+            if(m_httpServiceHost != null) m_httpServiceHost.Stop();
             WsUdpServiceHost.Instance.Stop();
         }
 
@@ -280,7 +292,7 @@ namespace Dpws.Client
             // Look for a client event sink callback action
             if ((callback = m_eventCallbacks[header.Action]) != null)
             {
-                System.Reflection.MethodInfo methodInfo = this.GetType().GetMethod(callback.MethodName);
+                System.Reflection.MethodInfo methodInfo = this.GetType().GetMethod(callback.MethodName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public);
                 if (methodInfo == null)
                 {
                     System.Ext.Console.Write("");

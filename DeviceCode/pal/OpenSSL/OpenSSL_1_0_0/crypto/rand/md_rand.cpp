@@ -319,7 +319,7 @@ static void ssleay_rand_add(const void *buf, int num, double add)
 	    entropy += add;
 	if (!do_not_lock) CRYPTO_w_unlock(CRYPTO_LOCK_RAND);
 	
-#if !defined(OPENSSL_THREADS) && !defined(OPENSSL_SYS_WIN32) && !defined(OPENSSL_SYS_ARM) || defined(OPENSSL_SYS_SH)
+#if !defined(OPENSSL_THREADS) && !defined(OPENSSL_SYS_WIN32) && !defined(OPENSSL_SYS_ARM) && !defined(OPENSSL_SYS_SH)
 	TINYCLR_SSL_ASSERT(md_c[1] == md_count[1]);
 #endif
 	}
@@ -477,11 +477,14 @@ static int ssleay_rand_bytes(unsigned char *buf, int num)
 		MD_Update(&m,(unsigned char *)&(md_c[0]),sizeof(md_c));
 
 #ifndef PURIFY /* purify complains */
-		/* DO NOT REMOVE THE FOLLOWING CALL TO MD_Update()! */
+		/* The following line uses the supplied buffer as a small
+		 * source of entropy: since this buffer is often uninitialised
+		 * it may cause programs such as purify or valgrind to
+		 * complain. So for those builds it is not used: the removal
+		 * of such a small source of entropy has negligible impact on
+		 * security.
+		 */
 		MD_Update(&m,buf,j);
-		/* We know that line may cause programs such as
-		   purify and valgrind to complain about use of
-		   uninitialized data.  */
 #endif
 
 		k=(st_idx+MD_DIGEST_LENGTH/2)-st_num;

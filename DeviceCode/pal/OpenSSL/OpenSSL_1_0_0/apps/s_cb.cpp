@@ -735,7 +735,7 @@ int MS_CALLBACK generate_cookie_callback(SSL *ssl, unsigned char *cookie, unsign
 		break;
 #endif
 	default:
-		OPENSSL_assert(0);
+		TINYCLR_SSL_ASSERT(0);
 		break;
 		}
 	buffer = (unsigned char*)OPENSSL_malloc(length);
@@ -767,7 +767,7 @@ int MS_CALLBACK generate_cookie_callback(SSL *ssl, unsigned char *cookie, unsign
 		break;
 #endif
 	default:
-		OPENSSL_assert(0);
+		TINYCLR_SSL_ASSERT(0);
 		break;
 		}
 
@@ -816,7 +816,7 @@ int MS_CALLBACK verify_cookie_callback(SSL *ssl, unsigned char *cookie, unsigned
 		break;
 #endif
 	default:
-		OPENSSL_assert(0);
+		TINYCLR_SSL_ASSERT(0);
 		break;
 		}
 	buffer = (unsigned char*)OPENSSL_malloc(length);
@@ -848,7 +848,7 @@ int MS_CALLBACK verify_cookie_callback(SSL *ssl, unsigned char *cookie, unsigned
 		break;
 #endif
 	default:
-		OPENSSL_assert(0);
+		TINYCLR_SSL_ASSERT(0);
 		break;
 		}
 

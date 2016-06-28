@@ -1,4 +1,4 @@
-#if defined (GCCOP_V4_2)
+#if defined (GCCOP)
 
 // Dummy codes to make the GCC OP compiler to compile.
 
@@ -73,7 +73,7 @@ double fmod(double x, double y)
 
 //////////////////////////
 
-#if defined(GCCOP_V4_2)
+#if defined(GCCOP)
 int setjmp(jmp_buf env)
 {
   return 0;

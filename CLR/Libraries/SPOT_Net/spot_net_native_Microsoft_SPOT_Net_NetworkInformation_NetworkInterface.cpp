@@ -3,8 +3,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////#include "SPOT_Net.h"
 #include "SPOT_Net.h"
 
-RSAKey* RetrieveWirelessEncryptionKey();
-BOOL Decrypt( BYTE *Key, BYTE *pCypherText, DWORD cbCypherText, BYTE* pPlainText, DWORD cbPlainText );
+//RSAKey* RetrieveWirelessEncryptionKey();
+//BOOL Decrypt( BYTE *Key, BYTE *pCypherText, DWORD cbCypherText, BYTE* pPlainText, DWORD cbPlainText );
 
 void Network_PostEvent( unsigned int eventType, unsigned int flags )
 {
@@ -48,7 +48,7 @@ HRESULT Library_spot_net_native_Microsoft_SPOT_Net_NetworkInformation_NetworkInt
     CLR_RT_HeapBlock*         pConfig;
     CLR_UINT32                interfaceIndex = stack.Arg0().NumericByRef().u4;
     CLR_RT_HeapBlock&         top            = stack.PushValueAndClear();
-    RSAKey*                   key            = NULL;
+    //RSAKey*                   key            = NULL;
 
     TINYCLR_CLEAR(config);
 
@@ -110,11 +110,12 @@ HRESULT Library_spot_net_native_Microsoft_SPOT_Net_NetworkInformation_NetworkInt
 
             UINT32 dataFlag = WIRELESS_FLAG_DATA__value(wirelessConfig.wirelessFlags);
             if (dataFlag & WIRELESS_FLAG_DATA_ENCRYPTED)
-            {
-                key = RetrieveWirelessEncryptionKey();
+            {
+                ASSERT(FALSE);  // TODO: ADD SUPPORT FOR ENCRYPTION
+                //key = RetrieveWirelessEncryptionKey();
             }
 
-            if (key == NULL)
+            //if (key == NULL)
             {   
                 wirelessConfig.passPhrase[ WIRELESS_PASSPHRASE_LENGTH - 1 ] = 0;
                 TINYCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance( pConfig[ Library_spot_net_native_Microsoft_SPOT_Net_NetworkInformation_Wireless80211::FIELD__PassPhrase ], wirelessConfig.passPhrase ));                
@@ -127,24 +128,26 @@ HRESULT Library_spot_net_native_Microsoft_SPOT_Net_NetworkInformation_NetworkInt
                     memcpy( pConfig[ Library_spot_net_native_Microsoft_SPOT_Net_NetworkInformation_Wireless80211::FIELD__ReKeyInternal ].DereferenceArray()->GetFirstElement(), wirelessConfig.reKeyInternal, wirelessConfig.reKeyLength );
                 }
             }
-            else
-            {   
-                char passPhrase[ WIRELESS_PASSPHRASE_LENGTH ];
-                
-                Decrypt( (BYTE *)key, (BYTE *)wirelessConfig.passPhrase, WIRELESS_PASSPHRASE_LENGTH - 1, (BYTE *)passPhrase, WIRELESS_PASSPHRASE_LENGTH - 1 );
-                passPhrase[ WIRELESS_PASSPHRASE_LENGTH - 1 ] = 0;
-                TINYCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance( pConfig[ Library_spot_net_native_Microsoft_SPOT_Net_NetworkInformation_Wireless80211::FIELD__PassPhrase ], passPhrase ));
+            /*
+                    else
+                    {   
+                        char passPhrase[ WIRELESS_PASSPHRASE_LENGTH ];
+                        
+                        Decrypt( (BYTE *)key, (BYTE *)wirelessConfig.passPhrase, WIRELESS_PASSPHRASE_LENGTH - 1, (BYTE *)passPhrase, WIRELESS_PASSPHRASE_LENGTH - 1 );
+                        passPhrase[ WIRELESS_PASSPHRASE_LENGTH - 1 ] = 0;
+                        TINYCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance( pConfig[ Library_spot_net_native_Microsoft_SPOT_Net_NetworkInformation_Wireless80211::FIELD__PassPhrase ], passPhrase ));
 
-                if(wirelessConfig.networkKeyLength > 0)
-                {
-                    Decrypt( (BYTE *)key, (BYTE *)wirelessConfig.networkKey, wirelessConfig.networkKeyLength, pConfig[ Library_spot_net_native_Microsoft_SPOT_Net_NetworkInformation_Wireless80211::FIELD__NetworkKey ].DereferenceArray()->GetFirstElement(), wirelessConfig.networkKeyLength );
-                }
+                        if(wirelessConfig.networkKeyLength > 0)
+                        {
+                            Decrypt( (BYTE *)key, (BYTE *)wirelessConfig.networkKey, wirelessConfig.networkKeyLength, pConfig[ Library_spot_net_native_Microsoft_SPOT_Net_NetworkInformation_Wireless80211::FIELD__NetworkKey ].DereferenceArray()->GetFirstElement(), wirelessConfig.networkKeyLength );
+                        }
 
-                if(wirelessConfig.reKeyLength > 0)
-                {
-                    Decrypt( (BYTE *)key, (BYTE *)wirelessConfig.reKeyInternal, wirelessConfig.reKeyLength, pConfig[ Library_spot_net_native_Microsoft_SPOT_Net_NetworkInformation_Wireless80211::FIELD__ReKeyInternal ].DereferenceArray()->GetFirstElement(), wirelessConfig.reKeyLength );                
-                }
-            }
+                        if(wirelessConfig.reKeyLength > 0)
+                        {
+                            Decrypt( (BYTE *)key, (BYTE *)wirelessConfig.reKeyInternal, wirelessConfig.reKeyLength, pConfig[ Library_spot_net_native_Microsoft_SPOT_Net_NetworkInformation_Wireless80211::FIELD__ReKeyInternal ].DereferenceArray()->GetFirstElement(), wirelessConfig.reKeyLength );                
+                        }
+                    }
+                    */
 
             TINYCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance( pConfig[ Library_spot_net_native_Microsoft_SPOT_Net_NetworkInformation_Wireless80211::FIELD__Ssid ], wirelessConfig.ssid ));                
 

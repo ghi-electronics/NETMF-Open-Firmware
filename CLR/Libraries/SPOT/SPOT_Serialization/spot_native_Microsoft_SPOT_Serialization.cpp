@@ -9,8 +9,22 @@ HRESULT Library_spot_native_Microsoft_SPOT_Reflection::Serialize___STATIC__SZARR
 {
     NATIVE_PROFILE_CLR_SERIALIZATION();
     TINYCLR_HEADER();
-	
-    TINYCLR_SET_AND_LEAVE(CLR_RT_BinaryFormatter::Serialize( stack.PushValue(), stack.Arg0(), &stack.Arg1(), 0 ));
+
+    CLR_RT_HeapBlock* pObj = &stack.Arg1();
+    CLR_UINT32 flags = 0;
+
+    // unbox reflection types
+    if(pObj->DataType() == DATATYPE_OBJECT)
+    {
+        pObj = pObj->Dereference();
+        
+        if(pObj && pObj->DataType() == DATATYPE_REFLECTION)
+        {
+            flags = CLR_RT_BinaryFormatter::c_Flags_Marshal;
+        }
+    }
+
+    TINYCLR_SET_AND_LEAVE(CLR_RT_BinaryFormatter::Serialize( stack.PushValue(), stack.Arg0(), &stack.Arg1(), flags ));
 
     TINYCLR_NOCLEANUP();
 }
@@ -21,8 +35,21 @@ HRESULT Library_spot_native_Microsoft_SPOT_Reflection::Deserialize___STATIC__OBJ
     TINYCLR_HEADER();
 
     CLR_UINT32 hash = 0;
+    CLR_RT_HeapBlock* pObj = &stack.Arg1();
+    CLR_UINT32 flags = 0;
 
-    TINYCLR_SET_AND_LEAVE(CLR_RT_BinaryFormatter::Deserialize( stack.PushValue(), stack.Arg0(), &stack.Arg1(), &hash, 0 ));
+    // unbox reflection types
+    if(pObj->DataType() == DATATYPE_OBJECT)
+    {
+        pObj = pObj->Dereference();
+        
+        if(pObj && pObj->DataType() == DATATYPE_REFLECTION)
+        {
+            flags = CLR_RT_BinaryFormatter::c_Flags_Marshal;
+        }
+    }
+
+    TINYCLR_SET_AND_LEAVE(CLR_RT_BinaryFormatter::Deserialize( stack.PushValue(), stack.Arg0(), &stack.Arg1(), &hash, flags ));
 
     TINYCLR_CLEANUP();
 

@@ -56,7 +56,10 @@
  * [including the GNU Public Licence.]
  */
 
+
+
 #include <openssl/md2.h>
+#ifndef OPENSSL_NO_MD2
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
 #ifdef OPENSSL_SYS_WINDOWS
@@ -226,4 +229,6 @@ int MD2_Final(unsigned char *md, MD2_CTX *c)
 	TINYCLR_SSL_MEMSET((char *)&c,0,sizeof(c));
 	return 1;
 	}
+
+#endif // OPENSSL_NO_MD2
 

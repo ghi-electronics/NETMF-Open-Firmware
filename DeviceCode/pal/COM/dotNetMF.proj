@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>COM_pal</AssemblyName>
     <ProjectGuid>{0e80e34a-2b6a-4e2e-8e61-ee8bbc16d4ff}</ProjectGuid>
@@ -43,16 +44,15 @@
   <Import Project="$(SPOCLIENT)\Framework\Features\USB_HAL.libcatproj" />
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
   <ItemGroup>
-    <SubDirectories Include="i2c"/>
-    <SubDirectories Include="sockets"/>
-    <SubDirectories Include="usart"/>
-    <SubDirectories Include="usb"/>
-    <SubDirectories Include="stubs"/>    
+    <SubDirectories Include="i2c" />
+    <SubDirectories Include="sockets" />
+    <SubDirectories Include="usart" />
+    <SubDirectories Include="usb" />
+    <SubDirectories Include="stubs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComDirector.cpp" />
     <IncludePaths Include="DeviceCode\include" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

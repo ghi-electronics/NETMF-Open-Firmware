@@ -103,7 +103,7 @@ void do_fp(TINYCLR_SSL_FILE *f)
 	int i;
 	unsigned char buf[BUFSIZE];
 
-	fd=fileno(f);
+	fd=TINYCLR_SSL_FILENO(f);
 	SHA_Init(&c);
 	for (;;)
 		{

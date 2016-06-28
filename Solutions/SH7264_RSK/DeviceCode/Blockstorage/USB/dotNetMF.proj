@@ -1,9 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <AssemblyName>USB_blconfig_SH7264_RSK</AssemblyName>
     <Size>
     </Size>
-    <ProjectGuid>{8a450a25-5230-4da8-9cb8-372630544fdd}</ProjectGuid>
+    <ProjectGuid>{938DEA17-564B-4ADC-89C2-0EE30A37F51B}</ProjectGuid>
     <Description>Block storage configuration for SH7264_RSK</Description>
     <Level>HAL</Level>
     <LibraryFile>USB_blconfig_SH7264_RSK.$(LIB_EXT)</LibraryFile>
@@ -40,6 +41,8 @@
   <ItemGroup>
     <Compile Include="USB_BL_Config.cpp" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\devicecode\targets\native\sh7264\devicecode\blockstorage\usb\usb_bl.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

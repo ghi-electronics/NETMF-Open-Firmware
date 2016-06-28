@@ -187,6 +187,18 @@ BOOL SOCKETS_Flush( INT32 ComPortNum )
     return TRUE;
 }
 
+BOOL SOCKETS_UpgradeToSsl( INT32 ComPortNum, const UINT8* pCACert, UINT32 caCertLen, const UINT8* pDeviceCert, UINT32 deviceCertLen, LPCSTR szTargetHost )
+{
+    NATIVE_PROFILE_PAL_COM();
+    return FALSE;
+}
+
+BOOL SOCKETS_IsUsingSsl( INT32 ComPortNum )
+{
+    NATIVE_PROFILE_PAL_COM();
+    return FALSE;
+}
+
 void SOCKETS_CloseConnections()
 {
     NATIVE_PROFILE_PAL_COM();
@@ -880,6 +892,8 @@ BOOL Sockets_Driver::InitializeDbgListener( int ComPortNum )
 
     g_Sockets_Driver.m_stateDebugSocket = DbgSock_Listening;
 
+    Sockets_Driver::InitializeMulticastDiscovery();
+
     SOCKET_CLEANUP();
 
     if(g_Sockets_Driver.m_SocketDebugListener != SOCK_SOCKET_ERROR)
@@ -978,6 +992,8 @@ BOOL Sockets_Driver::InitializeMulticastDiscovery()
     SOCK_sockaddr_in sockAddr;
     INT32 nonblocking = 1;
 
+    if(g_Sockets_Driver.s_discoveryInitialized) return TRUE;
+
     // set up discovery socket to list to defined discovery port for any ip address
     memset( &sockAddr, 0, sizeof(sockAddr) );
     sockAddr.sin_family           = SOCK_AF_INET;
@@ -998,6 +1014,8 @@ BOOL Sockets_Driver::InitializeMulticastDiscovery()
     SOCKET_CHECK_RESULT( SOCK_setsockopt( g_Sockets_Driver.m_multicastSocket, SOCK_IPPROTO_IP, SOCK_IPO_ADD_MEMBERSHIP, (const char*)&multicast, sizeof(multicast) ) );
 
     SOCKET_CHECK_RESULT( SOCK_bind( g_Sockets_Driver.m_multicastSocket, (SOCK_sockaddr*)&sockAddr, sizeof(sockAddr) ) );
+
+    g_Sockets_Driver.s_discoveryInitialized = TRUE;
 
     SOCKET_CLEANUP()
 
@@ -1059,10 +1077,7 @@ BOOL Sockets_Driver::Initialize()
 
         //SOCKET_CHECK_BOOL( InitializeDbgListener() );
 
-        if(!SSL_Initialize())
-        {
-            debug_printf("SSL initialize failed!\r\n");
-        }
+        SSL_Initialize();
 
         s_initialized = TRUE;
     }
@@ -1108,7 +1123,9 @@ BOOL Sockets_Driver::Uninitialize( )
 
         ret = HAL_SOCK_Uninitialize();
 
-        s_initialized = FALSE;
+        s_initialized          = FALSE;
+        s_discoveryInitialized = FALSE;
+        s_wirelessInitialized  = FALSE;
     }
    
     
@@ -1155,7 +1172,7 @@ INT32 Sockets_Driver::Write( int ComPortNum, const char* Data, size_t size )
 
     if(ret < 0) 
     {
-        INT32 err = SOCK_getlasterror();
+        INT32 err = HAL_SOCK_getlasterror();
 
         // debugger stream is no longer active, change to listening state
         if(err != SOCK_EWOULDBLOCK)
@@ -1200,6 +1217,8 @@ INT32 Sockets_Driver::Read( int ComPortNum, char* Data, size_t size )
 
     if(g_Sockets_Driver.m_stateDebugSocket == DbgSock_Uninitialized) return 0;
 
+    memset(&addr, 0, sizeof(addr));
+
     // if we are connected, then read from the debug stream
     if(g_Sockets_Driver.m_stateDebugSocket == DbgSock_Connected)
     {
@@ -1207,7 +1226,7 @@ INT32 Sockets_Driver::Read( int ComPortNum, char* Data, size_t size )
 
         // return value of zero indicates a shutdown of the socket.  Also we shutdown for any error except
         // ewouldblock.  If either of these happens, then we go back to the listening state
-        if((ret == 0) || (ret == SOCK_SOCKET_ERROR && SOCK_getlasterror() != SOCK_EWOULDBLOCK))
+        if((ret == 0) || (ret == SOCK_SOCKET_ERROR && HAL_SOCK_getlasterror() != SOCK_EWOULDBLOCK))
         {
             CloseDebuggerSocket();
         }
@@ -1458,6 +1477,7 @@ void Sockets_Driver::UnregisterSocket( INT32 index )
 
 BOOL Sockets_Driver::s_initialized=FALSE;
 BOOL Sockets_Driver::s_wirelessInitialized=FALSE;
+BOOL Sockets_Driver::s_discoveryInitialized=FALSE;
 
 #if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
 #pragma arm section zidata

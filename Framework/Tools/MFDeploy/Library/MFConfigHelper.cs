@@ -426,11 +426,14 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
                 throw new MFDeviceNoResponseException();
             }
 
-            if (m_device.DbgEngine.ConnectionSource != Microsoft.SPOT.Debugger.ConnectionSource.TinyBooter)
+            if (!m_device.UpgradeToSsl())
             {
-                if (!m_device.ConnectToTinyBooter())
+                if (m_device.DbgEngine.ConnectionSource != Microsoft.SPOT.Debugger.ConnectionSource.TinyBooter)
                 {
-                    throw new MFDeviceNoResponseException();
+                    if (!m_device.ConnectToTinyBooter())
+                    {
+                        throw new MFDeviceNoResponseException();
+                    }
                 }
             }
 

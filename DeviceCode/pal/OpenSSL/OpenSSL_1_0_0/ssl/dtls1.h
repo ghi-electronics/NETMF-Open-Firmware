@@ -71,6 +71,9 @@
 #include <winsock.h>
 #elif defined(OPENSSL_SYS_NETWARE) && !defined(_WINSOCK2API_)
 #include <sys/timeval.h>
+#elif defined(OPENSSL_SYS_ARM) || defined(OPENSSL_SYS_SH)
+#include <tinyhal.h>
+#include <tinyclr/ssl_types.h>
 #else
 #include <sys/time.h>
 #endif
@@ -167,6 +170,7 @@ typedef struct hm_fragment_st
 	{
 	struct hm_header_st msg_header;
 	unsigned char *fragment;
+	unsigned char *reassembly;
 	} hm_fragment;
 
 typedef struct dtls1_state_st
@@ -227,7 +231,7 @@ typedef struct dtls1_state_st
 	struct dtls1_timeout_st timeout;
 
 	/* Indicates when the last handshake msg sent will timeout */
-	struct timeval next_timeout;
+	struct TINYCLR_SSL_TIMEVAL next_timeout;
 
 	/* Timeout duration */
 	unsigned short timeout_duration;

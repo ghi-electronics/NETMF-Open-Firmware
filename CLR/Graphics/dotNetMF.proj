@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>Graphics</AssemblyName>
     <Size>
@@ -43,22 +44,36 @@
   <PropertyGroup>
     <ExtraFlags Condition="'$(PLATFORM_FAMILY)'=='BLACKFIN'"> -D_NO_CPP_INLINES </ExtraFlags>
   </PropertyGroup>
-
   <ItemGroup>
-    <SubDirectories Include="Jpeg"/>
-    <SubDirectories Include="Gif"/>
-    <SubDirectories Include="Bmp"/>
+    <SubDirectories Include="Jpeg" />
+    <SubDirectories Include="Gif" />
+    <SubDirectories Include="Bmp" />
   </ItemGroup>
-
   <ItemGroup>
     <FastCompileCPPFile Include="Graphics_fastcompile.cpp" />
-    <HFiles Include="Graphics.h" />
     <Compile Include="Bitmap_Win32.cpp" Condition="'$(PLATFORM_FAMILY)'=='x86'" />
     <Compile Include="Font.cpp" />
     <Compile Include="Font_Win32.cpp" Condition="'$(PLATFORM_FAMILY)'=='x86'" />
     <Compile Include="Graphics.cpp" />
-    <ExtraProjects Include="dotNetMF_Stub.proj"/>
+    <ExtraProjects Include="dotNetMF_Stub.proj" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\clr\include\clr_defines.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_application.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_debugging.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_errorcodes.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_graphics.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_hardware.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_interop.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_messaging.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_platformdef.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_profiling.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_runtime.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_runtime__heapblock.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_runtime__serialization.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_types.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_win32.h" />
+    <HFiles Include="graphics.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

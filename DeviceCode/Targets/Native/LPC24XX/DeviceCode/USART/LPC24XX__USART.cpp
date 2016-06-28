@@ -176,7 +176,7 @@ void LPC24XX_USART_Driver::UART_IntHandler (void *param)
    // Send up to 2 bytes of Tx data
 
 
-  // for (i = 0; i <2; i++)
+   for (i = 0; i <2; i++)
    {
 
      if (USART_RemoveCharFromTxBuffer( ComNum, c ))
@@ -190,7 +190,7 @@ void LPC24XX_USART_Driver::UART_IntHandler (void *param)
          // enabled by the PAL uart driver when a character to the
 	     // TxBuffer is added
 	     TxBufferEmptyInterruptEnable( ComNum, FALSE );
-	    // break;
+	     break;
 	 }
 
    }
@@ -211,7 +211,7 @@ BOOL LPC24XX_USART_Driver::Initialize( int ComPortNum, int BaudRate, int Parity,
     ASSERT(LPC24XX_USART_Driver::IsValidPortNum(ComPortNum));
     
     //calculate the divisor that's required.
-    divisor     =  ((LPC24XX_USART::c_ClockRate /*(72000000/4)*/ / (BaudRate * 16)));
+    divisor     =  ((LPC24XX_USART::c_ClockRate / (BaudRate * 16)));
     
     // CWS: Disable interrupts
     USARTC.UART_LCR = 0; // prepare to Init UART
@@ -286,18 +286,12 @@ BOOL LPC24XX_USART_Driver::Initialize( int ComPortNum, int BaudRate, int Parity,
                                 LPC24XX_USART::UART_FCR_FME;
 
     ProtectPins( ComPortNum, FALSE );
-//	LPC_IOCON->P0_2 = 1; //TXD
-//	LPC_IOCON->P0_3 = 1; //RXD
 
     CPU_INTC_ActivateInterrupt( LPC24XX_USART::getIntNo(ComPortNum),
                                 UART_IntHandler,
-                                (void *)ComPortNum);
+                                (void *)ComPortNum);    
     USARTC.UART_TER = LPC24XX_USART::UART_TER_TXEN;
     
-//    while(1)
-//      CPU_USART_WriteCharToTxBuffer(ComPortNum, 'U');
-
-
     return fRet;
 }
 
@@ -394,13 +388,12 @@ void LPC24XX_USART_Driver::TxBufferEmptyInterruptEnable( int ComPortNum, BOOL En
 
 BOOL LPC24XX_USART_Driver::TxBufferEmptyInterruptState ( int ComPortNum )
 {
-   LPC24XX_USART& USARTC = LPC24XX::UART(ComPortNum);
+    LPC24XX_USART& USARTC = LPC24XX::UART(ComPortNum);
     
     ASSERT(LPC24XX_USART_Driver::IsValidPortNum(ComPortNum));    
     USARTC.UART_LCR &= (~LPC24XX_USART::UART_LCR_DLAB);	
 
     if (USARTC.SEL2.IER.UART_IER & (LPC24XX_USART::UART_IER_THREIE)) return TRUE;
-	
     return FALSE;
 }
 
@@ -432,7 +425,6 @@ BOOL LPC24XX_USART_Driver::RxBufferFullInterruptState ( int ComPortNum )
 
 
     if (USARTC.SEL2.IER.UART_IER & (LPC24XX_USART::UART_IER_RDAIE)) return TRUE;
-    
     return FALSE;
 
 }
@@ -490,10 +482,10 @@ void LPC24XX_USART_Driver::ProtectPins ( int ComPortNum, BOOL On )
             *PinsProtected = FALSE;
 
             // Connect pin to UART
-            CPU_GPIO_DisablePin( SER_TXD, RESISTOR_DISABLED, GPIO_ATTRIBUTE_NONE, GPIO_ALT_MODE_2 );
+            CPU_GPIO_DisablePin( SER_TXD, RESISTOR_DISABLED, GPIO_ATTRIBUTE_NONE, GPIO_ALT_MODE_1 );
 
             // Connect pin to UART
-            CPU_GPIO_DisablePin( SER_RXD, RESISTOR_DISABLED, GPIO_ATTRIBUTE_NONE, GPIO_ALT_MODE_2 );
+            CPU_GPIO_DisablePin( SER_RXD, RESISTOR_DISABLED, GPIO_ATTRIBUTE_NONE, GPIO_ALT_MODE_1 );
 
             TxBufferEmptyInterruptEnable( ComPortNum, TRUE );
 

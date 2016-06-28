@@ -17,6 +17,7 @@
     <SubDirectories Include="SPOT_Net_Security"/>
     <SubDirectories Include="SPOT_TimeService"/>
     <SubDirectories Include="SPOT_Touch"/>
+    <SubDirectories Include="SPOT_Update"/>
     <SubDirectories Include="System_Xml"/>
   </ItemGroup>
 

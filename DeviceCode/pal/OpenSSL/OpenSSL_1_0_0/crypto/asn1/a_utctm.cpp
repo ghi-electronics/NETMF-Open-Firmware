@@ -308,7 +308,7 @@ time_t ASN1_UTCTIME_get(const ASN1_UTCTIME *s)
 		}
 #undef g2
 
-	return mktime(&tm)-offset*60; /* FIXME: mktime assumes the current timezone
+	return TINYCLR_SSL_MKTIME(&tm)-offset*60; /* FIXME: mktime assumes the current timezone
 	                               * instead of UTC, and unless we rewrite OpenSSL
 				       * in Lisp we cannot locally change the timezone
 				       * without possibly interfering with other parts

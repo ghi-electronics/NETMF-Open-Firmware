@@ -74,7 +74,17 @@ namespace System.Text
             return null;
         }
 
+        public virtual int GetBytes(string s, int charIndex, int charCount, byte[] bytes, int byteIndex)
+        {
+            throw new NotImplementedException();
+        }
+
         public virtual char[] GetChars(byte[] bytes)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual char[] GetChars(byte[] bytes, int byteIndex, int byteCount)
         {
             throw new NotImplementedException();
         }

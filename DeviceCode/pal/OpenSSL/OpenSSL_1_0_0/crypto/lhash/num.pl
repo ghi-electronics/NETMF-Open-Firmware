@@ -13,5 +13,5 @@ while (<>)
 @a=sort {$a <=> $b } keys %num;
 foreach (0 .. $a[$#a])
 	{
-	TINYCLR_SSL_PRINTF "%4d:%4d\n",$_,$num{$_};
+	printf "%4d:%4d\n",$_,$num{$_};
 	}

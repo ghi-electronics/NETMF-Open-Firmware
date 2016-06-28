@@ -101,7 +101,7 @@ X509 *TS_CONF_load_cert(const char *file)
 	x = PEM_read_bio_X509_AUX(cert, NULL, NULL, NULL);
 end:
 	if (x == NULL)
-		TINYCLR_SSL_PRINTF("unable to load certificate: %s\n", file);
+		TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR, "unable to load certificate: %s\n", file);
 	BIO_free(cert);
 	return x;
 	}
@@ -128,7 +128,7 @@ STACK_OF(X509) *TS_CONF_load_certs(const char *file)
 		}
 end:
 	if (othercerts == NULL)
-		TINYCLR_SSL_PRINTF("unable to load certificates: %s\n", file);
+		TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR, "unable to load certificates: %s\n", file);
 	sk_X509_INFO_pop_free(allcerts, X509_INFO_free);
 	BIO_free(certs);
 	return othercerts;
@@ -143,7 +143,7 @@ EVP_PKEY *TS_CONF_load_key(const char *file, const char *pass)
 	pkey = PEM_read_bio_PrivateKey(key, NULL, NULL, (char *) pass);
  end:
 	if (pkey == NULL)
-		TINYCLR_SSL_PRINTF("unable to load private key: %s\n", file);
+		TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR, "unable to load private key: %s\n", file);
 	BIO_free(key);
 	return pkey;
 	}
@@ -152,12 +152,12 @@ EVP_PKEY *TS_CONF_load_key(const char *file, const char *pass)
 
 static void TS_CONF_lookup_fail(const char *name, const char *tag)
 	{
-	TINYCLR_SSL_PRINTF("variable lookup failed for %s::%s\n", name, tag);
+	TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR, "variable lookup failed for %s::%s\n", name, tag);
 	}
 
 static void TS_CONF_invalid(const char *name, const char *tag)
 	{
-	TINYCLR_SSL_PRINTF("invalid variable value for %s::%s\n", name, tag);
+	TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR, "invalid variable value for %s::%s\n", name, tag);
 	}
 
 const char *TS_CONF_get_tsa_section(CONF *conf, const char *section)

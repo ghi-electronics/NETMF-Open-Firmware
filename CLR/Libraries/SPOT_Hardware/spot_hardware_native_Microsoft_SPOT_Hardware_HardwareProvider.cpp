@@ -55,15 +55,18 @@ HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::N
 {
     TINYCLR_HEADER();
 
-    CLR_UINT32 port;
+    CLR_UINT32 port = stack.Arg1().NumericByRef().u4;
 
-    port = stack.Arg1().NumericByRef().u4;
-    if (::CPU_USART_SupportNonStandardBaudRate( port )==TRUE)
+    if(::CPU_USART_SupportNonStandardBaudRate( port )==TRUE)
+    {
         stack.SetResult_Boolean( true );
+    }
     else
+    {
         stack.SetResult_Boolean( false );
+    }
         
-	TINYCLR_NOCLEANUP_NOLABEL();
+    TINYCLR_NOCLEANUP_NOLABEL();
 }
 
 HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::NativeGetBaudRateBoundary___VOID__I4__BYREF_U4__BYREF_U4( CLR_RT_StackFrame& stack )
@@ -73,12 +76,7 @@ HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::N
     CLR_RT_HeapBlock  hbmaxBR;
     CLR_RT_HeapBlock  hbminBR;
 
-    CLR_UINT32 port, maxBR, minBR;
-
-    port = stack.Arg1().NumericByRef().u4;
-
-    maxBR = (CLR_UINT32)0; 
-    minBR = (CLR_UINT32)0; 
+    CLR_UINT32 maxBR = 0, minBR = 0, port = stack.Arg1().NumericByRef().u4;
     
     // COM ports are numbered from 0 up
     if(port >= CPU_USART_PortsCount())
@@ -99,7 +97,7 @@ HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::N
 
 HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::NativeIsSupportedBaudRate___BOOLEAN__I4__BYREF_U4( CLR_RT_StackFrame& stack )
 {
-	TINYCLR_HEADER();
+    TINYCLR_HEADER();
     CLR_RT_HeapBlock  hbBR;
     CLR_UINT32        port;
    
@@ -273,5 +271,133 @@ HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::N
     TINYCLR_NOCLEANUP();
 }
 
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::NativeGetPWMChannelsCount___I4( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
 
+    stack.SetResult_I4( ::PWM_PWMChannels() );
 
+    TINYCLR_NOCLEANUP_NOLABEL();
+}
+
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::NativeGetPWMPinForChannel___MicrosoftSPOTHardwareCpuPin__MicrosoftSPOTHardwareCpuPWMChannel( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+    
+    GPIO_PIN pin = ::PWM_GetPinForChannel( (PWM_CHANNEL)stack.Arg1().NumericByRef().s4 );
+
+    stack.SetResult_I4( (CLR_INT32)pin );
+    
+    TINYCLR_NOCLEANUP_NOLABEL();
+}
+
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::NativeGetAnalogChannelsCount___I4( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+
+    stack.SetResult_I4( ::AD_ADChannels() );
+
+    TINYCLR_NOCLEANUP_NOLABEL();
+}
+
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::NativeGetAnalogPinForChannel___MicrosoftSPOTHardwareCpuPin__MicrosoftSPOTHardwareCpuAnalogChannel( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+    
+    GPIO_PIN pin = ::AD_GetPinForChannel( (ANALOG_CHANNEL)stack.Arg1().NumericByRef().s4 );
+
+    if(pin == GPIO_PIN_NONE)
+    {
+        TINYCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
+    }
+
+    stack.SetResult_I4( (CLR_INT32)pin );
+    
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::NativeGetAvailablePrecisionInBitsForChannel___SZARRAY_I4__MicrosoftSPOTHardwareCpuAnalogChannel( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+    
+    CLR_INT32 precisions[32];
+    CLR_UINT32 size = 32;
+
+    if(::AD_GetAvailablePrecisionsForChannel( (ANALOG_CHANNEL)stack.Arg1().NumericByRef().s4, precisions, size ) == TRUE)
+    {
+        CLR_INT32* pPrecision = NULL;
+        CLR_RT_HeapBlock& top = stack.PushValue();
+        
+        TINYCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Array::CreateInstance( top, size, g_CLR_RT_WellKnownTypes.m_Int32));
+        
+        pPrecision = (CLR_INT32*)top.DereferenceArray()->GetFirstElement();
+        
+        memcpy(pPrecision, precisions, size * sizeof(CLR_INT32));        
+    }
+    else 
+    {
+        TINYCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
+    }
+
+    TINYCLR_NOCLEANUP();
+    
+}
+
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::NativeGetAnalogOutputChannelsCount___I4( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+
+    stack.SetResult_I4( ::DA_DAChannels() );
+
+    TINYCLR_NOCLEANUP_NOLABEL();
+}
+
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::NativeGetAnalogOutputPinForChannel___MicrosoftSPOTHardwareCpuPin__MicrosoftSPOTHardwareCpuAnalogOutputChannel( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+    
+    GPIO_PIN pin = ::DA_GetPinForChannel((DA_CHANNEL)stack.Arg1().NumericByRef().s4);
+    
+    if(pin == GPIO_PIN_NONE)
+    {
+        TINYCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
+    }
+
+    stack.SetResult_I4( (CLR_INT32)pin );
+    
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::NativeGetAvailableAnalogOutputPrecisionInBitsForChannel___SZARRAY_I4__MicrosoftSPOTHardwareCpuAnalogOutputChannel( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+    
+    CLR_INT32 precisions[32];
+    CLR_UINT32 size = 32;
+
+    if(::DA_GetAvailablePrecisionsForChannel( (DA_CHANNEL)stack.Arg1().NumericByRef().s4, precisions, size ) == TRUE) 
+    {
+        CLR_INT32* pPrecision = NULL;
+        CLR_RT_HeapBlock& top = stack.PushValue();
+        
+        TINYCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Array::CreateInstance( top, size, g_CLR_RT_WellKnownTypes.m_Int32));
+        
+        pPrecision = (CLR_INT32*)top.DereferenceArray()->GetFirstElement();
+        
+        memcpy(pPrecision, precisions, size * sizeof(CLR_INT32));        
+    } 
+    else 
+    {
+        TINYCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
+    }
+
+    TINYCLR_NOCLEANUP();
+}

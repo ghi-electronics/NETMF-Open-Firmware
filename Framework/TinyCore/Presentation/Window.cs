@@ -7,6 +7,7 @@ using System.Collections;
 using System.Threading;
 using Microsoft.SPOT.Presentation.Controls;
 using Microsoft.SPOT.Presentation.Media;
+using System.Runtime.CompilerServices;
 
 namespace Microsoft.SPOT.Presentation
 {
@@ -74,6 +75,7 @@ namespace Microsoft.SPOT.Presentation
 
         #region Public Methods
 
+        [MethodImplAttribute( MethodImplOptions.Synchronized )]
         public void Close()
         {
             Application app = Microsoft.SPOT.Application.Current;
@@ -83,8 +85,11 @@ namespace Microsoft.SPOT.Presentation
                 app.NonAppWindowsInternal.Remove(this);
             }
 
-            _windowManager.Children.Remove(this);
-            _windowManager = null;
+            if(_windowManager != null)
+            {
+                _windowManager.Children.Remove(this);
+                _windowManager = null;
+            }
         }
 
         #endregion Public Methods

@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{c2f7ad1b-ff66-4d09-a327-cba36dabe879}</ProjectGuid>
     <AssemblyName>AT91_TIME</AssemblyName>
@@ -39,18 +40,24 @@
   </PropertyGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
   <PropertyGroup>
-    <OutputType >Library</OutputType>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <HFiles Include="AT91_TIME.h" />
     <Compile Include="AT91_TIME.cpp" />
     <Compile Include="AT91_time_functions.cpp" />
   </ItemGroup>
   <PropertyGroup>
     <ARMBUILD_ONLY>true</ARMBUILD_ONLY>
-  </PropertyGroup>  
+  </PropertyGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\AT91\DeviceCode\AT91_TIMER\dotNetMF.proj" />
+  </ItemGroup>
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\arm_util.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\cpu.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\cpu_definitions.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\smartptr_fiq_arm.h" />
+    <HFiles Include="at91_time.h" />
   </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

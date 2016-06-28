@@ -8,6 +8,13 @@
 #include "tinyhal.h"
 #include "FS_decl.h"
 
+//#define FAT_FS__VALIDATE_READONLY_CACHELINE 1
+
+#ifndef FAT_FS__CACHE_FLUSH_TIMEOUT_USEC
+#define FAT_FS__CACHE_FLUSH_TIMEOUT_USEC (60*1000*1000)
+#endif
+
+
 #define ATTR_READONLY  0x01                       // file is readonly
 #define ATTR_HIDDEN    0x02                       // file is hidden
 #define ATTR_SYSTEM    0x04                       // file is a system file
@@ -694,7 +701,7 @@ public:
     HRESULT Create( FAT_LogicDisk* logicDisk, UINT32 clusIndex, LPCWSTR fileName, UINT32 fileNameLen, BYTE attributes );
     HRESULT Parse ( FAT_LogicDisk* logicDisk, FAT_EntryEnumerator* entryEnum );
 
-    FAT_Directory* GetDirectoryEntry( BOOL forWrite = FALSE );
+    FAT_Directory* GetDirectoryEntry( BOOL forWrite );
     void MarkDirectoryEntryForWrite();
 
     HRESULT DeleteDirectoryEntry();
@@ -753,6 +760,7 @@ private:
     static const int Helper_Read  = 0;
     static const int Helper_Write = 1;
     static const int Helper_Seek  = 2;
+    static const int Helper_Flush = 3;
     
     HRESULT ReadWriteSeekHelper( int type, BYTE* buffer, int size, int* bytesDone );
 };
@@ -807,15 +815,26 @@ private:
         UINT32 m_begin;
         UINT32 m_bsByteAddress;
         UINT32 m_flags;
+#ifdef FAT_FS__VALIDATE_READONLY_CACHELINE
+        UINT32 m_crc;
+#endif
 
         static const UINT32 CacheLine__Dirty           = 0x80000000;
-        static const UINT32 CacheLine__LRUCounter_Mask = 0x7FFFFFFF;
+        static const UINT32 CacheLine__IsReadWrite     = 0x40000000;
+        static const UINT32 CacheLine__LRUCounter_Mask = 0x3FFFFFFF;
 
-        BOOL IsDirty() { return (m_flags & CacheLine__Dirty); }
+        BOOL IsDirty() { return 0 != (m_flags & CacheLine__Dirty); }
         void SetDirty( BOOL dirty )
         {
-            if(dirty) m_flags |= CacheLine__Dirty;
+            if(dirty) m_flags |=  CacheLine__Dirty | CacheLine__IsReadWrite;
             else      m_flags &= ~CacheLine__Dirty;
+        }
+
+        BOOL IsReadWrite() { return 0 != (m_flags & CacheLine__IsReadWrite); }
+        void SetReadWrite( BOOL readWrite )
+        {
+            if(readWrite) m_flags |=  CacheLine__IsReadWrite;
+            else          m_flags &= ~CacheLine__IsReadWrite;
         }
 
         UINT32 GetLRUCounter() { return m_flags & CacheLine__LRUCounter_Mask; }
@@ -836,16 +855,20 @@ private:
     BlockStorageDevice* m_blockStorageDevice;
     UINT32              m_bytesPerSector;
     UINT32              m_sectorCount;
+    HAL_COMPLETION      m_flushCompletion;
 
     FAT_CacheLine* GetCacheLine( UINT32 sectorIndex );
-    FAT_CacheLine* GetUnusedCacheLine();
-    void FlushSector( FAT_CacheLine* cacheLine );
+    FAT_CacheLine* GetUnusedCacheLine(BOOL useLRU);
+    void FlushSector( FAT_CacheLine* cacheLine, BOOL fClearDirtyBit=TRUE );
+
+    static void OnFlushCallback(void* arg);
 
 public:
     void Initialize( BlockStorageDevice* blockStorageDevice, UINT32 bytesPerSector, UINT32 baseAddress, UINT32 sectorCount );
     void Uninitialize();
-    
-    BYTE* GetSector( UINT32 sectorIndex, BOOL forWrite = FALSE );
+
+    BYTE* GetSector( UINT32 sectorIndex, BOOL forWrite );
+    BYTE* GetSector( UINT32 sectorIndex, BOOL useLRU, BOOL forWrite );
     void MarkSectorDirty( UINT32 sectorIndex );
 
     void FlushSector( UINT32 sectorIndex );
@@ -910,7 +933,7 @@ public:
 
     //--//
     BOOL MountDisk();
-    HRESULT FormatHelper( UINT32 parameters );
+    HRESULT FormatHelper( LPCSTR volumeLabel, UINT32 parameters );
     HRESULT GetDiskVolLab( LPSTR label );
     UINT64 GetDiskTotalSize();
     UINT64 GetDiskFreeSize();
@@ -951,7 +974,7 @@ public:
     
     static FAT_LogicDisk* Initialize( const VOLUME_ID *volume );    
     BOOL Uninitialize();
-    static HRESULT Format( const VOLUME_ID *volume, UINT32 parameters );
+    static HRESULT Format( const VOLUME_ID *volume, LPCSTR volumeLabel, UINT32 parameters );
     static BOOL IsLoadableMedia( BlockStorageDevice *driverInterface, UINT32 *numVolumes );
 
     
@@ -1019,9 +1042,10 @@ struct FAT_FS_Driver
     static void Initialize();
     static BOOL InitializeVolume( const VOLUME_ID *volume );
     static BOOL UnInitializeVolume( const VOLUME_ID *volume );
-    static HRESULT Format( const VOLUME_ID *volume, UINT32 parameters );
+    static HRESULT Format( const VOLUME_ID *volume, LPCSTR volumeLabel, UINT32 parameters );
     static HRESULT GetSizeInfo( const VOLUME_ID *volume, INT64* totalSize, INT64* totalFreeSpace );
     static HRESULT FlushAll( const VOLUME_ID* volume );
+    static HRESULT GetVolumeLabel( const VOLUME_ID* volume, LPSTR volumeLabel, INT32 volumeLabelLen );
 
     //--//
     static BOOL IsLoadableMedia( BlockStorageDevice *driverInterface, UINT32 *numVolumes );

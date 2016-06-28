@@ -23,23 +23,23 @@
 
 
 //SST39VF320 flash information
-#define     FLASH_MANUFACTURER_CODE             		0x00BF
-#define     FLASH_DEVICE_CODE                       			0x235B
+#define     FLASH_MANUFACTURER_CODE                     0x00BF
+#define     FLASH_DEVICE_CODE                           0x235B
 
-#define     FLASH_BLOCK_COUNT                       			1024
-#define     FLASH_BYTES_PER_SECTOR               			2
-#define     FLASH_BYTES_PER_BLOCK                			0x1000
+#define     FLASH_BLOCK_COUNT                           1024
+#define     FLASH_BYTES_PER_SECTOR                      2
+#define     FLASH_BYTES_PER_BLOCK                       0x1000
 
-#define     FLASH_SECTOR_WRITE_TYPICAL_TIME_USEC  10
-#define    FLASH_BLOCK_ERASE_ACTUAL_TIME_USEC       25000
-#define    FLASH_SECTOR_WRITE_MAX_TIME_USEC          	10            //WORD as per SST docs, that is a SECTOR
+#define     FLASH_SECTOR_WRITE_TYPICAL_TIME_USEC        10
+#define     FLASH_BLOCK_ERASE_ACTUAL_TIME_USEC          25000
+#define     FLASH_SECTOR_WRITE_MAX_TIME_USEC          	10          //WORD as per SST docs, that is a SECTOR
 #define     FLASH_BLOCK_ERASE_MAX_TIME_USEC        	25000       //SECTOR as per SST docs, that is a BLOCK
 
 
 // can be platform dependant for both the chip select and the the sector map
 #define SST39VF320_16_CHIP_SELECT                   		0
 #define SST39VF320_16_WAIT_STATES                   		0
-#define SST39VF320_16_RELEASE_COUNTS                	0
+#define SST39VF320_16_RELEASE_COUNTS                            0
 #define SST39VF320_16_BIT_WIDTH                     		16
 #define SST39VF320_16_BASE_ADDRESS                  		FLASH_MEMORY_Base
 #define SST39VF320_16_SIZE_IN_BYTES                 		FLASH_MEMORY_Size
@@ -48,21 +48,19 @@
 
 #define SST39VF320_16_SECTOR_SIZE                   		2   //(in bytes. SST calls this a Word.)
 #define SST39VF320_16_BLOCK_SIZE                    		2*1024*2    //(in bytes, 2KWord, where Word = 16bit. SST docs call this a Sector)
-#define SST39VF320_16_SECTORS_PER_BLOCK             	SST39VF320_16_BLOCK_SIZE/SST39VF320_16_SECTOR_SIZE
+#define SST39VF320_16_SECTORS_PER_BLOCK                         SST39VF320_16_BLOCK_SIZE/SST39VF320_16_SECTOR_SIZE
 
 // BlockDeviceInformation
 
 #define SST39VF320_16__IS_REMOVABLE                 		FALSE
 #define SST39VF320_16__SUPPORTS_XIP                 		TRUE
-#define SST39VF320_16__WRITE_PROTECTED              	FALSE
-#define SST39VF320_16__NUM_REGIONS             	      1
+#define SST39VF320_16__WRITE_PROTECTED                          FALSE
+#define SST39VF320_16__NUM_REGIONS                              1
 
 
 const BlockRange g_SST39VF320_16_BlockRange[] =
 {
-    { BlockRange::BLOCKTYPE_CODE       ,  0,  1 },   // TinyBooter
-
-    { BlockRange::BLOCKTYPE_CODE       ,  2,  383 },   // TinyCLR runtime
+    { BlockRange::BLOCKTYPE_CODE       ,   0, 383 },   // TinyCLR runtime
 
     { BlockRange::BLOCKTYPE_DEPLOYMENT , 384, 570 },   // TinyCLR runtime
     { BlockRange::BLOCKTYPE_DEPLOYMENT , 571, 721 },   // TinyCLR runtime
@@ -86,9 +84,9 @@ const BlockRange g_SST39VF320_16_BlockRange[] =
 
 const BlockRegionInfo  g_SST39VF320_16_BlkRegion[SST39VF320_16__NUM_REGIONS] = 
 {
-    SST39VF320_16_BASE_ADDRESS,   // ByteAddress   Start;              // Starting Sector address
-    FLASH_BLOCK_COUNT,                 		 // UINT32          NumBlocks;          // total number of blocks in this region
-    FLASH_BYTES_PER_BLOCK,              // UINT32        BytesPerBlock;      // Total number of bytes per block (MUST be SectorsPerBlock * DataBytesPerSector)
+    SST39VF320_16_BASE_ADDRESS,      // ByteAddress   Start;              // Starting Sector address
+    FLASH_BLOCK_COUNT,               // UINT32        NumBlocks;          // total number of blocks in this region
+    FLASH_BYTES_PER_BLOCK,           // UINT32        BytesPerBlock;      // Total number of bytes per block (MUST be SectorsPerBlock * DataBytesPerSector)
 
     ARRAYSIZE_CONST_EXPR(g_SST39VF320_16_BlockRange),
     g_SST39VF320_16_BlockRange,
@@ -98,8 +96,8 @@ const BlockRegionInfo  g_SST39VF320_16_BlkRegion[SST39VF320_16__NUM_REGIONS] =
 BlockDeviceInfo g_SST39VF320_16_DeviceInfo=
 {
         {  
-            SST39VF320_16__IS_REMOVABLE,                     // BOOL Removable;
-            SST39VF320_16__SUPPORTS_XIP,                     // BOOL SupportsXIP;
+            SST39VF320_16__IS_REMOVABLE,                    // BOOL Removable;
+            SST39VF320_16__SUPPORTS_XIP,                    // BOOL SupportsXIP;
             SST39VF320_16__WRITE_PROTECTED,
         },
 
@@ -109,8 +107,8 @@ BlockDeviceInfo g_SST39VF320_16_DeviceInfo=
 
 	    FLASH_MEMORY_Size,                              // UINT32 Size;
 
-          SST39VF320_16__NUM_REGIONS,                      // UINT32 NumRegions;
-          g_SST39VF320_16_BlkRegion,                      //const BlockRegionInfo* pRegions;
+          SST39VF320_16__NUM_REGIONS,                       // UINT32 NumRegions;
+          g_SST39VF320_16_BlkRegion,                        //const BlockRegionInfo* pRegions;
 };
 
 
@@ -118,15 +116,15 @@ struct MEMORY_MAPPED_NOR_BLOCK_CONFIG g_SST39VF320_16_BS_Config =
 {
    { // BLOCK_CONFIG
         {
-            SST39VF320_16__WP_GPIO_PIN,                       // GPIO_PIN             Pin;
-            SST39VF320_16__WP_ACTIVE,                         // BOOL                 ActiveState;
+            SST39VF320_16__WP_GPIO_PIN,                    // GPIO_PIN             Pin;
+            SST39VF320_16__WP_ACTIVE,                      // BOOL                 ActiveState;
         },
        &g_SST39VF320_16_DeviceInfo,                        // BlockDeviceinfo
     },
 
     {
         SST39VF320_16_CHIP_SELECT,                     // UINT8  CPU_MEMORY_CONFIG::ChipSelect;
-        FALSE,                                           // UINT8  CPU_MEMORY_CONFIG::ReadOnly;
+        FALSE,                                         // UINT8  CPU_MEMORY_CONFIG::ReadOnly;
         SST39VF320_16_WAIT_STATES,                     // UINT32 CPU_MEMORY_CONFIG::WaitStates;
         SST39VF320_16_RELEASE_COUNTS,                  // UINT32 CPU_MEMORY_CONFIG::ReleaseCounts;
         SST39VF320_16_BIT_WIDTH,                       // UINT32 CPU_MEMORY_CONFIG::BitWidth;

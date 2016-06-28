@@ -143,7 +143,8 @@ namespace System.Net
 
             if (m_redirectLocation != null)
             {
-                m_httpResponseHeaders.AddWithoutValidate(HttpKnownHeaderNames.Location, m_contentType);
+                m_httpResponseHeaders.AddWithoutValidate(HttpKnownHeaderNames.Location, m_redirectLocation);
+                m_ResponseStatusCode = (int)HttpStatusCode.Redirect;
             }
         }
 
@@ -387,6 +388,19 @@ namespace System.Net
             {
                 ThrowIfResponseSent();
                 m_statusDescription = value;
+            }
+        }
+
+        public void Detach()
+        {
+            if (!m_IsResponseClosed)
+            {
+                if (!m_WasResponseSent)
+                {
+                    SendHeaders();
+                }
+
+                m_IsResponseClosed = true;
             }
         }
 

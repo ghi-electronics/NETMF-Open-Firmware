@@ -1789,12 +1789,18 @@ const COMP_METHOD *SSL_get_current_expansion(SSL *s);
 const char *SSL_COMP_get_name(const COMP_METHOD *comp);
 STACK_OF(SSL_COMP) *SSL_COMP_get_compression_methods(void);
 int SSL_COMP_add_compression_method(int id,COMP_METHOD *cm);
+//[MS_CHANGE] - added SSL_COMP_init to zero out global
+// variables for soft reboot 
+void SSL_COMP_init(void);
 #else
 const void *SSL_get_current_compression(SSL *s);
 const void *SSL_get_current_expansion(SSL *s);
 const char *SSL_COMP_get_name(const void *comp);
 void *SSL_COMP_get_compression_methods(void);
 int SSL_COMP_add_compression_method(int id,void *cm);
+//[MS_CHANGE] - added SSL_COMP_init to zero out global
+// variables for soft reboot 
+void SSL_COMP_init(void);
 #endif
 
 /* TLS extensions functions */

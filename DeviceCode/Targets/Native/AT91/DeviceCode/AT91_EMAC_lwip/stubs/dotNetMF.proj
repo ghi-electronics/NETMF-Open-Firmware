@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>EMAC_Config_stubs_lwip</AssemblyName>
     <Size>
@@ -48,6 +49,5 @@
     <IncludePaths Include="DeviceCode\pal\lwip\lwip_1_3_2\contrib\ports\arm\proj\lwIPv4lib" />
     <IncludePaths Include="Solutions\DeviceCode\AT91_EMAC_lwip" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

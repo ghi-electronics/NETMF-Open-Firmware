@@ -15,7 +15,7 @@
 #include "..\LPC24XX.h"
 
 //--//
-/*
+
 #if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
 #pragma arm section rodata = "c_Gpio_Attributes_LPC24XX"
 #endif
@@ -188,8 +188,6 @@ const UINT8 __section(rodata) LPC24XX_GPIO_Driver::c_Gpio_Attributes[LPC24XX_GPI
     GPIO_ATTRIBUTE_INPUT | GPIO_ATTRIBUTE_OUTPUT, // 159
 
 };
-*/
-
 
 #if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
 #pragma arm section zidata = "g_LPC24XX_GPIO_Driver"
@@ -310,25 +308,25 @@ BOOL LPC24XX_GPIO_Driver::Initialize()
 
     // initialize the interrupt information
     {
-        //PIN_ISR_DESCRIPTOR* pinIsr = g_LPC24XX_GPIO_Driver.m_PinIsr;
+        PIN_ISR_DESCRIPTOR* pinIsr = g_LPC24XX_GPIO_Driver.m_PinIsr;
 
-        //for(i = 0; i < c_MaxPins; i++)
-        //{
-        //    pinIsr->m_pin     = i;
-        //    pinIsr->m_intEdge = GPIO_INT_NONE;
-        //    pinIsr->m_isr     = LPC24XX_GPIO_Driver::STUB_ISRVector;
-        //    pinIsr->m_param   = NULL;
-        //    
-        //    pinIsr->m_completion.Initialize( );
-        //    pinIsr->m_completion.InitializeForISR( &PIN_ISR_DESCRIPTOR::Fire, pinIsr );
-        //    
-        //    pinIsr++;
-        //}
+        for(i = 0; i < c_MaxPins; i++)
+        {
+            pinIsr->m_pin     = i;
+            pinIsr->m_intEdge = GPIO_INT_NONE;
+            pinIsr->m_isr     = LPC24XX_GPIO_Driver::STUB_ISRVector;
+            pinIsr->m_param   = NULL;
+            
+            pinIsr->m_completion.Initialize( );
+            pinIsr->m_completion.InitializeForISR( &PIN_ISR_DESCRIPTOR::Fire, pinIsr );
+            
+            pinIsr++;
+        }
     }
 
     
     // register interrupt handler (GPIO uses EINT3)
-   // if(!CPU_INTC_ActivateInterrupt( LPC24XX_VIC::c_IRQ_INDEX_EINT3, GPIO_ISR, NULL )) return FALSE;
+    if(!CPU_INTC_ActivateInterrupt( LPC24XX_VIC::c_IRQ_INDEX_EINT3, GPIO_ISR, NULL )) return FALSE;
     
     return TRUE;
 }
@@ -343,15 +341,15 @@ BOOL LPC24XX_GPIO_Driver::Uninitialize()
 
     // uninitialize the interrupt information
     {
-        //PIN_ISR_DESCRIPTOR* pinIsr = g_LPC24XX_GPIO_Driver.m_PinIsr;
+        PIN_ISR_DESCRIPTOR* pinIsr = g_LPC24XX_GPIO_Driver.m_PinIsr;
         LPC24XX_GPIOIRQ& GPIOIRQ = LPC24XX::GPIOIRQ();
 
-        //for(int i = 0; i < c_MaxPins; i++)
-        //{
-        //    pinIsr->m_completion.Abort();
+        for(int i = 0; i < c_MaxPins; i++)
+        {
+            pinIsr->m_completion.Abort();
 
-        //    pinIsr++;
-        //}
+            pinIsr++;
+        }
 
         // turn off interrupts
         GPIOIRQ.IO0IntEnR = 0x00000000;
@@ -380,7 +378,7 @@ UINT32 LPC24XX_GPIO_Driver::Attributes( GPIO_PIN pin )
 
     if(pin < c_MaxPins)
     {
-        return GPIO_ATTRIBUTE_INPUT | GPIO_ATTRIBUTE_OUTPUT;//c_Gpio_Attributes[pin];
+        return c_Gpio_Attributes[pin];
     }
 
     return GPIO_ATTRIBUTE_NONE;
@@ -406,11 +404,11 @@ void LPC24XX_GPIO_Driver::DisablePin( GPIO_PIN pin, GPIO_RESISTOR resistorState,
     PCB.Regs[PCBReg].PINSEL = temp | ( AltFunction << PCBRegBit );
     
     // Disable ISR
-    //PIN_ISR_DESCRIPTOR& PinIsr = g_LPC24XX_GPIO_Driver.m_PinIsr[pin];
+    PIN_ISR_DESCRIPTOR& PinIsr = g_LPC24XX_GPIO_Driver.m_PinIsr[pin];
 
-    //PinIsr.m_intEdge = GPIO_INT_NONE;
-    //PinIsr.m_isr     = STUB_ISRVector;
-    //PinIsr.m_param   = (void*)(size_t)pin;
+    PinIsr.m_intEdge = GPIO_INT_NONE;
+    PinIsr.m_isr     = STUB_ISRVector;
+    PinIsr.m_param   = (void*)(size_t)pin;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -438,11 +436,11 @@ void LPC24XX_GPIO_Driver::EnableOutputPin( GPIO_PIN pin, BOOL initialState )
     GPIO.Regs[Port].FIODIR_PX |= 0x1 << Bit;
     
     // Disable ISR
-    //PIN_ISR_DESCRIPTOR& PinIsr = g_LPC24XX_GPIO_Driver.m_PinIsr[pin];
+    PIN_ISR_DESCRIPTOR& PinIsr = g_LPC24XX_GPIO_Driver.m_PinIsr[pin];
 
-    //PinIsr.m_intEdge = GPIO_INT_NONE;
-    //PinIsr.m_isr     = STUB_ISRVector;
-    //PinIsr.m_param   = (void*)(size_t)pin;
+    PinIsr.m_intEdge = GPIO_INT_NONE;
+    PinIsr.m_isr     = STUB_ISRVector;
+    PinIsr.m_param   = (void*)(size_t)pin;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -479,15 +477,15 @@ BOOL LPC24XX_GPIO_Driver::EnableInputPin( GPIO_PIN pin, BOOL GlitchFilterEnable,
             return FALSE;                       // TODO: Enable pull down resistor instead of failing
     }
     
-    //PIN_ISR_DESCRIPTOR& PinIsr = g_LPC24XX_GPIO_Driver.m_PinIsr[pin];
+    PIN_ISR_DESCRIPTOR& PinIsr = g_LPC24XX_GPIO_Driver.m_PinIsr[pin];
 
-    //PinIsr.m_intEdge = intEdge;
-    //PinIsr.m_isr     = (ISR != NULL)?ISR:STUB_ISRVector;
-    //PinIsr.m_param   = (Param != NULL)?Param:(void*)(size_t)pin;
-    //PinIsr.m_flags   = GlitchFilterEnable ? PIN_ISR_DESCRIPTOR::c_Flags_Debounce : 0;
-    //PinIsr.m_status  = 0;                        
-    //PinIsr.m_completion.Abort();
-    //PinIsr.m_completion.Initialize();
+    PinIsr.m_intEdge = intEdge;
+    PinIsr.m_isr     = (ISR != NULL)?ISR:STUB_ISRVector;
+    PinIsr.m_param   = (Param != NULL)?Param:(void*)(size_t)pin;
+    PinIsr.m_flags   = GlitchFilterEnable ? PIN_ISR_DESCRIPTOR::c_Flags_Debounce : 0;
+    PinIsr.m_status  = 0;                        
+    PinIsr.m_completion.Abort();
+    PinIsr.m_completion.Initialize();
 
     GPIO.Regs[Port].FIODIR_PX &= ~(0x1 << Bit);
     
@@ -634,7 +632,6 @@ INT32 LPC24XX_GPIO_Driver::GetPinCount()
 
 void LPC24XX_GPIO_Driver::GetPinsMap( UINT8* pins, size_t size )
 {
-	/*
     const UINT8*    src = c_Gpio_Attributes;
     UINT8* dst = pins;   
     UINT32 maxpin = c_MaxPins;
@@ -644,7 +641,7 @@ void LPC24XX_GPIO_Driver::GetPinsMap( UINT8* pins, size_t size )
     {
         *dst = *src;  
         ++dst; ++src;
-    }*/
+    }
 }
 
 UINT8 LPC24XX_GPIO_Driver::GetSupportedResistorModes( GPIO_PIN pin)
@@ -682,7 +679,7 @@ void LPC24XX_GPIO_Driver::GPIO_ISR( void* Param )
         //clear this pin's IRQ
         GPIOIRQ.IO0IntClr |= 0x1 << bit;
         
-        //pinIsr = &g_LPC24XX_GPIO_Driver.m_PinIsr[ bit /*+ 0 * LPC24XX_GPIO_Driver::c_PinsPerPort*/ ];
+        pinIsr = &g_LPC24XX_GPIO_Driver.m_PinIsr[ bit /*+ 0 * LPC24XX_GPIO_Driver::c_PinsPerPort*/ ];
         
         //Debounce
         if( (pinIsr->m_flags & PIN_ISR_DESCRIPTOR::c_Flags_Debounce)&&
@@ -708,7 +705,7 @@ void LPC24XX_GPIO_Driver::GPIO_ISR( void* Param )
         //clear this pin's IRQ
         GPIOIRQ.IO2IntClr |= 0x1 << bit;
         
-        //pinIsr = &g_LPC24XX_GPIO_Driver.m_PinIsr[ bit + 2 * LPC24XX_GPIO_Driver::c_PinsPerPort ];
+        pinIsr = &g_LPC24XX_GPIO_Driver.m_PinIsr[ bit + 2 * LPC24XX_GPIO_Driver::c_PinsPerPort ];
         
         //Debounce
         if( (pinIsr->m_flags & PIN_ISR_DESCRIPTOR::c_Flags_Debounce)&&

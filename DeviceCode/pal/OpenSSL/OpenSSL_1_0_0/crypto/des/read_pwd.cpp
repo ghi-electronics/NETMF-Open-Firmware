@@ -306,7 +306,7 @@ int des_read_pw(char *buf, char *buff, int size, const char *prompt,
 #endif
 
 #if defined(TTY_get) && !defined(OPENSSL_SYS_VMS)
-	if (TTY_get(fileno(tty),&tty_orig) == -1)
+	if (TTY_get(TINYCLR_SSL_FILENO(tty),&tty_orig) == -1)
 		{
 #ifdef ENOTTY
 		if (errno == ENOTTY)
@@ -341,7 +341,7 @@ int des_read_pw(char *buf, char *buff, int size, const char *prompt,
 #endif
 
 #if defined(TTY_set) && !defined(OPENSSL_SYS_VMS)
-	if (is_a_tty && (TTY_set(fileno(tty),&tty_new) == -1))
+	if (is_a_tty && (TTY_set(TINYCLR_SSL_FILENO(tty),&tty_new) == -1))
 #ifdef OPENSSL_SYS_MPE 
 		; /* MPE lies -- echo really has been disabled */
 #else
@@ -399,7 +399,7 @@ error:
 #endif
 	/* What can we do if there is an error? */
 #if defined(TTY_set) && !defined(OPENSSL_SYS_VMS)
-	if (ps >= 2) TTY_set(fileno(tty),&tty_orig);
+	if (ps >= 2) TTY_set(TINYCLR_SSL_FILENO(tty),&tty_orig);
 #endif
 #ifdef OPENSSL_SYS_VMS
 	if (ps >= 2)

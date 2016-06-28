@@ -165,7 +165,7 @@ static int gost_digests(ENGINE *e, const EVP_MD **digest,
 		*nids = gost_digest_nids;
 		return 2; 
 		}
-	/*TINYCLR_SSL_PRINTF("Digest no %d requested\n",nid);*/
+	/*printf("Digest no %d requested\n",nid);*/
 	if(nid == NID_id_GostR3411_94) 
 		{
 		*digest = &digest_gost;

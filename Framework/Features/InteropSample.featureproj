@@ -8,11 +8,11 @@
     <MMP_DAT_CreateDatabase Include="$(BUILD_TREE_CLIENT)\pe\$(ENDIANNESS)\mscorlib.pe" />
     <MMP_DAT_CreateDatabase Include="$(BUILD_TREE_CLIENT)\pe\$(ENDIANNESS)\Microsoft.SPOT.Native.pe" />
   </ItemGroup>
-  <ItemGroup Condition="'$(PORT_BUILD)'!=''" >
+  <ItemGroup Condition="!EXISTS('$(SPOCLIENT)\tools\scripts\port\Sample\InteropSample\InteropManagedCode\InteropSample.csproj')">
     <RequiredManagedProjects Include="$(SPOCLIENT)\Product\Sample\InteropSample\InteropManagedCode\InteropSample.csproj"/>
     <RequiredProjects Include="$(SPOCLIENT)\Product\Sample\InteropSample\InteropNativeCode\dotnetmf.proj"/>
   </ItemGroup>
-  <ItemGroup Condition="'$(PORT_BUILD)'==''">
+  <ItemGroup Condition="EXISTS('$(SPOCLIENT)\tools\scripts\port\Sample\InteropSample\InteropManagedCode\InteropSample.csproj')">
     <RequiredManagedProjects Include="$(SPOCLIENT)\tools\scripts\port\Sample\InteropSample\InteropManagedCode\InteropSample.csproj"/>
     <RequiredProjects Include="$(SPOCLIENT)\tools\scripts\port\Sample\InteropSample\InteropNativeCode\dotnetmf.proj"/>
   </ItemGroup>

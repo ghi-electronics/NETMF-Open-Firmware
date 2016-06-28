@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>tinyclr</AssemblyName>
     <ProjectGuid>{7614965a-1611-4559-a052-49192b10c55f}</ProjectGuid>
@@ -30,7 +31,6 @@
     <MMP_DAT_CreateDatabaseFile>$(BIN_DIR)\tinyclr.dat</MMP_DAT_CreateDatabaseFile>
     <EXEScatterFileDefinition>$(SRC_DIR)\scatterfile_tinyclr_$(COMPILER_TOOL).$(SCATTER_EXT)</EXEScatterFileDefinition>
   </PropertyGroup>
-  <ItemGroup />
   <ItemGroup>
     <Compile Include="allocator.cpp" />
     <Compile Include="tinyclr.cpp" />
@@ -54,6 +54,7 @@
   <Import Project="$(SPOCLIENT)\Framework\Features\Gesture.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\serial_port.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\SerialPort.featureproj" />
+  <Import Project="$(SPOCLIENT)\Framework\Features\OneWire.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\Serialization.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\I2C.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\Backlight.featureproj" />
@@ -64,8 +65,84 @@
   <Import Project="$(SPOCLIENT)\Framework\Features\Ink.featureproj" />
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Interop.Settings" />
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\drivers\LargeBuffer\stubs\dotnetmf.proj"/>
-    <DriverLibs Include="LargeBuffer_hal_stubs.$(LIB_EXT)"/>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\MFUpdate\stubs\dotnetMF.proj" />
+    <DriverLibs Include="MFUpdate_PAL_stub.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\Solutions\iMXS\DeviceCode\Crypto\dotnetmf.proj" />
+    <DriverLibs Include="Crypto_Config_iMXS.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\PKCS11\dotNetMF.proj" />
+    <DriverLibs Include="PKCS11_Engine.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\OpenSSL\stubs\dotNetMF.proj" />
+    <DriverLibs Include="openssl_pal_stubs.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\OpenSSL\OpenSSL_1_0_0\TinyCLR\dotNetMF.proj" />
+    <DriverLibs Include="ssl_types.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\OpenSSL\OpenSSL_1_0_0\crypto\dotNetMF.proj" />
+    <DriverLibs Include="crypto_openssl.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(COMPILER_TOOL)'!='RVDS'">
+    <DriverLibs Include="aes_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="asn1_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="asn1pt2_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="bf_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="bio_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="buffer_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="bn_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="cast_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="comp_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="conf_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="des_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="dh_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="dsa_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="dso_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ecdh_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ec_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ecdsa_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="engine_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="err_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="evp_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="hmac_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="lhash_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="md2_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="md4_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="md5_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="modes_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ocsp_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="objects_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="pem_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="pkcs7_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="pkcs12_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="pqueue_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="rand_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="rc2_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="rc4_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ripemd_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="rsa_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="seed_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="sha_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="stack_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ts_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="txt_db_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ui_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="whrlpool_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="x509_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="x509v3_openssl.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\SimpleStorage\dotNetMF.proj" />
+    <DriverLibs Include="SimpleStorage_PAL.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\PKCS11\Tokens\OpenSSL\dotNetMF.proj" />
+    <DriverLibs Include="OpenSSL_PKCS11_Crypto.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\drivers\LargeBuffer\stubs\dotnetmf.proj" />
+    <DriverLibs Include="LargeBuffer_hal_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Core\dotNetMF.proj" />
@@ -148,10 +225,6 @@
     <PlatformIndependentLibs Include="SPOT.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT\SPOT_Crypto\dotNetMF.proj" />
-    <PlatformIndependentLibs Include="SPOT_Crypto.$(LIB_EXT)" />
-  </ItemGroup>
-  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT\SPOT_Serialization\dotNetMF.proj" />
     <PlatformIndependentLibs Include="SPOT_Serialization.$(LIB_EXT)" />
   </ItemGroup>
@@ -214,10 +287,6 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\StartupLib\dotNetMF.proj" />
     <PlatformIndependentLibs Include="CLRStartup.$(LIB_EXT)" />
-  </ItemGroup>
-  <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\Crypto\dotNetMF.proj" />
-    <DriverLibs Include="Crypto.$(LIB_EXT)"  />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Cores\arm\Common\GlobalLock\dotNetMF.proj" />
@@ -310,6 +379,10 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\dotNetMF.proj" />
     <DriverLibs Include="COM_pal.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <DriverLibs Include="DebuggerPort_SSL_config_stubs.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Config\dotnetmf.proj" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\I2C\dotNetMF.proj" />
@@ -460,12 +533,39 @@
     <DriverLibs Include="TimeService_pal_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_DA\dotnetmf.proj" />
+    <DriverLibs Include="cpu_DA_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\stubs\Processor\stubs_PWM\dotnetmf.proj" />
+    <DriverLibs Include="cpu_pwm_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\stubs\Processor\stubs_analog\dotnetmf.proj" />
+    <DriverLibs Include="cpu_analog_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT\SPOT_Messaging\dotNetMF_Stub.proj" />
     <PlatformIndependentLibs Include="SPOT_Messaging_stub.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\OneWire\dotNetMF.proj" />
+    <DriverLibs Include="OneWire_pal.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT_Hardware\SPOT_OneWire\dotNetMF.proj"  />
+    <PlatformIndependentLibs Include="SPOT_Hardware_OneWire.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\MC9328\DeviceCode\MC9328MXL_PerformanceCounter\dotNetMF.proj" />
     <DriverLibs Include="MC9328MXL_PerformanceCounter.$(LIB_EXT)" />
+  </ItemGroup>
+   <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Double\dotNetMF.proj" />
+    <DriverLibs Include="native_double_pal.$(LIB_EXT)" />
+  </ItemGroup>
+ <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_application.h" />
   </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

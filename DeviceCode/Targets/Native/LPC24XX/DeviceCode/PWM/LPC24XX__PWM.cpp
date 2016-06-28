@@ -16,61 +16,49 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
-#pragma arm section zidata = "g_LPC24XX_PWM_Driver"
-#endif
-
-LPC24XX_PWM_Driver g_LPC24XX_PWM_Driver;
-
-#if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
-#pragma arm section zidata
-#endif
-
-//--//
-
 BOOL PWM_Initialize(PWM_CHANNEL channel)
 {
-    return g_LPC24XX_PWM_Driver.Initialize(channel);
+    return LPC24XX_PWM_Driver::Initialize(channel);
 }
 
 BOOL PWM_Uninitialize(PWM_CHANNEL channel)
 {
-    return g_LPC24XX_PWM_Driver.Uninitialize(channel);
+    return LPC24XX_PWM_Driver::Uninitialize(channel);
 }
 
 BOOL PWM_ApplyConfiguration(PWM_CHANNEL channel, GPIO_PIN pin, UINT32& period, UINT32& duration, PWM_SCALE_FACTOR& scale, BOOL invert)
 {
-    return g_LPC24XX_PWM_Driver.ApplyConfiguration(channel, pin, period, duration, scale, invert);
+    return LPC24XX_PWM_Driver::ApplyConfiguration(channel, pin, period, duration, scale, invert);
 }
 
 BOOL PWM_Start(PWM_CHANNEL channel, GPIO_PIN pin)
 {
-    return g_LPC24XX_PWM_Driver.Start(channel,pin);
+    return LPC24XX_PWM_Driver::Start(channel,pin);
 }
 
 void PWM_Stop(PWM_CHANNEL channel, GPIO_PIN pin)
 {
-    return g_LPC24XX_PWM_Driver.Stop(channel,pin);
+    return LPC24XX_PWM_Driver::Stop(channel,pin);
 }
 
 BOOL PWM_Start(PWM_CHANNEL* channel, GPIO_PIN* pin, UINT32 count)
 {
-    return g_LPC24XX_PWM_Driver.Start(channel, pin, count);
+    return LPC24XX_PWM_Driver::Start(channel, pin, count);
 }
 
 void PWM_Stop(PWM_CHANNEL* channel, GPIO_PIN* pin, UINT32 count)
 {
-    return g_LPC24XX_PWM_Driver.Stop(channel, pin, count);
+    return LPC24XX_PWM_Driver::Stop(channel, pin, count);
 }
 
 UINT32 PWM_PWMChannels() 
 {
-    return g_LPC24XX_PWM_Driver.Channels();
+    return LPC24XX_PWM_Driver::Channels();
 }
 
 GPIO_PIN PWM_GetPinForChannel( PWM_CHANNEL channel )
 {
-    return g_LPC24XX_PWM_Driver.GetPinForChannel( channel );
+    return LPC24XX_PWM_Driver::GetPinForChannel( channel );
 }
 
 //--//
@@ -83,8 +71,13 @@ BOOL LPC24XX_PWM_Driver::Initialize(PWM_CHANNEL channel)
     BOOL isChannel0 = channel == PWM_CHANNEL_0;
     
     // make sure power is on and select a clock
-    scs.PCONP    |= isChannel0 ? LPC24XX_SYSCON::ENABLE_PWM0 : LPC24XX_SYSCON::ENABLE_PWM1;
-    scs.PCLKSEL0 |= isChannel0 ? LPC24XX_SYSCON::PCLK_PWM0_CLK_DIV_1 : LPC24XX_SYSCON::PCLK_PWM1_CLK_DIV_1;       
+    if(isChannel0) scs.PCONP |= LPC24XX_SYSCON::ENABLE_PWM0;
+    else scs.PCONP |= LPC24XX_SYSCON::ENABLE_PWM1;
+    //scs.PCONP    |= isChannel0 ? LPC24XX_SYSCON::ENABLE_PWM0 : LPC24XX_SYSCON::ENABLE_PWM1;
+    
+    if(isChannel0) scs.PCLKSEL0 |= LPC24XX_SYSCON::PCLK_PWM0_CLK_DIV_1;
+    else scs.PCLKSEL0 |= LPC24XX_SYSCON::PCLK_PWM1_CLK_DIV_1;       
+    //scs.PCLKSEL0 |= isChannel0 ? LPC24XX_SYSCON::PCLK_PWM0_CLK_DIV_1 : LPC24XX_SYSCON::PCLK_PWM1_CLK_DIV_1;       
 
     // enable PWM mode on this controller 
     pwm.TCR |= LPC24XX_PWM::TCR_PWM_ENABLE;    
@@ -103,7 +96,10 @@ BOOL LPC24XX_PWM_Driver::Uninitialize(PWM_CHANNEL channel)
     pwm.TCR &= ~(LPC24XX_PWM::TCR_PWM_ENABLE);    
     
     // make sure power is off 
-    scs.PCONP &= ~( isChannel0 ? LPC24XX_SYSCON::ENABLE_PWM0 : LPC24XX_SYSCON::ENABLE_PWM1);
+    if(isChannel0) scs.PCONP &= ~ LPC24XX_SYSCON::ENABLE_PWM0;
+    else scs.PCONP &= ~LPC24XX_SYSCON::ENABLE_PWM1;
+
+    //scs.PCONP &= ~( isChannel0 ? LPC24XX_SYSCON::ENABLE_PWM0 : LPC24XX_SYSCON::ENABLE_PWM1);
 
     return TRUE;
 }
@@ -138,7 +134,9 @@ BOOL LPC24XX_PWM_Driver::ApplyConfiguration(PWM_CHANNEL channel, GPIO_PIN pin,UI
     }
     
     // enable latching, in case this channel was started already
-    pwm.LER |=  (LPC24XX_PWM::LER_ENABLE_0 | (isChannel0 ? LPC24XX_PWM::LER_ENABLE_2 : LPC24XX_PWM::LER_ENABLE_1));
+    if(isChannel0) pwm.LER |= LPC24XX_PWM::LER_ENABLE_0 | LPC24XX_PWM::LER_ENABLE_2;
+    else pwm.LER |= LPC24XX_PWM::LER_ENABLE_0 | LPC24XX_PWM::LER_ENABLE_1;
+    //pwm.LER |=  (LPC24XX_PWM::LER_ENABLE_0 | (isChannel0 ? LPC24XX_PWM::LER_ENABLE_2 : LPC24XX_PWM::LER_ENABLE_1));
     
     return TRUE;
 }
@@ -199,14 +197,14 @@ void LPC24XX_PWM_Driver::DisablePin( PWM_CHANNEL channel, GPIO_PIN pin )
 BOOL LPC24XX_PWM_Driver::Start(PWM_CHANNEL channel, GPIO_PIN pin)
 {
     // we can enable the pin, as the match register is supposed to be set already by a previous call to ApplyConfiguration
-    EnablePin(channel, pin);
+    LPC24XX_PWM_Driver::EnablePin(channel, pin);
 
     return TRUE;
 }
 
 void LPC24XX_PWM_Driver::Stop(PWM_CHANNEL channel, GPIO_PIN pin)
 {    
-    DisablePin(channel, pin);
+    LPC24XX_PWM_Driver::DisablePin(channel, pin);
 }
 
 BOOL LPC24XX_PWM_Driver::Start(PWM_CHANNEL* channel,GPIO_PIN* pin,UINT32 count)

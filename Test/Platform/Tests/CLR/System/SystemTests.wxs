@@ -14,5 +14,17 @@
       <ComponentRef Id='Component_SPOTXmlTests' />
       <ComponentRef Id='Component_xmlTests' />
       <ComponentRef Id='Component_HttpTests' />
+      <ComponentRef Id='Component_SecurityTests' />
+      <ComponentRef Id='Component_AsymmetricTests' />
+      <ComponentRef Id='Component_HashTests' />
+      <ComponentRef Id='Component_KeyTests' />
+      <ComponentRef Id='Component_MiscSecurity' />
+      <ComponentRef Id='Component_PaddingTests' />
+      <ComponentRef Id='Component_RSATests' />
+      <ComponentRef Id='Component_CertTests' />
+      <ComponentRef Id='Component_CertsTest2' />
+      <ComponentRef Id='Component_StringBuilder' />
+      <ComponentRef Id='Component_RegEx' />
+      <ComponentRef Id='Component_MathTests' />
   </Module>
 </Wix>

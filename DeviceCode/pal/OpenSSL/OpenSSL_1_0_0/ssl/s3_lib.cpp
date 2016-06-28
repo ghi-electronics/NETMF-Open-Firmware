@@ -165,7 +165,7 @@
 #endif
 
 #include <openssl/x509v3.h>
-const char ssl3_version_str[]="SSLv3" OPENSSL_VERSION_PTEXT;
+//const char ssl3_version_str[]="SSLv3" OPENSSL_VERSION_PTEXT;
 
 #define SSL3_NUM_CIPHERS	(sizeof(ssl3_ciphers)/sizeof(SSL_CIPHER))
 
@@ -2449,12 +2449,12 @@ long ssl3_ctrl(SSL *s, int cmd, long larg, void *parg)
 		break;
 
 	case SSL_CTRL_GET_TLSEXT_STATUS_REQ_EXTS:
-		*(STACK_OF(X509_EXTENSION) **)parg = *(STACK_OF(X509_EXTENSION) **)(s->tlsext_ocsp_exts); //MS:
+		*(STACK_OF(X509_EXTENSION) **)parg = (STACK_OF(X509_EXTENSION) *)(s->tlsext_ocsp_exts); //MS:
 		ret = 1;
 		break;
 
 	case SSL_CTRL_SET_TLSEXT_STATUS_REQ_EXTS:
-		s->tlsext_ocsp_exts = (X509_extension_st*)parg;
+		s->tlsext_ocsp_exts = (X509_EXTENSIONS*)parg;
 		ret = 1;
 		break;
 

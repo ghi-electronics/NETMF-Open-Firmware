@@ -102,20 +102,25 @@ namespace Microsoft.SPOT.IO
 
         public void Format(uint parameter)
         {
-            Format(FileSystem, parameter, false);
+            Format(FileSystem, parameter, VolumeLabel, false);
         }
-
+        
         public void Format(uint parameter, bool force)
         {
-            Format(FileSystem, parameter, force);
+            Format(FileSystem, parameter, VolumeLabel, force);
         }
 
         public void Format(String fileSystem, uint parameter)
         {
-            Format(fileSystem, parameter, false);
+            Format(fileSystem, parameter, VolumeLabel, false);
         }
 
         public void Format(String fileSystem, uint parameter, bool force)
+        {
+            Format( fileSystem, parameter, VolumeLabel, force );
+        }
+
+        public void Format(String fileSystem, uint parameter, String volumeLabel, bool force )
         {
             String rootedNameSpace = "\\" + Name;
 
@@ -135,7 +140,7 @@ namespace Microsoft.SPOT.IO
 
             try
             {
-                NativeIO.Format(Name, fileSystem, parameter);
+                NativeIO.Format(Name, fileSystem, volumeLabel, parameter);
                 Refresh();
             }
             finally

@@ -76,16 +76,11 @@
 #define CONTINUE_IF_LOOP    continue;
 #define CONTINUE_IF_LOOP_FAIL  continue;
 
-#elif (CFG_NIFACES > 1)
+#else
 #define LOOP_THRU_IFACES(I) for (I = 0; I < CFG_NIFACES; I++)
 #define BREAK_IF_LOOP           break;
 #define CONTINUE_IF_LOOP        continue;
 #define CONTINUE_IF_LOOP_FAIL   continue;
-#elif (CFG_NIFACES == 1)
-#define LOOP_THRU_IFACES(I) I = 0;
-#define BREAK_IF_LOOP
-#define CONTINUE_IF_LOOP      return;
-#define CONTINUE_IF_LOOP_FAIL return(-1);
 #endif
 
 #if (INCLUDE_MALLOC_DCU_INIT && INCLUDE_MALLOC_DCU_AS_NEEDED)

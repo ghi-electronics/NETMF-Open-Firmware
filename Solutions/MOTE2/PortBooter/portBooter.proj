@@ -119,6 +119,10 @@
     <DriverLibs Include="COM_pal.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
+    <DriverLibs Include="DebuggerPort_SSL_config_stubs.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Config\dotnetmf.proj" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\I2C\stubs\dotNetMF.proj" />
     <DriverLibs Include="i2c_pal_stubs.$(LIB_EXT)" />
   </ItemGroup>

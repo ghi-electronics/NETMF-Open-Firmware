@@ -1,5 +1,5 @@
 #include <tinyhal.h>
-#include "net_decl.h"
+#include "net_decl_lwip.h"
 #include "loopback_lwip_driver.h"
  
 #include "netif\etharp.h"

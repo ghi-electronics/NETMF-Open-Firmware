@@ -19,6 +19,7 @@ namespace Microsoft.SPOT.Platform.Tests
             Log.Comment("These tests might create a directory DOTNETMF_FS_EMULATION in the location where the test solution is");
 
             IOTests.Tests = new string[]{
+                "VolumeLabelTests",
                 "DirectoryTests",
                 "PathTests",
                 "FileTests",

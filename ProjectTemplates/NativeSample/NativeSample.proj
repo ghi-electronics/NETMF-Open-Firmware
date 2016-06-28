@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>NativeSample</AssemblyName>
     <ProjectGuid>
@@ -26,7 +27,6 @@
     <ExtraTargets>BuildSigFiles</ExtraTargets>
     <EXEScatterFileDefinition>$(SRC_DIR)\scatterfile_tools_$(COMPILER_TOOL).xml</EXEScatterFileDefinition>
   </PropertyGroup>
-  <ItemGroup />
   <ItemGroup>
     <Compile Include="NativeSample.cpp" />
     <ScatterFileReferences Include="$(SRC_DIR)\scatterfile_tools_$(COMPILER_TOOL).xml" />
@@ -36,5 +36,17 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Test\native\src\dotnetmf.proj" />
     <DriverLibs Include="Native.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\devicecode\include\tests.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\gpio\gpio.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\log\log.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\ramtest\ramtest.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\spi\eeprom_stm95x.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\spi\spi.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\timedevents\timedevents.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\timers\timers.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\uart\uart.h" />
+    <HFiles Include="nativesample.h" />
   </ItemGroup>
 </Project>

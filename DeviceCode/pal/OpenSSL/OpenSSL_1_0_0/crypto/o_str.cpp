@@ -97,7 +97,7 @@ int OPENSSL_strcasecmp(const char *str1, const char *str2)
 #if defined(OPENSSL_IMPLEMENTS_strncasecmp)
 	return OPENSSL_strncasecmp(str1, str2, (size_t)-1);
 #else
-	return strcasecmp(str1, str2);
+	return TINYCLR_SSL_STRCASECMP(str1, str2);
 #endif
 	}
 

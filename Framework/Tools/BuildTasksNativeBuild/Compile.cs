@@ -91,6 +91,15 @@ namespace Microsoft.SPOT.Tasks.NativeBuild
             set { tool = value; }
         }
 
+        private string m_headers = "";
+
+        public string HeaderFiles
+        {
+            get { return m_headers; }
+            set { m_headers = value; }
+        }
+     
+        
         protected string outputExtension;
 
         string BaseName(string inputFile)
@@ -357,7 +366,55 @@ namespace Microsoft.SPOT.Tasks.NativeBuild
             {
                 bool firstFile = true;
                 // iterate throught the input files
-                string[] inputs = InputFiles.Split(new char[1] { ';' });
+                string[] inputs = InputFiles.Split(';' );
+                string[] headers = HeaderFiles.Split(';');
+                string[] paths = IncludePaths.Split(';');
+
+                bool hdrsChanged = false;
+
+                if (headers.Length > 0 && inputs.Length > 0 && File.Exists(inputs[0]))
+                {
+                    string outFile = OutputFileName(inputs[0]);
+
+                    if (File.Exists(outFile))
+                    {
+                        DateTime last = File.GetLastWriteTime(outFile);
+
+                        for (int i = headers.Length - 1; i >= 0; i--)
+                        {
+                            string hdr = headers[i];
+                            if (!Path.IsPathRooted(hdr))
+                            {
+                                int cnt = paths.Length;
+                                for (int j = 0; j < cnt; j++)
+                                {
+                                    string fp = Path.Combine(paths[j], hdr);
+
+                                    if (File.Exists(fp))
+                                    {
+                                        hdr = fp;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (File.Exists(hdr))
+                            {
+                                if (File.GetLastWriteTime(hdr) > last)
+                                {
+                                    hdrsChanged = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        hdrsChanged = true;
+                    }
+                }
+
+
                 foreach (string inputFile in inputs)
                 {
                     if (!File.Exists(inputFile))
@@ -374,7 +431,7 @@ namespace Microsoft.SPOT.Tasks.NativeBuild
                         return false;
                     }
 
-                    if (MustRebuild(outfile, inputFile))
+                    if (hdrsChanged || MustRebuild(outfile, inputFile))
                     {
                         File.Delete(outfile);
                         if (!Process(inputFile, outfile, firstFile))

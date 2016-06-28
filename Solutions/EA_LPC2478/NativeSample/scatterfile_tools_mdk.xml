@@ -15,27 +15,27 @@
     <If Name="TARGETLOCATION" Value="FLASH">
 
         <!-- LPC2478 has 504K of 32-bit On-Chip FLASH at 0x00000000 -->
-        <Set Name="Config_BaseAddress"        Value="0x803DF000"/>		
-        <Set Name="Config_Size"               Value="0x00001000"/>		
-        <Set Name="Code_BaseAddress"          Value="0x00000000"/>
+        <Set Name="Config_BaseAddress"        Value="0x803DF000"/>      
+        <Set Name="Config_Size"               Value="0x00001000"/>      
+        <Set Name="Code_BaseAddress"          Value="0x80000000"/>
         <Set Name="Code_Size"                 Value="0x00080000"/>        
         <Set Name="ER_RAM_RO_BaseAddress"     Value="0xA0000000"/>    
         <Set Name="ER_RAM_RO_Size"            Value="%Heap_Begin%-%ER_RAM_RO_BaseAddress%"/>    
         <Set Name="Valid"                     Value="true"/>
 
         <!-- -->
-		
-		<!-- use internal SRAM for fast execution of application-critical tasks-->
-		<Set Name="IRAM_TC_BaseAddress"	  Value="0x40000040"/>	<!-- skip SRAM vector table -->
-		<Set Name="IRAM_TC_Size"		  Value="0x4000FFFF-%IRAM_TC_BaseAddress%"/>	<!-- Fill up SRAM -->
-		
-		<!-- use internal FLASH for fast execution of application-critical tasks. Just RO code and data! -->
-		<Set Name="IFLASH_TC_BaseAddress"	  Value="0x00020000"/>-->	<!-- skip TinyBooterDecompressor (0x185b0 bytes) -->
-		<Set Name="IFLASH_TC_Size"		  Value="0x5D000"/>-->	
         
-        <IfDefined Name="ALTERNATEFLASHLOCATION">
-            <Set Name="Code_BaseAddress" Value="%Code_BaseAddress%"/>
-        </IfDefined>
+        <!-- use internal SRAM for fast execution of application-critical tasks-->
+        <Set Name="IRAM_TC_BaseAddress"   Value="0x40000040"/>  <!-- skip SRAM vector table -->
+        <Set Name="IRAM_TC_Size"          Value="0x4000FFFF-%IRAM_TC_BaseAddress%"/>    <!-- Fill up SRAM -->
+        
+        <!-- use internal FLASH for fast execution of application-critical tasks. Just RO code and data! -->
+        <Set Name="IFLASH_TC_BaseAddress"     Value="0x00020000"/>-->   <!-- skip TinyBooterDecompressor (0x185b0 bytes) -->
+        <Set Name="IFLASH_TC_Size"        Value="0x5D000"/>-->  
+        
+        <If Name="ALTERNATEFLASHLOCATION" Value="True">
+            <Set Name="Code_BaseAddress" Value="%Code_BaseAddress + Code_Size%"/>
+        </If>
 
     </If>
 
@@ -45,6 +45,11 @@
         <Set Name="ER_RAM_RO_BaseAddress"     Value="0xA0000000"/>    
         <Set Name="ER_RAM_RO_Size"            Value="0x50000"/>           
         <Set Name="Valid"                     Value="true"/>
+
+        <!-- use internal SRAM for fast execution of application-critical tasks-->
+        <Set Name="IRAM_TC_BaseAddress"   Value="0x40000040"/>  <!-- skip SRAM vector table -->
+        <Set Name="IRAM_TC_Size"          Value="0x4000FFFF-%IRAM_TC_BaseAddress%"/>    <!-- Fill up SRAM -->
+
 
     </If>
 
@@ -66,6 +71,12 @@
             <FileMapping Name="*" Options="(SectionForBootstrapOperations)" />
             <FileMapping Name="*" Options="(+RO-CODE)" />
             <FileMapping Name="*" Options="(+RO-DATA)" />
+            <IfNotDefined Name="Config_BaseAddress">
+               <FileMapping Name="*" Options="(SectionForConfig)" />
+            </IfNotDefined>
+            <IfNotDefined Name="IFLASH_TC_BaseAddress">
+                <FileMapping Name="*" Options="(SectionForInternalFLASH)" />
+            </IfNotDefined>
 
         </ExecRegion>
 
@@ -88,16 +99,17 @@
         <ExecRegion Name="ER_IRAM" Base="0x40000000" Options="ABSOLUTE" Size="0x40">
             <FileMapping Name="VectorsTrampolines.obj" Options="(+RO, +FIRST)" /> <!-- for vector handlers to be far from the vectors -->
         </ExecRegion>
-		
-		<!-- Internal SRAM regions for time-critical data and code -->
-		
-		<ExecRegion Name="ER_IRAM_TC" Base="%IRAM_TC_BaseAddress%" Options="ABSOLUTE" Size="%IRAM_TC_Size%">
-			
-			<FileMapping Name="*" Options="(SectionForInternalSRAM)" />
-			
-		</ExecRegion>
-		
-		
+        
+        <!-- Internal SRAM regions for time-critical data and code -->
+
+        <IfDefined Name="IRAM_TC_BaseAddress">
+        
+          <ExecRegion Name="ER_IRAM_TC" Base="%IRAM_TC_BaseAddress%" Options="ABSOLUTE" Size="%IRAM_TC_Size%">
+            
+            <FileMapping Name="*" Options="(SectionForInternalSRAM)" />
+            
+          </ExecRegion>
+        </IfDefined>    
 
         <ExecRegion Name="ER_HEAP_BEGIN" Base="%Heap_Begin%" Options="ABSOLUTE" Size="UNINIT">
             <FileMapping Name="*" Options="(SectionForHeapBegin)" />
@@ -121,14 +133,14 @@
         </ExecRegion>
 
     </LoadRegion>
-	
-	<IfDefined Name="IFLASH_TC_BaseAddress">
+    
+    <IfDefined Name="IFLASH_TC_BaseAddress">
 
         <LoadRegion Name="LR_IFLASH" Base="%IFLASH_TC_BaseAddress%" Options="ABSOLUTE" Size="%IFLASH_TC_Size%">
 
             <ExecRegion Name="ER_IFLASH" Base="%IFLASH_TC_BaseAddress%" Options="FIXED" Size="%IFLASH_TC_Size%">
 
-				<FileMapping Name="*" Options="(SectionForInternalFLASH)" />
+                <FileMapping Name="*" Options="(SectionForInternalFLASH)" />
 
             </ExecRegion>
 

@@ -60,9 +60,12 @@
 #ifndef HEADER_PQUEUE_H
 #define HEADER_PQUEUE_H
 
+ #include <openssl/opensslconf.h>
+#ifdef OPENSSL_SYS_WINDOWS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#endif
 
 typedef struct _pqueue *pqueue;
 

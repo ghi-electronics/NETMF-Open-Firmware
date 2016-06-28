@@ -80,28 +80,21 @@
 
 //--//
 
-#if defined(BUILD_RTM)
-        #define MEMORY_BLOCKTYPE_SPECIAL  BlockRange::BLOCKTYPE_DEPLOYMENT
-#else
-        #define MEMORY_BLOCKTYPE_SPECIAL  BlockRange::BLOCKTYPE_FILESYSTEM
-#endif
-
-//--//
-
 
 const BlockRange g_I28F640J3_16_BlockRange[] =
 {
-    { BlockRange::BLOCKTYPE_BOOTSTRAP    ,  0,  0 },   // TinyBooter
-    { MEMORY_BLOCKTYPE_GCC_BOOTSTRAP_CODE,  1,  1 },   // TinyCLR runtime
-    { BlockRange::BLOCKTYPE_CODE         ,  2,  7 },   // TinyCLR runtime
+    { BlockRange::BLOCKTYPE_BOOTSTRAP    ,  0,   0 },   // TinyBooter
+    { MEMORY_BLOCKTYPE_GCC_BOOTSTRAP_CODE,  1,   1 },   // TinyCLR runtime
+    { BlockRange::BLOCKTYPE_CODE         ,  2,  13 },   // TinyCLR runtime
 
-    { MEMORY_BLOCKTYPE_GCC_SPECIAL_CODE,  8,  16 },   // TinyCLR runtime 
-    { BlockRange::BLOCKTYPE_DEPLOYMENT , 17, 20 },   // TinyCLR runtime
+    { MEMORY_BLOCKTYPE_GCC_SPECIAL_CODE, 14, 20 },   // TinyCLR runtime 
     { BlockRange::BLOCKTYPE_DEPLOYMENT , 21, 30 },   // TinyCLR runtime
     { BlockRange::BLOCKTYPE_DEPLOYMENT , 31, 40 },   // TinyCLR runtime
     { BlockRange::BLOCKTYPE_DEPLOYMENT , 41, 50 },   // TinyCLR runtime
+    { BlockRange::BLOCKTYPE_DEPLOYMENT , 51, 58 },        
 
-    { MEMORY_BLOCKTYPE_SPECIAL         , 51, 60 },        
+    { BlockRange::BLOCKTYPE_SIMPLE_A   , 59, 59 },        
+    { BlockRange::BLOCKTYPE_SIMPLE_B   , 60, 60 },        
     { BlockRange::BLOCKTYPE_STORAGE_A  , 61, 61 },    
     { BlockRange::BLOCKTYPE_STORAGE_B  , 62, 62 }, 
     { BlockRange::BLOCKTYPE_CONFIG     , 63, 63 }    // g_ConfigurationSector

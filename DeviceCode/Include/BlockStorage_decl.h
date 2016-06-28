@@ -142,9 +142,15 @@ struct BlockUsage
     static const UINT32 FILESYSTEM  = 0x0040;    
 
     static const UINT32 DEPLOYMENT  = 0x0050; 
-    static const UINT32 DAT         = 0x0080;     
+
+    static const UINT32 UPDATE      = 0x0060;
+
+    static const UINT32 SIMPLE_A    = 0x0090;
+    static const UINT32 SIMPLE_B    = 0x00A0;
+    
     static const UINT32 STORAGE_A   = 0x00E0;
     static const UINT32 STORAGE_B   = 0x00F0;
+
 
     static const UINT32 ANY         = 0x0000;
 };
@@ -181,11 +187,28 @@ public:
 
     static const UINT32 BLOCKTYPE_BOOTSTRAP  = EXECUTABLE     | RESERVED | DATATYPE_NATIVECODE  | BlockUsage::BOOTSTRAP;  // Boot loader and boot strap code
     static const UINT32 BLOCKTYPE_CODE       = EXECUTABLE     | RESERVED | DATATYPE_NATIVECODE  | BlockUsage::CODE;       // CLR or other native code "application"
-    static const UINT32 BLOCKTYPE_DAT        =                  RESERVED | DATATYPE_MANAGEDCODE | BlockUsage::DAT;        // Built-In managed code
     static const UINT32 BLOCKTYPE_DEPLOYMENT =                  RESERVED | DATATYPE_MANAGEDCODE | BlockUsage::DEPLOYMENT; // Deployment area for MFdeploy & Visual Studio
+    static const UINT32 BLOCKTYPE_SIMPLE_A   =                  RESERVED | DATATYPE_RAW         | BlockUsage::SIMPLE_A;   // Part A of Simple Storage
+    static const UINT32 BLOCKTYPE_SIMPLE_B   =                  RESERVED | DATATYPE_RAW         | BlockUsage::SIMPLE_B;   // Part B of Simple Storage
     static const UINT32 BLOCKTYPE_STORAGE_A  =                  RESERVED | DATATYPE_RAW         | BlockUsage::STORAGE_A;  // Part A of EWR Storage
     static const UINT32 BLOCKTYPE_STORAGE_B  =                  RESERVED | DATATYPE_RAW         | BlockUsage::STORAGE_B;  // Part B of EWR Storage
     static const UINT32 BLOCKTYPE_FILESYSTEM =                             DATATYPE_RAW         | BlockUsage::FILESYSTEM; // File System
+    static const UINT32 BLOCKTYPE_UPDATE     =                  RESERVED | DATATYPE_RAW         | BlockUsage::UPDATE;     // Used for MFUpdate for firmware/assembly/etc updates
+
+    static BOOL IsBlockTinyBooterAgnostic( UINT32 BlockType )
+    {
+        // The only blocks that should be distinguished by TinyBooter are CONFIG, 
+        // Bootstrap and reserved blocks (DirtyBit is another version of CONFIG).
+        if( BlockType == BlockRange::BLOCKTYPE_BOOTSTRAP || 
+            BlockType == BlockRange::BLOCKTYPE_CONFIG    ||
+            BlockType == BlockRange::BLOCKTYPE_RESERVED  ||
+            BlockType == BlockRange::BLOCKTYPE_DIRTYBIT)
+        {
+            return FALSE;
+        }    
+
+        return TRUE;        
+    }
     
     BOOL IsReserved() const      { return ((RangeType & RESERVED) == RESERVED);       }
     BOOL IsReadOnly() const      { return ((RangeType & READONLY) == READONLY);       }
@@ -198,7 +221,6 @@ public:
     BOOL IsDirtyBit() const         { return ((RangeType & BLOCKTYPE_CONFIG) == BLOCKTYPE_DIRTYBIT);}
     BOOL IsConfig() const           { return ((RangeType & BLOCKTYPE_CONFIG) == BLOCKTYPE_CONFIG); }
     BOOL IsDeployment() const  { return ((RangeType & USAGE_MASK) == BlockUsage::DEPLOYMENT);}
-    BOOL IsDAT() const              { return ((RangeType & USAGE_MASK) == BlockUsage::DAT); }
     BOOL IsFileSystem() const     { return ((RangeType & USAGE_MASK) == BlockUsage::FILESYSTEM); }
     UINT32 GetBlockCount() const    { return (EndBlock - StartBlock + 1); }
 
@@ -207,7 +229,7 @@ public:
     //       the Native code application and the DAT section. Obviously these inlines can be
     //       altered or added upon to test for any combination of the flags as desired but seperating
     //       the DAT region out on it's own allows for locating ANY managed code sections of storage
-    BOOL IsLegacyCode() const    { return (IsCode() || IsDAT());     }
+    BOOL IsLegacyCode() const    { return (IsCode());     }
     UINT32 GetBlockUsage() const { return (RangeType & USAGE_MASK); }
 
         
@@ -276,6 +298,7 @@ struct MediaAttribute
     BOOL SupportsXIP:1;
     BOOL WriteProtected:1;
     BOOL SupportsCopyBack:1;
+    BOOL ErasedBitsAreZero:1;
 };
     
 ///////////////////////////////////////////////////////////
@@ -296,7 +319,7 @@ struct BlockDeviceInfo
     UINT32 BytesPerSector;         
 
     // Total Size
-    UINT32 Size;
+    ByteAddress Size;
 
     // count of regions in the flash.
     UINT32 NumRegions;
@@ -563,7 +586,6 @@ struct IBlockStorageDevice
     UINT32 (*MaxSectorWrite_uSec)(void*);
 
     UINT32 (*MaxBlockErase_uSec)(void*);
-   
 };
 
 
@@ -792,6 +814,9 @@ struct BlockStorageStream
     static const INT32 STREAM_SEEK_NEXT_BLOCK = 0x7FFFFFFF;
     static const INT32 STREAM_SEEK_PREV_BLOCK = 0x7FFFFFFE;
 
+    static const UINT32 c_BlockStorageStream__XIP          = 0x00000001;
+    static const UINT32 c_BlockStorageStream__ReadModWrite = 0x00000002;
+    
     enum SeekOrigin
     {
         SeekBegin   = 0,
@@ -802,18 +827,22 @@ struct BlockStorageStream
 
     //--//
     
-    UINT32 BaseAddress;
+    ByteAddress BaseAddress;
     UINT32 CurrentIndex;
     UINT32 Length;
     UINT32 BlockLength;
     UINT32 Usage;
     UINT32 RegionIndex;
     UINT32 RangeIndex;
-    BOOL   IsXIP;
+    UINT32 Flags;
     UINT32 CurrentUsage;
     BlockStorageDevice *Device;
 
     //--//
+
+    BOOL IsXIP()            { return 0 != (Flags & c_BlockStorageStream__XIP);          }
+    BOOL IsReadModifyWrite() { return 0 != (Flags & c_BlockStorageStream__ReadModWrite); }
+    void SetReadModifyWrite(){ Flags |= c_BlockStorageStream__ReadModWrite;              }
 
     BOOL Initialize(UINT32 blockUsage); 
     BOOL Initialize(UINT32 blockUsage, BlockStorageDevice* pDevice); 
@@ -825,6 +854,7 @@ struct BlockStorageStream
     BOOL ReadIntoBuffer( UINT8*  pBuffer, UINT32 length );
     BOOL Read( UINT8** ppBuffer, UINT32 length );
     UINT32 CurrentAddress();
+    BOOL IsErased( UINT32 length );
 };
     
 // -- global List

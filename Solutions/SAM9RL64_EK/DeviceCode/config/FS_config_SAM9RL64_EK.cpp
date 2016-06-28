@@ -42,7 +42,7 @@ void FS_AddVolumes()
 	   pLogicDisk = FAT_LogicDisk::Initialize(&(pFSVolume->m_volumeId));
 	   if (pLogicDisk== NULL)
 	   {
-	       pFSVolume->Format(FORMAT_PARAMETER_FORCE_FAT32);  
+	       pFSVolume->Format("", FORMAT_PARAMETER_FORCE_FAT32);  
 		 
 	   }
 	   else

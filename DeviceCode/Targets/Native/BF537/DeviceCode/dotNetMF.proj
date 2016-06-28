@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>BlackfinHal_native</AssemblyName>
     <Size>
@@ -40,16 +41,16 @@
   <PropertyGroup />
   <ItemGroup>
     <FastCompileCPPFile Include="blackfinhal_native_fastcompile.cpp" />
-    <HFiles Include="..\include\tinyhal.h" />
     <Compile Include="configuration.cpp" />
     <Compile Include="cpu.cpp" />
     <Compile Include="crypto.cpp" />
     <Compile Include="GlobalLock.cpp" />
-    <Compile Include="Simpleheap.cpp" />
     <Compile Include="various.cpp" />
     <CFiles Include="Application_heaptab.c" />
     <AssemblyFiles Include="AssemblyCode\Application_basiccrt.s" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\crypto\inc\crypto.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

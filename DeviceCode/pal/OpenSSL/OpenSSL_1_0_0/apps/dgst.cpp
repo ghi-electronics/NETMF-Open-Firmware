@@ -274,7 +274,7 @@ int MAIN(int argc, char **argv)
 		BIO_printf(bio_err,"-verify file    verify a signature using public key in file\n");
 		BIO_printf(bio_err,"-prverify file  verify a signature using private key in file\n");
 		BIO_printf(bio_err,"-keyform arg    key file format (PEM or ENGINE)\n");
-		BIO_printf(bio_err,"-out filename   output to filename rather than OPENSSL_TYPE__FILE_STDOUT\n");
+		BIO_printf(bio_err,"-out filename   output to filename rather than stdout\n");
 		BIO_printf(bio_err,"-signature file signature to verify\n");
 		BIO_printf(bio_err,"-sigopt nm:v    signature parameter\n");
 		BIO_printf(bio_err,"-hmac key       create hashed MAC with key\n");
@@ -489,7 +489,7 @@ int MAIN(int argc, char **argv)
 		{
 		BIO_set_fp(in,OPENSSL_TYPE__FILE_STDIN,BIO_NOCLOSE);
 		err=do_fp(out, buf,inp,separator, out_bin, sigkey, sigbuf,
-			  siglen,NULL,NULL,"OPENSSL_TYPE__FILE_STDIN",bmd);
+			  siglen,NULL,NULL,"stdin",bmd);
 		}
 	else
 		{

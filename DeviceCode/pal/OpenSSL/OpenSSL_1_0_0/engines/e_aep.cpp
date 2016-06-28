@@ -71,6 +71,8 @@ typedef int pid_t;
 #if defined(OPENSSL_SYS_NETWARE) && defined(NETWARE_CLIB)
 #define getpid GetThreadID
 extern int GetThreadID(void);
+#elif defined(_WIN32) && !defined(__WATCOMC__)
+#define getpid _getpid
 #endif
 
 #include <openssl/crypto.h>
@@ -870,10 +872,8 @@ static AEP_RV aep_get_connection(AEP_CONNECTION_HNDL_PTR phConnection)
 
 	CRYPTO_w_lock(CRYPTO_LOCK_ENGINE);
 
-#ifdef NETWARE_CLIB
-	curr_pid = GetThreadID();
-#elif defined(_WIN32)
-	curr_pid = _getpid();
+#if defined(_WIN32)
+	curr_pid = getpid();
 #else
 	curr_pid = TINYCLR_SSL_GETPID();
 #endif

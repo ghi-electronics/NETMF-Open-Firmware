@@ -26,12 +26,14 @@
 #error You must define a NETWORK_MEMORY_PROFILE_LWIP_xxx for this platform
 #endif
 
+#define TCPIP_LWIP 1
+
 /* min, default, max configuration for lwIP. Values have initially 
 been taken from lwiopts.small.h, lwipopts.h and lwipopts.big.h */
 
 /* MEM_SIZE: the size of the heap memory. If the application will send
 a lot of data that needs to be copied, this should be set high. */
-#define MEM_SIZE__min                       (10*1024)
+#define MEM_SIZE__min                       (16*1024)
 #define MEM_SIZE__default                   (64*1024)
 #define MEM_SIZE__max                       (1024*1024)  // TODO - this seems a bit extreme
 
@@ -56,7 +58,7 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP
    connections. */
-#define MEMP_NUM_TCP_PCB_LISTEN__min        8
+#define MEMP_NUM_TCP_PCB_LISTEN__min        5
 #define MEMP_NUM_TCP_PCB_LISTEN__default    8
 #define MEMP_NUM_TCP_PCB_LISTEN__max        12
 
@@ -73,7 +75,7 @@ a lot of data that needs to be copied, this should be set high. */
 #define MEMP_NUM_SYS_TIMEOUT__max           16
 
 /* MEMP_NUM_NETBUF: the number of struct netbufs. */
-#define MEMP_NUM_NETBUF__min                6
+#define MEMP_NUM_NETBUF__min                8
 #define MEMP_NUM_NETBUF__default            16
 #define MEMP_NUM_NETBUF__max                32
 
@@ -89,7 +91,7 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool. */
 #define PBUF_POOL_BUFSIZE__min              512
-#define PBUF_POOL_BUFSIZE__default          512
+#define PBUF_POOL_BUFSIZE__default          1024
 #define PBUF_POOL_BUFSIZE__max              2048
 
 /* TCP Maximum segment size. */
@@ -109,8 +111,8 @@ a lot of data that needs to be copied, this should be set high. */
 #define TCP_SND_QUEUELEN__max               (8*TCP_SND_BUF/TCP_MSS)
 
 /* TCP receive window. */
-#define TCP_WND__min                        1024
-#define TCP_WND__default                    8192
+#define TCP_WND__min                        (2*1024)
+#define TCP_WND__default                    (8*1024)
 #define TCP_WND__max                        (32*1024)
 
 /* TCP writable space (bytes). This must be less than or equal
@@ -179,6 +181,8 @@ a lot of data that needs to be copied, this should be set high. */
     #define PLATFORM_DEPENDENT__TCP_WND                         TCP_WND__max
     #define PLATFORM_DEPENDENT__TCP_SNDLOWAT                    TCP_SNDLOWAT__max
 #endif
+
+#define PLATFORM_DEPENDENT__SOCKETS_MAX_COUNT                   (PLATFORM_DEPENDENT__MEMP_NUM_UDP_PCB + PLATFORM_DEPENDENT__MEMP_NUM_TCP_PCB)                                     
 
 #endif // _DRIVERS_NETWORK_DEFINES_LWIP_H_
 

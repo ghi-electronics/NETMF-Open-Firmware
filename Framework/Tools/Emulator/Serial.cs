@@ -17,6 +17,8 @@ namespace Microsoft.SPOT.Emulator.Serial
 {
     internal class SerialDriver : HalDriver<ISerialDriver>, ISerialDriver
     {
+        OnSerialPortEvtHandler _evtHandler;
+
         private ComPort GetComPort( int serialPortNum )
         {
             // serialPortNum is 0-based (i.e. COM1 is 0, COM2 is 1) and ComPortHandle is 1-based (COM1 is (Usart, 1), COM2 is (Usart, 2))
@@ -84,27 +86,25 @@ namespace Microsoft.SPOT.Emulator.Serial
 
         bool ISerialDriver.AddCharToRxBuffer(int ComPortNum, char c)
         {
-            throw new Exception("The method or operation is not implemented.");
+            return false;
         }
 
         bool ISerialDriver.RemoveCharFromTxBuffer(int ComPortNum, ref char c)
         {
-            throw new Exception("The method or operation is not implemented.");
+            return false;
         }
 
         byte ISerialDriver.PowerSave(int ComPortNum, byte Enable)
         {
-            throw new Exception("The method or operation is not implemented.");
+            return 0;
         }
 
         void ISerialDriver.PrepareForClockStop()
         {
-            throw new Exception("The method or operation is not implemented.");
         }
 
         void ISerialDriver.ClockStopFinished()
         {
-            throw new Exception("The method or operation is not implemented.");
         }
 
         void ISerialDriver.CloseAllPorts()
@@ -135,8 +135,25 @@ namespace Microsoft.SPOT.Emulator.Serial
         
         void ISerialDriver.DiscardBuffer( int serialPortNum, bool fRx )
         {
-            // this function is not implemented now
-            throw new Exception("The method or operation is not implemented.");
+            if (fRx)
+            {
+                byte[] buf = new byte[1024];
+
+                ComPortToStream port = GetComPort(serialPortNum) as ComPortToStream;
+
+                if (port != null)
+                {
+                    while (port.AvailableBytes > 0)
+                    {
+                        port.DeviceRead(buf);
+                    }
+
+                    while (port._fifoToDevice.Available > 0)
+                    {
+                        port._fifoToDevice.Read(buf, 0, buf.Length);
+                    }
+                }
+            }
         }
         
         uint ISerialDriver.PortsCount()
@@ -173,6 +190,20 @@ namespace Microsoft.SPOT.Emulator.Serial
 
             BaudrateHz = comPort.MaxBaudrateHz;
             return false;
+        }
+
+        bool ISerialDriver.SetDataEventHandler(int serialPortNum, IntPtr handler )
+        {
+            _evtHandler = (OnSerialPortEvtHandler)Marshal.GetDelegateForFunctionPointer(handler, typeof(OnSerialPortEvtHandler));
+
+            ISerialPortToStream serialPort = GetComPort(serialPortNum) as ISerialPortToStream;
+
+            if(serialPort != null)
+            {
+                serialPort.SetDataEventHandler(new OnEmuSerialPortEvtHandler(_evtHandler));
+            }
+
+            return true;
         }
 
 

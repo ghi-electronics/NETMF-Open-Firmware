@@ -30,7 +30,17 @@ unsigned int Events_WaitForEvents( unsigned int powerLevel, unsigned int,unsigne
 
 void Events_SetBoolTimer( int *,unsigned int ) {}
 
-int DebuggerPort_Flush( int ) { return 0; }
+BOOL DebuggerPort_Flush( int ) { return FALSE; }
+
+BOOL DebuggerPort_IsSslSupported( COM_HANDLE ComPortNum ) { return FALSE; }
+
+BOOL DebuggerPort_UpgradeToSsl( COM_HANDLE ComPortNum, UINT32 flags ) { return FALSE; }
+
+BOOL DebuggerPort_IsUsingSsl( COM_HANDLE ComPortNum )
+{
+    return FALSE;
+}
+
 
 // ----------------------------------------------------------
 

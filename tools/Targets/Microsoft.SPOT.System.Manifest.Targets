@@ -11,7 +11,7 @@
 
     <Target Name="CreateLibManifest"
         Condition=" '@(TargetLib)' != '' "
-        Inputs="$(ProjectFile)"
+        Inputs="$(ProjectFile);%(TargetLib.FullPath)"
         Outputs="%(TargetLib.FullPath).manifest"
         >
 

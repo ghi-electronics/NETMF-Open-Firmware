@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <AssemblyName>tinyclr</AssemblyName>
@@ -29,13 +30,20 @@
   <Import Project="$(SPOCLIENT)\Framework\Features\NativeEventDispatcher.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\InterruptHandler.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\SerialPort.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Crypto.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\DataStorage.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\Debugger.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Diagnostics.featureproj"/>
+  <Import Project="$(SPOCLIENT)\Framework\Features\Diagnostics.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\Serialization.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\Network.featureproj" />
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Interop.Settings" />
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\MFUpdate\stubs\dotnetMF.proj" />
+    <DriverLibs Include="MFUpdate_PAL_stub.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\ssl\stubs\dotNetMF.proj" />
+    <DriverLibs Include="ssl_pal_stubs.$(LIB_EXT)" />
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Diagnostics\dotNetMF.proj" Condition="'$(FLAVOR)'!='rtm'" />
     <PlatformIndependentLibs Include="Diagnostics.$(LIB_EXT)" Condition="'$(FLAVOR)'!='rtm'" />
@@ -53,15 +61,11 @@
     <PlatformIndependentLibs Include="Debugger_minimal.$(LIB_EXT)" Condition="'$(FLAVOR)'=='rtm'" />
   </ItemGroup>
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\drivers\LargeBuffer\stubs\dotnetmf.proj"/>
-    <DriverLibs Include="LargeBuffer_hal_stubs.$(LIB_EXT)"/>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\drivers\LargeBuffer\stubs\dotnetmf.proj" />
+    <DriverLibs Include="LargeBuffer_hal_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <PlatformIndependentLibs Include="SPOT.$(LIB_EXT)" />
-  </ItemGroup>
-  <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT\SPOT_Crypto\dotNetMF.proj" />
-    <PlatformIndependentLibs Include="SPOT_Crypto.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT_Graphics\dotNetMF.proj" />
@@ -204,6 +208,10 @@
     <DriverLibs Include="COM_pal.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
+    <DriverLibs Include="DebuggerPort_SSL_config_stubs.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Config\dotnetmf.proj" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\COM\USB\dotnetmf.proj" />
     <DriverLibs Include="usb_pal.$(LIB_EXT)" />
   </ItemGroup>
@@ -291,6 +299,10 @@
     <DriverLibs Include="cpu_cache_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_DA\dotnetmf.proj" />
+    <DriverLibs Include="cpu_DA_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_GPIO\dotnetmf.proj" />
     <DriverLibs Include="cpu_gpio_stubs.$(LIB_EXT)" />
   </ItemGroup>
@@ -305,10 +317,6 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_Power\dotnetmf.proj" />
     <DriverLibs Include="cpu_power_stubs.$(LIB_EXT)" />
-  </ItemGroup>
-  <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_Security\dotnetmf.proj" />
-    <DriverLibs Include="cpu_security_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_SPI\dotnetmf.proj" />
@@ -341,6 +349,10 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\stubs\Processor\stubs_Bootstrap\dotnetmf.proj" />
     <DriverLibs Include="cpu_bootstrap_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\stubs\Processor\stubs_PWM\dotnetmf.proj" />
+    <DriverLibs Include="cpu_pwm_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\COM\Sockets\Stubs\dotnetmf.proj" />
@@ -380,6 +392,10 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Diagnostics\dotnetmf.proj" />
     <DriverLibs Include="diagnostics_pal.$(LIB_EXT)" />
   </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Double\dotNetMF.proj" />
+    <DriverLibs Include="native_double_pal.$(LIB_EXT)" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
   <Target Name="IsMemorySupported">
     <Error Condition="'$(MEMORY)'!='RAM' and '$(MEMORY)'!='FLASH'" Text="Unsupported memory target $(MEMORY)!" />
@@ -393,5 +409,8 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\TimeService\stubs\dotNetMF.proj" />
     <DriverLibs Include="TimeService_pal_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_application.h" />
   </ItemGroup>
 </Project>

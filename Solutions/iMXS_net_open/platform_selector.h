@@ -32,6 +32,8 @@
 //  IMXS SOCKETS ENABLED PLATFORM -- TODO TODO TODO: REMOVE WHEN PLATFORM BUILDER AVAILABLE
 //
 
+#define PLATFORM_DEPENDENT__UPDATE_SIGNATURE_SIZE 256
+
 #if !defined(HAL_REDUCESIZE)
 #define iMXS_net_open_SOCKETS_ENABLED               1
 #endif
@@ -45,7 +47,7 @@
 #define NETWORK_MEMORY_PROFILE__medium      1
 
 #define NETWORK_MEMORY_POOL__INCLUDE_SSL    1
-#include <pal\net\Network_Defines.h>
+#include <pal\net\Network_Defines_lwip.h>
 
 #define NETWORK_USE_LOOPBACK                1
 #define NETWORK_USE_DHCP                    1
@@ -116,10 +118,18 @@
     
 #define INSTRUMENTATION_H_GPIO_PIN      MC9328MXL_GPIO::c_Pin_None
 
+#if defined(iMXS_net_open_SOCKETS_ENABLED)
     #define DEBUG_TEXT_PORT    USB1
     #define STDIO              USB1
-    #define DEBUGGER_PORT      USB1
-    #define MESSAGING_PORT     USB1
+    #define DEBUGGER_PORT      COM_SOCKET_DBG
+    #define MESSAGING_PORT     COM_SOCKET_DBG
+
+#else
+    #define DEBUG_TEXT_PORT         USB1
+    #define STDIO                   USB1
+    #define DEBUGGER_PORT           USB1
+    #define MESSAGING_PORT          USB1
+#endif
 
 //
 // constants

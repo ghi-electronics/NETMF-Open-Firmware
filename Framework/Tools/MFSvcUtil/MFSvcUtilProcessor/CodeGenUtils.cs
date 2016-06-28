@@ -131,24 +131,6 @@ namespace Ws.SvcUtilCodeGen
                     }
                 }
             }
-            else
-            {
-                foreach (Service svc in servDesc.Services)
-                {
-                    foreach (Port port in svc.Ports)
-                    {
-                        if (port.Name.Contains(portType.Name))
-                        {
-                            if (port.Binding.Name.ToLower().StartsWith("ws"))
-                            {
-                                return true;
-                            }
-
-                            return false;
-                        }
-                    }
-                }
-            }
 
             return false;
         }

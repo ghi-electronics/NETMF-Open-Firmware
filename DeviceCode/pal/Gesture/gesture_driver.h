@@ -6,12 +6,14 @@
 
 void Listener(unsigned int e, unsigned int param);
 
-class GestureDriver
+struct GestureDriver
 {
     static const int c_IgnoreCount = 2;
-protected:
+private:
+    static BOOL      s_initialized;
+
+    
     PalEventListener m_gestureListener;
-    bool             m_initialized;
     HAL_COMPLETION   m_gestureCompletion;
     UINT32           m_index;
     UINT32           m_currentState;
@@ -27,18 +29,11 @@ protected:
 
 
 public:
+    static HRESULT Initialize();
+    static HRESULT Uninitialize();
+    static BOOL ProcessPoint(UINT32 flags, UINT16 source, UINT16 x, UINT16 y, INT64 time);
 
-    GestureDriver()
-    {
-        m_initialized = false;
-    }
-
-
-    HRESULT Initialize();
-    HRESULT Uninitialize();
-    static bool ProcessPoint(UINT32 flags, UINT16 source, UINT16 x, UINT16 y, INT64 time);
-
-    void ResetRecognition();
+    static void ResetRecognition();
     static void EventListener(unsigned int e, unsigned int param);
     static void GestureContinuationRoutine(void *arg);
 

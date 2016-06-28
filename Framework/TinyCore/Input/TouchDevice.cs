@@ -9,17 +9,6 @@ using Microsoft.SPOT.Presentation;
 
 namespace Microsoft.SPOT.Input
 {
-    ///
-    /// IMPORTANT - This must be in sync with code in PAL and also TinyCore
-    ///
-    internal enum TouchMessages : byte
-    {
-        Down = 1,
-        Up = 2,
-        Move = 3,
-    }
-
-
     /// <summary>
     ///     The TouchDevice class represents the stylus/touch device to the
     ///     members of a context.

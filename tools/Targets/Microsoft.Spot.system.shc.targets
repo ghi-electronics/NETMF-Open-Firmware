@@ -153,16 +153,13 @@
 
     <CC_CPP_MARCO_FLAGS  Condition="'$(PATCH_BUILD)'=='Active'"  Include="PATCH_BUILD"/>
     <CC_CPP_MARCO_FLAGS  Condition="'$(OS_PLATFORM)'=='true'"    Include="PLATFORM_ARM_OS_PORT"/> 
-    <CC_CPP_MARCO_FLAGS Condition="'$(PLATFORM_NO_APPDOMAINS)'=='true'"             Include="TINYCLR_NO_APPDOAMINS"/>
-    <CC_CPP_MARCO_FLAGS Condition="'$(PLATFORM_EMULATED_FLOATINGPOINT)'=='true'"    Include="PLATFORM_EMULATED_FLOATINGPOINT"/>
 
     <CC_CPP_MARCO_FLAGS Condition="'$(TCP_IP_STACK)'=='LWIP'"    Include="TCPIP_LWIP"/>
     <CC_CPP_MARCO_FLAGS Condition="'$(TCP_IP_STACK)'=='LWIP'"    Include="PACK_STRUCT_USE_INCLUDES"/>
 
-    <CC_CPP_MARCO_FLAGS Condition="'$(PLATFORM_HEAP_SIZE_THRESHOLD)'!=''"  Include="PLATFORM_DEPENDENT_HEAP_SIZE_THRESHOLD=$(PLATFORM_HEAP_SIZE_THRESHOLD)"/>
-    <CC_CPP_MARCO_FLAGS Condition="'$(PLATFORM_HEAP_SIZE_THRESHOLD_UPPER)'!=''"  Include="PLATFORM_DEPENDENT_HEAP_SIZE_THRESHOLD_UPPER=$(PLATFORM_HEAP_SIZE_THRESHOLD_UPPER)"/>
+    <CC_CPP_MARCO_FLAGS Include="@(TinyCLR_Defines)"/>
 
-
+    <CC_CPP_MARCO_FLAGS Include="@(CC_CPP_Defines)"/>
   </ItemGroup>
   
   <ItemGroup>
@@ -358,7 +355,7 @@
 
 
   <Target Name="ShBuildLib" Condition="'$(OutputType)'=='Library'" DependsOnTargets="FindCompileFilesExistence;FindFastCompileFilesExistence;DelBuildLib;ShCompileC;ShCompileCPP;ShAssemble;CreateLibManifest;$(ExtraTargets);" Inputs="@(ObjFiles);@(LIB_FIRSTENTRY_OBJ);@(OEM_TARGETS);@(OEM_TARGETS_OBJ)" Outputs="@(TargetLib);@(TargetLib->'%(FullPath).manifest')">
-    <Exec Condition="'@(FilesExist)'!='' " Command="$(AR) -form=library $(ARFLAGS)  -list=@(TargetLib->'%(FullPath).lst') -show=SYmbol,SEction -output=@(TargetLib) @(ObjFiles,' ') @(LIB_FIRSTENTRY_OBJ,' ') @(OEM_TARGETS,' ') @(OEM_TARGETS_OBJ,' ')"/>
+    <Exec WorkingDirectory="$(OBJ_DIR)" Condition="'@(FilesExist)'!='' " Command="$(AR) -form=library $(ARFLAGS)  -list=@(TargetLib->'%(FullPath).lst') -show=SYmbol,SEction -output=@(TargetLib) @(ObjFiles->'%(FileName)%(Extension)', ' ') @(LIB_FIRSTENTRY_OBJ,' ') @(OEM_TARGETS,' ') @(OEM_TARGETS_OBJ,' ')"/>
   </Target>
 
 

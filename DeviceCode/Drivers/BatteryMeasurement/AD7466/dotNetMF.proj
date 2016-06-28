@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>AD7466</AssemblyName>
     <ProjectGuid>{89d0cf9a-b2ab-43f0-8d67-69133c67f231}</ProjectGuid>
@@ -40,11 +41,12 @@
   <PropertyGroup />
   <ItemGroup>
     <FastCompileCPPFile Include="AD7466_fastcompile.cpp" />
-    <HFiles Include="AD7466.h" />
     <Compile Include="..\batterymeasurement_config.cpp" />
     <Compile Include="AD7466_driver.cpp" />
     <Compile Include="AD7466_functions.cpp" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="ad7466.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

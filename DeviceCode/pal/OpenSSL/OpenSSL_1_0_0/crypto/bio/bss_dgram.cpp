@@ -317,7 +317,7 @@ static int dgram_read(BIO *b, char *out, int outl)
 #endif
 		if (sizeof(sa.len.i)!=sizeof(sa.len.s) && sa.len.i==0)
 			{
-			OPENSSL_assert(sa.len.s<=sizeof(sa.peer));
+			TINYCLR_SSL_ASSERT(sa.len.s<=sizeof(sa.peer));
 			sa.len.i = (int)sa.len.s;
 			}
 		dgram_reset_rcv_timeout(b);
@@ -352,7 +352,7 @@ static int dgram_write(BIO *b, const char *in, int inl)
 
 		if (data->peer.sa.sa_family == AF_INET)
 			peerlen = sizeof(data->peer.sa_in);
-#if OPENSSL_USE_IVP6
+#if OPENSSL_USE_IPV6
 		else if (data->peer.sa.sa_family == AF_INET6)
 			peerlen = sizeof(data->peer.sa_in6);
 #endif

@@ -9,6 +9,25 @@
 static const CLR_RT_MethodHandler method_lookup[] =
 {
     NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
     Library_spot_touch_native_Microsoft_SPOT_Touch_Ink::SetInkRegion___STATIC__VOID__U4__I4__I4__I4__I4__I4__I4__I4__MicrosoftSPOTGraphicsMicrosoftSPOTBitmap,
     Library_spot_touch_native_Microsoft_SPOT_Touch_Ink::ResetInkRegion___STATIC__VOID,
     NULL,
@@ -39,13 +58,13 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_spot_touch_native_Microsoft_SPOT_Touch_TouchPanel::StartCalibration___VOID,
     Library_spot_touch_native_Microsoft_SPOT_Touch_TouchPanel::GetCalibrationPoint___VOID__I4__BYREF_I4__BYREF_I4,
     Library_spot_touch_native_Microsoft_SPOT_Touch_TouchPanel::EnableInternal___VOID__BOOLEAN,
-    NULL,
+    NULL, 
 };
 
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_Microsoft_SPOT_Touch =
 {
     "Microsoft.SPOT.Touch", 
-    0x4940D53E,
+    0x2D4E2DCC,
     method_lookup
 };
 

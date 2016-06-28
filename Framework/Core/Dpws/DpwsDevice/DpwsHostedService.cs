@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Reflection;
 using System.Text;
 using Dpws.Device.Services;
 using Ws.Services;
@@ -301,7 +302,7 @@ namespace Dpws.Device.Services
             WsServiceOperation operation = m_serviceOperations[action];
             if (operation != null)
             {
-                System.Reflection.MethodInfo methodInfo = this.GetType().GetMethod(operation.MethodName);
+                System.Reflection.MethodInfo methodInfo = this.GetType().GetMethod(operation.MethodName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public);
                 if (methodInfo == null)
                 {
                     System.Ext.Console.Write("");

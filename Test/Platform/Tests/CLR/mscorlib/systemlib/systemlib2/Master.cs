@@ -16,6 +16,7 @@ namespace Microsoft.SPOT.Platform.Tests
         public static void Main()
         {
             string[] args = {  
+                                "Utf8EncodingTests",
                                 "MicrosoftSpotReflectionTests",
                                 "SystemReflectionAssembly", 
                                 "SystemReflectionTypeTests",

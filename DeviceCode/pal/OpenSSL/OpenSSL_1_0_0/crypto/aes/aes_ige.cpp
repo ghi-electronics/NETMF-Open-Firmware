@@ -83,9 +83,9 @@ void AES_ige_encrypt(const unsigned char *in, unsigned char *out,
 	size_t n;
 	size_t len = length;
 
-	OPENSSL_assert(in && out && key && ivec);
-	OPENSSL_assert((AES_ENCRYPT == enc)||(AES_DECRYPT == enc));
-	OPENSSL_assert((length%AES_BLOCK_SIZE) == 0);
+	TINYCLR_SSL_ASSERT(in && out && key && ivec);
+	TINYCLR_SSL_ASSERT((AES_ENCRYPT == enc)||(AES_DECRYPT == enc));
+	TINYCLR_SSL_ASSERT((length%AES_BLOCK_SIZE) == 0);
 
 	len = length / AES_BLOCK_SIZE;
 
@@ -224,9 +224,9 @@ void AES_bi_ige_encrypt(const unsigned char *in, unsigned char *out,
 	const unsigned char *iv;
 	const unsigned char *iv2;
 
-	OPENSSL_assert(in && out && key && ivec);
-	OPENSSL_assert((AES_ENCRYPT == enc)||(AES_DECRYPT == enc));
-	OPENSSL_assert((length%AES_BLOCK_SIZE) == 0);
+	TINYCLR_SSL_ASSERT(in && out && key && ivec);
+	TINYCLR_SSL_ASSERT((AES_ENCRYPT == enc)||(AES_DECRYPT == enc));
+	TINYCLR_SSL_ASSERT((length%AES_BLOCK_SIZE) == 0);
 
 	if (AES_ENCRYPT == enc)
 		{
@@ -262,13 +262,13 @@ void AES_bi_ige_encrypt(const unsigned char *in, unsigned char *out,
 			TINYCLR_SSL_MEMCPY(tmp, out, AES_BLOCK_SIZE);
 			for(n=0 ; n < AES_BLOCK_SIZE ; ++n)
 				out[n] ^= iv[n];
-			/*			hexdump(stdout, "out ^ iv", out, AES_BLOCK_SIZE); */
+			/*			hexdump(OPENSSL_TYPE__FILE_STDOUT, "out ^ iv", out, AES_BLOCK_SIZE); */
 			AES_encrypt(out, out, key);
-			/*			hexdump(stdout,"enc", out, AES_BLOCK_SIZE); */
-			/*			hexdump(stdout,"iv2", iv2, AES_BLOCK_SIZE); */
+			/*			hexdump(OPENSSL_TYPE__FILE_STDOUT,"enc", out, AES_BLOCK_SIZE); */
+			/*			hexdump(OPENSSL_TYPE__FILE_STDOUT,"iv2", iv2, AES_BLOCK_SIZE); */
 			for(n=0 ; n < AES_BLOCK_SIZE ; ++n)
 				out[n] ^= iv2[n];
-			/*			hexdump(stdout,"out", out, AES_BLOCK_SIZE); */
+			/*			hexdump(OPENSSL_TYPE__FILE_STDOUT,"out", out, AES_BLOCK_SIZE); */
 			iv = out;
 			TINYCLR_SSL_MEMCPY(prev, tmp, AES_BLOCK_SIZE);
 			iv2 = prev;

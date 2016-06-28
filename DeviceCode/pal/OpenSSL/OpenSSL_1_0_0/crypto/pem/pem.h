@@ -218,11 +218,11 @@ typedef struct pem_ctx_st
 #define IMPLEMENT_PEM_write_cb_fp_const(name, type, str, asn1) /**/
 
 #else
-
+//MS: cast to match return type
 #define IMPLEMENT_PEM_read_fp(name, type, str, asn1) \
 type *PEM_read_##name(TINYCLR_SSL_FILE *fp, type **x, pem_password_cb *cb, void *u)\
 { \
-return PEM_ASN1_read((d2i_of_void *)d2i_##asn1, str,fp,(void **)x,cb,u); \
+return (type*)PEM_ASN1_read((d2i_of_void *)d2i_##asn1, str,fp,(void **)x,cb,u); \
 } 
 
 #define IMPLEMENT_PEM_write_fp(name, type, str, asn1) \
@@ -254,11 +254,11 @@ int PEM_write_##name(TINYCLR_SSL_FILE *fp, type *x, const EVP_CIPHER *enc, \
 	}
 
 #endif
-
+//MS: cast to match return type
 #define IMPLEMENT_PEM_read_bio(name, type, str, asn1) \
 type *PEM_read_bio_##name(BIO *bp, type **x, pem_password_cb *cb, void *u)\
 { \
-return PEM_ASN1_read_bio((d2i_of_void *)d2i_##asn1, str,bp,(void **)x,cb,u); \
+return (type*)PEM_ASN1_read_bio((d2i_of_void *)d2i_##asn1, str,bp,(void **)x,cb,u); \
 }
 
 #define IMPLEMENT_PEM_write_bio(name, type, str, asn1) \
@@ -548,10 +548,11 @@ EVP_PKEY *b2i_PrivateKey_bio(BIO *in);
 EVP_PKEY *b2i_PublicKey_bio(BIO *in);
 int i2b_PrivateKey_bio(BIO *out, EVP_PKEY *pk);
 int i2b_PublicKey_bio(BIO *out, EVP_PKEY *pk);
-
+#ifndef OPENSSL_NO_RC4
 EVP_PKEY *b2i_PVK_bio(BIO *in, pem_password_cb *cb, void *u);
 int i2b_PVK_bio(BIO *out, EVP_PKEY *pk, int enclevel,
 		pem_password_cb *cb, void *u);
+#endif
 
 
 /* BEGIN ERROR CODES */

@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>ARM9_cache</AssemblyName>
     <ProjectGuid>{2853b806-79d1-4653-a060-b75530cf0a47}</ProjectGuid>
@@ -22,19 +23,21 @@
     <Version>4.0.0.0</Version>
   </PropertyGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
-
   <PropertyGroup>
     <OutputType Condition="'$(INSTRUCTION_SET)'=='arm' or '$(INSTRUCTION_SET)'=='thumb'">Library</OutputType>
   </PropertyGroup>
-
   <PropertyGroup>
     <ARMBUILD_ONLY>true</ARMBUILD_ONLY>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="ARM9_cache_functions.cpp" />
     <Compile Include="GNU_S\ARM9_cache_asm.s" Condition="'$(COMPILER_TOOL)'=='GCC'" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\arm_util.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\cpu.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\cpu_definitions.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\smartptr_fiq_arm.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

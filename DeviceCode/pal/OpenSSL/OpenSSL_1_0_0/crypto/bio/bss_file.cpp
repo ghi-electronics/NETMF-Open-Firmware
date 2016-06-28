@@ -120,10 +120,53 @@ static BIO_METHOD methods_filep=
 
 BIO *BIO_new_file(const char *filename, const char *mode)
 	{
-	BIO *ret;
-	TINYCLR_SSL_FILE *file;
+	BIO  *ret;
+	TINYCLR_SSL_FILE *file=NULL;
 
-	if ((file=TINYCLR_SSL_FOPEN(filename,mode)) == NULL)
+#if defined(_WIN32) && defined(CP_UTF8)
+	int sz, len_0 = (int)TINYCLR_SSL_STRLEN(filename)+1;
+	DWORD flags;
+
+	/*
+	 * Basically there are three cases to cover: a) filename is
+	 * pure ASCII string; b) actual UTF-8 encoded string and
+	 * c) locale-ized string, i.e. one containing 8-bit
+	 * characters that are meaningful in current system locale.
+	 * If filename is pure ASCII or real UTF-8 encoded string,
+	 * MultiByteToWideChar succeeds and _wfopen works. If
+	 * filename is locale-ized string, chances are that
+	 * MultiByteToWideChar fails reporting
+	 * ERROR_NO_UNICODE_TRANSLATION, in which case we fall
+	 * back to fopen...
+	 */
+	if ((sz=MultiByteToWideChar(CP_UTF8,(flags=MB_ERR_INVALID_CHARS),
+					filename,len_0,NULL,0))>0 ||
+	    (GetLastError()==ERROR_INVALID_FLAGS &&
+	     (sz=MultiByteToWideChar(CP_UTF8,(flags=0),
+					filename,len_0,NULL,0))>0)
+	   )
+		{
+		WCHAR  wmode[8];
+		WCHAR *wfilename = (WCHAR*)_alloca(sz*sizeof(WCHAR));
+
+		if (MultiByteToWideChar(CP_UTF8,flags,
+					filename,len_0,wfilename,sz) &&
+		    MultiByteToWideChar(CP_UTF8,0,mode,TINYCLR_SSL_STRLEN(mode)+1,
+			    		wmode,sizeof(wmode)/sizeof(wmode[0])) &&
+		    (file=_wfopen(wfilename,wmode))==NULL &&
+		    (errno==ENOENT || errno==EBADF)
+		   )	/* UTF-8 decode succeeded, but no file, filename
+			 * could still have been locale-ized... */
+			file = TINYCLR_SSL_FOPEN(filename,mode);
+		}
+	else if (GetLastError()==ERROR_NO_UNICODE_TRANSLATION)
+		{
+		file = TINYCLR_SSL_FOPEN(filename,mode);
+		}
+#else
+	file=TINYCLR_SSL_FOPEN(filename,mode);	
+#endif
+	if (file == NULL)
 		{
 		SYSerr(SYS_F_FOPEN,get_last_sys_error());
 		ERR_add_error_data(5,"TINYCLR_SSL_FOPEN('",filename,"','",mode,"')");
@@ -287,14 +330,14 @@ static long MS_CALLBACK file_ctrl(BIO *b, int cmd, long num, void *ptr)
 		else
 			_setmode(fd,_O_BINARY);
 #elif defined(OPENSSL_SYS_NETWARE) && defined(NETWARE_CLIB)
-		int fd = fileno((TINYCLR_SSL_FILE*)ptr);
+		int fd = TINYCLR_SSL_FILENO((TINYCLR_SSL_FILE*)ptr);
 		/* Under CLib there are differences in file modes */
 		if (num & BIO_FP_TEXT)
 			setmode(fd,O_TEXT);
 		else
 			setmode(fd,O_BINARY);
 #elif defined(OPENSSL_SYS_MSDOS)
-		int fd = fileno((TINYCLR_SSL_FILE*)ptr);
+		int fd = TINYCLR_SSL_FILENO((TINYCLR_SSL_FILE*)ptr);
 		/* Set correct text/binary mode */
 		if (num & BIO_FP_TEXT)
 			_setmode(fd,_O_TEXT);
@@ -310,7 +353,7 @@ static long MS_CALLBACK file_ctrl(BIO *b, int cmd, long num, void *ptr)
 				_setmode(fd,_O_BINARY);
 			}
 #elif defined(OPENSSL_SYS_OS2) || defined(OPENSSL_SYS_WIN32_CYGWIN)
-		int fd = fileno((TINYCLR_SSL_FILE*)ptr);
+		int fd = TINYCLR_SSL_FILENO((TINYCLR_SSL_FILE*)ptr);
 		if (num & BIO_FP_TEXT)
 			setmode(fd, O_TEXT);
 		else

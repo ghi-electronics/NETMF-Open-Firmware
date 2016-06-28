@@ -53,10 +53,7 @@ static IMPLEMENT_LHASH_COMP_FN(obj_name, OBJ_NAME)
 
 int OBJ_NAME_init(void)
 	{
-	//[MS_CHANGE] - commented out the following so that 
-	// names_lh is always initialized at the start (to support
-	// soft reboot) 
-	//if (names_lh != NULL) return(1);
+	if (names_lh != NULL) return(1);
 	MemCheck_off();
 	names_lh=lh_OBJ_NAME_new();
 	MemCheck_on();
@@ -87,7 +84,7 @@ int OBJ_NAME_new_index(unsigned long (*hash_func)(const char *),
 	for (i=sk_NAME_FUNCS_num(name_funcs_stack); i<names_type_num; i++)
 		{
 		MemCheck_off();
-		name_funcs = (NAME_FUNCS*)OPENSSL_malloc(sizeof(NAME_FUNCS));
+        name_funcs = (NAME_FUNCS*)OPENSSL_malloc(sizeof(NAME_FUNCS));
 		MemCheck_on();
 		if (!name_funcs)
 			{
@@ -132,7 +129,7 @@ static int obj_name_cmp(const void *a_void, const void *b_void)
 				a->type)->cmp_func(a->name,b->name);
 			}
 		else
-			ret=TINYCLR_SSL_STRCMP(a->name,b->name);
+            ret=TINYCLR_SSL_STRCMP(a->name,b->name);
 		}
 	return(ret);
 	}
@@ -299,7 +296,7 @@ struct doall_sorted
 
 static void do_all_sorted_fn(const OBJ_NAME *name,void *d_)
 	{
-	struct doall_sorted *d=(struct doall_sorted*)d_;
+    struct doall_sorted *d=(struct doall_sorted*)d_;
 
 	if(name->type != d->type)
 		return;
@@ -309,10 +306,10 @@ static void do_all_sorted_fn(const OBJ_NAME *name,void *d_)
 
 static int do_all_sorted_cmp(const void *n1_,const void *n2_)
 	{
-	const OBJ_NAME * const *n1=(const OBJ_NAME* const*)n1_;
-	const OBJ_NAME * const *n2=(const OBJ_NAME* const*)n2_;
+    const OBJ_NAME * const *n1=(const OBJ_NAME* const*)n1_;
+    const OBJ_NAME * const *n2=(const OBJ_NAME* const*)n2_;
 
-	return TINYCLR_SSL_STRCMP((*n1)->name,(*n2)->name);
+    return TINYCLR_SSL_STRCMP((*n1)->name,(*n2)->name);
 	}
 
 extern "C" void OBJ_NAME_do_all_sorted(int type,void (*fn)(const OBJ_NAME *,void *arg),
@@ -322,11 +319,11 @@ extern "C" void OBJ_NAME_do_all_sorted(int type,void (*fn)(const OBJ_NAME *,void
 	int n;
 
 	d.type=type;
-	d.names=(const OBJ_NAME**)OPENSSL_malloc(lh_OBJ_NAME_num_items(names_lh)*sizeof *d.names);
+    d.names=(const OBJ_NAME**)OPENSSL_malloc(lh_OBJ_NAME_num_items(names_lh)*sizeof *d.names);
 	d.n=0;
 	OBJ_NAME_do_all(type,do_all_sorted_fn,&d);
 
-	qsort((void *)d.names,d.n,sizeof *d.names,do_all_sorted_cmp);
+	TINYCLR_SSL_QSORT((void *)d.names,d.n,sizeof *d.names,do_all_sorted_cmp);
 
 	for(n=0 ; n < d.n ; ++n)
 		fn(d.names[n],arg);

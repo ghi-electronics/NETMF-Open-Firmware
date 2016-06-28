@@ -1,9 +1,11 @@
 #include "e_os.h"
 #include <tinyhal.h>
+#include "ssl_types.h"
 #include <tinyclr/ssl_functions.h>
 #include <openssl/asn1.h>
 #include <openssl/pem.h>
 #include <openssl/err.h>
+#include <openssl/pkcs12.h>
 
 static const char *mon[12]=
 { 
@@ -11,46 +13,121 @@ static const char *mon[12]=
     "Jul","Aug","Sep","Oct","Nov","Dec"
 };
 
-static int ssl_get_ASN1_UTCTIME(BIO *bp, const ASN1_UTCTIME *tm, DATE_TIME_INFO *dti);
-static X509 *ssl_load_cert(const char *cert_buf, int format, X509CertData* x509,
-                           const char *pass, const char *descrip);
+static int ssl_get_ASN1_UTCTIME(const ASN1_UTCTIME *tm, DATE_TIME_INFO *dti);
 
-BOOL ssl_parse_certificate_internal(void * bytes, size_t size,  void * pwd, void* x509CertData, int format)
+static int password_cb(char *buf, int size, int rwflag, void *userdata)
 {
-    // load certificate 
-    X509* x = ssl_load_cert((const char*)bytes, format, (X509CertData*)x509CertData, NULL, "Certificate");
+    const char* password = (const char*)userdata;
+    int res = TINYCLR_SSL_STRLEN(password);
 
-    BOOL ret = (x!=NULL ? TRUE: FALSE);
-
-    X509_free(x);
-
-    return (ret);
+    if (res > size)
+        res = size;
+    
+    TINYCLR_SSL_MEMCPY(buf, password, res);
+    
+    return res;
 }
 
-static X509 *ssl_load_cert(const char *cert_buf, int format, X509CertData* x509,
-                           const char *pass, const char *descrip)
+X509* ssl_parse_certificate(void* pCert, size_t certLen, LPCSTR pwd, EVP_PKEY** privateKey)
 {
-    BUF_MEM *buf=NULL;
     X509 *x=NULL;
-    BIO *cert;
-    char *name,*subject;
+    PKCS12* p12 = NULL;
 
-    if ((cert=BIO_new(BIO_s_mem())) == NULL)
+    if(privateKey != NULL)
     {
-        ERR_print_errors_fp(OPENSSL_TYPE__FILE_STDERR);
-        goto end;
+        *privateKey = NULL;
     }
-    BIO_puts(cert,cert_buf);
     
-    x=PEM_read_bio_X509_AUX(cert, NULL, 0, NULL);
+    //check for PEM BASE64 header
+    BIO *certBio = NULL;
+    if ((certBio=BIO_new(BIO_s_mem())) != NULL)
+    {
+        BIO_write(certBio, (const char*)pCert, certLen);
+    
+        x = PEM_read_bio_X509(certBio, NULL, 0, NULL);
+        
+        if(x != NULL)
+        {
+            BIO_reset(certBio);
+            BIO_write(certBio, (const char*)pCert, certLen);
+
+            if(privateKey != NULL)
+            {
+                *privateKey = PEM_read_bio_PrivateKey(certBio, NULL, password_cb, (void*)pwd);
+            }
+        }
+    
+        if(x == NULL)
+        {
+            BIO_reset(certBio);
+            BIO_write(certBio, (const char*)pCert, certLen);
+    
+            p12 = d2i_PKCS12_bio(certBio, NULL);
+    
+            if(p12 != NULL)
+            {
+                if(privateKey == NULL)
+                {
+                    PKCS12_parse(p12, pwd, NULL, &x, NULL); 
+                }
+                else
+                {
+                    PKCS12_parse(p12, pwd, privateKey, &x, NULL); 
+                }
+    
+                PKCS12_free(p12);
+            }
+        }
+    
+        BIO_free(certBio);
+    }
+    
+    if(x == NULL)
+    {
+        const UINT8* tmp = (const UINT8*)pCert;
+        
+        x = d2i_X509(NULL, &tmp, certLen);
+
+        if(x != NULL && privateKey != NULL)
+        {
+            X509_PKEY* pKey;
+            
+            tmp = (const UINT8*)pCert;
+            
+            pKey = d2i_X509_PKEY(NULL, &tmp, certLen);            
+
+            if(pKey != NULL)
+            {
+                *privateKey = pKey->dec_pkey;
+            }
+        }
+    }
+    
+    return x;
+    
+}
+
+BOOL ssl_parse_certificate_internal(void * bytes, size_t size, void* pwd, void* x509CertData)
+{
+    char *name,*subject;
+    X509CertData* x509 = (X509CertData*)x509CertData;
+    X509* x = ssl_parse_certificate(bytes, size, (LPCSTR)pwd, NULL);
+
+    if (x == NULL)
+    {
+        TINYCLR_SSL_PRINTF("Unable to load certificate\n");
+        ERR_print_errors_fp(OPENSSL_TYPE__FILE_STDERR);
+        return FALSE;
+    }
+    
     name=X509_NAME_oneline(X509_get_issuer_name(x),NULL,0);
     subject=X509_NAME_oneline(X509_get_subject_name(x),NULL,0);
 
     TINYCLR_SSL_STRNCPY(x509->Issuer, name, TINYCLR_SSL_STRLEN(name));
     TINYCLR_SSL_STRNCPY(x509->Subject, subject, TINYCLR_SSL_STRLEN(subject));
 
-    ssl_get_ASN1_UTCTIME(cert, X509_get_notBefore(x), &x509->EffectiveDate);
-    ssl_get_ASN1_UTCTIME(cert, X509_get_notAfter(x), &x509->ExpirationDate);
+    ssl_get_ASN1_UTCTIME(X509_get_notBefore(x), &x509->EffectiveDate);
+    ssl_get_ASN1_UTCTIME(X509_get_notAfter(x), &x509->ExpirationDate);
 
 #if defined(DEBUG) || defined(_DEBUG)
     TINYCLR_SSL_PRINTF("\n        Issuer: ");
@@ -81,23 +158,17 @@ static X509 *ssl_load_cert(const char *cert_buf, int format, X509CertData* x509,
     TINYCLR_SSL_PRINTF("\n");
 #endif
 
-end:
-    if (x == NULL)
-    {
-        TINYCLR_SSL_PRINTF("Unable to load certificate\n");
-        ERR_print_errors_fp(OPENSSL_TYPE__FILE_STDERR);
-    }
-
     OPENSSL_free(name);
     OPENSSL_free(subject);
-    if (cert != NULL) BIO_free(cert);
-    if (buf != NULL) BUF_MEM_free(buf);
-    return(x);
+
+    X509_free(x);
+
+    return TRUE;
 }
 
 //MS: copied decoding algo from get_ASN1_UTCTIME of asn1_openssl.lib
 //MS: populate DATE_TIME_INFO struct with year,month, day,hour,minute,second,etc
-static int ssl_get_ASN1_UTCTIME(BIO *bp, const ASN1_UTCTIME *tm, DATE_TIME_INFO *dti)
+static int ssl_get_ASN1_UTCTIME(const ASN1_UTCTIME *tm, DATE_TIME_INFO *dti)
 {
     const char *v;
     int gmt=0;

@@ -67,8 +67,8 @@
 char *usage[]={
 "usage: rc4 args\n",
 "\n",
-" -in arg         - input file - default OPENSSL_TYPE__FILE_STDIN\n",
-" -out arg        - output file - default OPENSSL_TYPE__FILE_STDOUT\n",
+" -in arg         - input file - default stdin\n",
+" -out arg        - output file - default stdout\n",
 " -key key        - password\n",
 NULL
 };
@@ -148,8 +148,8 @@ bad:
 	/* This should set the file to binary mode. */
 	{
 #include <fcntl.h>
-	setmode(fileno(in),O_BINARY);
-	setmode(fileno(out),O_BINARY);
+	setmode(TINYCLR_SSL_FILENO(in),O_BINARY);
+	setmode(TINYCLR_SSL_FILENO(out),O_BINARY);
 	}
 #endif
 

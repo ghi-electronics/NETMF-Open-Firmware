@@ -54,7 +54,7 @@ namespace Ws.Services
     /// A collection of service endpoints managed by a transport host.
     /// </summary>
     /// <remarks>
-    /// This collection is used to store a list of services hosted by a tranport. A transport host uses this collection
+    /// This collection is used to store a list of services hosted by a transport. A transport host uses this collection
     /// when dispatching calls to service endpoints.
     /// This base class is thread safe.
     /// </remarks>
@@ -62,6 +62,8 @@ namespace Ws.Services
     {
         private object    m_threadLock;
         private ArrayList m_Services;
+        private Hashtable m_lookup;
+        private IWsServiceEndpoint m_mexService;
 
         /// <summary>
         /// Create an instance of the WsServiceEndpoints collection.
@@ -70,6 +72,7 @@ namespace Ws.Services
         {
             m_threadLock = new object();
             m_Services   = new ArrayList();
+            m_lookup     = new Hashtable();
         }
 
         /// <summary>
@@ -85,6 +88,20 @@ namespace Ws.Services
                 return m_Services.Count;
             }
         }
+
+        public IWsServiceEndpoint DiscoMexService
+        {
+            get
+            {
+                return m_mexService;                
+            }
+
+            set
+            {
+                m_mexService = value;
+            }
+        }
+            
 
         /// <summary>
         /// Gets the WsService element at the specified index.
@@ -110,6 +127,14 @@ namespace Ws.Services
         {
             get
             {
+                lock(m_lookup)
+                {
+                    if(m_lookup.Contains(serviceAddress))
+                    {
+                        return (IWsServiceEndpoint)m_lookup[serviceAddress];
+                    }
+                }
+                
                 lock (m_threadLock)
                 {
                     int count = m_Services.Count;
@@ -141,10 +166,29 @@ namespace Ws.Services
         /// </returns>
         public int Add(IWsServiceEndpoint service)
         {
+            int retVal;
+            
+            string epService = service.EndpointAddress;
+
             lock (m_threadLock)
             {
-                return m_Services.Add(service);
+                retVal = m_Services.Add(service);
             }
+            
+            if (epService.IndexOf("http") == 0)
+            {
+                // Convert to address to Uri
+                Uri toUri = new Uri(epService);
+
+                epService = "urn:uuid:" + toUri.AbsolutePath.Substring(1);
+
+                lock(m_lookup)
+                {
+                    m_lookup[epService] = service;
+                }
+            }
+
+            return retVal;
         }
 
         /// <summary>
@@ -167,6 +211,20 @@ namespace Ws.Services
         /// </param>
         public void Remove(IWsServiceEndpoint service)
         {
+            string epService = service.EndpointAddress;
+            if(service.EndpointAddress.IndexOf("http") == 0)
+            {
+                // Convert to address to Uri
+                Uri toUri = new Uri(epService);
+                
+                epService = "urn:uuid:" + toUri.AbsolutePath.Substring(1);
+
+                lock(m_lookup)
+                {                    
+                    m_lookup.Remove(epService);
+                }
+            }
+            
             lock (m_threadLock)
             {
                 m_Services.Remove(service);

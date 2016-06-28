@@ -22,7 +22,7 @@ struct JPEGErrorManager
 #if defined(ARM_V3_0) || defined(ARM_V3_1)
     __int64    setjmpBuffer[48];
 
-#elif defined(GCCOP_V4_2) || defined(__RENESAS__)
+#elif defined(GCCOP) || defined(__RENESAS__)
    jmp_buf     setjmpBuffer;
 
 #elif 1

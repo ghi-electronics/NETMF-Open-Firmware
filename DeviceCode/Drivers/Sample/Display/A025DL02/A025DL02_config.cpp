@@ -42,6 +42,8 @@
 #define SPI_A025DL02_CS_SETUP_USEC         0
 #define SPI_A025DL02_CS_HOLD_USEC          0
 #define SPI_A025DL02_MODULE                0
+#define SPI_A025DL02_BUSYPIN               GPIO_PIN_NONE
+#define SPI_A025DL02_BUSYPIN_ACTIVESTATE   FALSE
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -59,7 +61,11 @@ SPI_CONFIGURATION g_A025DL02_SPI_Config =
     SPI_A025DL02_CLOCK_RATE_KHZ,
     SPI_A025DL02_CS_SETUP_USEC,
     SPI_A025DL02_CS_HOLD_USEC,
-    SPI_A025DL02_MODULE
+    SPI_A025DL02_MODULE,
+    {
+        SPI_A025DL02_BUSYPIN,
+        SPI_A025DL02_BUSYPIN_ACTIVESTATE,
+    },
 };
 
 #if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)

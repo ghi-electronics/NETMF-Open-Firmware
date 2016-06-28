@@ -97,6 +97,9 @@ namespace schemas.example.org.AttachmentService
             respDcs.BodyParts = response.BodyParts;
             TwoWayAttachmentResponse resp;
             resp = ((TwoWayAttachmentResponse)(respDcs.ReadObject(response.Reader)));
+            response.Reader.Dispose();
+            response.Reader = null;
+
             return resp;
         }
     }

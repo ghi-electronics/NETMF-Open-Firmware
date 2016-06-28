@@ -76,7 +76,6 @@ int MAIN(int argc, char **argv)
 	EVP_PKEY *pkey=NULL;
 	int badarg = 0;
 #ifndef OPENSSL_NO_ENGINE
-	ENGINE *e = NULL;
 	char *engine=NULL;
 #endif
 	int ret = 1;
@@ -143,7 +142,7 @@ int MAIN(int argc, char **argv)
 		}
 
 #ifndef OPENSSL_NO_ENGINE
-        e = setup_engine(bio_err, engine, 0);
+        setup_engine(bio_err, engine, 0);
 #endif
 
 	if (infile)

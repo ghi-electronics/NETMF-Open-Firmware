@@ -49,6 +49,11 @@ namespace schemas.example.org.EventingService
             EventSources.Add(new DpwsServiceType("SimpleEvent", "http://schemas.example.org/EventingService"));
             ServiceOperations.Add(new WsServiceOperation("http://schemas.example.org/EventingService", "IntegerEvent"));
             EventSources.Add(new DpwsServiceType("IntegerEvent", "http://schemas.example.org/EventingService"));
+
+            // Add eventing SubscriptionEnd ServiceOperations. By default Subscription End call back to this client
+            ServiceOperations.Add(new WsServiceOperation(WsWellKnownUri.WseNamespaceUri, "SubscriptionEnd"));
+
+            this.StartEventListeners();
         }
         
         public virtual WsMessage SimpleEvent(WsMessage request)
@@ -58,12 +63,14 @@ namespace schemas.example.org.EventingService
             reqDcs = new SimpleEventRequestDataContractSerializer("SimpleEventRequest", "http://schemas.example.org/EventingService");
             SimpleEventRequest req;
             req = ((SimpleEventRequest)(reqDcs.ReadObject(request.Reader)));
+            request.Reader.Dispose();
+            request.Reader = null;
 
             // Call service operation to process request.
             m_eventHandler.SimpleEvent(req);
 
-            // Return null response for event callback messages
-            return null;
+            // Return OneWayResponse message for event callback messages
+            return WsMessage.CreateOneWayResponse();
         }
         
         public virtual WsMessage IntegerEvent(WsMessage request)
@@ -73,12 +80,14 @@ namespace schemas.example.org.EventingService
             reqDcs = new IntegerEventRequestDataContractSerializer("IntegerEventRequest", "http://schemas.example.org/EventingService");
             IntegerEventRequest req;
             req = ((IntegerEventRequest)(reqDcs.ReadObject(request.Reader)));
+            request.Reader.Dispose();
+            request.Reader = null;
 
             // Call service operation to process request.
             m_eventHandler.IntegerEvent(req);
 
-            // Return null response for event callback messages
-            return null;
+            // Return OneWayResponse message for event callback messages
+            return WsMessage.CreateOneWayResponse();
         }
     }
 }

@@ -500,7 +500,7 @@ static void sha512_block_data_order (SHA512_CTX *ctx, const void *in, size_t num
 
 static void sha512_block_data_order (SHA512_CTX *ctx, const void *in, size_t num)
 	{
-	const SHA_LONG64 *W=in;
+	const SHA_LONG64 *W=(const SHA_LONG64 *)in;
 	SHA_LONG64	a,b,c,d,e,f,g,h,s0,s1,T1,T2;
 	SHA_LONG64	X[16];
 	int i;

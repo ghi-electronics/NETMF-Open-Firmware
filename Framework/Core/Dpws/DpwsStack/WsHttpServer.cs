@@ -33,6 +33,7 @@ namespace Ws.Services.Transport.HTTP
         private WsThreadManager        m_threadManager;
         private _Bind.Binding          m_binding;
         private _Bind.IReplyChannel    m_replyChannel;
+        private _Bind.ServerBindingContext m_ctx;
 
         private static int m_maxReadPayload = 0x20000;
 
@@ -43,7 +44,6 @@ namespace Ws.Services.Transport.HTTP
         /// <param name="serviceEndpoints">A collection of service endpoints this transport service can dispatch to.</param>
         public WsHttpServiceHost(_Bind.Binding binding, WsServiceEndpoints serviceEndpoints)
         {
-            m_serviceEndpoints = new WsServiceEndpoints();
             m_threadManager    = new WsThreadManager(5, "Http");            
             m_binding          = binding;
             m_serviceEndpoints = serviceEndpoints;
@@ -55,6 +55,22 @@ namespace Ws.Services.Transport.HTTP
         /// </summary>
         public int MaxThreadCount { get { return m_threadManager.MaxThreadCount; } set { m_threadManager.MaxThreadCount = value; } }
 
+
+        /// <summary>
+        /// Use to get or set the maximum number of incoming messages to hold for processing.  Default is 20.
+        /// </summary>
+        public int MaxRequestQueue 
+        { 
+            get { return WsHttpMessageProcessor.s_maxReqQueueSize; } 
+            set 
+            { 
+                if(value <= 0) throw new ArgumentException();
+
+                WsHttpMessageProcessor.s_maxReqQueueSize = value;
+            }
+        }
+                
+        
         /// <summary>
         /// Property containing the maximum message size this transport service will accept.
         /// </summary>
@@ -69,6 +85,8 @@ namespace Ws.Services.Transport.HTTP
             if (m_isStarted) throw new InvalidOperationException();
 
             m_isStarted = true;
+
+            m_ctx = ctx;
 
             m_replyChannel = m_binding.CreateServerChannel(ctx);
             m_replyChannel.Open();
@@ -86,7 +104,9 @@ namespace Ws.Services.Transport.HTTP
             if(!m_isStarted) throw new InvalidOperationException();
 
             m_isStarted = false;
-            
+
+            WsHttpMessageProcessor.StopProcessing();
+
             m_replyChannel.Close();
             m_thread.Join();
         }
@@ -111,41 +131,31 @@ namespace Ws.Services.Transport.HTTP
                     // The context returned by m_httpListener.GetContext(); can be null in case the service was stopped.
                     if (context != null)
                     {
-                        WsHttpMessageProcessor processor = new WsHttpMessageProcessor(m_serviceEndpoints, context);
+                        WsHttpMessageProcessor processor = new WsHttpMessageProcessor(m_serviceEndpoints);
 
-                        if (m_threadManager.ThreadsAvailable == false)
-                        {
-                            WsWsaHeader header = new WsWsaHeader();
-                            
-                            context.Reply(WsFault.GenerateFaultResponse(header, WsFaultType.WsaEndpointUnavailable, "Service Unavailable (busy)", context.Version));
-
-                            System.Ext.Console.Write("Http max thread count exceeded. Request ignored.");
-                        }
-                        else
-                        {
-                            // Try to get a processing thread and process the request
-                            m_threadManager.StartNewThread(processor);
-                        }
+                        // Try to get a processing thread and process the request
+                        m_threadManager.StartNewThread(processor, context);
+                        m_ctx.ContextObject = context.m_context.ContextObject;
                     }
                 }
                 catch
                 {
-                    if (!m_isStarted)
-                    {
-                        break;
-                    }
+                    m_ctx.ContextObject = null;
                 }
             }
         }
     }
 
-    sealed class WsHttpMessageProcessor : IDisposable, IWsTransportMessageProcessor
+    sealed class WsHttpMessageProcessor : IWsTransportMessageProcessor
     {
         // Fields
-        _Bind.RequestContext       m_context;
-        private WsServiceEndpoints m_serviceEndpoints;
+        private WsServiceEndpoints    m_serviceEndpoints;
+        private static Queue          s_requests     = new Queue();
+        private static AutoResetEvent s_requestEvent = new AutoResetEvent(false);
+        private static int            s_threadCnt    = 0;
+        internal static int           s_maxReqQueueSize = 20;
+        private static bool           s_exit         = false;
 
-        //private const int ReadPayload = 0x800;
 
         /// <summary>
         /// HttpProcess()
@@ -156,33 +166,47 @@ namespace Ws.Services.Transport.HTTP
         /// <param name="s">
         /// Socket s
         /// </param>
-        public WsHttpMessageProcessor(WsServiceEndpoints serviceEndpoints, _Bind.RequestContext context)
+        public WsHttpMessageProcessor(WsServiceEndpoints serviceEndpoints)
         {
-            m_context = context;
             m_serviceEndpoints = serviceEndpoints;
         }
 
-        void Dispose(bool disposing)
+        /// <summary>
+        /// Adds a request object to be processed
+        /// </summary>
+        public int AddRequest(object request)
         {
-            if(disposing)
+            lock(s_requests)
             {
+                if(s_requests.Count >= s_maxReqQueueSize)
+                {
+                    s_requests.Dequeue();
+                }
+                s_requests.Enqueue(request);
             }
+    
+            s_requestEvent.Set();
+            
+            return s_requests.Count;
         }
 
         /// <summary>
-        /// Releases all resources used by the HttpProcess object.
+        /// Stop all threads so that the server can shut down.
         /// </summary>
-        public void Dispose()
+        public static void StopProcessing()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            s_exit = true;
+            lock(s_requests)
+            {
+                s_requests.Clear();
+            }
+            while(s_threadCnt > 0)
+            {
+                s_requestEvent.Set();
+                Thread.Sleep(0);
+            }
         }
-
-        ~WsHttpMessageProcessor()
-        {
-            Dispose(false);
-        }
-
+    
         /// <summary>
         /// Http servers message processor. This method reads a message from a socket and calls downstream
         /// processes that parse the request, dispatch to a method and returns a response.
@@ -190,13 +214,47 @@ namespace Ws.Services.Transport.HTTP
         /// <remarks>The parameters should always be set to null. See IWsTransportMessageProcessor for details.</remarks>
         public void ProcessRequest()
         {
-            // Process the message
-            if (m_context.Message != null)
+            _Bind.RequestContext request;
+        
+            Interlocked.Increment(ref s_threadCnt);
+        
+            while(true)
             {
-                WsMessage response = ProcessRequestMessage(m_context.Message);
-
-                m_context.Reply(response);
+                if (s_exit || (s_requests.Count == 0 && !s_requestEvent.WaitOne(1000, false))) break;
+        
+                lock (s_requests)
+                {
+                    if (s_requests.Count == 0)
+                    {
+                        continue;
+                    }
+        
+                    request = (_Bind.RequestContext)s_requests.Dequeue();
+                }
+                
+                // Process the message
+                if (request.Message != null)
+                {
+                    WsMessage response = ProcessRequestMessage(request);
+                    
+                    // null response indicates error which requires a response.  IsOneWay, on the other hand,
+                    // should not send a response (for events and oneway messages).
+                    if(response == null || response.Header == null || !response.Header.IsOneWayResponse)
+                    {
+                        request.Reply(response);
+                    }
+                }
             }
+            
+            Interlocked.Decrement(ref s_threadCnt);
+        }
+    
+        /// <summary>
+        /// Gets the current number of threads currently processing the given message transport
+        /// </summary>
+        public int ThreadCount
+        {
+            get { return s_threadCnt; }
         }
 
         /// <summary>
@@ -205,12 +263,13 @@ namespace Ws.Services.Transport.HTTP
         /// </summary>
         /// <param name="soapRequest">WsRequestMessage object containing a raw soap message or mtom soap request.</param>
         /// <returns>WsResponseMessage object containing the soap response returned from a service endpoint.</returns>
-        private WsMessage ProcessRequestMessage(WsMessage soapRequest)
+        private WsMessage ProcessRequestMessage(_Bind.RequestContext context)
         {
             // Now check for implementation specific service endpoints.
             IWsServiceEndpoint serviceEndpoint = null;
             string             endpointAddress;
-            WsWsaHeader        header = soapRequest.Header;
+            WsMessage          soapRequest = context.Message;
+            WsWsaHeader        header      = soapRequest.Header;
 
             // If this is Uri convert it
             if (header.To.IndexOf("urn") == 0 || header.To.IndexOf("http") == 0)
@@ -225,7 +284,7 @@ namespace Ws.Services.Transport.HTTP
                 catch
                 {
                     System.Ext.Console.Write("Unsupported Header.To Uri format: " + header.To);
-                    return WsFault.GenerateFaultResponse(header, WsFaultType.ArgumentException, "Unsupported Header.To Uri format", m_context.Version);
+                    return WsFault.GenerateFaultResponse(header, WsFaultType.ArgumentException, "Unsupported Header.To Uri format", context.Version);
                 }
 
                 // Convert the to address to a Urn:uuid if it is an Http endpoint
@@ -233,7 +292,7 @@ namespace Ws.Services.Transport.HTTP
                     endpointAddress = toUri.AbsoluteUri;
                 else if (toUri.Scheme == "http")
                 {
-                    endpointAddress = "urn:uuid:" + toUri.AbsoluteUri.Substring(1);
+                    endpointAddress = "urn:uuid:" + toUri.AbsolutePath.Substring(1);
                 }
                 else
                     endpointAddress = header.To;
@@ -250,14 +309,20 @@ namespace Ws.Services.Transport.HTTP
                 {
                     serviceEndpoint = ep;
                 }
-                else
-                {
-                    ep = m_serviceEndpoints[0]; // mex endpoint
+            }
 
-                    if (ep.ServiceOperations[header.Action] != null)
-                    {
-                        serviceEndpoint = ep;
-                    }
+            if(serviceEndpoint == null)
+            {
+                IWsServiceEndpoint mex = m_serviceEndpoints.DiscoMexService; // mex endpoint
+
+                // If either the MEX endpoint or any of the services endpoints match
+                // the requested endpoint then see if the requested action is for the discovery
+                // service.
+                if (mex != null && 
+                   (mex.EndpointAddress == endpointAddress || ep != null) &&
+                    mex.ServiceOperations[header.Action] != null)
+                {
+                    serviceEndpoint = mex;
                 }
             }
             
@@ -272,18 +337,18 @@ namespace Ws.Services.Transport.HTTP
                 }
                 catch (WsFaultException e)
                 {
-                    return WsFault.GenerateFaultResponse(e, m_context.Version);
+                    return WsFault.GenerateFaultResponse(e, context.Version);
                 }
                 catch (Exception e)
                 {
-                    return WsFault.GenerateFaultResponse(header, WsFaultType.Exception, e.ToString(), m_context.Version);
+                    return WsFault.GenerateFaultResponse(header, WsFaultType.Exception, e.ToString(), context.Version);
                 }
 
                 return response;
             }
 
             // Unreachable endpoint requested. Generate fault response
-            return WsFault.GenerateFaultResponse(header, WsFaultType.WsaDestinationUnreachable, "Unknown service endpoint", m_context.Version);
+            return WsFault.GenerateFaultResponse(header, WsFaultType.WsaDestinationUnreachable, "Unknown service endpoint", context.Version);
         }
 
     }

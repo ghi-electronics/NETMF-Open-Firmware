@@ -349,7 +349,7 @@ static void expand(_LHASH *lh)
 			(int)(sizeof(LHASH_NODE *)*j));
 		if (n == NULL)
 			{
-/*			fputs("realloc error in lhash",stderr); */
+/*			TINYCLR_SSL_FPUTS("realloc error in lhash",OPENSSL_TYPE__FILE_STDERR); */
 			lh->error++;
 			lh->p=0;
 			return;
@@ -377,7 +377,7 @@ static void contract(_LHASH *lh)
 			(unsigned int)(sizeof(LHASH_NODE *)*lh->pmax));
 		if (n == NULL)
 			{
-/*			fputs("realloc error in lhash",stderr); */
+/*			TINYCLR_SSL_FPUTS("realloc error in lhash",OPENSSL_TYPE__FILE_STDERR); */
 			lh->error++;
 			return;
 			}

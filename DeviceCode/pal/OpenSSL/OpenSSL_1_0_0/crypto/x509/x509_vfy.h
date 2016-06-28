@@ -142,7 +142,7 @@ typedef struct x509_lookup_method_st
 	{
 	const char *name;
 	int (*new_item)(X509_LOOKUP *ctx);
-	void (*TINYCLR_SSL_FREE)(X509_LOOKUP *ctx);
+	void (*free)(X509_LOOKUP *ctx);
 	int (*init)(X509_LOOKUP *ctx);
 	int (*shutdown)(X509_LOOKUP *ctx);
 	int (*ctrl)(X509_LOOKUP *ctx,int cmd,const char *argc,long argl,

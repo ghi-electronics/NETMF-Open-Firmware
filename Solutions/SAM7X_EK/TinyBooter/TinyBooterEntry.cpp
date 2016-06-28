@@ -54,6 +54,7 @@ void Tinybooter_PrepareForDecompressedLaunch()
 {
 }
 
+#define USE_GPIO_FOR_TINYBOOTER_ENTRY 1
 
 ////////////////////////////////////////////////////////////////////////////////
 // The WaitForTinyBooterUpload method was designed to allow porting kit partners
@@ -73,15 +74,30 @@ void Tinybooter_PrepareForDecompressedLaunch()
 bool WaitForTinyBooterUpload( INT32 &timeout_ms )
 {
     bool enterBooterMode = false;
-    GPIO_BUTTON_CONFIG *  ButtonConfig = &g_GPIO_BUTTON_Config;
 
-    timeout_ms = 5000;
+    timeout_ms      = 5000;
     enterBooterMode = true;
 
-// always wait forever when using RAM build
+    // always wait forever when using RAM build
 #if defined(TARGETLOCATION_RAM)
     enterBooterMode = true;
     timeout_ms = -1;
+#endif
+
+#if USE_GPIO_FOR_TINYBOOTER_ENTRY
+    timeout_ms      = 0;
+    enterBooterMode = false;
+    Events_WaitForEvents(0,100);
+    if(!CPU_GPIO_EnableInputPin( AT91_GPIO_Driver::PA16, FALSE, NULL, GPIO_INT_NONE, RESISTOR_PULLUP ))
+    {
+        ASSERT(FALSE);
+    }
+    if(!CPU_GPIO_GetPinState( AT91_GPIO_Driver::PA16 ))
+    {
+        // user override, so lets stay forever
+        timeout_ms = -1;
+        enterBooterMode = true;
+    }
 #endif
 
     return enterBooterMode;
@@ -216,9 +232,8 @@ void TinyBooter_OnStateChange( TinyBooterState state, void* data, void ** retDat
 bool CheckFlashSectorPermission( BlockStorageDevice *pDevice, ByteAddress address )
 {
     bool fAllowWrite = false;
-    UINT32 BlockType, iRegion, iRange;
+    UINT32 iRegion, iRange;
     
-
     if(pDevice->FindRegionFromAddress(address, iRegion, iRange))
     {
         const BlockRange& range = pDevice->GetDeviceInfo()->Regions[iRegion].BlockRanges[iRange];

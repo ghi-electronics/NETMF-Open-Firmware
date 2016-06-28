@@ -38,10 +38,25 @@
 extern "C" {
 #endif
 
+#ifdef PACK_STRUCT_USE_INCLUDES
+#  include "arch\bpstruct.h"
+#endif
+
+
+//[MSCHANGE] - in_addr needs to be packed because sockaddr_in is packed 
+// This is required for to assure proper alignment when casting from sockaddr 
+// to sockaddr_in 
 /* For compatibility with BSD code */
+PACK_STRUCT_BEGIN
 struct in_addr {
-  u32_t s_addr;
-};
+  PACK_STRUCT_FIELD(u32_t s_addr);
+} PACK_STRUCT_STRUCT;
+PACK_STRUCT_END
+
+#ifdef PACK_STRUCT_USE_INCLUDES
+#  include "arch\epstruct.h"
+#endif
+
 
 #define INADDR_NONE         ((u32_t)0xffffffffUL)  /* 255.255.255.255 */
 #define INADDR_LOOPBACK     ((u32_t)0x7f000001UL)  /* 127.0.0.1 */

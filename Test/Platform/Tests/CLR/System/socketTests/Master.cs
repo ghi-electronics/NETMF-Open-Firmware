@@ -33,10 +33,10 @@ namespace Microsoft.SPOT.Platform.Tests
                 Thread.Sleep(500);
             }
             string[] args = { 
-                "StressTests",                
+                "SocketTests",
                 "SocketsEnumsTests",
                 "SocketExceptionTests",
-                "SocketTests"
+                "StressTests",                
             };
 
             MFTestRunner runner = new MFTestRunner(args);

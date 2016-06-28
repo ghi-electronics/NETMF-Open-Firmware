@@ -96,12 +96,19 @@ struct Settings
         {   
             // First verify that check sum in assembly object matches hardcoded check sum. 
             if ( assm->m_header->nativeMethodsChecksum != pNativeAssmData->m_checkSum )
-            {             
-                CLR_Debug::Printf( "Invalid native checksum: %s 0x%X!=0x%X\r\n",
+            {
+                CLR_Debug::Printf("***********************************************************************\r\n");
+                CLR_Debug::Printf("*                                                                     *\r\n");
+                CLR_Debug::Printf("* ERROR!!!!  Firmware version does not match managed code version!!!! *\r\n");
+                CLR_Debug::Printf("*                                                                     *\r\n");
+                CLR_Debug::Printf("*                                                                     *\r\n");
+                CLR_Debug::Printf("* Invalid native checksum: %s 0x%08X!=0x%08X *\r\n",
                                     assm->m_szName,
                                     assm->m_header->nativeMethodsChecksum,
                                     pNativeAssmData->m_checkSum
                                  );
+                CLR_Debug::Printf("*                                                                     *\r\n");
+                CLR_Debug::Printf("***********************************************************************\r\n");
 
                 TINYCLR_SET_AND_LEAVE(CLR_E_ASSM_WRONG_CHECKSUM);
             }
@@ -237,9 +244,6 @@ struct Settings
         {
             CLR_RT_Assembly* assm;
 
-#if !defined(BUILD_RTM)
-            CLR_Debug::Printf( "Attaching file.\r\n" );
-#endif
             // Creates instance of assembly, sets pointer to native functions, links to g_CLR_RT_TypeSystem 
             TINYCLR_CHECK_HRESULT(LoadAssembly( header, assm ));
             
@@ -358,6 +362,18 @@ struct Settings
 
         CLR_RT_ExecutionEngine::DeleteInstance();
 
+#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_WINCE)
+        memset( &g_CLR_RT_Persistence_Manager, 0, sizeof(g_CLR_RT_Persistence_Manager) );
+        memset( &g_CLR_RT_ExecutionEngine, 0, sizeof(g_CLR_RT_ExecutionEngine));
+        memset( &g_CLR_RT_WellKnownTypes, 0, sizeof(g_CLR_RT_WellKnownTypes));
+
+        memset( &g_CLR_RT_WellKnownMethods, 0, sizeof(g_CLR_RT_WellKnownMethods));
+        memset( &g_CLR_RT_TypeSystem, 0, sizeof(g_CLR_RT_TypeSystem));
+        memset( &g_CLR_RT_EventCache, 0, sizeof(g_CLR_RT_EventCache));
+        memset( &g_CLR_RT_GarbageCollector, 0, sizeof(g_CLR_RT_GarbageCollector));
+        memset( &g_CLR_HW_Hardware, 0, sizeof(g_CLR_HW_Hardware));
+#endif
+
         m_fInitialized = false;
     }
 
@@ -458,6 +474,7 @@ struct Settings
         TINYCLR_CLEANUP_END();
     }
 
+
     HRESULT Cmd_LoadDatabase( CLR_RT_ParseOptions::ParameterList* params = NULL )
     {
         TINYCLR_HEADER();
@@ -473,22 +490,22 @@ struct Settings
             CLR_RECORD_ASSEMBLY* header;
             CLR_RECORD_ASSEMBLY* headerEnd;
             std::wstring         strName;
-
+            
             TINYCLR_CHECK_HRESULT(CLR_RT_FileStore::LoadFile( szFile, buffer ));
 
             header    = (CLR_RECORD_ASSEMBLY*)&buffer[0              ];
             headerEnd = (CLR_RECORD_ASSEMBLY*)&buffer[buffer.size()-1];
-
+            
             while(header + 1 <= headerEnd && header->GoodAssembly())
             {
                 CLR_RT_Buffer*       bufferSub = new CLR_RT_Buffer(); 
                 CLR_RECORD_ASSEMBLY* headerSub;
                 CLR_RT_Assembly*     assm;
-
+            
                 bufferSub->resize( header->TotalSize() );
-
+            
                 headerSub = (CLR_RECORD_ASSEMBLY*)&(*bufferSub)[0]; 
-
+            
                 if((CLR_UINT8*)header + header->TotalSize() > (CLR_UINT8*)headerEnd)
                 {
                     //checksum passed, but not enough data in assembly
@@ -497,19 +514,19 @@ struct Settings
                     break;
                 }
                 memcpy( headerSub, header, header->TotalSize() );
-
+            
                 m_assemblies[strName] = bufferSub;
-
+            
                 if(FAILED(hr = CLR_RT_Assembly::CreateInstance( headerSub, assm )))
                 {
                     delete bufferSub;
                     break;
                 }
-
+            
                 CLR_RT_UnicodeHelper::ConvertFromUTF8( assm->m_szName, strName ); m_assemblies[strName] = bufferSub;
-
+            
                 assm->DestroyInstance();
-
+            
                 header = (CLR_RECORD_ASSEMBLY*)ROUNDTOMULTIPLE( (size_t)header + header->TotalSize(), CLR_UINT32 );
             }
         }
@@ -565,6 +582,13 @@ void ClrExit()
 {
     NATIVE_PROFILE_CLR_STARTUP();
     CLR_EE_DBG_SET(ExitPending);
+}
+
+void ClrReboot()
+{
+    NATIVE_PROFILE_CLR_STARTUP();
+    CLR_EE_REBOOT_SET(ClrOnly);
+    CLR_EE_DBG_SET(RebootPending);
 }
 
 

@@ -12,6 +12,13 @@ CLR_UINT32 CLR_RT_GarbageCollector::ExecuteCompaction()
 #if defined(TINYCLR_PROFILE_NEW_ALLOCATIONS)
     g_CLR_PRF_Profiler.RecordHeapCompactionBegin();
 #endif
+    
+#if defined(TINYCLR_TRACE_MEMORY_STATS)
+    if(s_CLR_RT_fTrace_MemoryStats >= c_CLR_RT_Trace_Info)
+    {
+        CLR_Debug::Printf( "GC: performing heap compaction...\r\n" );
+    }
+#endif
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 

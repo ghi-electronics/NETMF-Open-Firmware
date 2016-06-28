@@ -193,6 +193,8 @@ int SH7619_EDMAC_LWIP_Driver::Open(int index)
     // Enable Interrupt
  //   CPU_INTC_ActivateInterrupt(AT91C_ID_EMAC, (HAL_CALLBACK_FPN)AT91_EMAC_LWIP_interrupt, &g_AT91_EMAC_NetIF);
 
+    g_SH7619_EDMAC_NetIF.flags |= NETIF_FLAG_IGMP;
+ 
     pNetIF = netif_add( &g_SH7619_EDMAC_NetIF, &ipaddr, &subnetmask, &gateway, NULL, SH7619_EDMAC_ethhw_init, ethernet_input );
 
     netif_set_default( pNetIF );

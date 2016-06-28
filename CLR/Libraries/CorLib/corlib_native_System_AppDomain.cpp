@@ -48,7 +48,7 @@ HRESULT Library_corlib_native_System_AppDomain::LoadInternal___SystemReflectionA
     build      = pArgs[ 4 ].NumericByRef().s4;
     rev        = pArgs[ 5 ].NumericByRef().s4;
 
-    if(fVersion && !(maj != -1 && min != -1 && build != -1 && rev != -1))
+    if(fVersion && (maj == -1 || min == -1 || build == -1 || rev == -1))
     {
         TINYCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
     }
@@ -226,8 +226,44 @@ HRESULT Library_corlib_native_System_AppDomain::GetAssemblies___SZARRAY_SystemRe
 {
     NATIVE_PROFILE_CLR_CORE();
     TINYCLR_HEADER();
+    
+    CLR_RT_HeapBlock& top = stack.PushValueAndClear();
 
-    TINYCLR_SET_AND_LEAVE(stack.NotImplementedStub());
+    int               count  = 0;
+    CLR_RT_HeapBlock* pArray = NULL;
+
+    for(int pass=0; pass<2; pass++)
+    {
+        TINYCLR_FOREACH_ASSEMBLY(g_CLR_RT_TypeSystem)
+        {
+            if(pASSM->m_header->flags & CLR_RECORD_ASSEMBLY::c_Flags_Patch) continue;
+
+            if(pass == 0)
+            {
+                count++;
+            }
+            else
+            {
+                CLR_RT_HeapBlock* hbObj;
+                CLR_RT_Assembly_Index idx; idx.Set( pASSM->m_idx );
+
+                TINYCLR_CHECK_HRESULT(g_CLR_RT_ExecutionEngine.NewObjectFromIndex(*pArray, g_CLR_RT_WellKnownTypes.m_Assembly));
+                hbObj = pArray->Dereference();
+                
+                hbObj->SetReflection( idx ); 
+
+                pArray++;
+            }
+        }
+        TINYCLR_FOREACH_ASSEMBLY_END();
+
+        if(pass == 0)
+        {
+            TINYCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Array::CreateInstance( top, count, g_CLR_RT_WellKnownTypes.m_Assembly ));
+
+            pArray = (CLR_RT_HeapBlock*)top.DereferenceArray()->GetFirstElement();
+        }
+    }
 
     TINYCLR_NOCLEANUP();
 }

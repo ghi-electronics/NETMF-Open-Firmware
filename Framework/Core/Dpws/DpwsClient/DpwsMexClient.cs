@@ -77,8 +77,7 @@ namespace Dpws.Client.Discovery
                     WsWellKnownUri.WstNamespaceUri + "/Get",            // Action
                     null,                                               // RelatesTo
                     "urn:uuid:" + serviceUri.AbsolutePath.Substring(1), // To
-                    //TODO: should be ROLE???
-                    m_version.AnonymousRoleUri,                              // ReplyTo
+                    m_version.AnonymousUri,                             // ReplyTo
                     null, null);                                        // From, Any
 
                 WsMessage msg = new WsMessage(header, null, WsPrefix.None, null, null);

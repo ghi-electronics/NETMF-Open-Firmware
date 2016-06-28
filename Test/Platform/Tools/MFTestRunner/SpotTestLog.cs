@@ -101,7 +101,7 @@ namespace Microsoft.SPOT.Platform.Test
             LogKnownFailureCount();
             SpotTestLog.EndNode("Results");
             SpotTestLog.EndTestLog(test);
-            System.Threading.Thread.Sleep(2000);
+            //System.Threading.Thread.Sleep(2000);
         }
 
         internal static void TestResult(string message, MFTestResults result)

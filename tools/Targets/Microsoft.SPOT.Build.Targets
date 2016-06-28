@@ -23,9 +23,7 @@
     <!-- END ADAPTED FROM DEVICE.TARGETS... -->
     <BuildingProject Condition=" '$(BuildingProject)'=='' " >false</BuildingProject>
     <BuildSilently Condition=" '$(BuildSilently)'=='' " >!$(BuildingProject)</BuildSilently>
-
-  
-</PropertyGroup>
+  </PropertyGroup>
 
   <PropertyGroup Condition=" '$(BuildingInsideVisualStudio)' == 'true' ">
     <ResolveReferencesDependsOn>$(ResolveReferencesDependsOn);ResolveRuntimeDependenciesLE;ResolveRuntimeDependenciesBE</ResolveReferencesDependsOn>
@@ -78,8 +76,9 @@
   </PropertyGroup>
 
     <ItemGroup>
-        <MF_GeneratedStubFile Include="$(MF_GenerateStubsDirectory)\$(MF_GenerateStubsRootName).h" />
-        <MF_GeneratedStubFile Include="$(MF_GenerateStubsDirectory)\$(MF_GenerateStubsRootName).cpp" />
+        <MF_GeneratedStubFile Include="$(MF_GenerateStubsDirectory)$(MF_GenerateStubsRootName).h" />
+        <MF_GeneratedStubFile Include="$(MF_GenerateStubsDirectory)$(MF_GenerateStubsRootName).cpp" />
+        <MF_GenerateStubsFeatureProj Include="$(MF_GenerateStubsDirectory)$(MF_GenerateStubsRootName).featureproj" Condition="'$(MF_GenerateStubs)'=='true'" />
     </ItemGroup>
 
     <ItemGroup Condition=" '$(IsMscorlib)' != 'true' ">
@@ -102,9 +101,10 @@
   </ItemGroup>
 
   <Target Name="MetaDataProcessorDat" DependsOnTargets="MetaDataProcessorDatBE;MetaDataProcessorCompileBE" />
+
   <Target Name="MMP_CreateDatabaseAndDependencyMap" DependsOnTargets="MetaDataProcessorDump;MetaDataProcessorDat;MetadataProcessorXML" />
-  <Target
-    Name="MetaDataProcessorCompile"
+
+  <Target Name="MetaDataProcessorCompile"
     Inputs="
         $(MMP_PE_Parse);
         @(MMP_PE_LoadHints);
@@ -121,7 +121,9 @@
         $(MMP_PE_DumpExports);
         $(MMP_PE_RefreshAssemblyOutput);
         $(MMP_PE_CreateDatabaseFile);
-        $(MMP_PE_GenerateDependency)"
+        $(MMP_PE_GenerateDependency);
+        @(MF_GenerateStubsFeatureProj)"
+
     DependsOnTargets="ResolveRuntimeDependenciesLE"
     Condition="'$(MMP_PE_SKIP)' != 'true'"
     >
@@ -205,6 +207,7 @@
         GenerateSkeletonFile="$(MMP_STUB_GenerateSkeletonFile)"
         GenerateSkeletonName="$(MMP_STUB_GenerateSkeletonName)"
         GenerateSkeletonProject="$(MMP_STUB_GenerateSkeletonProject)"
+        LegacySkeletonInterop="$(MMP_STUB_LegacySkeletonInterop)"
         GenerateDependency="$(MMP_STUB_GenerateDependency)"
         CreateDatabase="@(MMP_STUB_CreateDatabase)"
         RefreshAssemblyName="$(MMP_STUB_RefreshAssemblyName)"
@@ -272,8 +275,8 @@
     </PropertyGroup>
 
    <!-- Compile to PE -->
-      <Message Text="Distilling assemblies to TinyCLR PE files in other endianness..." />
-      <MetaDataProcessor
+   <Message Text="Distilling assemblies to TinyCLR PE files in other endianness..." />
+   <MetaDataProcessor
       Endianness="be"
       Minimize="$(MMP_PE_Minimize)"
       Verbose="$(MMP_PE_Verbose)"
@@ -308,10 +311,11 @@
       <Output TaskParameter="FilesWritten" ItemName="FileWrites"/>
     </MetaDataProcessor>
       
-      
+
+<!-- DON'T NEED TO BUILD INTEROP STUBS FOR BE ENDIAN      
     <Message Text="Generating interop stub files for other endian $(MMP_STUB_GenerateSkeletonName)..." Condition="'$(MMP_STUB_SKIP)' != 'true'"/>
 
-    <!-- Create STUB file -->
+    <! - - Create STUB file - - >
     <MetaDataProcessor
       Endianness="be"
       Minimize="$(MMP_STUB_Minimize)"
@@ -329,6 +333,7 @@
       GenerateSkeletonFile="$(MMP_STUB_GenerateSkeletonFile)"
       GenerateSkeletonName="$(MMP_STUB_GenerateSkeletonName)"
       GenerateSkeletonProject="$(MMP_STUB_GenerateSkeletonProject)"
+      LegacySkeletonInterop="$(MMP_STUB_LegacySkeletonInterop)"
       GenerateDependency="$(MMP_STUB_GenerateDependency)"
       CreateDatabase="@(MMP_STUB_CreateDatabase)"
       RefreshAssemblyName="$(MMP_STUB_RefreshAssemblyName)"
@@ -348,6 +353,7 @@
     </MetaDataProcessor>
 
       <CallTarget Targets="GenerateStubs" Condition="'$(MF_GenerateStubs)'=='true'" />
+-->
   </Target>
 
   <Target Name="GenerateStubs"
@@ -695,7 +701,6 @@
       <ResolvedPEFile Include="%(_ResolvedPEFile.identity)" Condition="EXISTS(%(_ResolvedPEFile.identity))" />
     </ItemGroup>
 
-
     <ResolveRuntimeDependencies
         Condition="'$(BuildingInsideVisualStudio)' == 'true'"
         Assembly="$(TinyCLR_Assembly)"
@@ -785,8 +790,8 @@
          the .NET framework assemblies for the desktop; we continue to treat TargetFrameworkDirectory
          as a single path to the one directory containing the entire .NET MF.
     -->
-  <Target
-    Name="GetReferenceAssemblyPaths"
+
+  <Target Name="GetReferenceAssemblyPaths"
     DependsOnTargets="$(GetReferenceAssemblyPathsDependsOn)">
   </Target>
 

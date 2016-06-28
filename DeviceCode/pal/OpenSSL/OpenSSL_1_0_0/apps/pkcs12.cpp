@@ -381,7 +381,7 @@ int MAIN(int argc, char **argv)
     else in = BIO_new_file(infile, "rb");
     if (!in) {
 	    BIO_printf(bio_err, "Error opening input file %s\n",
-						infile ? infile : "<OPENSSL_TYPE__FILE_STDIN>");
+						infile ? infile : "<stdin>");
 	    TINYCLR_SSL_PERROR (infile);
 	    goto end;
    }
@@ -402,7 +402,7 @@ int MAIN(int argc, char **argv)
     } else out = BIO_new_file(outfile, "wb");
     if (!out) {
 	BIO_printf(bio_err, "Error opening output file %s\n",
-						outfile ? outfile : "<OPENSSL_TYPE__FILE_STDOUT>");
+						outfile ? outfile : "<stdout>");
 	TINYCLR_SSL_PERROR (outfile);
 	goto end;
     }

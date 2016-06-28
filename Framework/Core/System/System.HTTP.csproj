@@ -17,7 +17,6 @@
   </PropertyGroup>
   <Import Project="$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.CSharp.Targets" />
   <ItemGroup>
-    <Compile Include="HTTP\System.Convert_Base64.cs" />
     <Compile Include="HTTP\System.Net.AuthenticationType.cs" />
     <Compile Include="HTTP\System.Net.NetworkCredential.cs" />
     <Compile Include="HTTP\System.Net._InputNetworkStreamWrapper.cs" />

@@ -15,6 +15,7 @@ using namespace System::Reflection;
 using namespace Microsoft::SPOT::Emulator::BlockStorage;
 
 extern void EmulatorHook__Watchdog_Callback();
+extern void ClrReboot();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -76,6 +77,10 @@ void Settings::DeleteInstance( Settings*& settings )
 
 //--//
 
+#ifdef NETMF_RUN_NATIVE_UNIT_TESTS
+extern BOOL TestEntry();
+#endif
+
 HRESULT Settings::System_Start()
 {
     TINYCLR_HEADER();
@@ -113,6 +118,9 @@ HRESULT Settings::System_Start()
     Ink_Initialize();
     */
 
+#ifdef NETMF_RUN_NATIVE_UNIT_TESTS
+    TestEntry();
+#endif
 
     TINYCLR_NOCLEANUP();
 }
@@ -174,6 +182,7 @@ namespace Microsoft
                 INT64 rdtscStart, rdtscEnd;
                 double RDTSC_To_PerfCount_Ratio;
 
+                m_isClrStarted = false;
                 m_managedHal = managedHal;
                 m_batteryDriver = managedHal->Battery;
                 m_comDriver = managedHal->Com;
@@ -192,6 +201,19 @@ namespace Microsoft
                 m_watchdogDriver = managedHal->Watchdog;
                 m_blockStorageDriver = managedHal->BlockStorage;
                 m_sslDriver = managedHal->Ssl;
+
+                m_sessionDriver = managedHal->Session;
+                m_encryptionDriver = managedHal->Encryption;
+                m_signatureDriver = managedHal->Signature;
+                m_digestDriver = managedHal->Digest;
+                m_keyManagementDriver = managedHal->KeyManagement;
+                m_crypokiObjectMgrDriver = managedHal->CryptokiObjectMgr;
+                m_randomDriver = managedHal->Random;
+
+                m_updateProvider = managedHal->UpdateProvider;
+                m_updateBackup = managedHal->UpdateBackup;
+                m_updateStorage = managedHal->UpdateStorage;
+                m_updateValidation = managedHal->UpdateValidation;
 
                 m_socketsDriver->Initialize();
 
@@ -229,7 +251,16 @@ namespace Microsoft
             {
                 ASSERT(settings);
 
-                ClrStartup(settings->m_emuSettings);
+                if(m_isClrStarted)
+                {
+                    ClrReboot();
+                }
+                else
+                {
+                    m_isClrStarted = true;
+
+                    ClrStartup(settings->m_emuSettings);
+                }
             }
 
             void EmulatorNative::Shutdown()
@@ -372,6 +403,55 @@ namespace Microsoft
             {
                 return s_emulatorNative->m_watchdogDriver;
             }
+
+            ISessionDriver^ EmulatorNative::GetISessionDriver()
+            {
+                return s_emulatorNative->m_sessionDriver;
+            }
+
+            IEncryptionDriver^ EmulatorNative::GetIEncryptionDriver()
+            {
+                return s_emulatorNative->m_encryptionDriver;
+            }
+
+            IDigestDriver^ EmulatorNative::GetIDigestDriver()
+            {
+                return s_emulatorNative->m_digestDriver;
+            }
+            ISignatureDriver^ EmulatorNative::GetISignatureDriver()
+            {
+                return s_emulatorNative->m_signatureDriver;
+            }
+            IKeyManagementDriver^ EmulatorNative::GetIKeyManagementDriver()
+            {
+                return s_emulatorNative->m_keyManagementDriver;
+            }
+            ICryptokiObjectDriver^ EmulatorNative::GetICryptokiObjectDriver()
+            {
+                return s_emulatorNative->m_crypokiObjectMgrDriver;
+            }
+            IRandomDriver^ EmulatorNative::GetIRandomDriver()
+            {
+                return s_emulatorNative->m_randomDriver;
+            }
+            
+            IUpdateDriver^ EmulatorNative::GetIUpdateProvider()
+            {
+                return s_emulatorNative->m_updateProvider;
+            }
+            IUpdateStorageDriver^ EmulatorNative::GetIUpdateStorage()
+            {
+                return s_emulatorNative->m_updateStorage;
+            }
+            IUpdateBackupDriver^ EmulatorNative::GetIUpdateBackup()
+            {
+                return s_emulatorNative->m_updateBackup;
+            }
+            IUpdateValidationDriver^ EmulatorNative::GetIUpdateValidation()
+             {
+                return s_emulatorNative->m_updateValidation;
+            }
+
 
             void EmulatorNative::ExecuteCompletion( IntPtr completion )
             {

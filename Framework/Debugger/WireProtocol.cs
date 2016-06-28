@@ -134,14 +134,14 @@ namespace Microsoft.SPOT.Debugger.WireProtocol
 
         public class Monitor_FlashSectorMap
         {
-            public const uint c_MEMORY_USAGE_APPLICATION = 0x00000000;
             public const uint c_MEMORY_USAGE_BOOTSTRAP = 0x00000010;
             public const uint c_MEMORY_USAGE_CODE = 0x00000020;
             public const uint c_MEMORY_USAGE_CONFIG = 0x00000030;
             public const uint c_MEMORY_USAGE_FS = 0x00000040;
             public const uint c_MEMORY_USAGE_DEPLOYMENT = 0x00000050;
-            public const uint c_MEMORY_USAGE_JITTER = 0x00000060;
-            public const uint c_MEMORY_USAGE_RESERVED = 0x00000070;
+            public const uint c_MEMORY_USAGE_UPDATE = 0x0060;
+            public const uint c_MEMORY_USAGE_SIMPLE_A = 0x00000090;
+            public const uint c_MEMORY_USAGE_SIMPLE_B = 0x000000A0;
             public const uint c_MEMORY_USAGE_STORAGE_A = 0x000000E0;
             public const uint c_MEMORY_USAGE_STORAGE_B = 0x000000F0;
             public const uint c_MEMORY_USAGE_MASK = 0x000000F0;
@@ -428,6 +428,15 @@ namespace Microsoft.SPOT.Debugger.WireProtocol
         public const uint c_Debugging_Resolve_Method = 0x00020053; // Resolves a method to a string.
         public const uint c_Debugging_Resolve_VirtualMethod = 0x00020054; // Resolves a virtual method to the actual implementation.
         public const uint c_Debugging_Resolve_AppDomain = 0x00020055; // Resolves an AppDomain to it's name, and list its loaded assemblies.
+        
+        public const uint c_Debugging_MFUpdate_Start = 0x00020056; // 
+        public const uint c_Debugging_MFUpdate_AddPacket = 0x00020057; // 
+        public const uint c_Debugging_MFUpdate_Install = 0x00020058; // 
+        public const uint c_Debugging_MFUpdate_AuthCmd = 0x00020059; // 
+        public const uint c_Debugging_MFUpdate_Authenticate = 0x00020060; // 
+        public const uint c_Debugging_MFUpdate_GetMissingPkts = 0x00020061; // 
+
+        public const uint c_Debugging_UpgradeToSsl = 0x00020069; // 
 
         public const uint c_Debugging_Lcd_NewFrame = 0x00020070; // Reports a new frame sent to the LCD.
         public const uint c_Debugging_Lcd_NewFrameData = 0x00020071; // Reports a new frame sent to the LCD, with its contents.
@@ -509,6 +518,152 @@ namespace Microsoft.SPOT.Debugger.WireProtocol
                 public uint m_address = 0;
             }
         };
+
+        public class Debugging_UpgradeToSsl
+        {
+            public uint m_flags;
+
+            public class Reply
+            {
+                public int m_success;
+            }
+        }
+
+        public class Debugging_MFUpdate_Start
+        {
+            public const int c_UpdateProviderSize = 64;
+
+            public byte[] m_updateProvider = new byte[c_UpdateProviderSize];
+            public uint m_updateId;
+            public uint m_updateType;
+            public uint m_updateSubType;
+            public uint m_updateSize;
+            public uint m_updatePacketSize;
+            public ushort m_updateVerMajor;
+            public ushort m_updateVerMinor;
+        
+            public class Reply
+            {
+                public int m_updateHandle;
+            };
+        };
+
+        
+        public class Debugging_MFUpdate_AuthCommand
+        {
+            public int    m_updateHandle;
+            public uint   m_authCommand;
+            public uint   m_authArgsSize;
+            public byte[] m_authArgs;
+
+            public bool PrepareForSend(byte[] authArgs)
+            {
+                m_authArgsSize = (uint)authArgs.Length;
+                m_authArgs     = new byte[m_authArgsSize];
+
+                Array.Copy(authArgs, 0, m_authArgs, 0, m_authArgsSize);
+                
+                return true;
+            }
+        
+            public class Reply : IConverter
+            {
+                public int    m_success;
+                public uint   m_responseSize;
+                public byte[] m_response;
+
+                public void  PrepareForDeserialize(int size, byte[] data, Converter converter)
+                {
+                    m_response = new byte[(size - 8)]; // subtract sizeof(m_success) and sizeof(m_responseSize)
+                }
+            };
+        };
+        
+        public class Debugging_MFUpdate_Authenticate
+        {
+            public int    m_updateHandle;
+            public uint   m_authenticationSize;
+            public byte[] m_authenticationData;
+
+            public bool PrepareForSend(byte[] authenticationData)
+            {
+                m_authenticationSize = authenticationData == null ? 0 : (uint)authenticationData.Length;
+                m_authenticationData = new byte[m_authenticationSize];
+
+                if (m_authenticationSize > 0)
+                {
+                    Array.Copy(authenticationData, 0, m_authenticationData, 0, m_authenticationSize);
+                }
+                
+                return true;
+            }
+            
+            public class Reply
+            {
+                public int m_success;
+            };
+        };
+
+        public class Debugging_MFUpdate_GetMissingPkts
+        {
+            public int m_updateHandle;
+
+            public class Reply : IConverter
+            {
+                public int m_success;
+                public int m_missingPktCount;
+                public uint[] m_missingPkts;
+
+                public void PrepareForDeserialize(int size, byte[] data, Converter converter)
+                {
+                    m_missingPkts = new uint[(size - 8) / 4]; // subtract sizeof(m_success) and sizeof(m_missingPktCount)
+                }
+            };
+        };
+
+        public class Debugging_MFUpdate_AddPacket
+        {
+            public int  m_updateHandle;
+            public uint m_packetIndex;
+            public uint m_packetValidation;
+            public uint m_packetLength = 0;
+            public byte[] m_packetData;
+
+            public void PrepareForSend(byte[] packetData)
+            {
+                m_packetLength = (uint)packetData.Length;
+                m_packetData = new byte[m_packetLength];
+
+                Array.Copy(packetData, 0, m_packetData, 0, m_packetLength);
+            }
+        
+            public class Reply
+            {
+                public uint m_success;
+            };
+        };
+        
+        public class Debugging_MFUpdate_Install
+        {
+            public int m_updateHandle;
+            public uint m_updateValidationSize;
+            public byte[] m_updateValidation;
+
+            public void PrepareForSend(byte[] packetValidation)
+            {
+                m_updateValidationSize = (uint)packetValidation.Length;
+                m_updateValidation = new byte[m_updateValidationSize];
+
+                Array.Copy(packetValidation, 0, m_updateValidation, 0, m_updateValidationSize);
+            }
+        
+            public class Reply
+            {
+                public uint m_success;
+            };
+        };
+        
+        
 
         public class Debugging_Execution_BreakpointDef
         {
@@ -1455,6 +1610,15 @@ namespace Microsoft.SPOT.Debugger.WireProtocol
                     case c_Debugging_Execution_BreakpointStatus: return new Debugging_Execution_BreakpointStatus.Reply();
                     case c_Debugging_Execution_QueryCLRCapabilities: return new Debugging_Execution_QueryCLRCapabilities.Reply();
 
+                    case c_Debugging_MFUpdate_Start: return new Debugging_MFUpdate_Start.Reply();
+                    case c_Debugging_MFUpdate_AuthCmd: return new Debugging_MFUpdate_AuthCommand.Reply();
+                    case c_Debugging_MFUpdate_Authenticate: return new Debugging_MFUpdate_Authenticate.Reply();
+                    case c_Debugging_MFUpdate_GetMissingPkts: return new Debugging_MFUpdate_GetMissingPkts.Reply();
+                    case c_Debugging_MFUpdate_AddPacket: return new Debugging_MFUpdate_AddPacket.Reply();
+                    case c_Debugging_MFUpdate_Install: return new Debugging_MFUpdate_Install.Reply();
+
+                    case c_Debugging_UpgradeToSsl: return new Debugging_UpgradeToSsl.Reply();
+
                     case c_Debugging_Thread_Create: return new Debugging_Thread_Create.Reply();
                     case c_Debugging_Thread_CreateEx: return new Debugging_Thread_CreateEx.Reply();
                     case c_Debugging_Thread_List: return new Debugging_Thread_List.Reply();
@@ -1524,6 +1688,15 @@ namespace Microsoft.SPOT.Debugger.WireProtocol
                     case c_Debugging_Execution_BreakpointStatus: return new Debugging_Execution_BreakpointStatus();
                     case c_Debugging_Execution_QueryCLRCapabilities: return new Debugging_Execution_QueryCLRCapabilities();
                     case c_Debugging_Execution_SetCurrentAppDomain: return new Debugging_Execution_SetCurrentAppDomain();
+
+                    case c_Debugging_MFUpdate_Start: return new Debugging_MFUpdate_Start();
+                    case c_Debugging_MFUpdate_AuthCmd: return new Debugging_MFUpdate_AuthCommand();
+                    case c_Debugging_MFUpdate_Authenticate: return new Debugging_MFUpdate_Authenticate();
+                    case c_Debugging_MFUpdate_GetMissingPkts: return new Debugging_MFUpdate_GetMissingPkts();
+                    case c_Debugging_MFUpdate_AddPacket: return new Debugging_MFUpdate_AddPacket();
+                    case c_Debugging_MFUpdate_Install: return new Debugging_MFUpdate_Install();
+
+                    case c_Debugging_UpgradeToSsl: return new Debugging_UpgradeToSsl();
 
                     case c_Debugging_Thread_Create: return new Debugging_Thread_Create();
                     case c_Debugging_Thread_CreateEx: return new Debugging_Thread_CreateEx();

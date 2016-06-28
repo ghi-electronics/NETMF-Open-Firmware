@@ -30,6 +30,15 @@ const CLR_Messaging_CommandHandlerLookup c_Debugger_Lookup_Request[] =
     //
     DEFINE_CMD(Execution_Allocate        ),
 
+    DEFINE_CMD(UpgradeToSsl),
+
+    DEFINE_CMD(MFUpdate_Start            ),
+    DEFINE_CMD(MFUpdate_AuthCommand      ),
+    DEFINE_CMD(MFUpdate_Authenticate     ),
+    DEFINE_CMD(MFUpdate_GetMissingPkts   ),
+    DEFINE_CMD(MFUpdate_AddPacket        ),
+    DEFINE_CMD(MFUpdate_Install          ),
+
 #if defined(TINYCLR_ENABLE_SOURCELEVELDEBUGGING)
     DEFINE_CMD(Execution_SetCurrentAppDomain),
     DEFINE_CMD(Execution_Breakpoints        ),

@@ -66,6 +66,9 @@ namespace localhost.ServiceHelloWCF
             respDcs = new HelloWCFResponseDataContractSerializer("HelloWCFResponse", "http://localhost/ServiceHelloWCF");
             HelloWCFResponse resp;
             resp = ((HelloWCFResponse)(respDcs.ReadObject(response.Reader)));
+            response.Reader.Dispose();
+            response.Reader = null;
+            
             return resp;
         }
     }

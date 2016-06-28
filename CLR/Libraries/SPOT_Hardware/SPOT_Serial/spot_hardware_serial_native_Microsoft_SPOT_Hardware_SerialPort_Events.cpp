@@ -41,9 +41,9 @@ static HRESULT EnableDisableUsartDataEventSink( CLR_RT_HeapBlock_NativeEventDisp
 {
     UINT32 port;
 
-    if(pContext && pContext->m_pDrvCustomData)
+    if(pContext)
     {
-        port = *(UINT32*)(pContext->m_pDrvCustomData);
+        port = (UINT32)(pContext->m_pDrvCustomData);
 
         if(!USART_ConnectEventSink( port, USART_EVENT_TYPE_DATA, pContext, (fEnable ? PostUsartEvent : NULL), NULL )) return CLR_E_INVALID_PARAMETER;
     }
@@ -55,9 +55,9 @@ static HRESULT CleanupUsartDataEventSink( CLR_RT_HeapBlock_NativeEventDispatcher
 {
     UINT32 port;
 
-    if(pContext && pContext->m_pDrvCustomData)
+    if(pContext)
     {
-        port = *(UINT32*)(pContext->m_pDrvCustomData);
+        port = (UINT32)(pContext->m_pDrvCustomData);
 
         CleanupNativeEventsFromHALQueue( pContext );
 
@@ -105,9 +105,9 @@ static HRESULT EnableDisableUsartErrorSink( CLR_RT_HeapBlock_NativeEventDispatch
 {
     UINT32 port;
 
-    if(pContext && pContext->m_pDrvCustomData)
+    if(pContext)
     {
-        port = *(UINT32*)(pContext->m_pDrvCustomData);
+        port = (UINT32)(pContext->m_pDrvCustomData);
 
         if(!USART_ConnectEventSink( port, USART_EVENT_TYPE_ERROR, pContext, (fEnable ? PostUsartEvent : NULL), NULL )) return CLR_E_INVALID_PARAMETER;
     }
@@ -120,9 +120,9 @@ static HRESULT CleanupUsartErrorSink( CLR_RT_HeapBlock_NativeEventDispatcher *pC
 {
     UINT32 port;
 
-    if(pContext && pContext->m_pDrvCustomData)
+    if(pContext)
     {
-        port = *(UINT32*)(pContext->m_pDrvCustomData);
+        port = (UINT32)(pContext->m_pDrvCustomData);
 
         CleanupNativeEventsFromHALQueue( pContext );
 

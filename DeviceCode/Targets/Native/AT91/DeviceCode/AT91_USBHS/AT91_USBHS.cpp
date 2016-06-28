@@ -980,11 +980,10 @@ BOOL AT91_USBHS_Driver::ProtectPins( int Controller, BOOL On )
                     pMatrix->MATRIX_USBPCR |= AT91C_MATRIX_USBPCR_PUON;
                 #endif
                 
-				// Gus removed
-                //if(CPU_GPIO_GetPinState (AT91_VBUS))
-                //{
-                //    VBus_ISR(0, TRUE, NULL);
-                //}
+                if(CPU_GPIO_GetPinState (AT91_VBUS))
+                {
+                    VBus_ISR(0, TRUE, NULL);
+                }
 
             }
         }
@@ -1048,7 +1047,7 @@ void AT91_USBHS_Driver::VBus_ISR(GPIO_PIN Pin, BOOL PinState, void* Param)
 
     }
     
-        pUdp->UDPHS_TST = 3;
+        pUdp->UDPHS_TST = 0;
         //pUdp->UDPHS_IEN = 0;
         pUdp->UDPHS_IEN = AT91C_UDPHS_ENDOFRSM | AT91C_UDPHS_WAKE_UP | AT91C_UDPHS_DET_SUSPD;
         pUdp->UDPHS_CLRINT = 0xFE;

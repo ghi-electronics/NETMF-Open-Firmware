@@ -6,6 +6,8 @@ using System;
 
 namespace Microsoft.SPOT.Emulator.Serial
 {
+    public delegate void OnSerialPortEvtHandler(int port, uint evt);
+
     public interface ISerialDriver
     {
         bool Initialize(int ComPortNum, int BaudRate, int Parity, int DataBits, int StopBits, int FlowValue);
@@ -26,6 +28,7 @@ namespace Microsoft.SPOT.Emulator.Serial
         bool SupportNonStandardBaudRate (int ComPortNum);
         void BaudrateBoundary(int ComPortNum, out uint maxBaudrateHz, out uint minBaudrateHz);
         bool IsBaudrateSupported(int ComPortNum, ref uint BaudrateHz);
+        bool SetDataEventHandler(int ComPortNum, IntPtr handler );
         
     }
 }

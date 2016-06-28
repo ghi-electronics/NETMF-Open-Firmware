@@ -353,7 +353,7 @@ bool CLR_RT_Persistence_Manager::Bank::Erase( int& blockIndex )
 
     pRange  = &pRegion->BlockRanges[ m_stream.RangeIndex ];
 
-    if(pRange->GetBlockCount() <= blockIndex)
+    if(pRange->GetBlockCount() <= (CLR_UINT32)blockIndex)
     {
         return false;
     }
@@ -1461,9 +1461,10 @@ void CLR_RT_HeapBlock_WeakReference::Relocate()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool CLR_RT_HeapBlock_WeakReference::PrepareForRecovery( CLR_RT_HeapBlock_Node* ptr, CLR_RT_HeapBlock_Node* end )
+bool CLR_RT_HeapBlock_WeakReference::PrepareForRecovery( CLR_RT_HeapBlock_Node* ptr, CLR_RT_HeapBlock_Node* end, CLR_UINT32 blockSize )
 {
     NATIVE_PROFILE_CLR_HEAP_PERSISTENCE();
+    
     while(ptr < end)
     {
         if(ptr->DataType() == DATATYPE_WEAKCLASS)
@@ -1503,8 +1504,13 @@ bool CLR_RT_HeapBlock_WeakReference::PrepareForRecovery( CLR_RT_HeapBlock_Node* 
             }
         }
 
-        ptr->SetDataId( CLR_RT_HEAPBLOCK_RAW_ID(DATATYPE_FREEBLOCK,0,1) );
-        ptr++;
+        if((UINT32)(ptr + blockSize) > (UINT32)end)
+        {
+            blockSize = (CLR_UINT32)(end - ptr);
+        }
+
+        ptr->SetDataId( CLR_RT_HEAPBLOCK_RAW_ID(DATATYPE_FREEBLOCK,0,blockSize) );
+        ptr += blockSize;
     }
 
     return true;

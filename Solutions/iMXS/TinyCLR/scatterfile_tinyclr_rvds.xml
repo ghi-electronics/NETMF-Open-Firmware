@@ -24,12 +24,12 @@
         <Set Name="Config_BaseAddress"  Value="0x107E0000"/>    
         <Set Name="Config_Size"         Value="0x00020000"/>
         <Set Name="Code_BaseAddress"    Value="0x10020000"/>    
-        <Set Name="Deploy_BaseAddress"  Value="0x10100000"/>
+        <Set Name="Deploy_BaseAddress"  Value="0x101C0000"/>
         <Set Name="Code_Size"           Value="%Deploy_BaseAddress - Code_BaseAddress%"/>
         <Set Name="Valid"               Value="true"/>
 
         <If Name="TARGETTYPE" In="RELEASE DEBUG">
-            <Set Name="Data_BaseAddress"    Value="0x100C0000"/>
+            <Set Name="Data_BaseAddress"    Value="0x10180000"/>
             <Set Name="Code_Size"           Value="%Data_BaseAddress - Code_BaseAddress%"/>
             <Set Name="Data_Size"           Value="%Deploy_BaseAddress - Data_BaseAddress%"/>
         </If>
@@ -42,7 +42,7 @@
         <Set Name="Custom_Heap_End"     Value="0x088FFFF8"/>
         
         <Set Name="Code_BaseAddress" Value="0x08020000"/>
-        <Set Name="Code_Size"        Value="0x000D0000"/>
+        <Set Name="Code_Size"        Value="0x002D0000"/>
         <Set Name="Valid"            Value="true"/>
     </If>
 

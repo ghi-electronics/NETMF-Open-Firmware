@@ -157,16 +157,18 @@ ADS_PACKED struct GNU_PACKED USB_SETUP_PACKET
 };
 
 // USB 2.0 response structure lengths
-#define USB_STRING_DESCRIPTOR_MAX_LENGTH    126     /* Maximum number of characters allowed in USB string descriptor */
-#define USB_FRIENDLY_NAME_LENGTH             32
-#define USB_DEVICE_DESCRIPTOR_LENGTH         18
-#define USB_CONFIGURATION_DESCRIPTOR_LENGTH   9
-#define USB_STRING_DESCRIPTOR_HEADER_LENGTH   2
+#define USB_STRING_DESCRIPTOR_MAX_LENGTH        126  // Maximum number of characters allowed in USB string descriptor 
+#define USB_FRIENDLY_NAME_LENGTH                 32
+#define USB_DEVICE_DESCRIPTOR_LENGTH             18
+#define USB_CONFIGURATION_DESCRIPTOR_LENGTH       9
+#define USB_STRING_DESCRIPTOR_HEADER_LENGTH       2
 // Sideshow descriptor lengths
-#define OS_DESCRIPTOR_STRING_SIZE            18
-#define OS_DESCRIPTOR_STRING_LENGTH           7
-#define USB_XCOMPATIBLE_OS_SIZE              40
-#define USB_XCOMPATIBLE_OS_REQUEST            4
+#define OS_DESCRIPTOR_STRING_SIZE                18
+#define OS_DESCRIPTOR_STRING_LENGTH               7
+#define USB_XCOMPATIBLE_OS_SIZE                  40
+#define USB_XPROPERTY_OS_SIZE_WINUSB     0x0000008E  // Size of this descriptor (78 bytes for guid + 40 bytes for the property name + 24 bytes for other fields = 142 bytes)
+#define USB_XCOMPATIBLE_OS_REQUEST                4
+#define USB_XPROPERTY_OS_REQUEST                  5
 
 
 
@@ -338,7 +340,7 @@ ADS_PACKED struct GNU_PACKED USB_OS_STRING_DESCRIPTOR
 
 // USB configuration list structure that responds to requests for the OS extended compatible ID
 // Note that this is created as a Generic descriptor as described above.
-// This is generally only used by Sideshow
+// This is generally only used by WinUSB
 ADS_PACKED struct GNU_PACKED USB_XCOMPATIBLE_OS_ID
 {
     USB_GENERIC_DESCRIPTOR_HEADER header;
@@ -355,6 +357,34 @@ ADS_PACKED struct GNU_PACKED USB_XCOMPATIBLE_OS_ID
     UINT8  subCompatibleID[8];
     UINT8  padding2[6];
 };
+
+// USB configuration list structure that responds to requests for the OS extended properties feature descriptor 
+// This is generally only used by WinUSB
+ADS_PACKED struct GNU_PACKED USB_XPROPERTIES_OS_WINUSB
+{
+    USB_GENERIC_DESCRIPTOR_HEADER header;
+    
+    UINT32 dwLength;
+    UINT16 bcdVersion;
+    UINT16 wIndex;
+    UINT16  bCount;
+    // One Extended Property OS record
+    UINT32 dwSize;
+#define EX_PROPERTY_DATA_TYPE__RESERVED                 0
+#define EX_PROPERTY_DATA_TYPE__REG_SZ                   1
+#define EX_PROPERTY_DATA_TYPE__REG_SZ_ENV               2
+#define EX_PROPERTY_DATA_TYPE__REG_BINARY               3
+#define EX_PROPERTY_DATA_TYPE__REG_DWORD_LITTLE_ENDIAN  4
+#define EX_PROPERTY_DATA_TYPE__REG_DWORD_BIG_ENDIAN     5
+#define EX_PROPERTY_DATA_TYPE__REG_LINK                 6
+#define EX_PROPERTY_DATA_TYPE__REG_MULTI_SZ             7
+    UINT32 dwPropertyDataType;
+    UINT16 wPropertyNameLengh;
+    UINT8  bPropertyName[40]; // NULL -terminated UNICODE string
+    UINT32 dwPropertyDataLengh;
+    UINT8  bPropertyData[78]; // NULL -terminated UNICODE string
+};
+
 
 ADS_PACKED struct GNU_PACKED USB_DYNAMIC_CONFIGURATION;
 
@@ -529,6 +559,7 @@ UINT32 USB_GetEvent    ( int Controller,      UINT32 Mask              );
 UINT32 USB_SetEvent    ( int Controller,      UINT32 Event             );
 UINT32 USB_ClearEvent  ( int Controller,      UINT32 Event             );
 UINT8  USB_GetStatus   ( int Controller                                );
+void   USB_DiscardData ( int UsbStream ,      BOOL fTx                 );
 
 //--//
 

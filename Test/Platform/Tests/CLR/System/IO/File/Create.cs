@@ -238,6 +238,11 @@ namespace Microsoft.SPOT.Platform.Tests
                 if (!TestCreate(filedirspace))
                     result = MFTestResults.Fail;
 
+                if (!TestCreate(file1Dir1.ToLower()))
+                    result = MFTestResults.Fail;
+
+                if (!TestCreate(file1Dir1.ToUpper()))
+                    result = MFTestResults.Fail;
             }
             catch (Exception ex)
             {

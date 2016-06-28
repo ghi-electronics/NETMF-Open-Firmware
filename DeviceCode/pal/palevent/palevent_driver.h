@@ -4,22 +4,19 @@
 
 #include <tinyhal.h>
 
-class PalEventDriver
+struct PalEventDriver
 {
 public:
 
     HAL_DblLinkedList<PalEventListener> m_listenerList;
-    bool m_initialized;
 
-    PalEventDriver()
-    {
-        m_initialized = false;
-    }
+    static HRESULT Initialize();
+    static HRESULT Uninitialize();
+    static HRESULT PostEvent(unsigned int e, unsigned int param);
+    static HRESULT EnlistListener(PalEventListener* listener);
 
-    HRESULT Initialize();
-    HRESULT Uninitialize();
-    HRESULT PostEvent(unsigned int e, unsigned int param);
-    HRESULT EnlistListener(PalEventListener* listener);
+private:
+    static BOOL s_initialized;
 };
 
 extern PalEventDriver g_palEventDriver;

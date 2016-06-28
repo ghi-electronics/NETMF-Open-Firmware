@@ -20,6 +20,7 @@ namespace Microsoft.SPOT.Presentation
             public LayoutQueue(LayoutManager layoutManager)
             {
                 _layoutManager = layoutManager;
+                _elements      = new ArrayList();
             }
 
             public bool IsEmpty
@@ -89,7 +90,7 @@ namespace Microsoft.SPOT.Presentation
 
             private LayoutManager _layoutManager;
 
-            private ArrayList _elements = new ArrayList();
+            private ArrayList _elements;
         }
 
         private class SingletonLock
@@ -109,10 +110,9 @@ namespace Microsoft.SPOT.Presentation
         {
             if (!_layoutRequestPosted && !_isUpdating)
             {
+                _layoutRequestPosted = true;
                 MediaContext.From(Dispatcher).BeginInvokeOnRender(_updateCallback, this);
             }
-
-            _layoutRequestPosted = true;
         }
 
         private object UpdateLayoutBackground(object arg)
@@ -133,7 +133,13 @@ namespace Microsoft.SPOT.Presentation
             {
                 if (_arrangeQueue == null)
                 {
-                    _arrangeQueue = new LayoutQueue(this);
+                    lock (typeof(SingletonLock))
+                    {
+                        if (_arrangeQueue == null)
+                        {
+                            _arrangeQueue = new LayoutQueue(this);
+                        }
+                    }
                 }
 
                 return _arrangeQueue;
@@ -152,17 +158,20 @@ namespace Microsoft.SPOT.Presentation
 
         public static LayoutManager From(Dispatcher dispatcher)
         {
-            if (dispatcher == null) throw new ArgumentException("dispatcher");
+            if (dispatcher == null) throw new ArgumentException();
 
-            lock (typeof(SingletonLock))
+            if (dispatcher._layoutManager == null)
             {
-                if (dispatcher._layoutManager == null)
+                lock (typeof(SingletonLock))
                 {
-                    dispatcher._layoutManager = new LayoutManager();
+                    if (dispatcher._layoutManager == null)
+                    {
+                        dispatcher._layoutManager = new LayoutManager();
+                    }
                 }
-
-                return dispatcher._layoutManager;
             }
+
+            return dispatcher._layoutManager;
         }
 
         public LayoutQueue MeasureQueue
@@ -171,7 +180,13 @@ namespace Microsoft.SPOT.Presentation
             {
                 if (_measureQueue == null)
                 {
-                    _measureQueue = new LayoutQueue(this);
+                    lock (typeof(SingletonLock))
+                    {
+                        if (_measureQueue == null)
+                        {
+                            _measureQueue = new LayoutQueue(this);
+                        }
+                    }
                 }
 
                 return _measureQueue;
@@ -184,6 +199,8 @@ namespace Microsoft.SPOT.Presentation
 
             //make UpdateLayout to be a NOP if called during UpdateLayout.
             if (_isUpdating) return;
+
+            _isUpdating = true;
 
             WindowManager.Instance.Invalidate();
 
@@ -220,8 +237,6 @@ namespace Microsoft.SPOT.Presentation
                         gotException = false;
                         return;
                     }
-
-                    _isUpdating = true;
 
                     //loop for Measure
                     //We limit the number of loops here by time - normally, all layout
@@ -269,7 +284,7 @@ namespace Microsoft.SPOT.Presentation
                     loopCounter = 0;
                     loopStartTime = TimeSpan.Zero;
 
-                    while (measureQueue.IsEmpty)
+                    while (true)
                     {
                         if (++loopCounter > 153)
                         {
@@ -298,12 +313,6 @@ namespace Microsoft.SPOT.Presentation
                         currentElement.Arrange(arrangeX, arrangeY, arrangeWidth, arrangeHeight);
                         arrangeQueue.RemoveOrphans(currentElement);
                     }
-
-                    //if Arrange dirtied the tree go clean it again
-                    //it is not neccesary to check ArrangeQueue sicnce we just exited from Arrange loop
-                    if (!MeasureQueue.IsEmpty) continue;
-
-                    _isUpdating = false;
 
                     /* REFACTOR -- do we need Layout events and Size changed events?
 

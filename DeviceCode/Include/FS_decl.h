@@ -13,15 +13,18 @@ struct VOLUME_ID;
 
 
 // All these length includes the NULL termination at the end of the string
-#define FS_MAX_PATH_LENGTH      260 - 2 // To maintain compatibility with the desktop, the max "relative" path we can allow. 2 is the MAX_DRIVE, i.e. "C:", "D:" ... etc
+#define FS_MAX_PATH_LENGTH      (260 - 2) // To maintain compatibility with the desktop, the max "relative" path we can allow. 2 is the MAX_DRIVE, i.e. "C:", "D:" ... etc
 #define FS_MAX_FILENAME_LENGTH  256
-#define FS_MAX_DIRECTORY_LENGTH FS_MAX_PATH_LENGTH - 12 // As required by desktop, the longest directory path is MAX_PATH - 12 (size of an 8.3 file name)
+#define FS_MAX_DIRECTORY_LENGTH (FS_MAX_PATH_LENGTH - 12) // As required by desktop, the longest directory path is MAX_PATH - 12 (size of an 8.3 file name)
 
 #define FS_NAME_DEFAULT_LENGTH  7
-#define FS_NAME_MAXLENGTH       FS_NAME_DEFAULT_LENGTH+1
+#define FS_NAME_MAXLENGTH       (FS_NAME_DEFAULT_LENGTH+1)
+
+#define FS_LABEL_DEFAULT_LENGTH 11
+#define FS_LABEL_MAXLENGTH      (FS_LABEL_DEFAULT_LENGTH+1)
 
 #define FS_DEFAULT_BUFFER_SIZE  512
-#define FS_DEFAULT_TIMEOUT      -1
+#define FS_DEFAULT_TIMEOUT      (-1)
 
 #define SEEKORIGIN_BEGIN        0
 #define SEEKORIGIN_CURRENT      1
@@ -73,9 +76,10 @@ struct STREAM_DRIVER_DETAILS
 //--//
 
 typedef BOOL    (*FS_ISLOADABLEMEDIA)( BlockStorageDevice* /*driverInterface*/, UINT32* /*numVolumes*/ );
-typedef HRESULT (*FS_FORMAT)         ( const VOLUME_ID* /*volume*/, UINT32 /*parameters*/ );
+typedef HRESULT (*FS_FORMAT)         ( const VOLUME_ID* /*volume*/, LPCSTR /*volumeLabel*/, UINT32 /*parameters*/ );
 typedef HRESULT (*FS_GETSIZEINFO)    ( const VOLUME_ID* /*volume*/, INT64* /*totalSize*/, INT64* /*totalFreeSpace*/ );
 typedef HRESULT (*FS_FLUSHALL)       ( const VOLUME_ID* /*volume*/ );
+typedef HRESULT (*FS_GETVOLUMELABEL) ( const VOLUME_ID* /*volume*/, LPSTR  /*volumeLabel*/, INT32 /*volumeLabelLen*/ );
 
 typedef HRESULT (*FS_FINDOPEN)       ( const VOLUME_ID* /*volume*/, LPCWSTR /*path*/, UINT32* /*findHandle*/ );
 typedef HRESULT (*FS_FINDNEXT)       ( UINT32 /*findHandle*/, FS_FILEINFO* /*findData*/, BOOL* /*found*/ );
@@ -94,6 +98,8 @@ typedef HRESULT (*FS_SETATTRIBUTES)  ( const VOLUME_ID* /*volume*/, LPCWSTR /*pa
 #ifdef CreateDirectory
 #undef CreateDirectory
 #endif
+
+#define FS_DRIVER_ATTRIBUTE__FORMAT_REQUIRES_ERASE 0x10000000
 
 struct FILESYSTEM_DRIVER_INTERFACE
 {
@@ -114,6 +120,7 @@ struct FILESYSTEM_DRIVER_INTERFACE
     FS_ISLOADABLEMEDIA IsLoadableMedia;
     FS_GETSIZEINFO     GetSizeInfo;
     FS_FLUSHALL        FlushAll;
+    FS_GETVOLUMELABEL  GetVolumeLabel;
 
     LPCSTR             Name;
     UINT32             Flags;
@@ -204,14 +211,14 @@ public:
         return m_streamDriver->UninitializeVolume( &m_volumeId );
     }
 
-    HRESULT Format( UINT32 parameters )
+    HRESULT Format( LPCSTR volumeLabel, UINT32 parameters )
     {
         if(!m_fsDriver || !(m_fsDriver->Format))
         {
             return CLR_E_NOT_SUPPORTED;
         }
 
-        return m_fsDriver->Format( &m_volumeId, parameters );
+        return m_fsDriver->Format( &m_volumeId, volumeLabel, parameters );
     }
 
     HRESULT GetSizeInfo( INT64* totalSize, INT64* totalFreeSpace )
@@ -426,7 +433,7 @@ public:
     //--//
 
     char                            m_nameSpace[FS_NAME_MAXLENGTH];
-    char                            m_label[FS_NAME_MAXLENGTH];
+    char                            m_label[FS_LABEL_MAXLENGTH];
     UINT32                          m_serialNumber;
     UINT32                          m_deviceFlags;
     STREAM_DRIVER_INTERFACE*        m_streamDriver;

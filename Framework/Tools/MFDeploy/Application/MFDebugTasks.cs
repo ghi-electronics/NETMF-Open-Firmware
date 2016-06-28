@@ -164,9 +164,6 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Debug
                         string usage = "";
                         switch (fsd.m_flags & _DBG.WireProtocol.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_MASK)
                         {
-                            case _DBG.WireProtocol.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_APPLICATION:
-                                usage = "Application";
-                                break;
                             case _DBG.WireProtocol.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_BOOTSTRAP:
                                 usage = "Bootstrap";
                                 break;
@@ -179,20 +176,23 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Debug
                             case _DBG.WireProtocol.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_DEPLOYMENT:
                                 usage = "Deployment";
                                 break;
-                            case _DBG.WireProtocol.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_JITTER:
-                                usage = "Jitter";
+                            case _DBG.WireProtocol.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_UPDATE:
+                                usage = "Update Storage";
                                 break;
                             case _DBG.WireProtocol.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_FS:
                                 usage = "File System";
                                 break;
-                            case _DBG.WireProtocol.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_RESERVED:
-                                usage = "Reserved";
+                            case _DBG.WireProtocol.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_SIMPLE_A:
+                                usage = "Simple Storage (A)";
+                                break;
+                            case _DBG.WireProtocol.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_SIMPLE_B:
+                                usage = "Simple Storage (B)";
                                 break;
                             case _DBG.WireProtocol.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_STORAGE_A:
-                                usage = "Storage (A)";
+                                usage = "EWR Storage (A)";
                                 break;
                             case _DBG.WireProtocol.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_STORAGE_B:
-                                usage = "Storage (B)";
+                                usage = "EWR Storage (B)";
                                 break;
                         }
 
@@ -305,8 +305,9 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Debug
                     {
                         foreach (_WP.Commands.Monitor_FlashSectorMap.FlashSectorData sector in reply.m_map)
                         {
-                            if (0 != (sector.m_flags & _WP.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_CODE) ||
-                                0 != (sector.m_flags & _WP.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_CONFIG))
+                            uint usage = sector.m_flags & _WP.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_MASK;
+                            if (usage == _WP.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_CODE ||
+                                usage == _WP.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_CONFIG)
                             {
                                 device.DbgEngine.EraseMemory(sector.m_address, sector.m_size);
                             }

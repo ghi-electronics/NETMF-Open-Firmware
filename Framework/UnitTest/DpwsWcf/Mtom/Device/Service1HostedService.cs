@@ -65,6 +65,8 @@ namespace tempuri.org
             reqDcs.BodyParts = request.BodyParts;
             GetData req;
             req = ((GetData)(reqDcs.ReadObject(request.Reader)));
+            request.Reader.Dispose();
+            request.Reader = null;
 
             // Create response object
             // Call service operation to process request and return response.
@@ -93,6 +95,8 @@ namespace tempuri.org
             reqDcs.BodyParts = request.BodyParts;
             SetData req;
             req = ((SetData)(reqDcs.ReadObject(request.Reader)));
+            request.Reader.Dispose();
+            request.Reader = null;
 
             // Create response object
             // Call service operation to process request and return response.
@@ -121,6 +125,8 @@ namespace tempuri.org
             reqDcs.BodyParts = request.BodyParts;
             SetFileInfo req;
             req = ((SetFileInfo)(reqDcs.ReadObject(request.Reader)));
+            request.Reader.Dispose();
+            request.Reader = null;
 
             // Create response object
             // Call service operation to process request and return response.
@@ -149,6 +155,8 @@ namespace tempuri.org
             reqDcs.BodyParts = request.BodyParts;
             GetNestedData req;
             req = ((GetNestedData)(reqDcs.ReadObject(request.Reader)));
+            request.Reader.Dispose();
+            request.Reader = null;
 
             // Create response object
             // Call service operation to process request and return response.
@@ -177,6 +185,8 @@ namespace tempuri.org
             reqDcs.BodyParts = request.BodyParts;
             SetNestedData req;
             req = ((SetNestedData)(reqDcs.ReadObject(request.Reader)));
+            request.Reader.Dispose();
+            request.Reader = null;
 
             // Create response object
             // Call service operation to process request and return response.

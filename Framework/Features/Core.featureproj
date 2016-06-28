@@ -2,17 +2,21 @@
   <PropertyGroup>
     <FeatureName>Core</FeatureName>
   </PropertyGroup>
+
+  <Import Project="$(SPOCLIENT)\Framework\Features\SSL_PAL.libcatproj" />
+
   <ItemGroup>
     <InteropFeature Include="mscorlib" />
     <MMP_DAT_CreateDatabase Include="$(BUILD_TREE_CLIENT)\pe\$(ENDIANNESS)\mscorlib.pe" />
     <RequiredManagedProjects Include="$(SPOCLIENT)\Framework\Subset_of_CorLib\SpotCorLib.csproj" Condition="'$(AUTOMATED_BUILD)'==''" />
 
     <InteropFeature Include="Microsoft_SPOT_Native" />
-    <MMP_DAT_CreateDatabase Include="$(BUILD_TREE_CLIENT)\pe\$(ENDIANNESS)\mscorlib.pe" />
     <MMP_DAT_CreateDatabase Include="$(BUILD_TREE_CLIENT)\pe\$(ENDIANNESS)\Microsoft.SPOT.Native.pe" />    
     <RequiredManagedProjects Include="$(SPOCLIENT)\Framework\Core\Native\Core_Native.csproj" Condition="'$(AUTOMATED_BUILD)'==''" />
   </ItemGroup>
   <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\Framework\Tools\buildtasks.dirproj" Condition="!EXISTS('$(BUILD_TREE_SERVER)\dll\Microsoft.SPOT.Tasks.dll')" />
+    <RequiredProjects Include="$(SPOCLIENT)\Framework\Tools\CreateCLRDefines.proj" />
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Core\dotnetmf.proj" />
     <RequiredProjects Include="$(SPOCLIENT)\CLR\StartupLib\dotnetmf.proj" />
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\CorLib\dotnetmf.proj" />

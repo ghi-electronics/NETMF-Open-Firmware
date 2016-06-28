@@ -138,7 +138,7 @@ static unsigned long added_obj_hash(const ADDED_OBJ *ca)
 		ret=a->nid;
 		break;
 	default:
-		/* abort(); */
+		/* TINYCLR_SSL_ABORT(); */
 		return 0;
 		}
 	ret&=0x3fffffffL;
@@ -173,7 +173,7 @@ static int added_obj_cmp(const ADDED_OBJ *ca, const ADDED_OBJ *cb)
 	case ADDED_NID:
 		return(a->nid-b->nid);
 	default:
-		/* abort(); */
+		/* TINYCLR_SSL_ABORT(); */
 		return 0;
 		}
 	}

@@ -11,6 +11,7 @@ using schemas.example.org.SimpleService;
 using schemas.example.org.AttachmentService;
 using Ws.Services.Binding;
 using Microsoft.SPOT;
+using System.Net;
 
 #if !Windows && !WindowsCE
 using System.Ext;
@@ -41,6 +42,16 @@ namespace Interop.SimpleService
 
             System.Ext.Console.Write("Application started...");
 
+            // Wait for DHCP (on LWIP devices)
+            while (true)
+            {
+                IPAddress ip = IPAddress.GetDefaultLocalAddress();
+
+                if (ip != IPAddress.Any) break;
+
+                Thread.Sleep(1000);
+            }
+
             // Create a test application thread
             TestApplication testApp = new TestApplication();
             Thread testAppThread = new Thread(new ThreadStart(testApp.Run));
@@ -66,6 +77,10 @@ namespace Interop.SimpleService
         AttachmentServiceClientProxy m_attachmentServiceClient;
         DiscoClient m_discoClient;
 
+        string m_eventSubscriptionAddress;
+        string m_deviceEndpointAddress;
+        ProtocolVersion m_version;
+
         ManualResetEvent m_deviceSelected; // Tells the app a device is selected
 
         public TestApplication()
@@ -74,20 +89,23 @@ namespace Interop.SimpleService
             m_inOperation = false;
             m_deviceSelected = new ManualResetEvent(false);
 
-            ProtocolVersion version = new ProtocolVersion10();
+            m_version = new ProtocolVersion11();
+            // To enable WSDiscoveryApril2005 and Soap12WSAddressingAugust2004
+            //m_version = new ProtocolVersion10();
+            m_eventSubscriptionAddress = "";
+            m_deviceEndpointAddress = "";
 
-            WS2007HttpBinding binding = new WS2007HttpBinding( new HttpTransportBindingConfig("urn:uuid:3cb0d1ba-cc3a-46ce-b416-212ac2419b06", 15337));
-            m_simpleServiceClient = new SimpleServiceClientProxy(binding, new ProtocolVersion10());
+            m_simpleServiceClient = new SimpleServiceClientProxy(new WS2007HttpBinding(), m_version);
 
-            binding = new WS2007HttpBinding(new HttpTransportBindingConfig("urn:uuid:3cb0d1ba-cc3a-46ce-b416-212ac2419b07", 15338));
-            m_eventingServiceClient = new EventingServiceClientProxy(binding, version, new EventingClientImplementation());
+            // Event handling requires that we have a defined port (other than 8084)
+            WS2007HttpBinding binding = new WS2007HttpBinding(new HttpTransportBindingConfig("urn:uuid:3cb0d1ba-cc3a-46ce-b416-212ac2419b07", 15338, true));
+            m_eventingServiceClient = new EventingServiceClientProxy(binding, m_version, new EventingClientImplementation());
 
-            binding = new WS2007HttpBinding(new HttpTransportBindingConfig("urn:uuid:3cb0d1ba-cc3a-46ce-b416-212ac2419b08", 15339));
-            m_attachmentServiceClient = new AttachmentServiceClientProxy(binding, version);
+            m_attachmentServiceClient = new AttachmentServiceClientProxy(new WS2007HttpBinding(), m_version);
 
             // Turn listening to this IP on
-            m_simpleServiceClient.IgnoreRequestFromThisIP = false;
-            m_eventingServiceClient.IgnoreRequestFromThisIP = false;
+            m_simpleServiceClient.IgnoreRequestFromThisIP     = false;
+            m_eventingServiceClient.IgnoreRequestFromThisIP   = false;
             m_attachmentServiceClient.IgnoreRequestFromThisIP = false;
 
             m_discoClient = new DiscoClient(m_simpleServiceClient);
@@ -123,13 +141,9 @@ namespace Interop.SimpleService
 
         public void PrintMetadataInfo()
         {
-            // This is the endpoint (logical) address of the target device
-            // we want to obtain the metadata (keep in sync with SimpleService project)
-            string deviceEndpointAddr = "urn:uuid:18571766-87df-06e2-bb68-5136c48f483a";
-
             Debug.Print("Resolving the device...");
             // We need to resolve the device to get the transport address
-            DpwsServiceDescription resolveMatch = m_simpleServiceClient.DiscoveryClient.Resolve(deviceEndpointAddr);
+            DpwsServiceDescription resolveMatch = m_simpleServiceClient.DiscoveryClient.Resolve(m_deviceEndpointAddress);
             //if(true)
             if (resolveMatch != null)
             {
@@ -142,7 +156,7 @@ namespace Interop.SimpleService
                     deviceTransportAddr = deviceTransportAddr.Substring(0, length - 1);
 
                 // Get metadata
-                DpwsMexClient mexClient = new DpwsMexClient(new ProtocolVersion10());
+                DpwsMexClient mexClient = new DpwsMexClient(m_version);
                 DpwsMetadata metadata = mexClient.Get(deviceTransportAddr);
                 if (metadata != null)
                 {
@@ -232,7 +246,8 @@ namespace Interop.SimpleService
             {
                 if (firstPass && !m_inDiscovery)
                 {
-                    DpwsServiceDescriptions descs = m_simpleServiceClient.DiscoveryClient.Probe(typeProbes, 3, 1000);
+                    m_inDiscovery = true;
+                    DpwsServiceDescriptions descs = m_simpleServiceClient.DiscoveryClient.Probe(typeProbes, 3, 5000);
 
                     for (int i = 0; i < descs.Count; i++)
                     {
@@ -240,9 +255,10 @@ namespace Interop.SimpleService
 
                         if (desc.XAddrs != null && desc.XAddrs.Length > 0)
                         {
-                            CheckConnection(desc.ServiceTypes, desc.Endpoint.Address.AbsoluteUri);
+                            if (CheckConnection(desc.ServiceTypes, desc.Endpoint.Address.AbsoluteUri)) break;
                         }
                     }
+                    m_inDiscovery = false;
                 }
 
                 // If hello was received and a SimpleService device was found. SeletedService will not be null.
@@ -252,30 +268,39 @@ namespace Interop.SimpleService
                     // If this is the first time through the loop for this device subscribe to events
                     if (firstPass)
                     {
-                        // Test service host call
-                        System.Ext.Console.Write("Testing Host service...");
-                        DpwsSubscribeRequest subReq;
-                        subReq = new DpwsSubscribeRequest(m_eventingServiceClient.EventSources["SimpleEvent"], m_eventingServiceClient.EndpointAddress, m_eventingServiceClient.TransportAddress, "PT1H", null);
-                        m_simpleEventSubscription = m_eventingServiceClient.EventingClient.Subscribe(subReq);
-                        subReq = new DpwsSubscribeRequest(m_eventingServiceClient.EventSources["IntegerEvent"], m_eventingServiceClient.EndpointAddress, m_eventingServiceClient.TransportAddress, "PT1H", null);
-                        m_integerEventSubscription = m_eventingServiceClient.EventingClient.Subscribe(subReq);
+                        try
+                        {
+                            // Test service host call
+                            System.Ext.Console.Write("Testing Host service...");
+                            DpwsSubscribeRequest subReq;
+                            subReq = new DpwsSubscribeRequest(m_eventingServiceClient.EventSources["SimpleEvent"], m_eventSubscriptionAddress, m_eventingServiceClient.TransportAddress, "PT1H", null);
+                            m_simpleEventSubscription = m_eventingServiceClient.EventingClient.Subscribe(subReq);
+                            subReq = new DpwsSubscribeRequest(m_eventingServiceClient.EventSources["IntegerEvent"], m_eventSubscriptionAddress, m_eventingServiceClient.TransportAddress, "PT1H", null);
+                            m_integerEventSubscription = m_eventingServiceClient.EventingClient.Subscribe(subReq);
 
-                        firstPass = false;
+                            firstPass = false;
+                        }
+                        catch
+                        {
+                            m_deviceSelected.Reset();
+                        }
                     }
 
                     // Make 1Way and 2Way service calls
                     if (m_deviceSelected.WaitOne(0, false))
                     {
-                        PrintMetadataInfo();
-
-                        System.Ext.Console.Write("");
-                        System.Ext.Console.Write(">>>>>>>>>>>>> Sending 1way(10) request to: " + m_selectedService.ThisDevice.FriendlyName);
                         try
                         {
+                            PrintMetadataInfo();
+
+                            System.Ext.Console.Write("");
+                            System.Ext.Console.Write(">>>>>>>>>>>>> Sending 1way(10) request to: " + m_selectedService.ThisDevice.FriendlyName);
                             m_simpleServiceClient.OneWay(new OneWayRequest());
                         }
                         catch (Exception e)
                         {
+                            firstPass = true;
+                            m_deviceSelected.Reset();
                             System.Ext.Console.Write("");
                             System.Ext.Console.Write("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! OneWay method failed. " + e.Message);
                         }
@@ -308,6 +333,8 @@ namespace Interop.SimpleService
                         }
                         catch (Exception e)
                         {
+                            firstPass = true;
+                            m_deviceSelected.Reset();
                             System.Ext.Console.Write("");
                             System.Ext.Console.Write("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TwoWay method failed. " + e.Message);
                         }
@@ -331,6 +358,8 @@ namespace Interop.SimpleService
                             }
                             catch (Exception e)
                             {
+                                firstPass = true;
+                                m_deviceSelected.Reset();
                                 System.Ext.Console.Write("");
                                 System.Ext.Console.Write("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 1wayattach method failed: " + e.Message);
                             }
@@ -353,6 +382,8 @@ namespace Interop.SimpleService
                             }
                             catch (Exception e)
                             {
+                                firstPass = true;
+                                m_deviceSelected.Reset();
                                 System.Ext.Console.Write("");
                                 System.Ext.Console.Write("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TwoWay method failed. " + e.Message);
                             }
@@ -365,6 +396,8 @@ namespace Interop.SimpleService
                 {
                     firstPass = true;
                 }
+
+                GC.WaitForPendingFinalizers();
             }
         }
 
@@ -375,33 +408,44 @@ namespace Interop.SimpleService
             System.Ext.Console.Write("  SubscriptionID = " + SubscriptionEndEventArgs.SubscriptionID);
         }
 
-        void CheckConnection(DpwsServiceTypes servTypes, string servAddr)
+        bool CheckConnection(DpwsServiceTypes servTypes, string servAddr)
         {
-            bool simpleDeviceTypeFound = false;
-            string types = "";
-            for (int i = 0; i < servTypes.Count; ++i)
+            try
             {
-                if (servTypes[i].TypeName == "SimpleDeviceType")
-                    simpleDeviceTypeFound = true;
-                types += "NamespaceUri: " + servTypes[i].NamespaceUri + " " + "TypeName: " + servTypes[i].TypeName + "\n";
-            }
-            System.Ext.Console.Write("Types: " + types);
-            System.Ext.Console.Write("");
-
-            // If this is not a SimplDeviceType don't discover
-            if (simpleDeviceTypeFound == false)
-            {
+                bool simpleDeviceTypeFound = false;
+                string types = "";
+                for (int i = 0; i < servTypes.Count; ++i)
+                {
+                    if (servTypes[i].TypeName == "SimpleDeviceType")
+                        simpleDeviceTypeFound = true;
+                    types += "NamespaceUri: " + servTypes[i].NamespaceUri + " " + "TypeName: " + servTypes[i].TypeName + "\n";
+                }
+                System.Ext.Console.Write("Types: " + types);
                 System.Ext.Console.Write("");
-                System.Ext.Console.Write("Discovery will only resolve SimpleDeviceType services.");
+
+                // If this is not a SimplDeviceType don't discover
+                if (simpleDeviceTypeFound == false)
+                {
+                    System.Ext.Console.Write("");
+                    System.Ext.Console.Write("Discovery will only resolve SimpleDeviceType services.");
+                }
+
+                // Get SimpleService metadata
+                DpwsMetadata deviceMetadata = m_discoClient.GetSimpleService(servAddr);
+                if (deviceMetadata != null)
+                {
+                    SelectedService = deviceMetadata;
+                    m_deviceSelected.Set();
+                    m_deviceEndpointAddress = servAddr;
+
+                    return true;
+                }
+            }
+            catch
+            {
             }
 
-            // Get SimpleService metadata
-            DpwsMetadata deviceMetadata = m_discoClient.GetSimpleService(servAddr);
-            if (deviceMetadata != null)
-            {
-                SelectedService = deviceMetadata;
-                m_deviceSelected.Set();
-            }
+            return false;
         }
 
         void m_simpleControl_HelloEvent(object obj, DpwsServiceDescription helloEventArgs)
@@ -475,21 +519,27 @@ namespace Interop.SimpleService
                     // If existing event subscriptions are pending unsubscribe
                     if (m_integerEventSubscription != null)
                     {
-                        // Unsubscribe to simple event
-                        if (m_simpleEventSubscription != null)
+                        try
                         {
-                            if (!m_eventingServiceClient.EventingClient.Unsubscribe(new Uri(m_eventingServiceClient.EndpointAddress), m_simpleEventSubscription))
-                                System.Ext.Console.Write("Unsubscribe to SimpleEvent at service endpoint " + m_eventingServiceClient.EndpointAddress + " failed!");
-                        }
-
-                        // Unsubscribe to integer event
-                        if (m_integerEventSubscription != null)
-                        {
-                            if (!m_eventingServiceClient.EventingClient.Unsubscribe(new Uri(m_eventingServiceClient.EndpointAddress), m_integerEventSubscription))
+                            // Unsubscribe to simple event
+                            if (m_simpleEventSubscription != null)
                             {
-                                System.Ext.Console.Write("");
-                                System.Ext.Console.Write("Unsubscribe to IntegerEvent at service endpoint " + m_eventingServiceClient.EndpointAddress + " failed!");
+                                if (!m_eventingServiceClient.EventingClient.Unsubscribe(new Uri(m_eventingServiceClient.EndpointAddress), m_simpleEventSubscription))
+                                    System.Ext.Console.Write("Unsubscribe to SimpleEvent at service endpoint " + m_eventingServiceClient.EndpointAddress + " failed!");
                             }
+
+                            // Unsubscribe to integer event
+                            if (m_integerEventSubscription != null)
+                            {
+                                if (!m_eventingServiceClient.EventingClient.Unsubscribe(new Uri(m_eventingServiceClient.EndpointAddress), m_integerEventSubscription))
+                                {
+                                    System.Ext.Console.Write("");
+                                    System.Ext.Console.Write("Unsubscribe to IntegerEvent at service endpoint " + m_eventingServiceClient.EndpointAddress + " failed!");
+                                }
+                            }
+                        }
+                        catch
+                        {
                         }
                     }
 
@@ -502,7 +552,7 @@ namespace Interop.SimpleService
                         {
                             DpwsMexService hostedService = value.Relationship.HostedServices[i];
                             if (hostedService.ServiceTypes["EventingService"] != null)
-                                m_eventingServiceClient.EndpointAddress = hostedService.EndpointRefs[0].Address.AbsoluteUri;
+                                m_eventSubscriptionAddress = hostedService.EndpointRefs[0].Address.AbsoluteUri;
 
                             if (hostedService.ServiceTypes["SimpleService"] != null)
                                 m_simpleServiceClient.EndpointAddress = hostedService.EndpointRefs[0].Address.AbsoluteUri;

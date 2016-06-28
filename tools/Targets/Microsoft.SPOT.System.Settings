@@ -2,7 +2,7 @@
 
   <!-- Possibly propagated properties from enclosing or dependent projects -->
   <PropertyGroup>
-    <_PLATFORM              Condition="'$(_PLATFORM)'==''"              >WINDOWS</_PLATFORM>
+    <_PLATFORM              Condition="'$(_PLATFORM)'==''"              >WINDOWS2</_PLATFORM>
     <FLAVOR                 Condition="'$(FLAVOR)'==''"                 >$(_FLAVOR)</FLAVOR>
     <PLATFORM               Condition="'$(PLATFORM)'==''"               >$(_PLATFORM)</PLATFORM>
     <PLATFORMS              Condition="'$(PLATFORMS)'==''"              >$(_PLATFORMS)</PLATFORMS>
@@ -127,4 +127,6 @@
     <IncludePaths Include="CLR\include"/>
     <IncludePaths Include="Crypto\inc"/>
   </ItemGroup>
+
+  <Import Project="Microsoft.SPOT.System.HalIncludes.settings"/>
 </Project>

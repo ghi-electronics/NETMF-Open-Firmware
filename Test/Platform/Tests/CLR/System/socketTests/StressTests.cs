@@ -138,7 +138,7 @@ namespace Microsoft.SPOT.Platform.Tests
                         SocketType.Dgram );
                 
                     testSockets.Startup(0, 0);
-                    
+
                     testSockets.NewData( size );
 
                     int cBytes = testSockets.socketClient.SendTo(testSockets.bufSend, 
@@ -215,20 +215,21 @@ namespace Microsoft.SPOT.Platform.Tests
             MFTestResults testResult =  MFTestResults .Pass;
             int size        = c_StartSize;
             int increment   = 2;
+            Thread server = null;
 
             try
             {
                 do
                 {
-                    StressSocketPair testSockets = new StressSocketPair( 
-                        ProtocolType.Tcp, SocketType.Stream );
+                    StressSocketPair testSockets = new StressSocketPair(
+                        ProtocolType.Tcp, SocketType.Stream);
 
-                    Thread server = new Thread( new ThreadStart( 
-                        testSockets.StressTestAsyncThreadProc ) );
-                
+                    server = new Thread(new ThreadStart(
+                        testSockets.StressTestAsyncThreadProc));
+
                     testSockets.Startup(0, 0);
 
-                    testSockets.NewData( size );
+                    testSockets.NewData(size);
 
                     testSockets.socketServer.Listen(1);
 
@@ -239,7 +240,7 @@ namespace Microsoft.SPOT.Platform.Tests
                     DateTime start = DateTime.Now;
 
                     int cBytes = testSockets.socketClient.Send(testSockets.bufSend);
-                    
+
                     if (cBytes != testSockets.bufSend.Length)
                         throw new Exception("Send failed, wrong length");
 
@@ -261,22 +262,38 @@ namespace Microsoft.SPOT.Platform.Tests
                     Debug.GC(true);
 
                     server.Join();
+                    server = null;
                 } while (size <= c_EndSize);
             }
-            catch( System.Net.Sockets.SocketException e)
+            catch (System.Net.Sockets.SocketException e)
             {
                 Log.Exception("Unexpected SocketException - ErrorCode: " + ((SocketException)e).ErrorCode, e);
-                testResult = MFTestResults.Fail;
+
+                if (e.ErrorCode == (int)SocketError.MessageSize)
+                {
+                    testResult = MFTestResults.Pass;
+                }
+                else
+                {
+                    testResult = MFTestResults.Fail;
+                }
             }
-            catch( System.OutOfMemoryException e)
+            catch (System.OutOfMemoryException e)
             {
                 Log.Exception("System.OutOfMemoryException", e);
-                testResult = MFTestResults .Pass;
+                testResult = MFTestResults.Pass;
             }
             catch (Exception e)
             {
                 Log.Exception("Unexpected Exception", e);
                 testResult = MFTestResults.Fail;
+            }
+            finally
+            {
+                if (server != null && server.IsAlive)
+                {
+                    server.Abort();
+                }
             }
 
             return testResult;
@@ -364,6 +381,8 @@ namespace Microsoft.SPOT.Platform.Tests
                 Log.Comment("Testing with port 0");
                 testSockets.Startup(0, 0);
 
+                testSockets.socketClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.SendBuffer, 5 * 1024);
+
                 testSockets.socketServer.Listen(1);
 
                 testSockets.socketClient.Connect(testSockets.epServer);
@@ -372,6 +391,8 @@ namespace Microsoft.SPOT.Platform.Tests
 
                 using (Socket sock = testSockets.socketServer.Accept())
                 {
+                    sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, 5 * 1024);
+
                     for (int i = 0; i < 100; i++)
                     {
                         cBytes = testSockets.socketClient.Send(testSockets.bufSend);

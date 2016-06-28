@@ -29,6 +29,9 @@ namespace System.Resources
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         extern private object GetObjectInternal(short id);
+        
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        extern private object GetObjectInternal(short id, int offset, int length);
 
         public ResourceManager(string baseName, Assembly assembly)
             : this(baseName, assembly, CultureInfo.CurrentUICulture.Name, true)
@@ -174,6 +177,35 @@ namespace System.Resources
             while (rm != null)
             {
                 object obj = rm.GetObjectInternal(id);
+
+                if (obj != null)
+                    return obj;
+
+                if (rm.m_rmFallback == null)
+                {
+                    if (rm.m_cultureName != "")
+                    {
+                        string cultureNameParent = GetParentCultureName(rm.m_cultureName);
+                        ResourceManager rmFallback = new ResourceManager(m_baseName, m_baseAssembly, cultureNameParent, false);
+
+                        if (rmFallback.IsValid)
+                            rm.m_rmFallback = rmFallback;
+                    }
+                }
+
+                rm = rm.m_rmFallback;
+            }
+
+            throw new ArgumentException();
+        }
+
+        private object GetObjectChunkFromId(short id, int offset, int length)
+        {
+            ResourceManager rm = this;
+
+            while (rm != null)
+            {
+                object obj = rm.GetObjectInternal(id, offset, length);
 
                 if (obj != null)
                     return obj;

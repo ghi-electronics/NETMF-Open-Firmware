@@ -301,7 +301,7 @@ static int conn_state(BIO *b, BIO_CONNECT *c)
 			ret=1;
 			goto exit_loop;
 		default:
-			/* abort(); */
+			/* TINYCLR_SSL_ABORT(); */
 			goto exit_loop;
 			}
 
@@ -378,7 +378,7 @@ static void conn_close_socket(BIO *bio)
 		/* Only do a shutdown if things were established */
 		if (c->state == BIO_CONN_S_OK)
 			TINYCLR_SSL_SHUTDOWN(bio->num,2);
-		closesocket(bio->num);
+		TINYCLR_SSL_CLOSESOCKET(bio->num);
 		bio->num=INVALID_SOCKET;
 		}
 	}

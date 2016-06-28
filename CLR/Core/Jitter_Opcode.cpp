@@ -141,7 +141,7 @@ HRESULT MethodCompiler::Opcode::Initialize( MethodCompiler* mc, CLR_OFFSET offse
 #if !defined(TINYCLR_EMULATED_FLOATINGPOINT)
                 m_value.SetDoubleFromBits( arg );
 #else
-                m_value.SetDoubleIEEE754( arg );
+                TINYCLR_CHECK_HRESULT(m_value.SetDoubleIEEE754( arg ));
 #endif
 
             
@@ -191,7 +191,7 @@ HRESULT MethodCompiler::Opcode::Initialize( MethodCompiler* mc, CLR_OFFSET offse
 #if !defined(TINYCLR_EMULATED_FLOATINGPOINT)
                 m_value.SetFloatFromBits( arg );
 #else
-                m_value.SetFloatIEEE754( arg );
+                TINYCLR_CHECK_HRESULT(m_value.SetFloatIEEE754( arg ));
 #endif
 
 

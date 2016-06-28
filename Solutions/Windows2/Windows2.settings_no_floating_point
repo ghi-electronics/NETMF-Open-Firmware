@@ -15,6 +15,9 @@
     <FLAVOR Condition="'$(FLAVOR)'==''">Debug</FLAVOR>
   </PropertyGroup>
   <ItemGroup>
+    <TinyCLR_Defines Include="PLATFORM_EMULATED_FLOATINGPOINT=1" />
+  </ItemGroup>   
+  <ItemGroup>
     <IncludePaths Include="Solutions\Windows2" />
   </ItemGroup>
   <Import Project="$(SPOCLIENT)\devicecode\Targets\OS\Windows\Windows.settings" />

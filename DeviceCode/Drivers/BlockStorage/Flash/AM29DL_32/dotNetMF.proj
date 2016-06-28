@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectPath>$(SPOCLIENT)\DeviceCode\Drivers\BlockStorage\Flash\AM29DL_32\dotNetMF.proj</ProjectPath>
     <ProjectGuid>{84b3be78-43c5-42a1-8ebb-748dc432d2c0}</ProjectGuid>
@@ -40,9 +41,10 @@
   <Import Project="$(SPOCLIENT)\Framework\features\BlockStorageConfig_HAL.libcatproj" />
   <PropertyGroup />
   <ItemGroup>
-    <HFiles Include="AM29DL_32.h" />
     <Compile Include="AM29DL_32_driver.cpp" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="am29dl_32.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

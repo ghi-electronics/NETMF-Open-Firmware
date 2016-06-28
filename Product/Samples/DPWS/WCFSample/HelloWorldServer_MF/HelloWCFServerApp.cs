@@ -40,9 +40,12 @@ namespace Dpws.Device
             //Guid g = Guid.NewGuid();
             string guid = "urn:uuid:18571766-87df-06e2-bb68-5136c48f483f";
 
+            ProtocolVersion version = new ProtocolVersion11();
+            
             // ProtocolVersion10 can be used only if the corresponding HelloWorldClient_WCF application
             // uses a custom binding with Soap12WSAddressingAugust2004 text message encoding.
-            ProtocolVersion version = new ProtocolVersion11();
+            //ProtocolVersion version = new ProtocolVersion10();
+
             Device.Initialize(new WS2007HttpBinding(new HttpTransportBindingConfig(guid, 8084)), version);
 
             // Set device information

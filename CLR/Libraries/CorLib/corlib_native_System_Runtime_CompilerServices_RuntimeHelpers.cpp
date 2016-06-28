@@ -50,7 +50,7 @@ HRESULT Library_corlib_native_System_Runtime_CompilerServices_RuntimeHelpers::In
 
                 for(;lenSrc; lenSrc--, ptr++)
                 {
-                    tmp.SetFloatIEEE754( *ptr );
+                    TINYCLR_CHECK_HRESULT(tmp.SetFloatIEEE754( *ptr ));
 
                     *ptr = tmp.NumericByRef().u4;
                 }
@@ -64,7 +64,7 @@ HRESULT Library_corlib_native_System_Runtime_CompilerServices_RuntimeHelpers::In
 
                 for(;lenSrc; lenSrc--, ptr++)
                 {
-                    tmp.SetDoubleIEEE754( *ptr );
+                    TINYCLR_CHECK_HRESULT(tmp.SetDoubleIEEE754( *ptr ));
 
                     *ptr = tmp.NumericByRef().u8;
                 }
@@ -79,7 +79,7 @@ HRESULT Library_corlib_native_System_Runtime_CompilerServices_RuntimeHelpers::In
         // Unaligned reads handle endianess, just use them. FIXME GJS - this could be the subject of much optimization
         switch(array->m_typeOfElement)
         {
-		case DATATYPE_CHAR:
+        case DATATYPE_CHAR:
         case DATATYPE_I2:
         case DATATYPE_U2:
             {
@@ -143,7 +143,7 @@ HRESULT Library_corlib_native_System_Runtime_CompilerServices_RuntimeHelpers::In
 
                 for(;lenSrc; lenSrc--, ptr++)
                 {
-                    tmp.SetFloatIEEE754( *ptr );
+                    TINYCLR_CHECK_HRESULT(tmp.SetFloatIEEE754( *ptr ));
 
                     *ptr = tmp.NumericByRef().u4;
                 }
@@ -157,7 +157,7 @@ HRESULT Library_corlib_native_System_Runtime_CompilerServices_RuntimeHelpers::In
 
                 for(;lenSrc; lenSrc--, ptr++)
                 {
-                    tmp.SetDoubleIEEE754( *ptr );
+                    TINYCLR_CHECK_HRESULT(tmp.SetDoubleIEEE754( *ptr ));
 
                     *ptr = tmp.NumericByRef().u8;
                 }

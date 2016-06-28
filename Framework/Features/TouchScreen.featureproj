@@ -4,7 +4,6 @@
   </PropertyGroup>
   <Import Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\TinyCore.featureproj" />
   <ItemGroup>
     <InteropFeature Include="Microsoft_SPOT_Touch" />
     <MMP_DAT_CreateDatabase Include="$(BUILD_TREE_CLIENT)\pe\$(ENDIANNESS)\Microsoft.SPOT.Touch.pe" />

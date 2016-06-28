@@ -25,6 +25,7 @@
     <Compile Include="SystemStringTests.cs" />
     <Compile Include="SystemTypeTests.cs" />
     <Compile Include="SystemWeakReferenceTests.cs" />
+    <Compile Include="Utf8EncodingTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.SPOT.Native">

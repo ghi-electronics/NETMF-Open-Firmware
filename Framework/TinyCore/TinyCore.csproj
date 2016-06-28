@@ -25,7 +25,6 @@
     <Compile Include="Input\FocusChangedEventArgs.cs" />
     <Compile Include="Input\FocusChangedEventHandler.cs" />
     <Compile Include="Input\GenericDevice.cs" />
-    <Compile Include="Input\Gesture.cs" />
     <Compile Include="Input\InputDevice.cs" />
     <Compile Include="Input\InputEventArgs.cs" />
     <Compile Include="Input\InputEventHandler.cs" />

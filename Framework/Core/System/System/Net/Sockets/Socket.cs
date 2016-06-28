@@ -72,21 +72,28 @@ namespace System.Net.Sockets
 
             EndPoint ep = null;
 
-            if (m_localEndPoint != null)
+            if (m_localEndPoint == null)
             {
-                byte[] address = null;
+                m_localEndPoint = new IPEndPoint(IPAddress.Any, 0);
+            }
 
-                if (fLocal)
-                {
-                    NativeSocket.getsockname(this, out address);
-                }
-                else
-                {
-                    NativeSocket.getpeername(this, out address);
-                }
+            byte[] address = null;
 
-                SocketAddress socketAddress = new SocketAddress(address);
-                ep = m_localEndPoint.Create(socketAddress);
+            if (fLocal)
+            {
+                NativeSocket.getsockname(this, out address);
+            }
+            else
+            {
+                NativeSocket.getpeername(this, out address);
+            }
+
+            SocketAddress socketAddress = new SocketAddress(address);
+            ep = m_localEndPoint.Create(socketAddress);
+
+            if (fLocal)
+            {
+                m_localEndPoint = ep;
             }
 
             return ep;
@@ -373,7 +380,7 @@ namespace System.Net.Sockets
 
             //Use BitConverter.ToInt32
             //endianness?
-            int iVal ;
+            int iVal;
 
             if(SystemInfo.IsBigEndian)
                 iVal = (val[3] << 0 | val[2] << 8 | val[1] << 16 | val[0] << 24);

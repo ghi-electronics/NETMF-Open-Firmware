@@ -16,7 +16,7 @@ void CLR_RT_HeapBlock::InitializeToZero()
 
 #if defined(TINYCLR_EMULATED_FLOATINGPOINT)
 
-void CLR_RT_HeapBlock::SetFloatIEEE754( const CLR_UINT32 arg )
+HRESULT CLR_RT_HeapBlock::SetFloatIEEE754( const CLR_UINT32 arg )
 {
 
     CLR_INT32  res;
@@ -25,17 +25,50 @@ void CLR_RT_HeapBlock::SetFloatIEEE754( const CLR_UINT32 arg )
 
     exponent -= (23 - CLR_RT_HeapBlock::HB_FloatShift);
 
-    if(exponent <= -32)
+    if(arg == 0)
     {
         res = 0;
     }
-    else if(exponent >= 32)
+    else if(exponent <= -31)
+    {
+        res = 0;
+        
+        //
+        // Uncomment to produce an overflow exception for emulated floating points
+        //
+        // return CLR_E_OUT_OF_RANGE;
+    }
+    else if(exponent >= 31)
     {
         res = 0x7FFFFFFF;
+
+        //
+        // Uncomment to produce an overflow exception for emulated floating points
+        //
+        // return CLR_E_OUT_OF_RANGE;
     }
     else
     {
-        if     (exponent > 0) res = mantissa <<   exponent ;
+        if(exponent > 0)
+        {
+            CLR_UINT64 tmpRes;
+
+            tmpRes = ((CLR_UINT64)mantissa) << exponent;
+            
+            if(0 != (tmpRes >> 31))
+            {
+                res = 0x7FFFFFFF;
+                
+                //
+                // Uncomment to produce an overflow exception for emulated floating points
+                //
+                // return CLR_E_OUT_OF_RANGE;
+            }
+            else
+            {
+                res = (CLR_UINT32)tmpRes;
+            }
+        }
         else if(exponent < 0) res = mantissa >> (-exponent);
         else                  res = mantissa;
     }
@@ -44,29 +77,62 @@ void CLR_RT_HeapBlock::SetFloatIEEE754( const CLR_UINT32 arg )
 
     SetFloat( res );
 
+    return S_OK;
 }
 
-void CLR_RT_HeapBlock::SetDoubleIEEE754( const CLR_UINT64& arg )
+HRESULT CLR_RT_HeapBlock::SetDoubleIEEE754( const CLR_UINT64& arg )
 {
 
     CLR_INT64  res;
     CLR_UINT64 mantissa =      ( arg        & ULONGLONGCONSTANT(0x000FFFFFFFFFFFFF)) | ULONGLONGCONSTANT(0x0010000000000000);
     int        exponent = (int)((arg >> 52) & ULONGLONGCONSTANT(0x00000000000007FF)) - 1023;
 
-	
+    CLR_UINT64 mask = ULONGLONGCONSTANT(0xFFFFFFFFFFFFFFFF);
+
     exponent -= (52 - CLR_RT_HeapBlock::HB_DoubleShift);
 
-    if(exponent <= -64)
+    if(arg == 0)
     {
         res = 0;
     }
-    else if(exponent >= 64)
+    else if(exponent <= -63)
+    {
+        res = 0;
+        
+        //
+        // Uncomment to produce an overflow exception for emulated floating points
+        //
+        // return CLR_E_OUT_OF_RANGE;
+    }
+    else if(exponent >= 63)
     {
         res = ULONGLONGCONSTANT(0x7FFFFFFFFFFFFFFF);
+
+        //
+        // Uncomment to produce an overflow exception for emulated floating points
+        //
+        // return CLR_E_OUT_OF_RANGE;
     }
     else
     {
-        if     (exponent > 0) res = mantissa <<   exponent ;
+        if(exponent > 0)
+        {
+            mask <<= (63 - exponent);
+
+            if(0 != (mask & mantissa))
+            {
+                res = ULONGLONGCONSTANT(0x7FFFFFFFFFFFFFFF);
+                
+                //
+                // Uncomment to produce an overflow exception for emulated floating points
+                //
+                // return CLR_E_OUT_OF_RANGE;
+            }
+            else
+            {
+                res = mantissa << exponent;
+            }
+        }
         else if(exponent < 0) res = mantissa >> (-exponent);
         else                  res = mantissa;
     }
@@ -75,6 +141,7 @@ void CLR_RT_HeapBlock::SetDoubleIEEE754( const CLR_UINT64& arg )
 
     SetDouble( res );
 
+    return S_OK;
 }
 
 #endif
@@ -1011,7 +1078,10 @@ bool CLR_RT_HeapBlock::ObjectsEqual( const CLR_RT_HeapBlock& pArgLeft, const CLR
                 CLR_RT_HeapBlock* objRight = pArgRight.Dereference();
                 if(objLeft == objRight) return true;
 
-                if(fSameReference == false && objLeft && objRight) return ObjectsEqual( *objLeft, *objRight, false );
+                if(objLeft && objRight)
+                {
+                    if(!fSameReference || (objLeft->DataType() == DATATYPE_REFLECTION)) return ObjectsEqual( *objLeft, *objRight, false );
+                }
             }
             break;
 
@@ -1374,9 +1444,35 @@ HRESULT CLR_RT_HeapBlock::NumericAdd( const CLR_RT_HeapBlock& right )
 
     case DATATYPE_U8: m_data.numeric.u8 += right.m_data.numeric.u8; break;
 
-    case DATATYPE_R4: m_data.numeric.r4 += right.m_data.numeric.r4; break;
+    case DATATYPE_R4: 
+#if defined(TINYCLR_EMULATED_FLOATINGPOINT)
+    {
+        CLR_INT32 orig = (CLR_INT32)m_data.numeric.r4;
+        CLR_INT32 rhs  = (CLR_INT32)right.m_data.numeric.r4;
+#endif
+        m_data.numeric.r4 += right.m_data.numeric.r4; 
 
-    case DATATYPE_R8: m_data.numeric.r8 += right.m_data.numeric.r8; break;
+#if defined(TINYCLR_EMULATED_FLOATINGPOINT)
+             if(rhs > 0 && orig > 0 && orig > (CLR_INT32)m_data.numeric.r4) { m_data.numeric.r4 =                        0x7FFFFFFF; /*return CLR_E_OUT_OF_RANGE*/ }
+        else if(rhs < 0 && orig < 0 && orig < (CLR_INT32)m_data.numeric.r4) { m_data.numeric.r4 = (CLR_INT32)(CLR_UINT32)0x80000000; /*return CLR_E_OUT_OF_RANGE*/ }
+    }
+#endif
+        break;
+
+    case DATATYPE_R8: 
+#if defined(TINYCLR_EMULATED_FLOATINGPOINT)
+    {
+        CLR_INT64 orig = (CLR_INT64)m_data.numeric.r8;
+        CLR_INT64 rhs  = (CLR_INT64)right.m_data.numeric.r8;
+#endif
+        m_data.numeric.r8 += right.m_data.numeric.r8; 
+
+#if defined(TINYCLR_EMULATED_FLOATINGPOINT)
+             if(rhs > 0 && orig > 0 && orig > (CLR_INT64)m_data.numeric.r8) { m_data.numeric.r8 = (CLR_INT64)ULONGLONGCONSTANT(0x7FFFFFFFFFFFFFFF); /*return CLR_E_OUT_OF_RANGE*/ }
+        else if(rhs < 0 && orig < 0 && orig < (CLR_INT64)m_data.numeric.r8) { m_data.numeric.r8 = (CLR_INT64)ULONGLONGCONSTANT(0x8000000000000000); /*return CLR_E_OUT_OF_RANGE*/ }
+    }
+#endif
+        break;
 
 
     // Adding of value to array reference is like advancing the index in array.
@@ -1410,9 +1506,38 @@ HRESULT CLR_RT_HeapBlock::NumericSub( const CLR_RT_HeapBlock& right )
 
     case DATATYPE_I8: m_data.numeric.s8 -= right.m_data.numeric.s8; break;
 
-    case DATATYPE_R4: m_data.numeric.r4 -= right.m_data.numeric.r4; break;
+    case DATATYPE_R4: 
+#if defined(TINYCLR_EMULATED_FLOATINGPOINT)
+    {
+        CLR_INT32 orig = (CLR_INT32)m_data.numeric.r8;
+        CLR_INT32 rhs  = (CLR_INT32)right.m_data.numeric.r4;
+#endif
+        m_data.numeric.r4 -= right.m_data.numeric.r4; 
 
-    case DATATYPE_R8: m_data.numeric.r8 -= right.m_data.numeric.r8; break;
+#if defined(TINYCLR_EMULATED_FLOATINGPOINT)
+             if(rhs < 0 && orig > 0 && orig > (CLR_INT32)m_data.numeric.r4) { m_data.numeric.r4 =                        0x7FFFFFFF; /*return CLR_E_OUT_OF_RANGE*/ }
+        else if(rhs > 0 && orig < 0 && orig < (CLR_INT32)m_data.numeric.r4) { m_data.numeric.r4 = (CLR_INT32)(CLR_UINT32)0x80000000; /*return CLR_E_OUT_OF_RANGE*/ }
+    }
+#endif
+
+        break;
+
+    case DATATYPE_R8: 
+#if defined(TINYCLR_EMULATED_FLOATINGPOINT)
+    {
+        CLR_INT64 orig = (CLR_INT64)m_data.numeric.r8;
+        CLR_INT64 rhs  = (CLR_INT64)right.m_data.numeric.r8;
+#endif
+
+        m_data.numeric.r8 -= right.m_data.numeric.r8; 
+
+#if defined(TINYCLR_EMULATED_FLOATINGPOINT)
+             if(rhs < 0 && orig > 0 && orig > (CLR_INT64)m_data.numeric.r8) { m_data.numeric.r8 = (CLR_INT64)ULONGLONGCONSTANT(0x7FFFFFFFFFFFFFFF); /*return CLR_E_OUT_OF_RANGE*/ }
+        else if(rhs > 0 && orig < 0 && orig < (CLR_INT64)m_data.numeric.r8) { m_data.numeric.r8 = (CLR_INT64)ULONGLONGCONSTANT(0x8000000000000000); /*return CLR_E_OUT_OF_RANGE*/ }
+    }
+#endif
+
+        break;
 
 
     // Substructing of value to array reference is like decreasing the index in array.
@@ -1445,9 +1570,55 @@ HRESULT CLR_RT_HeapBlock::NumericMul( const CLR_RT_HeapBlock& right )
 
     case DATATYPE_I8: m_data.numeric.s8 = m_data.numeric.s8 * right.m_data.numeric.s8; break;
 
-    case DATATYPE_R4: m_data.numeric.r4 = m_data.numeric.r4 * right.m_data.numeric.r4; break;
+    case DATATYPE_R4: 
+#if defined(TINYCLR_EMULATED_FLOATINGPOINT)
+    {
+        CLR_INT32 orig = (CLR_INT32)m_data.numeric.r4;
+        CLR_INT32 rhs;
+#endif
+        m_data.numeric.r4 = m_data.numeric.r4 * right.m_data.numeric.r4; 
 
-    case DATATYPE_R8: m_data.numeric.r8 = m_data.numeric.r8 * right.m_data.numeric.r8; break;
+#if defined(TINYCLR_EMULATED_FLOATINGPOINT)
+        rhs = (CLR_INT32)right.m_data.numeric.r4;
+
+        if(orig != 0 && rhs != 0)
+        {
+            CLR_INT32 ret_value = (CLR_INT32)m_data.numeric.r4;
+            bool      isNeg     = orig < 0;
+
+            if(rhs < 0) isNeg = !isNeg;
+        
+                 if(!isNeg && (ret_value < 0 || ret_value < orig || ret_value < rhs)) { m_data.numeric.r4 =                        0x7FFFFFFF; /* return CLR_E_OUT_OF_RANGE; */ }
+            else if( isNeg && (ret_value > 0 || ret_value > orig || ret_value > rhs)) { m_data.numeric.r4 = (CLR_INT32)(CLR_UINT32)0x80000000; /* return CLR_E_OUT_OF_RANGE; */ }
+        }
+    }
+#endif
+        break;
+
+    case DATATYPE_R8: 
+#if defined(TINYCLR_EMULATED_FLOATINGPOINT)
+    {
+        CLR_INT64 orig = (CLR_INT64)m_data.numeric.r8;
+        CLR_INT64 rhs;
+#endif
+        m_data.numeric.r8 = m_data.numeric.r8 * right.m_data.numeric.r8; 
+
+#if defined(TINYCLR_EMULATED_FLOATINGPOINT)
+        rhs = (CLR_INT64)right.m_data.numeric.r8;
+
+        if(orig != 0 && rhs != 0)
+        {
+            CLR_INT64 ret_value = (CLR_INT64)m_data.numeric.r8;
+            bool      isNeg     = orig < 0;
+
+            if(rhs < 0) isNeg = !isNeg;
+        
+                 if(!isNeg && (ret_value < 0 || ret_value < orig || ret_value < rhs)) { m_data.numeric.r8 = (CLR_INT64)ULONGLONGCONSTANT(0x7FFFFFFFFFFFFFFF); /* return CLR_E_OUT_OF_RANGE; */ }
+            else if( isNeg && (ret_value > 0 || ret_value > orig || ret_value > rhs)) { m_data.numeric.r8 = (CLR_INT64)ULONGLONGCONSTANT(0x8000000000000000); /* return CLR_E_OUT_OF_RANGE; */ }
+        }
+    }
+#endif
+        break;
 
     default         : TINYCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
 

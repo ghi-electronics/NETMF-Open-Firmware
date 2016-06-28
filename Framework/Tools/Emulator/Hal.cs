@@ -22,6 +22,8 @@ using Microsoft.SPOT.Emulator.FS;
 using Microsoft.SPOT.Emulator.BlockStorage;
 using Microsoft.SPOT.Emulator.TouchPanel;
 using Microsoft.SPOT.Emulator.Watchdog;
+using Microsoft.SPOT.Emulator.PKCS11;
+using Microsoft.SPOT.Emulator.Update;
 
 namespace Microsoft.SPOT.Emulator
 {
@@ -44,6 +46,86 @@ namespace Microsoft.SPOT.Emulator
         private IBlockStorageDriver _blockStorageDevices;
         private ITouchPanelDriver _touchPanel;
         private IWatchdogDriver _watchdog;
+
+        private ISessionDriver _session;
+        private IEncryptionDriver _encryption;
+        private IDigestDriver _digest;
+        private ISignatureDriver _signature;
+        private IKeyManagementDriver _keyManagement;
+        private ICryptokiObjectDriver _cryptokiObjectMgr;
+        private IRandomDriver _random;
+
+        private IUpdateDriver _updateProvider;
+        private IUpdateStorageDriver _updateStorage;
+        private IUpdateBackupDriver _updateBackup;
+        private IUpdateValidationDriver _updateValidation;
+
+        public ISessionDriver Session
+        {
+            get { return _session; }
+            set
+            {
+                ThrowIfNotConfigurable();
+                _session = value;
+            }
+        }
+
+        public IEncryptionDriver Encryption
+        {
+            get { return _encryption; }
+            set
+            {
+                ThrowIfNotConfigurable();
+                _encryption = value;
+            }
+        }
+
+        public ISignatureDriver Signature
+        {
+            get { return _signature; }
+            set
+            {
+                ThrowIfNotConfigurable();
+                _signature = value;
+            }
+        }
+        public IDigestDriver Digest
+        {
+            get { return _digest; }
+            set
+            {
+                ThrowIfNotConfigurable();
+                _digest = value;
+            }
+        }
+        public IKeyManagementDriver KeyManagement
+        {
+            get { return _keyManagement; }
+            set
+            {
+                ThrowIfNotConfigurable();
+                _keyManagement = value;
+            }
+        }
+        public ICryptokiObjectDriver CryptokiObjectMgr
+        {
+            get { return _cryptokiObjectMgr; }
+            set
+            {
+                ThrowIfNotConfigurable();
+                _cryptokiObjectMgr = value;
+            }
+        }
+        public IRandomDriver Random
+        {
+            get { return _random; }
+            set
+            {
+                ThrowIfNotConfigurable();
+                _random = value;
+            }
+        }
+        
 
         public ITimeDriver Time
         {
@@ -252,6 +334,18 @@ namespace Microsoft.SPOT.Emulator
             ThrowIfNull( this.BlockStorage, "BlockStorage" );
             ThrowIfNull( this.Watchdog, "Watchdog" );
 
+            ThrowIfNull( this.Encryption, "Encryption" );
+            ThrowIfNull( this.Digest, "Digest" );
+            ThrowIfNull( this.Signature, "Signature" );
+            ThrowIfNull( this.KeyManagement, "KeyManagement" );
+            ThrowIfNull( this.CryptokiObjectMgr, "CryptokiObjectMgr" );
+            ThrowIfNull( this.Random, "Random" );
+
+            ThrowIfNull(this.UpdateBackup, "UpdateBackup");
+            ThrowIfNull(this.UpdateProvider, "UpdateProvider");
+            ThrowIfNull(this.UpdateStorage, "UpdateStorage");
+            
+
             this.Emulator.RegisterComponent( (EmulatorComponent)_battery, this );
             this.Emulator.RegisterComponent( (EmulatorComponent)_com, this );
             this.Emulator.RegisterComponent( (EmulatorComponent)_serial, this );
@@ -270,6 +364,19 @@ namespace Microsoft.SPOT.Emulator
             this.Emulator.RegisterComponent( (EmulatorComponent)_blockStorageDevices, this );
             this.Emulator.RegisterComponent( (EmulatorComponent)_watchdog, this );
 
+            this.Emulator.RegisterComponent( (EmulatorComponent)_session, this );
+            this.Emulator.RegisterComponent( (EmulatorComponent)_encryption, this );
+            this.Emulator.RegisterComponent( (EmulatorComponent)_digest, this );
+            this.Emulator.RegisterComponent( (EmulatorComponent)_signature, this );
+            this.Emulator.RegisterComponent( (EmulatorComponent)_keyManagement, this );
+            this.Emulator.RegisterComponent( (EmulatorComponent)_cryptokiObjectMgr, this );
+            this.Emulator.RegisterComponent( (EmulatorComponent)_random, this );
+
+            this.Emulator.RegisterComponent((EmulatorComponent)_updateProvider, this);
+            this.Emulator.RegisterComponent((EmulatorComponent)_updateStorage, this);
+            this.Emulator.RegisterComponent((EmulatorComponent)_updateBackup, this);
+            this.Emulator.RegisterComponent((EmulatorComponent)_updateValidation, this);
+            
             base.SetupComponent();
         }
 
@@ -300,11 +407,64 @@ namespace Microsoft.SPOT.Emulator
             _fileSystem = new FSDriver();
             _blockStorageDevices = new BlockStorageDriver();
             _watchdog = new WatchdogDriver();
+
+            _session = new SessionDriver();
+            _encryption = new EncryptionDriver();
+            _digest = new DigestDriver();
+            _signature = new SignatureDriver();
+            _keyManagement = new KeyManagementDriver();
+            _cryptokiObjectMgr = new CryptokiObjectMgrDriver();
+            _random = new RandomDriver();
+
+            _updateProvider = new UpdateProvider();
+            _updateStorage = new UpdateStorageProvider();
+            _updateBackup = new UpdateBackupProvider();
+            _updateValidation = new UpdateValidationProvider();
         }
 
         public override bool IsReplaceableBy( EmulatorComponent ec )
         {
             return (ec is Hal);
+        }
+
+        public IUpdateBackupDriver UpdateBackup
+        {
+            get { return _updateBackup; }
+            set
+            {
+                ThrowIfNotConfigurable();
+                _updateBackup = value;
+            }
+        }
+
+        public IUpdateDriver UpdateProvider
+        {
+            get { return _updateProvider; }
+            set
+            {
+                ThrowIfNotConfigurable();
+                _updateProvider = value;
+            }
+        }
+
+        public IUpdateValidationDriver UpdateValidation
+        {
+            get { return _updateValidation; }
+            set
+            {
+                ThrowIfNotConfigurable();
+                _updateValidation = value;
+            }
+        }
+
+        public IUpdateStorageDriver UpdateStorage
+        {
+            get { return _updateStorage; }
+            set
+            {
+                ThrowIfNotConfigurable();
+                _updateStorage = value;
+            }
         }
     }
 

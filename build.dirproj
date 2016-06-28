@@ -6,17 +6,18 @@
     <Project Include="
         Support\FrameworkBase\dotnetmf.proj;
         Framework\Tools\build.dirproj;
+        Framework\Tools\CreateCLRDefines.proj;
         Framework\build.dirproj;
         Solutions\Windows2\dotnetmf.proj"
         />
 
     <Project
-        Condition="'$(PORT_BUILD)'!=''" 
+        Condition="!EXISTS('$(SPOCLIENT)\sdk.dirproj')" 
         Include="Test\build.dirproj"
         />
 
     <Project 
-        Condition="'$(PORT_BUILD)'==''"
+        Condition="EXISTS('$(SPOCLIENT)\CLR\Tools\PlatformDesigner\build.dirproj')"
         Include="
         Product\build.dirproj;
         CLR\Tools\PlatformDesigner\build.dirproj;

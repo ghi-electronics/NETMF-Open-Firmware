@@ -24,11 +24,11 @@ namespace ClockSample
     // Standard application class declaration
     public class MyClock : Microsoft.SPOT.Application
     {
-        // In our sample we will use an arbitrary time server with IP address 10.192.53.107
+        // In our sample we will use an arbitrary time server with IP address 192.43.244.18 
         // one should change this IP Address to a less arbitrary value like a public time server
         // listed here: http://tf.nist.gov/tf-cgi/servers.cgi 
         // (accessing a public time server will require adequate proxy settings though)
-        public static byte[] TimeServerIPAddress = new byte[] { 10, 192, 53, 107 };
+        public static byte[] TimeServerIPAddress = new byte[] { 192, 43, 244, 18 };
 
         //--//
 
@@ -95,7 +95,7 @@ namespace ClockSample
             {
                 ip.TextContent = str;
                 DateTime now = DateTime.Now;
-                time.TextContent = now.ToString("hh:mm:ss");
+                time.TextContent = now.ToString("HH:mm:ss");
                 dayofWeek.TextContent = days[(int)now.DayOfWeek];
                 date.TextContent = now.ToString("MM/dd/yyyy");
                 time.Invalidate();
@@ -223,14 +223,13 @@ namespace ClockSample
             {
                 // reset the time to an arbitrary value
                 TimeService.SetUtcTime(128752416000000000);
-                TimeService.SetTimeZoneOffset(-420);
+                TimeService.SetTimeZoneOffset(-480); // time origin
             }
             else if (e.Button == Microsoft.SPOT.Hardware.Button.VK_SELECT)
             {
                 // Perform a one time sync with the time server
-                TimeServiceStatus status = TimeService.UpdateNow( TimeServerIPAddress, 10);
-
-                TimeService.SetTimeZoneOffset(-420); // time origin
+                TimeServiceStatus status = TimeService.UpdateNow(TimeServerIPAddress, 10);
+                TimeService.SetTimeZoneOffset(-480); // time origin
             }
             else if (e.Button == Microsoft.SPOT.Hardware.Button.VK_DOWN)
             {
@@ -238,12 +237,12 @@ namespace ClockSample
                 TimeServiceSettings settings = new TimeServiceSettings();
 
                 settings.PrimaryServer = TimeServerIPAddress;
-                settings.RefreshTime = 10; // sycn every 10 seconds
+                settings.RefreshTime = 10; // sync every 10 seconds
 
                 TimeService.Settings = settings;
 
-                TimeService.Start();
-                TimeService.SetTimeZoneOffset(-420);  // time origin 
+                TimeService.Start(); 
+                TimeService.SetTimeZoneOffset(-480); // time origin
             }
         }
     }

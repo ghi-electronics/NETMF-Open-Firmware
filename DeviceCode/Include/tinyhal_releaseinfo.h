@@ -6,7 +6,7 @@
 #define _TINYHAL_RELEASEINFO_H_ 1
 
 
-struct Version
+struct MFVersion
 {
     unsigned short usMajor;
     unsigned short usMinor;
@@ -16,7 +16,7 @@ struct Version
     // Version & MfReleaseInfo participate in a union in the debugging support,
     // and therefore cannot have real constructors, though that would be better
     // style otherwise.
-    static void Init(Version& version, unsigned short major=0, unsigned short minor=0, unsigned short build=0, unsigned short revision=0)
+    static void Init(MFVersion& version, unsigned short major=0, unsigned short minor=0, unsigned short build=0, unsigned short revision=0)
     {
         version.usMajor = major;
         version.usMinor = minor;
@@ -27,8 +27,8 @@ struct Version
 
 struct MfReleaseInfo
 {
-    Version version;
-    unsigned char infoString[64-sizeof(Version)];
+    MFVersion version;
+    unsigned char infoString[64-sizeof(MFVersion)];
     
     static void Init(MfReleaseInfo& releaseInfo, unsigned short major=0, unsigned short minor=0, unsigned short build=0, unsigned short revision=0, const char *info=(const char *)NULL, size_t infoLen=0);
 };

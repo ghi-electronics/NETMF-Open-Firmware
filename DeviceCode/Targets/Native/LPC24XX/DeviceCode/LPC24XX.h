@@ -549,8 +549,8 @@ struct LPC24XX_USART
     static const UINT32 c_SER1_RXD = LPC24XX_GPIO::c_P0_03;
 
     // Add more pins if UART1 is used in full mode    
-    static const UINT32 c_SER2_TXD = LPC24XX_GPIO::c_P2_00;//LPC24XX_GPIO::c_P3_16;
-    static const UINT32 c_SER2_RXD = LPC24XX_GPIO::c_P2_01;//LPC24XX_GPIO::c_P3_17;
+    static const UINT32 c_SER2_TXD = LPC24XX_GPIO::c_P3_16;
+    static const UINT32 c_SER2_RXD = LPC24XX_GPIO::c_P3_17;
 
     // UART2 pins
     static const UINT32 c_SER3_TXD = LPC24XX_GPIO::c_P0_10;
@@ -1219,7 +1219,17 @@ struct LPC24XX
     static LPC24XX_I2C    & I2C    (         ) { return *(LPC24XX_I2C*     )(size_t)( LPC24XX_I2C     ::c_I2C_Base      ); }
     static LPC24XX_WATCHDOG & WTDG (         ) { return *(LPC24XX_WATCHDOG*)(size_t)( LPC24XX_WATCHDOG::c_WATCHDOG_Base ); }
     static LPC24XX_DAC      & DAC  (         ) { return *(LPC24XX_DAC*     )(size_t)( LPC24XX_DAC     ::c_DAC_Base      ); }
-    static LPC24XX_PWM      & PWM  ( int sel ) { return *(LPC24XX_PWM*     )(size_t)( sel == PWM_CHANNEL_0 ? LPC24XX_PWM::c_PWM_Base_0 : LPC24XX_PWM::c_PWM_Base_1); }
+    static LPC24XX_PWM      & PWM  ( int sel ) 
+    { 
+        if(sel == PWM_CHANNEL_0)
+        {
+            return *(LPC24XX_PWM*)(size_t)LPC24XX_PWM::c_PWM_Base_0;
+        }
+        else 
+        {
+            return *(LPC24XX_PWM*)(size_t)LPC24XX_PWM::c_PWM_Base_1;
+        }
+    }
     
    
     static LPC24XX_TIMER  & TIMER( int sel )
@@ -1557,7 +1567,7 @@ struct LPC24XX_GPIO_Driver
 
 
 
-    //PIN_ISR_DESCRIPTOR m_PinIsr            [c_MaxPins ];
+    PIN_ISR_DESCRIPTOR m_PinIsr            [c_MaxPins ];
     UINT32             m_PinReservationInfo[c_MaxPins];
     UINT32             m_DebounceTicks;
     
@@ -1933,26 +1943,20 @@ struct LPC24XX_PWM_Driver
 
     //-//
     
-    BOOL     Initialize        ( PWM_CHANNEL channel );
-    BOOL     Uninitialize      ( PWM_CHANNEL channel );
-    BOOL     ApplyConfiguration( PWM_CHANNEL channel, GPIO_PIN pin, UINT32& period, UINT32& duration, PWM_SCALE_FACTOR& scale, BOOL invert );
-    BOOL     Start             ( PWM_CHANNEL channel, GPIO_PIN pin );
-    void     Stop              ( PWM_CHANNEL channel, GPIO_PIN pin );
-    BOOL     Start             ( PWM_CHANNEL* channel, GPIO_PIN* pin, UINT32 count );
-    void     Stop              ( PWM_CHANNEL* channel, GPIO_PIN* pin, UINT32 count );
-    UINT32   Channels          ( );
-    GPIO_PIN GetPinForChannel  ( PWM_CHANNEL channel );
+    static BOOL     Initialize        ( PWM_CHANNEL channel );
+    static BOOL     Uninitialize      ( PWM_CHANNEL channel );
+    static BOOL     ApplyConfiguration( PWM_CHANNEL channel, GPIO_PIN pin, UINT32& period, UINT32& duration, PWM_SCALE_FACTOR& scale, BOOL invert );
+    static BOOL     Start             ( PWM_CHANNEL channel, GPIO_PIN pin );
+    static void     Stop              ( PWM_CHANNEL channel, GPIO_PIN pin );
+    static BOOL     Start             ( PWM_CHANNEL* channel, GPIO_PIN* pin, UINT32 count );
+    static void     Stop              ( PWM_CHANNEL* channel, GPIO_PIN* pin, UINT32 count );
+    static UINT32   Channels          ( );
+    static GPIO_PIN GetPinForChannel  ( PWM_CHANNEL channel );
 
     //--//
 
-    void EnablePin( PWM_CHANNEL channel, GPIO_PIN pin );
-    void DisablePin( PWM_CHANNEL channel, GPIO_PIN pin );
-
-    //--//
-
-    static const GPIO_PIN c_Channel_0_Pins[6];
-    static const GPIO_PIN c_Channel_1_Pins[6];
-
+    static void EnablePin( PWM_CHANNEL channel, GPIO_PIN pin );
+    static void DisablePin( PWM_CHANNEL channel, GPIO_PIN pin );
 };
 
 //

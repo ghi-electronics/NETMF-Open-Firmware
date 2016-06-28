@@ -19,7 +19,6 @@ using Ws.Services;
 using Ws.Services.WsaAddressing;
 using Ws.Services.Xml;
 using Ws.Services.Binding;
-using Ws.Services.Mtom;
 using Ws.Services.Soap;
 
 namespace schemas.example.org.SimpleService
@@ -51,11 +50,6 @@ namespace schemas.example.org.SimpleService
             // Add event sources here
         }
         
-        public SimpleService(ISimpleService service) : 
-                this(service, new ProtocolVersion10())
-        {
-        }
-        
         public virtual WsMessage OneWay(WsMessage request)
         {
             // Build request object
@@ -63,12 +57,14 @@ namespace schemas.example.org.SimpleService
             reqDcs = new OneWayRequestDataContractSerializer("OneWayRequest", "http://schemas.example.org/SimpleService");
             OneWayRequest req;
             req = ((OneWayRequest)(reqDcs.ReadObject(request.Reader)));
+            request.Reader.Dispose();
+            request.Reader = null;
 
             // Call service operation to process request.
             m_service.OneWay(req);
 
-            // Return null response for oneway messages
-            return null;
+            // Return a OneWayResponse message for oneway messages
+            return WsMessage.CreateOneWayResponse();
         }
         
         public virtual WsMessage TwoWay(WsMessage request)
@@ -78,6 +74,8 @@ namespace schemas.example.org.SimpleService
             reqDcs = new TwoWayRequestDataContractSerializer("TwoWayRequest", "http://schemas.example.org/SimpleService");
             TwoWayRequest req;
             req = ((TwoWayRequest)(reqDcs.ReadObject(request.Reader)));
+            request.Reader.Dispose();
+            request.Reader = null;
 
             // Create response object
             // Call service operation to process request and return response.
@@ -102,6 +100,8 @@ namespace schemas.example.org.SimpleService
             reqDcs = new TypeCheckRequestDataContractSerializer("TypeCheckRequest", "http://schemas.example.org/SimpleService");
             TypeCheckRequest req;
             req = ((TypeCheckRequest)(reqDcs.ReadObject(request.Reader)));
+            request.Reader.Dispose();
+            request.Reader = null;
 
             // Create response object
             // Call service operation to process request and return response.
@@ -126,6 +126,8 @@ namespace schemas.example.org.SimpleService
             reqDcs = new AnyCheckRequestDataContractSerializer("AnyCheckRequest", "http://schemas.example.org/SimpleService");
             AnyCheckRequest req;
             req = ((AnyCheckRequest)(reqDcs.ReadObject(request.Reader)));
+            request.Reader.Dispose();
+            request.Reader = null;
 
             // Create response object
             // Call service operation to process request and return response.

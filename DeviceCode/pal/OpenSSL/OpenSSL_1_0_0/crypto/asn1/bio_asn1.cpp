@@ -234,7 +234,7 @@ static int asn1_bio_write(BIO *b, const char *in , int inl)
 			case ASN1_STATE_HEADER:
 			ctx->buflen =
 				ASN1_object_size(0, inl, ctx->asn1_tag) - inl;
-			OPENSSL_assert(ctx->buflen <= ctx->bufsize);
+			TINYCLR_SSL_ASSERT(ctx->buflen <= ctx->bufsize);
 			p = ctx->buf;
 			ASN1_put_object(&p, 0, inl,
 					ctx->asn1_tag, ctx->asn1_class);

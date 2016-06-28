@@ -88,6 +88,7 @@
 #define __section(x) __attribute__((section(#x)))
 #define __irq __attribute__((interrupt))
 #define __forceinline __attribute__((always_inline))
+#define ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED // Include so that zi variables are correctly sectioned
 
 #define FORCEINLINE __forceinline
 
@@ -293,6 +294,8 @@ private:
     }
 
 public:
+    static BOOL InvalidateBlockWithName( const char* Name, BOOL isChipRO );
+    
     static BOOL UpdateBlockWithName( const char*  Name, void* Data, size_t Length, BOOL isChipRO );
 
     static BOOL ApplyConfig( const char* Name, void* Address, size_t Length );
@@ -972,7 +975,7 @@ public:
 
     T* operator[](int index)
     {
-        if(index < 0 || index > NumberOfElements()) return NULL;
+        if(index < 0 || index >= NumberOfElements()) return NULL;
 
         return &m_data[(m_reader + index) % ARRAYSIZE(m_data)];
     }
@@ -1055,7 +1058,7 @@ public:
 
     T* operator[](int index)
     {
-        if(index < 0 || index > NumberOfElements()) return NULL;
+        if(index < 0 || index >= NumberOfElements()) return NULL;
 
         return &m_data[(m_reader + index) % m_size];
     }
@@ -1295,6 +1298,10 @@ void HAL_Uninitialize();
 
 void HAL_EnterBooterMode();
 
+typedef void (*ON_SOFT_REBOOT_HANDLER)(void);
+
+void HAL_AddSoftRebootHandler(ON_SOFT_REBOOT_HANDLER handler);
+
 //--//
 
 
@@ -1507,6 +1514,34 @@ struct CPU_UTILIZATION_TIME
 
 #include <..\Initialization\MasterConfig.h>
 
+#ifdef PLATFORM_DEPENDENT__UPDATE_SIGNATURE_SIZE
+#define HAL_UPDATE_SIGNATURE_SIZE PLATFORM_DEPENDENT__UPDATE_SIGNATURE_SIZE
+#else
+#define HAL_UPDATE_SIGNATURE_SIZE 4
+#endif
+
+#define HAL_UPDATE_CONFIG_SIGN_TYPE__SIGNATURE 0x0000
+#define HAL_UPDATE_CONFIG_SIGN_TYPE__CRC       0x0001
+#define HAL_UPDATE_CONFIG_SIGN_TYPE__USER_DEF  0x8000
+
+struct HAL_UPDATE_CONFIG
+{
+    HAL_DRIVER_CONFIG_HEADER Header;
+
+    UINT32 UpdateID;
+    UINT32 UpdateSignType;
+    UINT32 UpdateSignature[(HAL_UPDATE_SIGNATURE_SIZE+sizeof(UINT32)-1)/sizeof(UINT32)];
+
+    static LPCSTR GetDriverName() { return "BTLD"; }
+};
+
+//--//
+
+extern bool g_fDoNotUninitializeDebuggerPort;
+
+//--//
+
+#include <network_decl.h>
 #include <tinypal.h>
 #include <drivers.h>
 #include <tinybooterentry.h>

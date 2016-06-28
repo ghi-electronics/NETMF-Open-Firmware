@@ -2,7 +2,6 @@
   <PropertyGroup>
     <FeatureName>Ink</FeatureName>
   </PropertyGroup>
-  <Import Project="$(SPOCLIENT)\Framework\Features\TinyCore.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\TouchScreen.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\PalEvent_PAL.libcatproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />

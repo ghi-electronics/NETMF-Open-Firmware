@@ -2,17 +2,17 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl.h>
+#include <PKCS11\Tokens\OpenSSL\OpenSSL_pkcs11.h>
 
+extern CK_RV Cryptoki_GetSlotIDFromSession(CK_SESSION_HANDLE session, CK_SLOT_ID_PTR pSlotID, CryptokiSession** ppSession);
 
-//TODO:  ctx, meth need to be OPENSSL_free'd somewhere (unitialize maybe?)
 BOOL ssl_generic_init_internal( int sslMode, int sslVerify, const char* certificate, 
-    int cert_len, int& sslContextHandle, BOOL isServer )
+    int cert_len, const char* szCertPwd, int& sslContextHandle, BOOL isServer )
 {
     SSL*                ssl = NULL;
     SSL_CTX*            ctx = NULL;
     SSL_METHOD*         meth = NULL;
     X509*               cert_x509 = NULL;
-    BIO*                cert_bio = NULL;
     EVP_PKEY*           pkey = NULL;
 
     int                 sslCtxIndex = -1;
@@ -28,34 +28,10 @@ BOOL ssl_generic_init_internal( int sslMode, int sslVerify, const char* certific
     
     if(sslCtxIndex == -1) return FALSE;
 
-
     if(isServer)
     {
-        
-        if ((cert_bio=BIO_new(BIO_s_mem())) == NULL)
-        {
-            ERR_print_errors_fp(OPENSSL_TYPE__FILE_STDERR);
-            goto err;
-        }
-        BIO_puts(cert_bio,certificate);
-        
-        cert_x509 = PEM_read_bio_X509_AUX(cert_bio, NULL, 0, NULL);
-
-        if (cert_x509 == NULL)
-        {
-            ERR_print_errors_fp(OPENSSL_TYPE__FILE_STDERR);
-            goto err;
-        }
-        
-        pkey = PEM_read_bio_PrivateKey(cert_bio, NULL,
-                                       ctx->default_passwd_callback,
-                                       ctx->default_passwd_callback_userdata);
-
-        if (pkey == NULL)
-        {
-            ERR_print_errors_fp(OPENSSL_TYPE__FILE_STDERR);
-            goto err;
-        }
+        // TODO:  we should be setting up the CA lsit
+         //SSL_CTX_set_client_CA_list
 
         if(sslMode & TINYCLR_SSL_MODE_TLS1)
         {
@@ -65,21 +41,74 @@ BOOL ssl_generic_init_internal( int sslMode, int sslVerify, const char* certific
         {
             meth = (SSL_METHOD*)SSLv3_server_method();  
         }
-        
-        ctx = SSL_CTX_new (meth);
-
-        if (ctx == NULL)
+    }
+    else
+    {
+        if(sslMode & TINYCLR_SSL_MODE_TLS1)
         {
-            ERR_print_errors_fp(OPENSSL_TYPE__FILE_STDERR);
-            goto err;
+            meth = (SSL_METHOD*)TLSv1_client_method();
         }
+        else
+        {
+            meth = (SSL_METHOD*)SSLv3_client_method();  
+        }
+    }
 
+    // SSL_CTX is freed along with SSL in ssl_exit_context_internal
+    ctx = SSL_CTX_new (meth);
 
+    if (ctx == NULL)
+    {
+        ERR_print_errors_fp(OPENSSL_TYPE__FILE_STDERR);
+        goto err;
+    }
+
+    if(certificate != NULL && cert_len > 0)
+    {
+        // Certificate Handle passed
+        if(cert_len == sizeof(INT32))
+        {
+            CryptokiSession* pSession;
+            CK_SLOT_ID  slotID;
+            OBJECT_DATA* pObj;
+            CERT_DATA* pCert;
+            
+            if(CKR_OK != Cryptoki_GetSlotIDFromSession(sslContextHandle, &slotID, &pSession)) return FALSE;
+
+            pObj = PKCS11_Objects_OpenSSL::GetObjectFromHandle(&pSession->Context, *(INT32*)certificate);
+
+            if(pObj == NULL || pObj->Type != CertificateType) return FALSE;
+
+            pCert = (CERT_DATA*)pObj->Data;
+
+            cert_x509 = pCert->cert;
+            pkey = (EVP_PKEY*)pCert->privKeyData.key;
+
+            g_SSL_Driver.m_sslContextArray[sslCtxIndex].CryptokiSession = sslContextHandle;
+        }
+        else
+        {
+            cert_x509 = ssl_parse_certificate((void*)certificate, cert_len, szCertPwd, &pkey);
+
+            if (cert_x509 == NULL || pkey == NULL)
+            {
+                ERR_print_errors_fp(OPENSSL_TYPE__FILE_STDERR);
+                goto err;
+            }
+        }
+    }
+
+    if(cert_x509 != NULL)
+    {
         if (SSL_CTX_use_certificate(ctx, cert_x509) <= 0) 
         {
             ERR_print_errors_fp(OPENSSL_TYPE__FILE_STDERR);
             goto err;
         }
+    }
+
+    if(pkey != NULL)
+    {
         if (SSL_CTX_use_PrivateKey(ctx, pkey) <= 0) 
         {
             ERR_print_errors_fp(OPENSSL_TYPE__FILE_STDERR);
@@ -92,43 +121,23 @@ BOOL ssl_generic_init_internal( int sslMode, int sslVerify, const char* certific
                 "Private key does not match the certificate public key\n");
             goto err;
         }
-
-        // create the SSL object
-        ssl = SSL_new(ctx);
-        if (ssl == NULL)
-        {
-            ERR_print_errors_fp(OPENSSL_TYPE__FILE_STDERR);
-            goto err;
-        }
-
-        X509_free(cert_x509);
-        BIO_free(cert_bio);
     }
-    else
+
+    // create the SSL object
+    ssl = SSL_new(ctx);
+    if (ssl == NULL)
     {
-        if(sslMode & TINYCLR_SSL_MODE_TLS1)
-        {
-            meth = (SSL_METHOD*)TLSv1_client_method();
-        }
-        else
-        {
-            meth = (SSL_METHOD*)SSLv3_client_method();  
-        }
-        ctx = SSL_CTX_new (meth);
-        if (ctx == NULL)
-        {
-            ERR_print_errors_fp(OPENSSL_TYPE__FILE_STDERR);
-            goto err;
-        }
-        ssl = SSL_new(ctx);
-        if (ssl == NULL)
-        {
-            ERR_print_errors_fp(OPENSSL_TYPE__FILE_STDERR);
-            goto err;
-        }
+        ERR_print_errors_fp(OPENSSL_TYPE__FILE_STDERR);
+        goto err;
     }
     
     if (ssl == NULL) goto err;
+
+    if(cert_len != sizeof(INT32))
+    {
+        if(cert_x509 != NULL) X509_free(cert_x509);
+    }
+    
 
     // TINYCLR_SSL_VERIFY_XXX >> 1 == SSL_VERIFY_xxx
     ssl->verify_mode = (sslVerify >> 1);
@@ -141,11 +150,14 @@ BOOL ssl_generic_init_internal( int sslMode, int sslVerify, const char* certific
     return (ctx != NULL);
 
 err:
-    SSL_free(ssl);
-    SSL_CTX_free(ctx);
-    X509_free(cert_x509);
-    BIO_free(cert_bio);
-    EVP_PKEY_free(pkey);
+    if(ssl != NULL) SSL_free(ssl);
+    if(ctx != NULL) SSL_CTX_free(ctx);
+    
+    if(cert_len != sizeof(INT32))
+    {
+        X509_free(cert_x509);
+        EVP_PKEY_free(pkey);
+    }
     
     return FALSE;
 }

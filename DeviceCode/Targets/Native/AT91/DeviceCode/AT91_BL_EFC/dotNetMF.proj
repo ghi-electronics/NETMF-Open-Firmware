@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{8f9fc470-fee7-4794-a602-944ecefda12e}</ProjectGuid>
     <AssemblyName>AT91_BL_EFC</AssemblyName>
@@ -40,14 +41,16 @@
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
   <Import Project="$(SPOCLIENT)\Framework\features\BlockStorageConfig_HAL.libcatproj" />
   <PropertyGroup>
-    <OutputType >Library</OutputType>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
   <PropertyGroup>
     <ARMBUILD_ONLY>true</ARMBUILD_ONLY>
-  </PropertyGroup>  
+  </PropertyGroup>
   <ItemGroup>
-    <HFiles Include="AT91_BL_EFC.h" />
     <Compile Include="AT91_BL_EFC.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <HFiles Include="at91_bl_efc.h" />
   </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

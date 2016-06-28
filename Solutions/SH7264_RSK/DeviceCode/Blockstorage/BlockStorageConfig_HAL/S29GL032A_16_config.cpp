@@ -56,7 +56,9 @@ const BlockRange g_S29GL032A_16_BlockRange1[] =
     { BlockRange::BLOCKTYPE_CONFIG          , 31, 31 },       // SA31-- ER_Config(203E0000)
     { BlockRange::BLOCKTYPE_STORAGE_A       , 32, 32 },       // SA32- - Storage A(20400000)
     { BlockRange::BLOCKTYPE_STORAGE_B       , 33, 33 },       // SA33- - Storage B(20420000)
-    { BlockRange::BLOCKTYPE_DEPLOYMENT      , 34, 40 },
+    { BlockRange::BLOCKTYPE_SIMPLE_A        , 34, 34 },       // for cert storage
+    { BlockRange::BLOCKTYPE_SIMPLE_B        , 35, 35 },       // for cert storage
+    { BlockRange::BLOCKTYPE_DEPLOYMENT      , 36, 40 },
     { BlockRange::BLOCKTYPE_DEPLOYMENT      , 41, 50 },
     { BlockRange::BLOCKTYPE_DEPLOYMENT      , 51, 60 },
     { BlockRange::BLOCKTYPE_RESERVED       , 61, 511 },       // SA48-62- DEPLOYMENT()

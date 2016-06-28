@@ -255,7 +255,7 @@ int RAND_poll(void)
 				int try_read = 0;
 
 #if defined(OPENSSL_SYS_BEOS_R5)
-				/* select() is broken in BeOS R5, so we simply
+				/* TINYCLR_SSL_SELECT() is broken in BeOS R5, so we simply
 				 *  try to read something and snooze if we couldn't */
 				try_read = 1;
 
@@ -273,9 +273,9 @@ int RAND_poll(void)
 					try_read = (pset.revents & POLLIN) != 0;
 
 #else
-				/* use select() */
+				/* use TINYCLR_SSL_SELECT() */
 				fd_set fset;
-				struct timeval t;
+				struct TINYCLR_SSL_TIMEVAL t;
 				
 				t.tv_sec = 0;
 				t.tv_usec = usec;
@@ -290,7 +290,7 @@ int RAND_poll(void)
 					FD_ZERO(&fset);
 					FD_SET(fd, &fset);
 					
-					if (select(fd+1,&fset,NULL,NULL,&t) >= 0)
+					if (TINYCLR_SSL_SELECT(fd+1,&fset,NULL,NULL,&t) >= 0)
 						{
 						usec = t.tv_usec;
 						if (FD_ISSET(fd, &fset))
@@ -314,9 +314,9 @@ int RAND_poll(void)
 				else
 					r = -1;
 				
-				/* Some Unixen will update t in select(), some
+				/* Some Unixen will update t in TINYCLR_SSL_SELECT(), some
 				   won't.  For those who won't, or if we
-				   didn't use select() in the first place,
+				   didn't use TINYCLR_SSL_SELECT() in the first place,
 				   give up here, otherwise, we will do
 				   this once again for the remaining
 				   time. */
@@ -360,7 +360,7 @@ int RAND_poll(void)
 	l=getuid();
 	RAND_add(&l,sizeof(l),0.0);
 
-	l=time(NULL);
+	l=TINYCLR_SSL_TIME(NULL);
 	RAND_add(&l,sizeof(l),0.0);
 
 #if defined(OPENSSL_SYS_BEOS)

@@ -16,11 +16,12 @@ using System.Configuration;
 using System.Threading;
 using System.Security;
 using _DBG = Microsoft.SPOT.Debugger;
+using System.Security.Cryptography.X509Certificates;
 
 
 namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
 {
-    public partial class Form1 : Form, IMFDeployForm
+    public partial class Form1 : Form, IMFDeployForm 
     {
         private MFDeploy m_deploy = new MFDeploy();
         private Thread m_pluginThread = null;
@@ -216,7 +217,6 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
         private void Form1_Load(object sender, EventArgs e)
         {
             comboBoxTransport.SelectedIndex = 0;
-            m_deploy.OnDeviceListUpdate += new EventHandler<EventArgs>(OnDeviceListUpdate);
 
             if (m_transport != null)
             {
@@ -242,12 +242,6 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
                 }
             }
 
-
-            this.Height += 110;
-            richTextBoxOutput.Top += 110;
-            richTextBoxOutput.Height -= 110;
-
-            listViewFiles.Visible = true;
 
             AddPlugIns(typeof(Debug.DebugPlugins).GetNestedTypes(), "Debug");
 
@@ -413,14 +407,56 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
 
                         if (m_device != null)
                         {
+                            m_device.OnDebugText += new EventHandler<DebugOutputEventArgs>(OnDbgTxt);
+
+                            if (checkBoxUseSSL.Checked)
+                            {
+                                string certFile = textBoxCert.Text;
+
+                                if (!Path.IsPathRooted(certFile))
+                                {
+                                    certFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, certFile);
+                                }
+
+                                if (!File.Exists(certFile))
+                                {
+                                    MessageBox.Show(this, "The certificate '" + textBoxCert.Text + "' could not be found.", "MFDeploy Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                                    m_device.Disconnect();
+                                    return null;
+                                }
+                                try
+                                {
+                                    X509Certificate2 cert = new X509Certificate2(certFile, textBoxCertPwd.Text);
+
+                                    m_device.UseSsl(cert, Properties.Settings.Default.SslRequireClientCert);
+                                }
+                                catch
+                                {
+                                    MessageBox.Show(this, "Invalid password or certificate!", "MFDeploy Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    m_device.Disconnect();
+                                    return null;
+                                }
+                            }
+                            else if (!string.IsNullOrEmpty(textBoxCert.Text) && File.Exists(textBoxCert.Text))
+                            {
+                                try
+                                {
+                                    X509Certificate2 cert = new X509Certificate2(textBoxCert.Text, textBoxCertPwd.Text);
+
+                                    m_device.UseSsl(cert, Properties.Settings.Default.SslRequireClientCert);
+                                }
+                                catch
+                                {
+                                }
+                            }
+
                             comboBoxTransport.Invoke((MethodInvoker)delegate
                             {
                                 comboBoxDevice.Enabled = false;
                                 comboBoxTransport.Enabled = false;
                                 connectToolStripMenuItem.Enabled = false;
                             });
-
-                            m_device.OnDebugText += new EventHandler<DebugOutputEventArgs>(OnDbgTxt);
                             Interlocked.Increment(ref m_deviceRefCount);
                         }
                     }
@@ -495,12 +531,16 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
             MFDevice dev = ConnectToSelectedDevice();
             if (dev != null)
             {
-                if (DialogResult.Yes == MessageBox.Show(Properties.Resources.MessageEraseConfirmation, Properties.Resources.TitleEraseConfirmation, MessageBoxButtons.YesNo))
+                EraseDialog ed = new EraseDialog(dev);
+                ed.StartPosition = FormStartPosition.CenterParent;
+
+                if (DialogResult.OK == ed.ShowDialog(this))
                 {
-                    DeploymentStatusDialog dlg = new DeploymentStatusDialog(dev);
+                    DeploymentStatusDialog dlg = new DeploymentStatusDialog(dev, ed.EraseBlocks);
                     dlg.StartPosition = FormStartPosition.CenterParent;
                     dlg.ShowDialog(this);
                 }
+
                 DisconnectFromSelectedDevice();
             }
         }
@@ -605,7 +645,7 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
 
             MFDevice dev = ConnectToSelectedDevice();
 
-            if(dev != null)
+            if (dev != null)
             {
                 DeploymentStatusDialog dlg = new DeploymentStatusDialog(dev, files, sigfiles);
                 dlg.StartPosition = FormStartPosition.CenterParent;
@@ -613,7 +653,10 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
 
                 DisconnectFromSelectedDevice();
             }
-
+            else
+            {
+                MessageBox.Show(this, "Please select a valid device!", "No device selected");
+            }
         }
 
         private void button1_Click(System.Object sender, System.EventArgs e)
@@ -773,20 +816,76 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
 
                         FileInfo fi = new FileInfo(file);
 
-                        ArrayList blocks = new ArrayList();
-                        _DBG.SRecordFile.Parse(fi.FullName, blocks, null);
-
-                        foreach (_DBG.SRecordFile.Block blk in blocks)
+                        if (fi.Extension.ToLower() == ".nmf")
                         {
                             ListViewItem lvi = new ListViewItem(fi.Name);
                             lvi.SubItems.Add(fi.FullName);
-                            lvi.SubItems.Add("0x" + blk.address.ToString("x08"));
-                            lvi.SubItems.Add("0x" + blk.data.Length.ToString("x08"));
+
+                            uint dest = 0;
+                            uint size = 0;
+
+                            using (FileStream fs = File.OpenRead(file))
+                            { 
+                                byte []hdr = new byte[3*4];
+                                uint comp;
+
+                                fs.Read(hdr, 0, 12);
+
+                                dest = BitConverter.ToUInt32(hdr, 0);
+                                comp = BitConverter.ToUInt32(hdr, 4);
+                                size = BitConverter.ToUInt32(hdr, 8);
+
+                                while ((comp % 4) != 0)
+                                {
+                                    comp++;
+                                }
+                                fs.Seek(comp, SeekOrigin.Current);
+
+                                while(fs.Position < fs.Length-1)
+                                {
+                                    fs.Read(hdr, 0, 12);
+
+                                    uint destT = BitConverter.ToUInt32(hdr, 0);
+                                    if (destT < dest)
+                                    {
+                                        dest = destT;
+                                    }
+                                    comp  = BitConverter.ToUInt32(hdr, 4);
+                                    size += BitConverter.ToUInt32(hdr, 8);
+
+                                    while ((comp % 4) != 0)
+                                    {
+                                        comp++;
+                                    }
+                                    fs.Seek(comp, SeekOrigin.Current);
+                                }
+                            }
+
+                            lvi.SubItems.Add("0x" + dest.ToString("x08"));
+                            lvi.SubItems.Add("0x" + size.ToString("x08"));
                             lvi.SubItems.Add(fi.LastWriteTime.ToString());
-                            lvi.Checked = checkStateLookup.ContainsKey(fi.FullName)? (bool)checkStateLookup[fi.FullName]: true;
+                            lvi.Checked = checkStateLookup.ContainsKey(fi.FullName) ? (bool)checkStateLookup[fi.FullName] : true;
 
                             cache.Add(lvi);
                             listViewFiles.Items.Add(lvi);
+                        }
+                        else
+                        {
+                            ArrayList blocks = new ArrayList();
+                            _DBG.SRecordFile.Parse(fi.FullName, blocks, null);
+
+                            foreach (_DBG.SRecordFile.Block blk in blocks)
+                            {
+                                ListViewItem lvi = new ListViewItem(fi.Name);
+                                lvi.SubItems.Add(fi.FullName);
+                                lvi.SubItems.Add("0x" + blk.address.ToString("x08"));
+                                lvi.SubItems.Add("0x" + blk.data.Length.ToString("x08"));
+                                lvi.SubItems.Add(fi.LastWriteTime.ToString());
+                                lvi.Checked = checkStateLookup.ContainsKey(fi.FullName) ? (bool)checkStateLookup[fi.FullName] : true;
+
+                                cache.Add(lvi);
+                                listViewFiles.Items.Add(lvi);
+                            }
                         }
                     }
 
@@ -827,8 +926,48 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
             }
         }
 
+        int m_prevTransport = -1;
+
         private void comboBoxTransport_SelectedIndexChanged(System.Object sender, System.EventArgs e)
         {
+            if (comboBoxTransport.SelectedIndex == (int)TransportComboBoxType.Usb)
+            {
+                if (m_prevTransport != (int)TransportComboBoxType.Usb)
+                {
+                    m_deploy.OnDeviceListUpdate += new EventHandler<EventArgs>(OnDeviceListUpdate);
+                }
+            }
+            else
+            {
+                if (m_prevTransport == (int)TransportComboBoxType.Usb)
+                {
+                    m_deploy.OnDeviceListUpdate -= new EventHandler<EventArgs>(OnDeviceListUpdate);
+                }
+            }
+
+            if (comboBoxTransport.SelectedIndex == (int)TransportComboBoxType.TcpIp)
+            {
+                if (m_prevTransport != (int)TransportComboBoxType.TcpIp)
+                {
+                    checkBoxUseSSL.Enabled = true;
+                    if (Properties.Settings.Default.SslCert != null)
+                    {
+                        textBoxCert.Text = Properties.Settings.Default.SslCert;
+                    }
+                }
+            }
+            else
+            {
+                if (m_prevTransport == (int)TransportComboBoxType.TcpIp)
+                {
+                    checkBoxUseSSL.Checked = false;
+                    checkBoxUseSSL.Enabled = false;
+                }
+            }
+
+
+            m_prevTransport = comboBoxTransport.SelectedIndex;
+
             OnDeviceListUpdate(null, null);
         }
 
@@ -1194,6 +1333,36 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
                 DisconnectFromSelectedDevice();
                 Cursor = old;
                 DumpToOutput("Update Complete!", true);
+            }
+        }
+
+        private void checkBoxUseSSL_CheckedChanged(object sender, EventArgs e)
+        {
+            bool enabled = checkBoxUseSSL.Checked;
+        }
+
+        private void checkBoxUseSSL_EnabledChanged(object sender, EventArgs e)
+        {
+        }
+
+        private void buttonBrowseCert_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.DefaultExt = "*.pfx";
+            ofd.CheckFileExists = true;
+            ofd.Filter = "Certificate files (*.pfx;*.pem)|*.pfx;*.pem";
+            ofd.FilterIndex = 0;
+            ofd.Multiselect = false;
+            ofd.RestoreDirectory = true;
+
+            string initPath = string.IsNullOrEmpty(textBoxCert.Text) ?  "" : Path.GetDirectoryName(textBoxCert.Text);
+            if (initPath == "") initPath = AppDomain.CurrentDomain.BaseDirectory;
+
+            ofd.InitialDirectory = initPath;
+
+            if (DialogResult.OK == ofd.ShowDialog(this))
+            {
+                textBoxCert.Text = ofd.FileName;
             }
         }
     }

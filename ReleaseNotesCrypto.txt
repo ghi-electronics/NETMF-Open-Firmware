@@ -1,6 +1,6 @@
 ===============================================================================
 ===============================================================================
-Release Notes for the Microsoft .NET Micro Framework Porting Kit Version 4.1
+Release Notes for the Microsoft .NET Micro Framework Porting Kit Version 4.2
 
 This document details the system requirements, migration information, and 
 known issues in the Porting Kit.
@@ -26,7 +26,7 @@ tested by Microsoft.
 * VisualDSP++ 5.0 for Blackfin 
 
 
-NOTE: The .NET Micro Framework SDK Version 4.1 does not support side-by-side 
+NOTE: The .NET Micro Framework SDK Version 4.2 does not support side-by-side 
 installation with any other previous version of the same product. Please 
 uninstall any previous versions before proceeding. Choose the appropriate 
 target framework from the Application tab of your project properties to 
@@ -36,7 +36,7 @@ address legacy applications.
 ===============================================================================
 Migrating from the V3.0 porting kit to the V4.0 porting kit and later
 ===============================================================================
-If you are upgrading your HAL from version 3.0 to 4.1, you should be aware of 
+If you are upgrading your HAL from version 3.0 to 4.2, you should be aware of 
 the following differences:
 
 1) Block Storage API: The block storage API has changed substantially. 
@@ -51,7 +51,7 @@ For information about these topics, refer to the Porting Kit documentation.
 
 
 ===============================================================================
-Migrating from the V4.0 porting kit to the V4.1 porting kit
+Migrating from the V4.0 porting kit to the V4.2 porting kit
 ===============================================================================
 Please refer to the Porting Kit Documentation
 

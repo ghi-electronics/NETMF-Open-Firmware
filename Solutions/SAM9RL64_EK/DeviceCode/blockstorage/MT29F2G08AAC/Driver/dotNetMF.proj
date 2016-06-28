@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <HasLibraryCategory>True</HasLibraryCategory>
@@ -44,9 +45,10 @@
   <Import Project="$(SPOCLIENT)\Framework\Features\BlockStorageConfig_HAL.libcatproj" />
   <PropertyGroup />
   <ItemGroup>
-    <HFiles Include="..\MT29F2G08AAC.h" />
     <Compile Include="MT29F2G08AAC_driver.cpp" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\Solutions\$(PLATFORM)\mt29f2g08aac.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

@@ -248,16 +248,24 @@ BOOL HAL_CONFIG_BLOCK::UpdateBlock( const HAL_CONFIG_BLOCK_STORAGE_DATA &blData,
         fRet &= blData.Device->Write((ByteAddress)&pCfgHeader->Enable, sizeof(BOOL), (BYTE*)&fDirty, FALSE);
     }    
 
-    if((newCfgAddr + Length + sizeof(HAL_CONFIG_BLOCK)) > (blData.ConfigAddress + blData.BlockLength))
+    if(Header != NULL && Data != NULL)
     {
-        return FALSE;
+        if((newCfgAddr + Length + sizeof(HAL_CONFIG_BLOCK)) > (blData.ConfigAddress + blData.BlockLength))
+        {
+            return FALSE;
+        }
+
+        fRet &= blData.Device->Write(newCfgAddr, sizeof(HAL_CONFIG_BLOCK), (BYTE*)Header, FALSE);
+        
+        fRet &= blData.Device->Write(newCfgAddr + sizeof(HAL_CONFIG_BLOCK), Length, (BYTE*)Data, FALSE);
     }
 
-    fRet &= blData.Device->Write(newCfgAddr, sizeof(HAL_CONFIG_BLOCK), (BYTE*)Header, FALSE);
-    
-    fRet &= blData.Device->Write(newCfgAddr + sizeof(HAL_CONFIG_BLOCK), Length, (BYTE*)Data, FALSE);
-
     return fRet;
+}
+
+BOOL HAL_CONFIG_BLOCK::InvalidateBlockWithName( const char* Name, BOOL isChipRO )
+{
+    return UpdateBlockWithName(Name, NULL, 0, isChipRO);
 }
 
 BOOL HAL_CONFIG_BLOCK::UpdateBlockWithName( const char* Name, void* Data, size_t Length, BOOL isChipRO )
@@ -341,11 +349,22 @@ BOOL HAL_CONFIG_BLOCK::UpdateBlockWithName( const char* Name, void* Data, size_t
                     pXipConfigBuf = NULL;
                 }
 
-                HAL_CONFIG_BLOCK header;
+                if(Data != NULL)
+                {
+                    HAL_CONFIG_BLOCK header;
 
-                header.Prepare( Name, Data, Length );
+                    header.Prepare( Name, Data, Length );
 
-                fRet = UpdateBlock( blData, physAddr, (const HAL_CONFIG_BLOCK*)&header, Data, Length, physEnd, isChipRO );
+                    fRet = UpdateBlock( blData, physAddr, (const HAL_CONFIG_BLOCK*)&header, Data, Length, physEnd, isChipRO );
+                }
+                else if(physAddr != physEnd)
+                {
+                    fRet = UpdateBlock( blData, physAddr, NULL, NULL, 0, physEnd, isChipRO );
+                }
+                else
+                {
+                    fRet = TRUE;
+                }
 
                 if(fRet) break;
             }

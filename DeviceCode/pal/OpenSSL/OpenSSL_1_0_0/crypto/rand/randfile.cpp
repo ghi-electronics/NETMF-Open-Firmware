@@ -272,7 +272,6 @@ err:
 const char *RAND_file_name(char *buf, size_t size)
 	{
 	char *s=NULL;
-	int ok = 0;
 #ifdef __OpenBSD__
 	struct stat sb;
 #endif
@@ -301,7 +300,6 @@ const char *RAND_file_name(char *buf, size_t size)
 			BUF_strlcat(buf,"/",size);
 #endif
 			BUF_strlcat(buf,RFILE,size);
-			ok = 1;
 			}
 		else
 		  	buf[0] = '\0'; /* no file name */
@@ -315,7 +313,7 @@ const char *RAND_file_name(char *buf, size_t size)
 	 * to something hopefully decent if that isn't available. 
 	 */
 
-	if (!ok)
+	if (!buf[0])
 		if (BUF_strlcpy(buf,"/dev/arandom",size) >= size) {
 			return(NULL);
 		}	

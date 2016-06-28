@@ -37,6 +37,8 @@ namespace Microsoft.SPOT
                 {
                     lock(typeof(GlobalLock))
                     {
+                        dispatcher = FromThread(Thread.CurrentThread);
+
                         if(dispatcher == null)
                         {
                             dispatcher = new Dispatcher();
@@ -69,7 +71,7 @@ namespace Microsoft.SPOT
                 // the a different thread.
                 dispatcher = null;
 
-                WeakReference wref = (WeakReference)_dispatchers[thread];
+                WeakReference wref = (WeakReference)_dispatchers[thread.ManagedThreadId];
 
                 if(wref != null)
                 {
@@ -89,7 +91,7 @@ namespace Microsoft.SPOT
                         }
                         else
                         {
-                            _dispatchers.Remove(thread);
+                            _dispatchers.Remove(thread.ManagedThreadId);
                         }
                     }
                 }
@@ -106,7 +108,7 @@ namespace Microsoft.SPOT
             _instanceLock = new Object();
 
             // Add ourselves to the map of dispatchers to threads.
-            _dispatchers[_thread] = new WeakReference(this);
+            _dispatchers[_thread.ManagedThreadId] = new WeakReference(this);
 
             if(_possibleDispatcher == null)
             {
@@ -218,7 +220,7 @@ namespace Microsoft.SPOT
                         ShutdownImpl();
                     }
 
-                    _dispatchers.Remove(_thread);
+                    _dispatchers.Remove(_thread.ManagedThreadId);
                 }
             }
             catch (Exception e)
@@ -325,7 +327,7 @@ namespace Microsoft.SPOT
         {
             if (frame == null)
             {
-                throw new ArgumentNullException("frame");
+                throw new ArgumentNullException();
             }
 
             Dispatcher dispatcher = Dispatcher.CurrentDispatcher;
@@ -337,13 +339,21 @@ namespace Microsoft.SPOT
             dispatcher.PushFrameImpl(frame);
         }
 
+        internal DispatcherFrame CurrentFrame
+        {
+            get { return _currentFrame; }
+        }
+
         //
         // instance implementation of PushFrame
         private void PushFrameImpl(DispatcherFrame frame)
         {
+            DispatcherFrame prevFrame = _currentFrame;
             _frameDepth++;
             try
             {
+                _currentFrame = frame;
+
                 while (frame.Continue)
                 {
                     DispatcherOperation op = null;
@@ -403,6 +413,8 @@ namespace Microsoft.SPOT
             {
                 _frameDepth--;
 
+                _currentFrame = prevFrame;
+
                 // If this was the last frame to exit after a quit, we
                 // can now dispose the dispatcher.
                 if (_frameDepth == 0)
@@ -435,7 +447,7 @@ namespace Microsoft.SPOT
         {
             if (method == null)
             {
-                throw new ArgumentNullException("method");
+                throw new ArgumentNullException();
             }
 
             DispatcherOperation operation = null;
@@ -478,7 +490,7 @@ namespace Microsoft.SPOT
         {
             if (method == null)
             {
-                throw new ArgumentNullException("method");
+                throw new ArgumentNullException();
             }
 
             object result = null;
@@ -557,6 +569,7 @@ namespace Microsoft.SPOT
             _finalExceptionHandler = handler;
         }
 
+        private DispatcherFrame _currentFrame;
         private int _frameDepth;
         internal bool _hasShutdownStarted;  // used from DispatcherFrame
         private bool _hasShutdownFinished;

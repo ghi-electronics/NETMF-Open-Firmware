@@ -235,7 +235,8 @@ BOOL BlockStorageStream::Initialize(UINT32 usage, BlockStorageDevice* pDevice)
 
         const BlockDeviceInfo* pDevInfo = this->Device->GetDeviceInfo();
         
-        IsXIP = pDevInfo->Attribute.SupportsXIP;
+        if( pDevInfo->Attribute.SupportsXIP ) Flags |= c_BlockStorageStream__XIP;
+        else Flags &= ~c_BlockStorageStream__XIP;
     }
 
     return NextStream();
@@ -298,7 +299,9 @@ BOOL BlockStorageStream::PrevStream()
 
     } while( pRegion->BlockRanges[RangeIndex].GetBlockUsage() != Usage );
 
-    this->IsXIP        = pDevInfo->Attribute.SupportsXIP;
+    if( pDevInfo->Attribute.SupportsXIP ) Flags |= c_BlockStorageStream__XIP;
+    else Flags &= ~c_BlockStorageStream__XIP;
+    
     this->BlockLength  = pRegion->BytesPerBlock;
     this->BaseAddress  = pRegion->Start + pRegion->BlockRanges[RangeIndex].StartBlock * BlockLength;
     this->Length       = pRegion->BlockRanges[RangeIndex].GetBlockCount() * BlockLength;
@@ -323,7 +326,8 @@ BOOL BlockStorageStream::NextStream()
 
         const BlockDeviceInfo* pDevInfo = this->Device->GetDeviceInfo();
         
-        IsXIP = pDevInfo->Attribute.SupportsXIP;        
+        if( pDevInfo->Attribute.SupportsXIP ) Flags |= c_BlockStorageStream__XIP;
+        else Flags &= ~c_BlockStorageStream__XIP;
     }
     else
     {
@@ -352,7 +356,8 @@ BOOL BlockStorageStream::NextStream()
         {
             const BlockDeviceInfo* pDevInfo = this->Device->GetDeviceInfo();
         
-            IsXIP = pDevInfo->Attribute.SupportsXIP;
+            if( pDevInfo->Attribute.SupportsXIP ) Flags |= c_BlockStorageStream__XIP;
+            else Flags &= ~c_BlockStorageStream__XIP;
         }
         
 
@@ -438,7 +443,7 @@ BOOL BlockStorageStream::Write( UINT8* data  , UINT32 length )
             writeLen = Length - CurrentIndex;
         }
         
-        if(!this->Device->Write( this->CurrentAddress(), writeLen, pData, false ))
+        if(!this->Device->Write( this->CurrentAddress(), writeLen, pData, IsReadModifyWrite()))
         {
             return FALSE;
         }
@@ -471,7 +476,9 @@ BOOL BlockStorageStream::Erase( UINT32 length )
     {
         if(!this->Device->EraseBlock( this->CurrentAddress() )) return FALSE;
 
-        if(!Seek( BlockStorageStream::STREAM_SEEK_NEXT_BLOCK, BlockStorageStream::SeekCurrent ))
+        len -= this->BlockLength;
+
+        if(len > 0 && !Seek( BlockStorageStream::STREAM_SEEK_NEXT_BLOCK, BlockStorageStream::SeekCurrent ))
         {
             if(!NextStream())
             {
@@ -479,8 +486,6 @@ BOOL BlockStorageStream::Erase( UINT32 length )
                 break;
             }
         }
-
-        len -= this->BlockLength;
     }
 
     // always return stream back to its original position for erases
@@ -491,7 +496,7 @@ BOOL BlockStorageStream::Erase( UINT32 length )
 
 BOOL BlockStorageStream::ReadIntoBuffer( UINT8* pBuffer, UINT32 length )
 {
-    if(!IsXIP)
+    if(!IsXIP())
     {
         return Read(&pBuffer, length);
     }
@@ -562,10 +567,79 @@ BOOL BlockStorageStream::Read( UINT8** ppBuffer, UINT32 length )
     return TRUE;
 }
 
+BOOL BlockStorageStream::IsErased( UINT32 length )
+{
+    UINT32 bkupIdx   = this->CurrentIndex;
+    INT32  rem       = bkupIdx % this->BlockLength;
+    UINT8  compValue = this->Device->GetDeviceInfo()->Attribute.ErasedBitsAreZero ? 0 : 0xFF;
+    INT32  len       = (INT32)length;
+
+    if(rem != 0)
+    {
+        if(length > this->BlockLength)
+        {
+            rem = this->BlockLength - rem;
+            len -= rem;
+        }
+        else
+        {
+            rem = length;
+            len = 0;
+        }
+        
+        while(rem > 0)
+        {
+            UINT8 tmp[512];
+            INT32 left = (rem < sizeof(tmp) ? rem : sizeof(tmp));
+
+            this->ReadIntoBuffer(tmp, left);
+
+            for(int i=0; i<left; i++)
+            {
+                if(tmp[i] != compValue)
+                {
+                    return FALSE;
+                }
+            }
+
+            rem -= left;
+        }
+    }
+
+    while(len >= this->BlockLength)
+    {
+        if(!this->Device->IsBlockErased(this->BaseAddress + this->CurrentIndex, this->BlockLength)) return FALSE;
+
+        len                -= this->BlockLength;
+        this->CurrentIndex += this->BlockLength;
+    }
+
+    while(len > 0)
+    {
+        UINT8 tmp[512];
+        INT32 left = (len < sizeof(tmp) ? len : sizeof(tmp));
+
+        this->ReadIntoBuffer(tmp, left);
+
+        for(int i=0; i<left; i++)
+        {
+            if(tmp[i] != compValue)
+            {
+                return FALSE;
+            }
+        }
+
+        len -= left;
+    }
+
+    this->CurrentIndex = bkupIdx;
+
+    return TRUE;
+}
 
 //--// 
 
-SectorAddress BlockDeviceInfo::PhysicalToSectorAddress( const BlockRegionInfo* pRegion, UINT32 phyAddress ) const
+SectorAddress BlockDeviceInfo::PhysicalToSectorAddress( const BlockRegionInfo* pRegion, ByteAddress phyAddress ) const
 {
     return (phyAddress - pRegion->Start) / this->BytesPerSector;
 }
@@ -582,7 +656,7 @@ BOOL BlockDeviceInfo::FindRegionFromAddress(ByteAddress Address, UINT32 &BlockRe
 
         if(pRegion->Start <= Address && Address < (pRegion->Start + pRegion->NumBlocks * pRegion->BytesPerBlock))
         {
-            UINT32 endRangeAddr = pRegion->Start;
+            UINT32 endRangeAddr = pRegion->Start + pRegion->BytesPerBlock * pRegion->BlockRanges[0].StartBlock;
             
             for(UINT32 j =0; j < pRegion->NumBlockRanges; j++)
             {

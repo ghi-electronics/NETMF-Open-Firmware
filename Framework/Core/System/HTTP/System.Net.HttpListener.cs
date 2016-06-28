@@ -8,6 +8,7 @@ namespace System.Net
     using System.Collections;
     using System.Threading;
     using Microsoft.SPOT.Net.Security;
+    using System.Security.Cryptography.X509Certificates;
 
     /// <summary>
     /// Provides a simple, programmatically controlled HTTP protocol listener.
@@ -422,8 +423,18 @@ namespace System.Net
                 // Start server socket to accept incoming connections.
                 m_listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 
-                IPAddress ipAddress = IPAddress.Any;
-                IPEndPoint endPoint = new IPEndPoint(ipAddress, m_Port);
+                IPAddress addr;
+
+                if(Microsoft.SPOT.Hardware.SystemInfo.IsEmulator)
+                {
+                    addr = IPAddress.Any;
+                }
+                else
+                {
+                    addr = IPAddress.GetDefaultLocalAddress();
+                }
+
+                IPEndPoint endPoint = new IPEndPoint(addr, m_Port);
                 m_listener.Bind(endPoint);
 
                 // Starts to listen to maximum of 10 connections.
@@ -482,23 +493,18 @@ namespace System.Net
             {
                 if (m_Closed) throw new ObjectDisposedException();
             
-                // If the service is already stopped, return.  This case happens
-                // routinely when one thread calls Stop().  The accept thread
-                // throws an exception, which causes another call to Stop while
-                // the service is already stopped.
-                if (!m_ServiceRunning)
-                {
-                    return;
-                }
-
                 m_ServiceRunning = false;
                 
                 // We close the server socket that listen for incoming connection.
                 // Connections that already accepted are processed.
                 // Connections that has been in queue for server socket, but not accepted, are lost.
-                m_listener.Close();
+                if(m_listener != null)
+                {
+                    m_listener.Close();
+                    m_listener = null;
 
-                m_RequestArrived.Set();
+                    m_RequestArrived.Set();
+                }
             }
         }
 

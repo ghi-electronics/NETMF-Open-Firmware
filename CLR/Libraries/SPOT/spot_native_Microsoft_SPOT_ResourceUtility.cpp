@@ -10,6 +10,13 @@ HRESULT Library_spot_native_Microsoft_SPOT_ResourceUtility::GetObject___STATIC__
     return Library_corlib_native_System_Resources_ResourceManager::GetObject___STATIC__OBJECT__SystemResourcesResourceManager__SystemEnum( stack );
 }
 
+HRESULT Library_spot_native_Microsoft_SPOT_ResourceUtility::GetObject___STATIC__OBJECT__mscorlibSystemResourcesResourceManager__mscorlibSystemEnum__I4__I4( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_CORE();
+    return Library_corlib_native_System_Resources_ResourceManager::GetObject___STATIC__OBJECT__SystemResourcesResourceManager__SystemEnum__I4__I4( stack );
+}
+
+
 HRESULT Library_spot_native_Microsoft_SPOT_ResourceUtility::set_CurrentUICultureInternal___STATIC__VOID__mscorlibSystemGlobalizationCultureInfo( CLR_RT_StackFrame& stack )
 {
     NATIVE_PROFILE_CLR_CORE();

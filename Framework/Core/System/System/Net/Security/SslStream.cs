@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Sockets;
 using Microsoft.SPOT.Net.Security;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Microsoft.SPOT.Net.Security
 {
@@ -38,7 +39,7 @@ namespace Microsoft.SPOT.Net.Security
 
         public void AuthenticateAsClient(string targetHost, X509Certificate cert, SslVerification verify, params SslProtocols[] sslProtocols)
         {
-            AuthenticateAsClient(targetHost, cert, CertificateStore.CACertificates, verify, sslProtocols);
+            AuthenticateAsClient(targetHost, cert, null, verify, sslProtocols);
         }
 
         public void AuthenticateAsClient(string targetHost, X509Certificate cert, X509Certificate[] ca, SslVerification verify, params SslProtocols[] sslProtocols)
@@ -48,7 +49,7 @@ namespace Microsoft.SPOT.Net.Security
 
         public void AuthenticateAsServer(X509Certificate cert, SslVerification verify, params SslProtocols[] sslProtocols)
         {
-            AuthenticateAsServer(cert, CertificateStore.CACertificates, verify, sslProtocols);
+            AuthenticateAsServer(cert, null, verify, sslProtocols);
         }
 
         public void AuthenticateAsServer(X509Certificate cert, X509Certificate[] ca, SslVerification verify, params SslProtocols[] sslProtocols)

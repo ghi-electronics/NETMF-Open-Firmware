@@ -42,6 +42,7 @@ namespace MFSvcUtil
             if (args.Length < 1 || args.Length > 7)
             {
                 DisplayUsage();
+                return;
             }
             else
             {
@@ -98,7 +99,10 @@ namespace MFSvcUtil
 
                 // Check for minimum required parameters
                 if ((target = GetTargetType(filename)) == TargetOutputType.None)
+                {
                     DisplayUsage();
+                    return;
+                }
                 else
                 {
                     // Trim filename extension
@@ -182,6 +186,7 @@ namespace MFSvcUtil
                         Console.WriteLine("Program Error: " + e.Message);
                         Console.WriteLine();
                         DisplayUsage();
+                        return;
                     }
                 }
             }
@@ -202,33 +207,33 @@ namespace MFSvcUtil
             Console.WriteLine();
             Console.WriteLine("*** Generate code from Wsdl ***");
             Console.WriteLine("Usage: MFSvcUtil [WsdlFilename] [SchemaFileReferences] Options");
-            Console.WriteLine("\t Where [WsdlFilename] = A valid WSDL path\\filename.");
-            Console.WriteLine("\t Where [SchemaFileReferences] = Optional path to external schema");
-            Console.WriteLine("\t file reference(s) (xsd)");
-            Console.WriteLine("\t Where Options =");
-            Console.WriteLine("\t /D:[DestinationDirectory] or /Directory:[DestinationDirectory] to");
-            Console.WriteLine("\t specify the name of a directory where output files are generated.");
-            Console.WriteLine("\t /O:[ContractSourceName] or /Out:[ContractSourceName] to specify the");
-            Console.WriteLine("\t name of generated source file(s). Note: The name is used as the");
-            Console.WriteLine("\t contract source file name and as the prefix for Hosted Service and");
-            Console.WriteLine("\t Client Proxy source file names. If not specified the name of the");
-            Console.WriteLine("\t wsdl file is used.");
-            Console.WriteLine("\t /P:[TargetPlatform] or /Platform:[TargetPlatform] to specify");
-            Console.WriteLine("\t Microframework or Win32 target runtime platform.");
-            Console.WriteLine("\t /V or /Verbose to display extended information.");
+            Console.WriteLine("    Where [WsdlFilename] = A valid WSDL path\\filename.");
+            Console.WriteLine("    Where [SchemaFileReferences] = Optional path to external schema");
+            Console.WriteLine("       file reference(s) (xsd)");
+            Console.WriteLine("    Where Options =");
+            Console.WriteLine("      /D:[DestinationDirectory] or /Directory:[DestinationDirectory] to");
+            Console.WriteLine("         specify the name of a directory where output files are generated.");
+            Console.WriteLine("      /O:[ContractSourceName] or /Out:[ContractSourceName] to specify the");
+            Console.WriteLine("         name of generated source file(s). Note: The name is used as the");
+            Console.WriteLine("         contract source file name and as the prefix for Hosted Service and");
+            Console.WriteLine("         Client Proxy source file names. If not specified the name of the");
+            Console.WriteLine("         wsdl file is used.");
+            Console.WriteLine("      /P:[TargetPlatform] or /Platform:[TargetPlatform] to specify");
+            Console.WriteLine("         Microframework or Win32 target runtime platform.");
+            Console.WriteLine("      /V or /Verbose to display extended information.");
             Console.WriteLine();
             Console.WriteLine("*** Generate a wsdl from an assembly ***");
             Console.WriteLine("Usage: MFSvcUtil [AssemblyFilename] Options");
-            Console.WriteLine("\t Where [AssemblyFilename] = A valid assembly path\\filename.");
-            Console.WriteLine("\t Where Options =");
-            Console.WriteLine("\t /D:[DestinationDirectory] or /Directory:[DestinationDirectory] to");
-            Console.WriteLine("\t specify the name of a directory where the output files are stored.");
-            Console.WriteLine("\t /O:[Filename] or /Out:[Filename] to specify the name of the Wsdl");
-            Console.WriteLine("\t file generated. The default filename is the name of the assembly that");
-            Console.WriteLine("\t contains the contract used to generate the wsdl.");
-            Console.WriteLine("\t /R:[ReferencesPath] or /Reference:[ReferencesPath] to specify");
-            Console.WriteLine("\t a directory used to resolve external type references.");
-            Console.WriteLine("\t /V or /Verbose to display extended information.");
+            Console.WriteLine("    Where [AssemblyFilename] = A valid assembly path\\filename.");
+            Console.WriteLine("    Where Options =");
+            Console.WriteLine("      /D:[DestinationDirectory] or /Directory:[DestinationDirectory] to");
+            Console.WriteLine("         specify the name of a directory where the output files are stored.");
+            Console.WriteLine("      /O:[Filename] or /Out:[Filename] to specify the name of the Wsdl");
+            Console.WriteLine("         file generated. The default filename is the name of the assembly that");
+            Console.WriteLine("         contains the contract used to generate the wsdl.");
+            Console.WriteLine("      /R:[ReferencesPath] or /Reference:[ReferencesPath] to specify");
+            Console.WriteLine("         a directory used to resolve external type references.");
+            Console.WriteLine("      /V or /Verbose to display extended information.");
         }
 
         /// <summary>

@@ -8,7 +8,6 @@ using Ws.Services.Xml;
 
 namespace Ws.Services.WsaAddressing
 {
-
     /// <summary>
     /// Parses, validates and stores the soap header information.
     /// </summary>
@@ -17,6 +16,15 @@ namespace Ws.Services.WsaAddressing
     /// </remarks>
     public class WsWsaHeader
     {
+        [Flags]
+        private enum WsMessageFlags : ushort
+        {
+            None           = 0x0000,
+            IsFault        = 0x0001,
+            MustUnderstand = 0x0002,
+            OneWayResponse = 0x0004,
+        }
+
         // Addressing header properties
         private String _action;
         private String _relatesTo;
@@ -26,7 +34,7 @@ namespace Ws.Services.WsaAddressing
         private WsWsaEndpointRef _from;
         private WsWsaEndpointRef _faultTo;
         private WsXmlNodeList _any;
-        private bool          _mustUnderstand;
+        private WsMessageFlags _flags;
 
         /// <summary>
         /// Use to Get or Set a soap header Action property.
@@ -65,7 +73,62 @@ namespace Ws.Services.WsaAddressing
 
         public WsXmlNodeList Any { get { return _any; } }
 
-        public bool MustUnderstand { get { return _mustUnderstand; }  set { _mustUnderstand = value; } }
+        public bool MustUnderstand 
+        { 
+            get 
+            { 
+                return 0 != (_flags & WsMessageFlags.MustUnderstand); 
+            }  
+            set 
+            { 
+                if(value) 
+                { 
+                    _flags |= WsMessageFlags.MustUnderstand; 
+                } 
+                else 
+                { 
+                    _flags &= ~WsMessageFlags.MustUnderstand; 
+                } 
+            }
+        }
+
+        public bool IsFaultMessage 
+        { 
+            get 
+            { 
+                return 0 != (_flags & WsMessageFlags.IsFault); 
+            } 
+            set 
+            { 
+                if(value) 
+                { 
+                    _flags |= WsMessageFlags.IsFault; 
+                } 
+                else 
+                { 
+                    _flags &= ~WsMessageFlags.IsFault; 
+                } 
+            }
+        }
+
+        public bool IsOneWayResponse
+        { 
+            get 
+            { 
+                return 0 != (_flags & WsMessageFlags.OneWayResponse); 
+            } 
+            set 
+            { 
+                if(value) 
+                { 
+                    _flags |= WsMessageFlags.OneWayResponse; 
+                } 
+                else 
+                { 
+                    _flags &= ~WsMessageFlags.OneWayResponse; 
+                } 
+            }
+        }        
 
         /// <summary>
         /// Creates an instance of the soap header class.
@@ -73,7 +136,7 @@ namespace Ws.Services.WsaAddressing
         public WsWsaHeader()
         {
             _any = new WsXmlNodeList();
-            _mustUnderstand = false;
+            _flags = WsMessageFlags.None;
         }
 
         public WsWsaHeader(String action, String relatesTo, String to, String replyTo, String from, WsXmlNodeList any)
@@ -92,7 +155,7 @@ namespace Ws.Services.WsaAddressing
             }
 
             _any = any;
-            _mustUnderstand = false;
+            _flags = WsMessageFlags.None;
         }
 
         [Flags]
@@ -162,8 +225,9 @@ namespace Ws.Services.WsaAddressing
                                     {
                                         throw new XmlException("Action");
                                     }
-                                    
-                                    if(_action == version.AddressingNamespace + "/fault")
+
+                                    if (_action == version.AddressingNamespace + "/fault" || 
+                                        _action == version.AddressingNamespace + "/soap/fault")
                                     {
                                         isFault = true;
                                     }

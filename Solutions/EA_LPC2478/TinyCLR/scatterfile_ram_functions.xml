@@ -10,7 +10,6 @@
         Comment="000050f8 12 386989 LinkAtBack__20CLR_RT_DblLinkedListFP21CLR_RT_HeapBlock_Node" />
     <FileMapping Name="*" Options="(i.InitializeFromIndex__25CLR_RT_MethodDef_InstanceFRC22CLR_RT_MethodDef_Index)"
         Comment="00004c44 100 2804817 InitializeFromIndex__25CLR_RT_MethodDef_InstanceFRC22CLR_RT_MethodDef_Index" />
-    <FileMapping Name="*" Options="(i.SUPPORT_ComputeCRC__FPCviUi)" Comment="00006654 72 1709347 SUPPORT_ComputeCRC__FPCviUi" />
     <FileMapping Name="*" Options="(i.InitializeFromIndex__24CLR_RT_FieldDef_InstanceFRC21CLR_RT_FieldDef_Index)"
         Comment="00004be0 100 1751270 InitializeFromIndex__24CLR_RT_FieldDef_InstanceFRC21CLR_RT_FieldDef_Index" />
     <FileMapping Name="rt_memclr.o" Options="(+RO)" />
@@ -129,7 +128,7 @@
     <FileMapping Name="*" Options="(i.ClipToVisible__14CLR_GFX_BitmapFiN31R18CLR_GFX_RectAsSizePC14CLR_GFX_BitmapRiT7)"
         Comment="00001270 284 259079 ClipToVisible__14CLR_GFX_BitmapFiN31R18CLR_GFX_RectAsSizePC14CLR_GFX_BitmapRiT7" />
   </If>
-  <If Name="COMPILER_TOOL_VERSION" In="RVDS3.0 RVDS3.1 RVDS4.0">
+  <If Name="COMPILER_TOOL_VERSION" In="RVDS3.0 RVDS3.1 RVDS4.0 RVDS4.1">
     <FileMapping Name="*" Options="(i.IDelayLoop)" Comment="00004a98 24 16 IDelayLoop" />
     <FileMapping Name="*" Options="(i._Z27HAL_Time_Sleep_MicroSecondsj)" Comment="_Z27HAL_Time_Sleep_MicroSecondsj" />
     <FileMapping Name="*" Options="(i._Z44HAL_Time_Sleep_MicroSeconds_InterruptEnabledj)" Comment="_Z44HAL_Time_Sleep_MicroSeconds_InterruptEnabledj" />
@@ -139,7 +138,6 @@
         Comment="000050f8 12 386989 LinkAtBack__20CLR_RT_DblLinkedListFP21CLR_RT_HeapBlock_Node" />
     <FileMapping Name="*" Options="(i._ZN25CLR_RT_MethodDef_Instance19InitializeFromIndexERK22CLR_RT_MethodDef_Index)"
         Comment="00004c44 100 2804817 InitializeFromIndex__25CLR_RT_MethodDef_InstanceFRC22CLR_RT_MethodDef_Index" />
-    <FileMapping Name="*" Options="(i._Z18SUPPORT_ComputeCRCPKvij)" Comment="00006654 72 1709347 SUPPORT_ComputeCRC__FPCviUi" />
     <FileMapping Name="*" Options="(i._ZN24CLR_RT_FieldDef_Instance19InitializeFromIndexERK21CLR_RT_FieldDef_Index)"
         Comment="00004be0 100 1751270 InitializeFromIndex__24CLR_RT_FieldDef_InstanceFRC21CLR_RT_FieldDef_Index" />
     <FileMapping Name="rt_memclr.o" Options="(+RO)" />
@@ -263,7 +261,6 @@
         Comment="000050f8 12 386989 LinkAtBack__20CLR_RT_DblLinkedListFP21CLR_RT_HeapBlock_Node" />
     <FileMapping Name="*" Options="(.text._ZN25CLR_RT_MethodDef_Instance19InitializeFromIndexERK22CLR_RT_MethodDef_Index)"
         Comment="00004c44 100 2804817 InitializeFromIndex__25CLR_RT_MethodDef_InstanceFRC22CLR_RT_MethodDef_Index" />
-    <FileMapping Name="*" Options="(.text._Z18SUPPORT_ComputeCRCPKvij)" Comment="00006654 72 1709347 SUPPORT_ComputeCRC__FPCviUi" />
     <FileMapping Name="*" Options="(.text._ZN24CLR_RT_FieldDef_Instance19InitializeFromIndexERK21CLR_RT_FieldDef_Index)"
         Comment="00004be0 100 1751270 InitializeFromIndex__24CLR_RT_FieldDef_InstanceFRC21CLR_RT_FieldDef_Index" />
     <FileMapping Name="*" Options="(.text._ZN16CLR_RT_HeapBlock21EnsureObjectReferenceERPS_)"

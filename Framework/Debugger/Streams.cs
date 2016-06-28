@@ -16,6 +16,8 @@ using Microsoft.Win32;
 using Microsoft.Win32.SafeHandles;
 using System.Net;
 using System.Net.Sockets;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Microsoft.SPOT.Debugger
 {
@@ -166,6 +168,8 @@ namespace Microsoft.SPOT.Debugger
             {
                 numBytes  = 0;
                 errorCode = 0;
+
+                return;
             }
 
             // Unpack overlapped
@@ -300,7 +304,9 @@ namespace Microsoft.SPOT.Debugger
         {
             AsyncFileStream_AsyncResult afsar = CheckParameterForEnd( asyncResult, true );
 
-            afsar.WaitCompleted();
+            //afsar.WaitCompleted();
+
+            afsar.m_waitHandle.WaitOne(afsar.m_numBytes);
 
             m_outstandingRequests.Remove( afsar );
 
@@ -355,7 +361,7 @@ namespace Microsoft.SPOT.Debugger
             return new NotSupportedException( "Not Supported" );
         }
 
-        private void CheckParametersForBegin( byte[] array, int offset, int count )
+        internal void CheckParametersForBegin(byte[] array, int offset, int count)
         {
             if(array == null) throw new ArgumentNullException( "array" );
 
@@ -369,7 +375,7 @@ namespace Microsoft.SPOT.Debugger
             }
         }
 
-        private AsyncFileStream_AsyncResult CheckParameterForEnd( IAsyncResult asyncResult, bool isWrite )
+        internal AsyncFileStream_AsyncResult CheckParameterForEnd(IAsyncResult asyncResult, bool isWrite)
         {
             if(asyncResult == null) throw new ArgumentNullException( "asyncResult" );
 
@@ -432,6 +438,8 @@ namespace Microsoft.SPOT.Debugger
             }
             else
             {
+                asyncResult.m_numBytes = count;
+
                 // Keep the array in one location in memory until the OS writes the
                 // relevant data into the array.  Free GCHandle later.
                 asyncResult.PinBuffer( array );
@@ -503,7 +511,8 @@ namespace Microsoft.SPOT.Debugger
     {
         private string m_fileName = null;
 
-        public AsyncFileStream( string file, System.IO.FileShare share ) : base( OpenHandle( file, share ) )
+        public AsyncFileStream(string file, System.IO.FileShare share)
+            : base(OpenHandle(file, share))
         {
             m_fileName = file;
         }
@@ -655,17 +664,104 @@ namespace Microsoft.SPOT.Debugger
         }
     }
 
-    public class AsyncNetworkStream : NetworkStream, WireProtocol.IStreamAvailableCharacters
+    public class AsyncNetworkStream : /*NetworkStream,*/Stream,  WireProtocol.IStreamAvailableCharacters //, IDisposable
     {
+        Socket m_socket = null;
+        NetworkStream m_ns = null;
+        SslStream m_ssl = null;
+
         public AsyncNetworkStream(Socket socket, bool ownsSocket)
-            : base(socket, ownsSocket)
+            //: base(socket, ownsSocket)
         {
+            m_socket = socket;
+            m_ns = new NetworkStream(socket);
         }
 
+        public bool IsUsingSsl { get { return m_ssl != null; } }
+
+        public override bool CanRead { get { return true; } }
+        public override bool CanSeek { get { return false; } }
+        public override bool CanWrite { get { return true; } }
+        public override long Length { get { throw new NotSupportedException(); } }
+        public override long Position { get { throw new NotSupportedException(); } set { throw new NotSupportedException(); } }
+        public override void Flush() 
+        {
+            if (m_ssl != null)
+            {
+                m_ssl.Flush();
+            }
+            else if (m_ns != null)
+            {
+                m_ns.Flush();
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
+        }
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            if (m_ssl != null)
+            {
+                return m_ssl.Read(buffer, offset, count);
+            }
+            else if (m_ns != null)
+            {
+                return m_ns.Read(buffer, offset, count);
+            }
+
+            throw new InvalidOperationException();
+        }
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            throw new NotSupportedException();
+        }
+        public override void SetLength(long value)
+        {
+            throw new NotSupportedException();
+        }
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            if (m_ssl != null)
+            {
+                m_ssl.Write(buffer, offset, count);
+            }
+            else if (m_ns != null)
+            {
+                m_ns.Write(buffer, offset, count);
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
+        }
+        
         protected override void Dispose(bool disposing)
         {
+            if (disposing)
+            {
+                if (m_ssl != null) m_ssl.Dispose();
+                if (m_ns != null) m_ns.Dispose();
+                if (m_socket != null) m_socket.Close();
+            }
+
             base.Dispose(disposing);
         }
+
+        internal IAsyncResult BeginUpgradeToSSL(X509Certificate2 cert, bool requiresClientCert)
+        {
+            m_ssl = new SslStream(m_ns, true);
+
+            return m_ssl.BeginAuthenticateAsServer(cert, requiresClientCert, System.Security.Authentication.SslProtocols.Tls, true, null, null);
+        }
+
+        internal bool EndUpgradeToSSL(IAsyncResult iar)
+        {
+            m_ssl.EndAuthenticateAsServer(iar);
+
+            return iar.IsCompleted;
+        }
+
 
         #region IStreamAvailableCharacters
 
@@ -673,709 +769,10 @@ namespace Microsoft.SPOT.Debugger
         {
             get
             {
-                return this.Socket.Available;
+                return m_socket.Available;
             }
         }
         #endregion 
     }
 
-    [Serializable]
-    public class PortDefinition_Serial : PortDefinition
-    {
-        uint m_baudRate;
-
-        public PortDefinition_Serial( string displayName, string port, uint baudRate ) : base(displayName, port)
-        {
-            m_baudRate = baudRate;
-        }
-
-        public uint BaudRate
-        {
-            get
-            {
-                return m_baudRate;
-            }
-
-            set
-            {
-                m_baudRate = value;
-            }
-        }
-
-        public override Stream CreateStream()
-        {
-            return new AsyncSerialStream( m_port, m_baudRate );
-        }
-
-        public override string PersistName
-        {
-            get { return m_displayName; }
-        }
-    }
-
-    public class UsbDeviceDiscovery : IDisposable
-    {
-        public enum DeviceChanged : ushort
-        {
-            None          = 0,
-            Configuration = 1,
-            DeviceArrival = 2,
-            DeviceRemoval = 3,
-            Docking       = 4,
-        }
-
-        public delegate void DeviceChangedEventHandler( DeviceChanged change );
-
-        private const string c_EventQuery    = "Win32_DeviceChangeEvent";
-        private const string c_InstanceQuery = "SELECT * FROM __InstanceOperationEvent WITHIN 5 WHERE TargetInstance ISA \"Win32_PnPEntity\"";
-
-        ManagementEventWatcher    m_eventWatcher;
-        DeviceChangedEventHandler m_subscribers;
-
-        public UsbDeviceDiscovery()
-        {
-        }
-
-        ~UsbDeviceDiscovery()
-        {
-            try
-            {
-                Dispose();
-            }
-            catch
-            {
-            }
-        }
-
-        [MethodImplAttribute(MethodImplOptions.Synchronized)]
-        public void Dispose()
-        {
-            if( m_eventWatcher != null )
-            {
-                m_eventWatcher.Stop();
-
-                m_eventWatcher = null;
-                m_subscribers = null;
-            }
-            GC.SuppressFinalize(this);
-        }
-
-        // subscribing to this event allows applications to be notified when USB devices are plugged and unplugged
-        // as well as configuration changed and docking; upon receiving teh notification the applicaion can decide
-        // to call UsbDeviceDiscovery.EnumeratePorts to get an updated list of Usb devices
-        public event DeviceChangedEventHandler OnDeviceChanged
-        {
-            [MethodImplAttribute(MethodImplOptions.Synchronized)]
-            add
-            {
-                try
-                {
-                    TryEventNotification( value );
-                }
-                catch
-                {
-                    TryInstanceNotification( value );
-                }
-            }
-
-            [MethodImplAttribute(MethodImplOptions.Synchronized)]
-            remove
-            {
-                m_subscribers -= value;
-
-                if(m_subscribers == null)
-                {
-                    if (m_eventWatcher != null)
-                    {                        
-                        m_eventWatcher.Stop();
-                        m_eventWatcher = null;
-                    }
-                }
-            }
-        }
-
-        private void TryEventNotification( DeviceChangedEventHandler handler )
-        {
-            m_eventWatcher = new ManagementEventWatcher( new WqlEventQuery( c_EventQuery  ) );
-                
-            m_eventWatcher.EventArrived += new EventArrivedEventHandler( HandleDeviceEvent ); 
-
-            if(m_subscribers == null)
-            {
-                m_eventWatcher.Start();
-            }
-
-            m_subscribers += handler;           
-        }
-
-        private void TryInstanceNotification( DeviceChangedEventHandler handler )
-        {
-            m_eventWatcher = new ManagementEventWatcher( new WqlEventQuery( c_InstanceQuery ) );
-
-            m_eventWatcher.EventArrived += new EventArrivedEventHandler( HandleDeviceInstance );  
-
-            if(m_subscribers == null)
-            {
-                m_eventWatcher.Start();
-            }
-
-            m_subscribers += handler;          
-        }
-
-        private void HandleDeviceEvent( object sender, EventArrivedEventArgs args )
-        {
-            if(m_subscribers != null)
-            {
-                ManagementBaseObject deviceEvent = args.NewEvent;
-
-                ushort eventType = (ushort)deviceEvent["EventType"];
-
-                m_subscribers( (DeviceChanged)eventType );
-            }
-        }
-
-        private void HandleDeviceInstance( object sender, EventArrivedEventArgs args )
-        {
-            if(m_subscribers != null)
-            {
-                ManagementBaseObject deviceEvent = args.NewEvent;
-
-                if(deviceEvent.ClassPath.ClassName.Equals( "__InstanceCreationEvent" ))
-                {
-                    m_subscribers( DeviceChanged.DeviceArrival );                    
-                }
-                else if(deviceEvent.ClassPath.ClassName.Equals( "__InstanceDeletionEvent" ))
-                {
-                    m_subscribers( DeviceChanged.DeviceRemoval );
-                }
-            }
-        }
-    }
-
-    public class AsyncUsbStream : AsyncFileStream
-    {        
-        // IOCTL codes
-        private const int IOCTL_SPOTUSB_READ_AVAILABLE   = 0;
-        private const int IOCTL_SPOTUSB_DEVICE_HASH      = 1;
-        private const int IOCTL_SPOTUSB_MANUFACTURER     = 2;
-        private const int IOCTL_SPOTUSB_PRODUCT          = 3;
-        private const int IOCTL_SPOTUSB_SERIAL_NUMBER    = 4;
-        private const int IOCTL_SPOTUSB_VENDOR_ID        = 5;
-        private const int IOCTL_SPOTUSB_PRODUCT_ID       = 6;
-        private const int IOCTL_SPOTUSB_DISPLAY_NAME     = 7;
-        private const int IOCTL_SPOTUSB_PORT_NAME        = 8;
-
-        // paths
-        static readonly string SpotGuidKeyPath           = @"System\CurrentControlSet\Services\SpotUsb\Parameters";
-
-        // discovery keys
-        static public readonly string InquiriesInterface =  "InquiriesInterface";
-        static public readonly string DriverVersion      =  "DriverVersion";
-                                                       
-        // mandatory property keys                 
-        static public readonly string DeviceHash         =  "DeviceHash";
-        static public readonly string DisplayName        =  "DisplayName";
-
-        // optional property keys 
-        static public readonly string Manufacturer       = "Manufacturer";
-        static public readonly string Product            = "Product";
-        static public readonly string SerialNumber       = "SerialNumber";
-        static public readonly string VendorId           = "VendorId"; 
-        static public readonly string ProductId          = "ProductId";
-        
-        private const int c_DeviceStringBufferSize     = 260;
-
-        static private Hashtable s_textProperties;
-        static private Hashtable s_digitProperties;
-
-        static AsyncUsbStream()
-        {
-            s_textProperties  = new Hashtable();
-            s_digitProperties = new Hashtable();
-
-            s_textProperties.Add( DeviceHash  , IOCTL_SPOTUSB_DEVICE_HASH   );
-            s_textProperties.Add( Manufacturer, IOCTL_SPOTUSB_MANUFACTURER  );
-            s_textProperties.Add( Product     , IOCTL_SPOTUSB_PRODUCT       );
-            s_textProperties.Add( SerialNumber, IOCTL_SPOTUSB_SERIAL_NUMBER );  
-            
-            s_digitProperties.Add( VendorId   , IOCTL_SPOTUSB_VENDOR_ID     );
-            s_digitProperties.Add( ProductId  , IOCTL_SPOTUSB_PRODUCT_ID    );   
-        }
-
-        public AsyncUsbStream( string port ) : base( port, System.IO.FileShare.None )
-        {
-        }
-
-        public unsafe override int AvailableCharacters
-        {
-            get
-            {
-                int code = Native.ControlCode( Native.FILE_DEVICE_UNKNOWN, 0, Native.METHOD_BUFFERED, Native.FILE_ANY_ACCESS );
-                int avail;
-                int read;
-
-                if(!Native.DeviceIoControl( m_handle.DangerousGetHandle(), code, null, IOCTL_SPOTUSB_READ_AVAILABLE, (byte*)&avail, sizeof(int), out read, null ) || read != sizeof(int))
-                {
-                    return 0;
-                }
-
-                return avail;
-            }
-        }
-
-        public static PortDefinition[] EnumeratePorts()
-        {
-            SortedList lst = new SortedList();
-
-            // enumerate each guid under the discovery key
-            RegistryKey driverParametersKey = Registry.LocalMachine.OpenSubKey( SpotGuidKeyPath );
-
-            // if no parameters key is found, it means that no USB device has ever been plugged into the host 
-            // or no driver was installed
-            if(driverParametersKey != null)
-            {
-                string inquiriesInterfaceGuid   = (string)driverParametersKey.GetValue( InquiriesInterface   );
-                string driverVersion            = (string)driverParametersKey.GetValue( DriverVersion        );
-            
-                if((inquiriesInterfaceGuid != null) && (driverVersion != null))
-                {
-                    EnumeratePorts( new Guid( inquiriesInterfaceGuid ), driverVersion, lst ); 
-                }
-            }
-
-            ICollection      col = lst.Values;
-            PortDefinition[] res = new PortDefinition[col.Count];
-
-            col.CopyTo( res, 0 );
-
-            return res;
-        }
-
-
-        // The following procedure works with the USB device driver; upon finding all instances of USB devices
-        // that match the requested Guid, the procedure checks the corresponding registry keys to find the unique
-        // serial number to show to the user; the serial number is decided by the device driver at installation
-        // time and stored in a registry key whose name is the hash of the laser etched security key of the device
-        private static void EnumeratePorts( Guid inquiriesInterface, string driverVersion, SortedList lst )
-        {
-            IntPtr devInfo = Native.SetupDiGetClassDevs( ref inquiriesInterface, null, 0, Native.DIGCF_DEVICEINTERFACE | Native.DIGCF_PRESENT );
-
-            if(devInfo == Native.INVALID_HANDLE_VALUE)
-            {
-                return;
-            }
-
-            Native.SP_DEVICE_INTERFACE_DATA interfaceData = new Native.SP_DEVICE_INTERFACE_DATA(); interfaceData.cbSize = Marshal.SizeOf(interfaceData);
-            
-            int index = 0;
-
-            while(Native.SetupDiEnumDeviceInterfaces( devInfo, 0, ref inquiriesInterface, index++, ref interfaceData ))
-            {
-                Native.SP_DEVICE_INTERFACE_DETAIL_DATA detail = new Native.SP_DEVICE_INTERFACE_DETAIL_DATA();
-                // explicit size of unmanaged structure must be provided, because it does not include transfer buffer
-                // for whatever reason on 64 bit machines the detail size is 8 rather than 5, likewise the interfaceData.cbSize
-                // is 32 rather than 28 for non 64bit machines, therefore, we make the detemination of the size based 
-                // on the interfaceData.cbSize (kind of hacky but it works).
-                if( interfaceData.cbSize == 32 )
-                {
-                    detail.cbSize = 8;
-                }
-                else
-                {
-                    detail.cbSize = 5;
-                }
-                
-
-                if(Native.SetupDiGetDeviceInterfaceDetail( devInfo, ref interfaceData, ref detail, Marshal.SizeOf(detail) * 2, 0, 0 ))
-                {
-                    string port = detail.DevicePath.ToLower();
-
-                    AsyncUsbStream s = null;
-
-                    try
-                    {
-                        s = new AsyncUsbStream( port );
-
-                        string displayName     = s.RetrieveStringFromDevice( IOCTL_SPOTUSB_DISPLAY_NAME ); 
-                        string hash            = s.RetrieveStringFromDevice( IOCTL_SPOTUSB_DEVICE_HASH  ); 
-                        string operationalPort = s.RetrieveStringFromDevice( IOCTL_SPOTUSB_PORT_NAME    ); 
-
-                        if((operationalPort == null) || (displayName == null) || (hash == null))
-                        {
-                            continue;
-                        }
-
-                        // convert  kernel format to user mode format                        
-                        // kernel   : @"\??\USB#Vid_beef&Pid_0009#5&4162af8&0&1#{09343630-a794-10ef-334f-82ea332c49f3}"
-                        // user     : @"\\?\usb#vid_beef&pid_0009#5&4162af8&0&1#{09343630-a794-10ef-334f-82ea332c49f3}"
-                        StringBuilder operationalPortUser = new StringBuilder();
-                        operationalPortUser.Append( @"\\?" );
-                        operationalPortUser.Append( operationalPort.Substring( 3 ) );
-
-                        // change the display name if there is a collision (otherwise you will only be able to use one of the devices)
-                        displayName += "_" + hash;
-                        if (lst.ContainsKey(displayName))
-                        {
-                            int i = 2;
-                            while (lst.ContainsKey(displayName + " (" + i + ")"))
-                            {
-                                i++;
-                            }
-                            displayName += " (" + i + ")";
-                        }
-
-                        PortDefinition pd  = PortDefinition.CreateInstanceForUsb( displayName, operationalPortUser.ToString() );
-                        
-                        RetrieveProperties( hash, ref pd, s );
-
-                        lst.Add( pd.DisplayName, pd );
-                    }
-                    catch
-                    {
-                    }
-                    finally
-                    {
-                        if(s != null) s.Close();
-                    }
-                }
-            }
-
-            Native.SetupDiDestroyDeviceInfoList( devInfo );
-        }
-        
-        private static void RetrieveProperties( string hash, ref PortDefinition pd, AsyncUsbStream s )
-        {
-            IDictionaryEnumerator dict;
-            
-            dict = s_textProperties.GetEnumerator();
-
-            while(dict.MoveNext())
-            {
-                pd.Properties.Add( dict.Key, s.RetrieveStringFromDevice( (int)dict.Value ) );
-            }
-
-            dict = s_digitProperties.GetEnumerator();
-            
-            while(dict.MoveNext())
-            {
-                pd.Properties.Add( dict.Key, s.RetrieveIntegerFromDevice( (int)dict.Value ) );
-            }
-        }
-
-        private unsafe string RetrieveStringFromDevice( int controlCode )
-        {
-            int code = Native.ControlCode( Native.FILE_DEVICE_UNKNOWN, controlCode, Native.METHOD_BUFFERED, Native.FILE_ANY_ACCESS );
-            
-            string data;
-            int read; 
-            byte[] buffer = new byte[ c_DeviceStringBufferSize ];
-
-            fixed(byte* p = buffer)
-            {
-                if(!Native.DeviceIoControl( m_handle.DangerousGetHandle(), code, null, 0, p, buffer.Length, out read, null ) || (read <= 0))
-                {
-                    data = null;
-                }
-                else
-                {
-                    if(read > (c_DeviceStringBufferSize-2))
-                    {
-                        read = c_DeviceStringBufferSize-2;
-                    }
-
-                    p[read  ] = 0;
-                    p[read+1] = 0;
-
-                    data = new string( (char *)p );
-                }
-            }
-
-            return data;
-        }
-
-        private unsafe int RetrieveIntegerFromDevice( int controlCode )
-        {
-            int code = Native.ControlCode( Native.FILE_DEVICE_UNKNOWN, controlCode, Native.METHOD_BUFFERED, Native.FILE_ANY_ACCESS );
-            
-            int read; 
-            int digits = 0;
-
-            if(!Native.DeviceIoControl( m_handle.DangerousGetHandle(), code, null, 0, (byte*)&digits, sizeof(int), out read, null ) || (read <= 0))
-            {
-                digits = -1;
-            }
-
-            return digits;
-        }
-    }
-
-    [Serializable]
-    public class PortDefinition_Usb : PortDefinition
-    {
-        public PortDefinition_Usb( string displayName, string port, ListDictionary properties ) : base(displayName, port)
-        {
-            m_properties = properties;
-        }
-
-        public override object UniqueId
-        {
-            get
-            {
-                return m_properties[AsyncUsbStream.DeviceHash];
-            }
-        }
-
-        public override Stream CreateStream()
-        {
-            try
-            {
-                return new AsyncUsbStream( m_port );
-            }
-            catch
-            {
-                object uniqueId = UniqueId;
-
-                foreach(PortDefinition pd in AsyncUsbStream.EnumeratePorts())
-                {
-                    if(Object.Equals( pd.UniqueId, uniqueId ))
-                    {
-                        m_properties = pd.Properties;
-                        m_port       = pd.Port;
-
-                        return new AsyncUsbStream( m_port );
-                    }
-                }
-
-                throw;
-            }
-        }    
-    }
-
-    [Serializable]
-    public class PortDefinition_Tcp : PortDefinition
-    {
-        public const int WellKnownPort = 26000;
-
-        IPEndPoint m_ipEndPoint;
-
-        string m_macAddress = "";
-
-        internal unsafe struct SOCK_discoveryinfo 
-        {
-            internal uint       ipaddr;
-            internal uint       macAddressLen;
-            internal fixed byte macAddressBuffer[64];    
-        };
-
-        public string MacAddress
-        {
-            get { return m_macAddress; }
-                
-        }
-        
-
-        public PortDefinition_Tcp(IPEndPoint ipEndPoint, string macAddress)
-            : base(ipEndPoint.Address.ToString(), ipEndPoint.ToString())
-        {
-            if(!string.IsNullOrEmpty(macAddress))
-            {
-                m_displayName += " - (" + macAddress + ")";
-            }
-            m_ipEndPoint = ipEndPoint;
-            m_macAddress = macAddress;
-        }
-
-        public PortDefinition_Tcp(IPEndPoint ipEndPoint)
-            : this(ipEndPoint, "")
-        {
-            m_ipEndPoint = ipEndPoint;
-        }
-
-        public PortDefinition_Tcp(IPAddress address)
-            : this(new IPEndPoint(address, WellKnownPort), "")
-        {
-        }
-
-        public PortDefinition_Tcp(IPAddress address, string macAddress)
-            : this(new IPEndPoint(address, WellKnownPort), macAddress)
-        {
-        }
-
-        public override object UniqueId
-        {
-            get
-            {
-                return m_ipEndPoint.ToString();
-            }
-        }
-
-        public static PortDefinition[] EnumeratePorts()
-        {
-            return EnumeratePorts(System.Net.IPAddress.Parse("234.102.98.44"), System.Net.IPAddress.Parse("234.102.98.45"), 26001, "DOTNETMF", 3000, 1);
-        }
-
-        public static PortDefinition[] EnumeratePorts(
-            System.Net.IPAddress DiscoveryMulticastAddress    ,
-            System.Net.IPAddress DiscoveryMulticastAddressRecv,
-            int       DiscoveryMulticastPort       ,
-            string    DiscoveryMulticastToken      ,
-            int       DiscoveryMulticastTimeout    ,
-            int       DiscoveryTTL                 
-        )
-        {
-            PortDefinition_Tcp []ports = null;
-            Dictionary<string, string> addresses = new Dictionary<string, string>();
-            
-            try
-            {
-                IPHostEntry hostEntry = Dns.GetHostEntry(Dns.GetHostName());
-
-                foreach (IPAddress ip in hostEntry.AddressList)
-                {
-                    if (ip.AddressFamily == AddressFamily.InterNetwork)
-                    {
-                        int cnt = 0;
-                        int total = 0;
-                        byte[] data = new byte[1024];
-                        Socket sock = null;
-                        Socket recv = null;
-
-                        System.Net.IPEndPoint endPoint    = new System.Net.IPEndPoint(ip, 0);
-                        System.Net.EndPoint   epRemote    = new System.Net.IPEndPoint(System.Net.IPAddress.Any, 26001);
-                        System.Net.IPEndPoint epRecv      = new System.Net.IPEndPoint(ip, DiscoveryMulticastPort);
-                        System.Net.IPEndPoint epMulticast = new System.Net.IPEndPoint(DiscoveryMulticastAddress, DiscoveryMulticastPort);
-
-                        try
-                        {
-                            sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                            recv = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-
-                            recv.Bind(epRecv);
-                            recv.ReceiveTimeout = DiscoveryMulticastTimeout;
-                            recv.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(DiscoveryMulticastAddressRecv, ip));
-
-                            sock.Bind(endPoint);
-                            sock.MulticastLoopback = false;
-                            sock.Ttl = (short)DiscoveryTTL;
-                            sock.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, 64);
-
-                            // send ping
-                            sock.SendTo(System.Text.Encoding.ASCII.GetBytes(DiscoveryMulticastToken), SocketFlags.None, epMulticast);
-
-                            while (0 < (cnt = recv.ReceiveFrom(data, total, data.Length - total, SocketFlags.None, ref epRemote)))
-                            {
-                                addresses[((IPEndPoint)epRemote).Address.ToString()] = "";
-                                total += cnt;
-                                recv.ReceiveTimeout = DiscoveryMulticastTimeout / 2;
-                            }
-
-                            recv.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.DropMembership, new MulticastOption(DiscoveryMulticastAddressRecv));
-
-                        }
-                        // SocketException occurs in RecieveFrom if there is no data.
-                        catch (SocketException)
-                        {
-                        }
-                        finally
-                        {
-                            if (recv != null)
-                            {
-                                recv.Close();
-                                recv = null;
-                            }
-                            if (sock != null)
-                            {
-                                sock.Close();
-                                sock = null;
-                            }
-                        }
-
-                        // use this if we need to get the MAC address of the device
-                        SOCK_discoveryinfo disc = new SOCK_discoveryinfo();
-                        disc.ipaddr = 0;
-                        disc.macAddressLen = 0;
-                        int idx = 0;
-                        int c_DiscSize = Marshal.SizeOf(disc);
-                        while (total >= c_DiscSize)
-                        {
-                            byte[] discData = new byte[c_DiscSize];
-                            Array.Copy(data, idx, discData, 0, c_DiscSize);
-                            GCHandle gch = GCHandle.Alloc(discData, GCHandleType.Pinned);
-                            disc = (SOCK_discoveryinfo)Marshal.PtrToStructure(gch.AddrOfPinnedObject(), typeof(SOCK_discoveryinfo));
-                            gch.Free();
-
-                            // previously we only displayed the IP address for the device, which doesn't
-                            // really tell you which device you are talking to.  The MAC address should be unique.
-                            // therefore we will display the MAC address in the device display name to help distinguish
-                            // the devices.  
-                            if (disc.macAddressLen <= 64 && disc.macAddressLen > 0)
-                            {
-                                IPAddress ipResp = new IPAddress((long)disc.ipaddr);
-
-                                // only append the MAC if it matches one of the IP address we got responses from
-                                if (addresses.ContainsKey(ipResp.ToString()))
-                                {
-                                    string strMac = "";
-                                    for (int mi = 0; mi < disc.macAddressLen - 1; mi++)
-                                    {
-                                        unsafe
-                                        {
-                                            strMac += string.Format("{0:x02}-", disc.macAddressBuffer[mi]);
-                                        }
-                                    }
-                                    unsafe
-                                    {
-                                        strMac += string.Format("{0:x02}", disc.macAddressBuffer[disc.macAddressLen - 1]);
-                                    }
-
-                                    addresses[ipResp.ToString()] = strMac;
-                                }
-                            }
-                            total -= c_DiscSize;
-                            idx += c_DiscSize;
-                        }
-                    }
-                }
-            }
-            catch( Exception e2)
-            {
-                System.Diagnostics.Debug.Print(e2.ToString());
-            }
-
-            ports = new PortDefinition_Tcp[addresses.Count];
-            int i = 0;
-
-            foreach(string key in addresses.Keys)
-            {
-                ports[i++] = new PortDefinition_Tcp(IPAddress.Parse(key), addresses[key]);
-            }
-
-            return ports;            
-        }
-
-        [MethodImplAttribute(MethodImplOptions.Synchronized)]
-        public override Stream CreateStream()
-        {
-            Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-            socket.NoDelay = true;
-            socket.LingerState = new LingerOption(false, 0);
-
-            IAsyncResult asyncResult = socket.BeginConnect(m_ipEndPoint, null, null);
-
-            if (asyncResult.AsyncWaitHandle.WaitOne(2000, false))
-            {
-                socket.EndConnect(asyncResult);
-            }
-            else
-            {
-                socket.Close();
-                throw new IOException("Connect failed");
-            }
-
-            AsyncNetworkStream stream = new AsyncNetworkStream(socket, true);
-
-            return stream;
-        }    
-    }
 }

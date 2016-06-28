@@ -121,17 +121,17 @@ int MAIN(int argc, char **argv)
 		if (!TINYCLR_SSL_STRCMP(*argv,"-in"))
 			{
 			if (--argc < 1) badarg = 1;
-                        infile= *(++argv);
+                        else infile= *(++argv);
 			}
 		else if (!TINYCLR_SSL_STRCMP(*argv,"-out"))
 			{
 			if (--argc < 1) badarg = 1;
-			outfile= *(++argv);
+			else outfile= *(++argv);
 			}
 		else if (!TINYCLR_SSL_STRCMP(*argv,"-sigfile"))
 			{
 			if (--argc < 1) badarg = 1;
-			sigfile= *(++argv);
+			else sigfile= *(++argv);
 			}
 		else if(!TINYCLR_SSL_STRCMP(*argv, "-inkey"))
 			{
@@ -161,17 +161,17 @@ int MAIN(int argc, char **argv)
 		else if (!TINYCLR_SSL_STRCMP(*argv,"-passin"))
 			{
 			if (--argc < 1) badarg = 1;
-			passargin= *(++argv);
+			else passargin= *(++argv);
 			}
 		else if (TINYCLR_SSL_STRCMP(*argv,"-peerform") == 0)
 			{
 			if (--argc < 1) badarg = 1;
-			peerform=str2fmt(*(++argv));
+			else peerform=str2fmt(*(++argv));
 			}
 		else if (TINYCLR_SSL_STRCMP(*argv,"-keyform") == 0)
 			{
 			if (--argc < 1) badarg = 1;
-			keyform=str2fmt(*(++argv));
+			else keyform=str2fmt(*(++argv));
 			}
 #ifndef OPENSSL_NO_ENGINE
 		else if(!TINYCLR_SSL_STRCMP(*argv, "-engine"))

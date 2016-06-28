@@ -191,7 +191,7 @@ int EVP_CipherInit_ex(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher, ENGINE *imp
 skip_to_init:
 #endif
 	/* we assume block size is a power of 2 in *cryptUpdate */
-	OPENSSL_assert(ctx->cipher->block_size == 1
+	TINYCLR_SSL_ASSERT(ctx->cipher->block_size == 1
 	    || ctx->cipher->block_size == 8
 	    || ctx->cipher->block_size == 16);
 
@@ -206,10 +206,11 @@ skip_to_init:
 			case EVP_CIPH_OFB_MODE:
 
 			ctx->num = 0;
+			/* fall-through */
 
 			case EVP_CIPH_CBC_MODE:
 
-			OPENSSL_assert(EVP_CIPHER_CTX_iv_length(ctx) <=
+			TINYCLR_SSL_ASSERT(EVP_CIPHER_CTX_iv_length(ctx) <=
 					(int)sizeof(ctx->iv));
 			if(iv) TINYCLR_SSL_MEMCPY(ctx->oiv, iv, EVP_CIPHER_CTX_iv_length(ctx));
 			TINYCLR_SSL_MEMCPY(ctx->iv, ctx->oiv, EVP_CIPHER_CTX_iv_length(ctx));
@@ -302,7 +303,7 @@ int EVP_EncryptUpdate(EVP_CIPHER_CTX *ctx, unsigned char *out, int *outl,
 		}
 	i=ctx->buf_len;
 	bl=ctx->cipher->block_size;
-	OPENSSL_assert(bl <= (int)sizeof(ctx->buf));
+	TINYCLR_SSL_ASSERT(bl <= (int)sizeof(ctx->buf));
 	if (i != 0)
 		{
 		if (i+inl < bl)
@@ -352,7 +353,7 @@ int EVP_EncryptFinal_ex(EVP_CIPHER_CTX *ctx, unsigned char *out, int *outl)
 	unsigned int i, b, bl;
 
 	b=ctx->cipher->block_size;
-	OPENSSL_assert(b <= sizeof ctx->buf);
+	TINYCLR_SSL_ASSERT(b <= sizeof ctx->buf);
 	if (b == 1)
 		{
 		*outl=0;
@@ -398,7 +399,7 @@ int EVP_DecryptUpdate(EVP_CIPHER_CTX *ctx, unsigned char *out, int *outl,
 		return EVP_EncryptUpdate(ctx, out, outl, in, inl);
 
 	b=ctx->cipher->block_size;
-	OPENSSL_assert(b <= sizeof ctx->final);
+	TINYCLR_SSL_ASSERT(b <= sizeof ctx->final);
 
 	if(ctx->final_used)
 		{
@@ -461,7 +462,7 @@ int EVP_DecryptFinal_ex(EVP_CIPHER_CTX *ctx, unsigned char *out, int *outl)
 			EVPerr(EVP_F_EVP_DECRYPTFINAL_EX,EVP_R_WRONG_FINAL_BLOCK_LENGTH);
 			return(0);
 			}
-		OPENSSL_assert(b <= sizeof ctx->final);
+		TINYCLR_SSL_ASSERT(b <= sizeof ctx->final);
 		n=ctx->final[b-1];
 		if (n == 0 || n > (int)b)
 			{

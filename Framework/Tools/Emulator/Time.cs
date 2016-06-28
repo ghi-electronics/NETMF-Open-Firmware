@@ -160,19 +160,42 @@ namespace Microsoft.SPOT.Emulator.Time
 
         void ITimeDriver.Sleep_MicroSeconds(uint uSec)
         {
-            throw new Exception("The method or operation is not implemented.");
+            long ticks = ((ITimeDriver)this).MicrosecondsToTicks(uSec);
+            // ensure we sleep always at least the required time (+1)
+            Thread.Sleep((int)((ticks / ((ITimeDriver)this).TicksPerSecond) * 1000 ) + 1);
         }
 
-        long ITimeDriver.MicrosecondsToTicks(long ms)
+        void ITimeDriver.Sleep_MicroSecondsInterruptsEnabled(uint uSec)            
         {
-            throw new Exception("The method or operation is not implemented.");
+            long ticks = ((ITimeDriver)this).MicrosecondsToTicks(uSec);
+            // do it in chunks
+            ticks /= 10;
+            int count = 10;
+            do
+            {
+                long msec = (ticks * 1000) / ((ITimeDriver)this).TicksPerSecond;
+                Thread.Sleep((int)msec);
+            } while (--count >= 0);
+            // ensure we sleep always at least the required time (minium is 1 msec)
+            Thread.Sleep(1);
+        }
+ 
+        long ITimeDriver.MicrosecondsToTicks(long usec)
+        {
+            return usec * 10;
         }
 
         void ITimeDriver.EnqueueCompletion(IntPtr Completion, uint uSecFromNow)
         {
-            HalCompletion halCompletion = CreateContinuation(Completion);
+            lock (_completionLookup)
+            {
+                if(!_completionLookup.ContainsKey( Completion ))
+                {
+                    HalCompletion halCompletion = CreateContinuation( Completion );
 
-            this.TimingServices.EnqueueCompletion(halCompletion, uSecFromNow);            
+                    this.TimingServices.EnqueueCompletion( halCompletion, uSecFromNow );
+                }
+            }
         }
 
         void ITimeDriver.AbortCompletion(IntPtr Completion)
@@ -190,9 +213,19 @@ namespace Microsoft.SPOT.Emulator.Time
 
         void ITimeDriver.EnqueueContinuation(IntPtr Continuation)
         {
-            HalCompletion halCompletion = CreateContinuation(Continuation);
+            lock (_completionLookup)
+            {
+                if(!_completionLookup.ContainsKey( Continuation ))
+                {
+                    HalCompletion halCompletion = CreateContinuation(Continuation);
 
-            halCompletion.EnqueueContinuation();
+                    halCompletion.EnqueueContinuation();
+                }
+                else
+                {
+                    _completionLookup[Continuation].EnqueueContinuation();
+                }
+            }
         }
 
         void ITimeDriver.AbortContinuation(IntPtr Continuation)
@@ -233,10 +266,13 @@ namespace Microsoft.SPOT.Emulator.Time
         {
             get
             {
-                //What does this do?  The only place it is called is MS.SPOT.Hardware.Cpu.SlowClock
-                //So why is the HAL API called CPU_TicksPerSecond?
-                return 0;
+                return 10000000;
             }
+        }
+
+        bool ITimeDriver.IsLinked(IntPtr Continuation)
+        {
+            return _completionLookup.ContainsKey(Continuation);
         }
 
         #endregion
@@ -640,33 +676,35 @@ namespace Microsoft.SPOT.Emulator.Time
         internal void EnqueueCompletion(Completion completion, uint uSecFromNow)
         {
             int i;
-            
-            AbortCompletion(completion);
-
-            completion._ticks = this.CurrentTicks + uSecFromNow * 10;
-
-            bool fInserted = false;
-
-            for (i = 0; i < _completions.Count; i++)
+            lock(this)
             {
-                Completion c = _completions[i];
+                AbortCompletion(completion);
 
-                if (completion._ticks < c._ticks)
+                completion._ticks = this.CurrentTicks + uSecFromNow * 10;
+
+                bool fInserted = false;
+
+                for (i = 0; i < _completions.Count; i++)
                 {
-                    _completions.Insert(i, completion);
-                    fInserted = true;
-                    break;
+                    Completion c = _completions[i];
+
+                    if (completion._ticks < c._ticks)
+                    {
+                        _completions.Insert(i, completion);
+                        fInserted = true;
+                        break;
+                    }
                 }
-            }
 
-            if (!fInserted)
-            {
-                _completions.Add(completion);
-            }
+                if (!fInserted)
+                {
+                    _completions.Add(completion);
+                }
 
-            if(i == 0)
-            {
-                _areCompletions.Set();
+                if(i == 0)
+                {
+                    _areCompletions.Set();
+                }
             }
         }
 
@@ -676,7 +714,10 @@ namespace Microsoft.SPOT.Emulator.Time
             //remove it from the continuation queue
             AbortContinuation(completion);
 
-            _completions.Remove(completion);
+            lock(this)
+            {
+                _completions.Remove(completion);
+            }
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -684,13 +725,19 @@ namespace Microsoft.SPOT.Emulator.Time
         {
             AbortContinuation(continuation);
 
-            _continuations.Add(continuation);
+            lock(this)
+            {
+                _continuations.Add(continuation);
+            }
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         internal void AbortContinuation(Continuation continuation)
         {
-            _continuations.Remove(continuation);
+            lock(this)
+            {
+                _continuations.Remove(continuation);
+            }
         }
 
         private void CompletionThreadProc()

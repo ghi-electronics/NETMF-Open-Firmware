@@ -285,6 +285,8 @@ namespace Ws.Services.Faults
                     faultAddress,                           // To
                     null, null, null);                      // ReplyTo, From, Any
 
+                faultHeader.IsFaultMessage = true;
+
                 WsMessage msg = new WsMessage(faultHeader, null, extraNS, null, null);
 
                 WsSoapMessageWriter smw = new WsSoapMessageWriter(version);
@@ -334,115 +336,132 @@ namespace Ws.Services.Faults
             string subcode;
 
             reader.ReadStartElement("Body", WsWellKnownUri.SoapNamespaceUri);
-            reader.ReadStartElement("Fault", WsWellKnownUri.SoapNamespaceUri); 
+            reader.ReadStartElement("Fault", WsWellKnownUri.SoapNamespaceUri);
 
-            while(true)
+            try
             {
-                if(reader.IsStartElement("Code", WsWellKnownUri.SoapNamespaceUri))
+                while (true)
                 {
-                    reader.ReadStartElement(); //<Code>
-
-                    if(reader.IsStartElement("Value", WsWellKnownUri.SoapNamespaceUri))
+                    if (reader.IsStartElement("Code", WsWellKnownUri.SoapNamespaceUri))
                     {
-                        reader.ReadElementString();
+                        reader.ReadStartElement(); //<Code>
+
+                        if (reader.IsStartElement("Value", WsWellKnownUri.SoapNamespaceUri))
+                        {
+                            message = reader.ReadElementString();
+                        }
+                        if (reader.IsStartElement("Subcode", WsWellKnownUri.SoapNamespaceUri))
+                        {
+                            reader.ReadStartElement();
+                            subcode = reader.ReadElementString("Value", WsWellKnownUri.SoapNamespaceUri);
+
+                            int idx = subcode.IndexOf(':');
+
+                            if (idx != -1)
+                            {
+                                subcode = subcode.Substring(idx + 1);
+                            }
+
+                            switch (subcode)
+                            {
+                                case "ArgumentException":
+                                    type = WsFaultType.ArgumentException;
+                                    break;
+                                case "ArgumentNullException":
+                                    type = WsFaultType.ArgumentNullException;
+                                    break;
+                                case "Exception":
+                                    type = WsFaultType.Exception;
+                                    break;
+                                case "InvalidOperationException":
+                                    type = WsFaultType.InvalidOperationException;
+                                    break;
+                                case "XmlException":
+                                    type = WsFaultType.XmlException;
+                                    break;
+
+                                case "InvalidMessageInformationHeader":
+                                    type = WsFaultType.WsaInvalidMessageInformationHeader;
+                                    break;
+                                case "MessageInformationHeaderRequired":
+                                    type = WsFaultType.WsaMessageInformationHeaderRequired;
+                                    break;
+                                case "DestinationUnreachable":
+                                    type = WsFaultType.WsaDestinationUnreachable;
+                                    break;
+                                case "ActionNotSupported":
+                                    type = WsFaultType.WsaActionNotSupported;
+                                    break;
+                                case "EndpointUnavailable":
+                                    type = WsFaultType.WsaEndpointUnavailable;
+                                    break;
+
+                                case "DeliverModeRequestedUnavailable":
+                                    type = WsFaultType.WseDeliverModeRequestedUnavailable;
+                                    break;
+                                case "InvalidExpirationTime":
+                                    type = WsFaultType.WseInvalidExpirationTime;
+                                    break;
+                                case "UnsupportedExpirationType":
+                                    type = WsFaultType.WseUnsupportedExpirationType;
+                                    break;
+                                case "FilteringNotSupported":
+                                    type = WsFaultType.WseFilteringNotSupported;
+                                    break;
+                                case "FilteringRequestedUnavailable":
+                                    type = WsFaultType.WseFilteringRequestedUnavailable;
+                                    break;
+                                case "EventSourceUnableToProcess":
+                                    type = WsFaultType.WseEventSourceUnableToProcess;
+                                    break;
+                                case "UnableToRenew":
+                                    type = WsFaultType.WseUnableToRenew;
+                                    break;
+                                case "InvalidMessage":
+                                    type = WsFaultType.WseInvalidMessage;
+                                    break;
+                            }
+
+                            reader.ReadEndElement();
+                        }
+
+                        reader.ReadEndElement(); // </Code>
                     }
-                    if(reader.IsStartElement("Subcode", WsWellKnownUri.SoapNamespaceUri))
+
+                    if (reader.IsStartElement("Reason", WsWellKnownUri.SoapNamespaceUri))
                     {
                         reader.ReadStartElement();
-                        subcode = reader.ReadElementString("Value", WsWellKnownUri.SoapNamespaceUri);
 
-                        int idx = subcode.IndexOf(':');
+                        message += " = " + reader.ReadElementString("Text", WsWellKnownUri.SoapNamespaceUri);
 
-                        if(idx != -1)
-                        {
-                            subcode = subcode.Substring(idx+1);
-                        }
-
-                        switch(subcode)
-                        {
-                            case "ArgumentException":
-                                type = WsFaultType.ArgumentException;
-                                break;
-                            case "ArgumentNullException":
-                                type = WsFaultType.ArgumentNullException;
-                                break;
-                            case "Exception":
-                                type = WsFaultType.Exception;
-                                break;
-                            case "InvalidOperationException":
-                                type = WsFaultType.InvalidOperationException;
-                                break;
-                            case "XmlException":
-                                type = WsFaultType.XmlException;
-                                break;
-                            
-                            case "InvalidMessageInformationHeader":
-                                type = WsFaultType.WsaInvalidMessageInformationHeader;
-                                break;
-                            case "MessageInformationHeaderRequired":
-                                type = WsFaultType.WsaMessageInformationHeaderRequired;
-                                break;
-                            case "DestinationUnreachable":
-                                type = WsFaultType.WsaDestinationUnreachable;
-                                break;
-                            case "ActionNotSupported":
-                                type = WsFaultType.WsaActionNotSupported;
-                                break;
-                            case "EndpointUnavailable":
-                                type = WsFaultType.WsaEndpointUnavailable;
-                                break;
-                            
-                            case "DeliverModeRequestedUnavailable":
-                                type = WsFaultType.WseDeliverModeRequestedUnavailable;
-                                break;
-                            case "InvalidExpirationTime":
-                                type = WsFaultType.WseInvalidExpirationTime;
-                                break;
-                            case "UnsupportedExpirationType":
-                                type = WsFaultType.WseUnsupportedExpirationType;
-                                break;
-                            case "FilteringNotSupported":
-                                type = WsFaultType.WseFilteringNotSupported;
-                                break;
-                            case "FilteringRequestedUnavailable":
-                                type = WsFaultType.WseFilteringRequestedUnavailable;
-                                break;
-                            case "EventSourceUnableToProcess":
-                                type = WsFaultType.WseEventSourceUnableToProcess;
-                                break;
-                            case "UnableToRenew":
-                                type = WsFaultType.WseUnableToRenew;
-                                break;
-                            case "InvalidMessage":
-                                type = WsFaultType.WseInvalidMessage;
-                                break;
-                        }
-                        
                         reader.ReadEndElement();
                     }
 
-                    reader.ReadEndElement(); // </Code>
+                    if (reader.IsStartElement("Detail", WsWellKnownUri.SoapNamespaceUri))
+                    {
+                        reader.ReadStartElement();
+
+                        if (reader.IsStartElement())
+                        {
+                            detail = reader.ReadElementString("string"); 
+                        }
+                        else
+                        {
+                            detail = reader.ReadString();
+                        }
+
+                        reader.ReadEndElement();
+                    }
+
+                    if (!reader.IsStartElement()) break;
                 }
 
-                if(reader.IsStartElement("Reason", WsWellKnownUri.SoapNamespaceUri))
-                {
-                    reader.ReadStartElement();
-
-                    message = reader.ReadElementString("Text", WsWellKnownUri.SoapNamespaceUri);
-
-                    reader.ReadEndElement();
-                }
-
-                if(reader.IsStartElement("Detail", WsWellKnownUri.SoapNamespaceUri))
-                {
-                    detail = reader.ReadElementString("Detail", WsWellKnownUri.SoapNamespaceUri);
-                }
-
-                if(!reader.IsStartElement()) break;
+                reader.ReadEndElement(); // </Fault>
+                reader.ReadEndElement(); // </Body>
             }
-
-            reader.ReadEndElement(); // </Fault>
-            reader.ReadEndElement(); // </Body>
+            catch
+            {
+            }
 
             throw new WsFaultException(header, type, message, detail);
         }

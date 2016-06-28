@@ -376,14 +376,6 @@ static int int_new_class(void)
 	return toret;
 	}
 
-//[MS_CHANGE] - added EX_data_initialize to zero out global
-// variables for soft reboot 
-void EX_data_initalize(void)
-{
-    ex_data = NULL;
-    impl = NULL;    
-}
-
 static void int_cleanup(void)
 	{
 	EX_DATA_CHECK(return;)

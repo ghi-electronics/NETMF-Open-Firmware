@@ -82,6 +82,90 @@
       <InProject>false</InProject>
     </Project>
 
+    <Project Include="Security\SecurityTests.csproj" >
+      <InProject>false</InProject>
+    </Project>    
+    <Project Include="Security\SecurityTests.slnproj" >
+      <InProject>false</InProject>
+    </Project>
+
+    <Project Include="Security\ASYMM\AsymmetricTests.csproj" >
+      <InProject>false</InProject>
+    </Project>    
+    <Project Include="Security\ASYMM\AsymmetricTests.slnproj" >
+      <InProject>false</InProject>
+    </Project>    
+
+    <Project Include="Security\HASHING\HashTests.csproj" >
+      <InProject>false</InProject>
+    </Project>    
+    <Project Include="Security\HASHING\HashTests.slnproj" >
+      <InProject>false</InProject>
+    </Project>    
+
+    <Project Include="Security\KEYS\KeyTests.csproj" >
+      <InProject>false</InProject>
+    </Project>    
+    <Project Include="Security\KEYS\KeyTests.slnproj" >
+      <InProject>false</InProject>
+    </Project>    
+
+    <Project Include="Security\MISC\MiscSecurity.csproj" >
+      <InProject>false</InProject>
+    </Project>    
+    <Project Include="Security\MISC\MiscSecurity.slnproj" >
+      <InProject>false</InProject>
+    </Project>    
+
+    <Project Include="Security\PADDING\PaddingTests.csproj" >
+      <InProject>false</InProject>
+    </Project>    
+    <Project Include="Security\PADDING\PaddingTests.slnproj" >
+      <InProject>false</InProject>
+    </Project>    
+
+    <Project Include="Security\RSA\RSATests.csproj" >
+      <InProject>false</InProject>
+    </Project>    
+    <Project Include="Security\RSA\RSATests.slnproj" >
+      <InProject>false</InProject>
+    </Project>    
+
+<!--
+    <Project Include="Security\STREAMS\StreamTests.csproj" >
+      <InProject>false</InProject>
+    </Project>    
+    <Project Include="Security\STREAMS\StreamTests.slnproj" >
+      <InProject>false</InProject>
+    </Project>    
+-->
+
+    <Project Include="Security\X509Certificate\CertTests.csproj" >
+      <InProject>false</InProject>
+    </Project>    
+    <Project Include="Security\X509Certificate\CertTests.slnproj" >
+      <InProject>false</InProject>
+    </Project>    
+
+    <Project Include="Security\X509Certs\CertsTest2.csproj" >
+      <InProject>false</InProject>
+    </Project>    
+    <Project Include="Security\X509Certs\CertsTest2.slnproj" >
+      <InProject>false</InProject>
+    </Project>    
+    <Project Include="Text\RegExp\RegEx.csproj" >
+      <InProject>false</InProject>
+    </Project>    
+    <Project Include="Text\RegExp\RegEx.slnproj" >
+      <InProject>false</InProject>
+    </Project>    
+    <Project Include="Text\StringBuilder\StringBuilder.csproj" >
+      <InProject>false</InProject>
+    </Project>    
+    <Project Include="Text\StringBuilder\StringBuilder.slnproj" >
+      <InProject>false</InProject>
+    </Project>    
+
     <Project Include="SystemTests.wixproj" >
       <InProject>false</InProject>
     </Project>

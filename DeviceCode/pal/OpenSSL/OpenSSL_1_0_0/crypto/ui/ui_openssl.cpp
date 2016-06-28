@@ -507,7 +507,7 @@ static int open_console(UI *ui)
 #endif
 
 #if defined(TTY_get) && !defined(OPENSSL_SYS_VMS)
- 	if (TTY_get(fileno(tty_in),&tty_orig) == -1)
+ 	if (TTY_get(TINYCLR_SSL_FILENO(tty_in),&tty_orig) == -1)
 		{
 #ifdef ENOTTY
 		if (errno == ENOTTY)
@@ -543,7 +543,7 @@ static int noecho_console(UI *ui)
 #endif
 
 #if defined(TTY_set) && !defined(OPENSSL_SYS_VMS)
-	if (is_a_tty && (TTY_set(fileno(tty_in),&tty_new) == -1))
+	if (is_a_tty && (TTY_set(TINYCLR_SSL_FILENO(tty_in),&tty_new) == -1))
 		return 0;
 #endif
 #ifdef OPENSSL_SYS_VMS
@@ -565,7 +565,7 @@ static int echo_console(UI *ui)
 #endif
 
 #if defined(TTY_set) && !defined(OPENSSL_SYS_VMS)
-	if (is_a_tty && (TTY_set(fileno(tty_in),&tty_new) == -1))
+	if (is_a_tty && (TTY_set(TINYCLR_SSL_FILENO(tty_in),&tty_new) == -1))
 		return 0;
 #endif
 #ifdef OPENSSL_SYS_VMS

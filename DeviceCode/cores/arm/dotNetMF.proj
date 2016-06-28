@@ -52,21 +52,31 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(INSTRUCTION_SET)'=='thumb2'">
-    <Compile Include="AssemblyCode\thumb2\$(AS_SUBDIR)\FirstEntry.s" />
-    <Compile Include="AssemblyCode\thumb2\$(AS_SUBDIR)\IDelayLoop.s" />
-    <Compile Include="AssemblyCode\thumb2\$(AS_SUBDIR)\Sampling_Profiler_RAM.s" />
-    <Compile Include="AssemblyCode\thumb2\$(AS_SUBDIR)\VectorsHandlers.s" />
-    <Compile Include="AssemblyCode\thumb2\$(AS_SUBDIR)\VectorsTrampolines.s" />
-  </ItemGroup>
+     <Compile Include="AssemblyCode\thumb2\$(AS_SUBDIR)\FirstEntry.s" />
+     <Compile Include="AssemblyCode\thumb2\$(AS_SUBDIR)\IDelayLoop.s" />
+     <Compile Include="AssemblyCode\thumb2\$(AS_SUBDIR)\VectorsTrampolines.s" />
+	 <Compile Include="AssemblyCode\thumb2\$(AS_SUBDIR)\BootVectors.s" />	 
+	 <Compile Include="AssemblyCode\thumb2\$(AS_SUBDIR)\ProtectionArea.s" />	 
+    </ItemGroup>
 
-  <ItemGroup>
-    <HFiles Include="..\..\Initialization\MasterConfig.h" />
+  <ItemGroup Condition="'$(INSTRUCTION_SET)'=='arm' or '$(INSTRUCTION_SET)'=='thumb' ">
     <Compile Include="Diagnostics\Aborts.cpp" />
     <Compile Include="Diagnostics\FIQ_Profiler.cpp" />
     <Compile Include="Diagnostics\RamTest.cpp" />
-    <Compile Include="Diagnostics\RamTest.h" />
-    <LIB_FIRSTENTRY_OBJ Include="$(OBJ_DIR)\FirstEntry.$(OBJ_EXT)" />
+    <HFiles Include="Diagnostics\RamTest.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\diagnostics\ramtest.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\arm_util.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\cpu.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\cpu_definitions.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\smartptr_fiq_arm.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\com\usb\usb.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\targets\native\mc9328\devicecode\mc9328mxl.h" />
   </ItemGroup>
+
+   <ItemGroup>
+     <LIB_FIRSTENTRY_OBJ Include="$(OBJ_DIR)\FirstEntry.$(OBJ_EXT)" />
+   </ItemGroup>
+   
   <ItemGroup>
     <ExtraProjects Include="dotNetMF_loader.proj" Condition="'$(PLATFORM_FAMILY)'=='arm'" />
   </ItemGroup>

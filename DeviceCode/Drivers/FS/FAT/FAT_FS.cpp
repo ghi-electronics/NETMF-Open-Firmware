@@ -200,10 +200,9 @@ BOOL FAT_Directory::IsName( LPCWSTR name, UINT32 nameLen )
         // stop if we see the "."
         if(c == '.') break;
         
-        if(c >= 'a' && c <= 'z') c -= 'a' - 'A';
-        else if(j == 0 && c == 0xE5) c = 0x05;
+        if(j == 0 && c == 0xE5) c = 0x05;
 
-        if(DIR_Name[j] != c) return FALSE;
+        if(MF_towupper(DIR_Name[j]) != MF_towupper(c)) return FALSE;
         
     }
 
@@ -232,9 +231,7 @@ BOOL FAT_Directory::IsName( LPCWSTR name, UINT32 nameLen )
             name++;
             nameLen--;
 
-            if(c >= 'a' && c <= 'z') c -= 'a' - 'A';
-            
-            if(DIR_Name[j] != c) return FALSE;
+            if(MF_towupper(DIR_Name[j]) != MF_towupper(c)) return FALSE;
             
         }
     }
@@ -333,7 +330,7 @@ void FAT_LONG_Directory::SetName( LPCWSTR name, UINT32 nameLen )
     
     if(nameLen < 13)
     {
-        int i;
+        UINT32 i;
         for(i = 0; i < nameLen; i++)
         {
             tempName[i] = name[i];
@@ -380,7 +377,7 @@ void FAT_LONG_Directory::SetName( LPCWSTR name, UINT32 nameLen )
 
 BOOL FAT_LONG_Directory::IsName( LPCWSTR name, UINT32 nameLen )
 {
-    int j;
+    UINT32 j;
     WCHAR c;
     
     for(j = 0; j < LDIR_Name1__size; j+=2)
@@ -556,7 +553,7 @@ HRESULT FAT_FINDFILES::FindNext( FS_FILEINFO *fi, BOOL *fileFound )
             TINYCLR_SET_AND_LEAVE(S_OK);
         }
         
-        dirEntry = fileInfo.GetDirectoryEntry();
+        dirEntry = fileInfo.GetDirectoryEntry( FALSE );
 
         if(!dirEntry) TINYCLR_SET_AND_LEAVE(CLR_E_FILE_IO);
     }

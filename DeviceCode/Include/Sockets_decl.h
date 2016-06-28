@@ -5,51 +5,30 @@
 #ifndef _DRIVERS_SOCKETS_DECL_H_
 #define _DRIVERS_SOCKETS_DECL_H_ 1
 
+#include <platform_selector.h>
+
 //--//
 
 #if defined(__ADSPBLACKFIN__) || defined(__GNUC__) || defined(__RENESAS__)
 #define __int64 long long
 #endif
 
-
-#ifdef PLATFORM_DEPENDENT__SOCKETS_MAX_COUNT
-#define SOCKETS_MAX_COUNT                PLATFORM_DEPENDENT__SOCKETS_MAX_COUNT
-#else
-#define SOCKETS_MAX_COUNT                1 // required to have at least one for array init
-#endif
-
-#ifdef PLATFORM_DEPENDENT__SOCKETS_MAX_SEND_LENGTH
-#define SOCKETS_MAX_SEND_LENGTH         PLATFORM_DEPENDENT__SOCKETS_MAX_SEND_LENGTH
-#endif
-
-#if !defined(DEBGGER_NETWORK_INTERFACE_INDEX)
-#define DEBGGER_NETWORK_INTERFACE_INDEX  0
-#endif
-
-#if !defined(NETWORK_INTERFACE_COUNT)
-#define NETWORK_INTERFACE_COUNT          1
-#endif
-
-#if !defined(WIRELESS_INTERFACE_COUNT)
-#define WIRELESS_INTERFACE_COUNT          1
-#endif
-
 typedef struct _DATE_TIME_INFO
 {
-	unsigned int  year;           /* year, AD                   */
-	unsigned int  month;          /* 1 = January, 12 = December */
-	unsigned int  day;            /* 1 = first of the month     */
-	unsigned int  hour;           /* 0 = midnight, 12 = noon    */
-	unsigned int  minute;         /* minutes past the hour      */
-	unsigned int  second;         /* seconds in minute          */
-	unsigned int  msec;           /* milliseconds in second     */
+    unsigned int  year;           /* year, AD                   */
+    unsigned int  month;          /* 1 = January, 12 = December */
+    unsigned int  day;            /* 1 = first of the month     */
+    unsigned int  hour;           /* 0 = midnight, 12 = noon    */
+    unsigned int  minute;         /* minutes past the hour      */
+    unsigned int  second;         /* seconds in minute          */
+    unsigned int  msec;           /* milliseconds in second     */
 
-	/* These two fields help  */
-	/* interpret the absolute */
-	/* time meaning of the    */
-	/* above values.          */
-	unsigned int  dlsTime;       	 /* boolean; daylight savings time is in effect                      */
-	int           tzOffset;      		 /* signed int; difference in seconds imposed by timezone (from GMT) */
+    /* These two fields help  */
+    /* interpret the absolute */
+    /* time meaning of the    */
+    /* above values.          */
+    unsigned int  dlsTime;           /* boolean; daylight savings time is in effect                      */
+    int           tzOffset;              /* signed int; difference in seconds imposed by timezone (from GMT) */
 } DATE_TIME_INFO;
 
 typedef struct _X509CertData
@@ -255,8 +234,8 @@ typedef int SOCK_SOCKET;
 #define SOCK_FIOASYNC    SOCK__IOW('f', 125, u_long) /* set/clear async i/o */
 //
 
-#define SOCK_FD_SETSIZE SOCKETS_MAX_COUNT
-#define SOCK_MAX_ADDR_SIZE 128
+#define SOCK_FD_SETSIZE    256
+#define SOCK_MAX_ADDR_SIZE 14
 
 typedef struct SOCK_fd_set {  
     unsigned int fd_count;  
@@ -268,13 +247,15 @@ typedef struct SOCK_sockaddr {
     char    sa_data[SOCK_MAX_ADDR_SIZE];     /* up to SOCK_MAX_ADDR_SIZE bytes of direct address */
 }SOCK_sockaddr;
 
-typedef struct SOCK_in_addr{  
-    union {    
-        struct {      
+CT_ASSERT_UNIQUE_NAME(sizeof(SOCK_sockaddr)==(16), SOCK_SOCKADDR)
+
+typedef ADS_PACKED struct GNU_PACKED SOCK_in_addr{  
+    ADS_PACKED union GNU_PACKED {    
+        ADS_PACKED struct GNU_PACKED {      
             u_char s_b1,s_b2,s_b3,s_b4;    
         } S_un_b;    
         
-        struct {      
+        ADS_PACKED struct GNU_PACKED {      
             u_short s_w1,s_w2;    
         } S_un_w;    
         
@@ -282,13 +263,14 @@ typedef struct SOCK_in_addr{
     } S_un;
 } SOCK_in_addr;
 
-
-typedef struct SOCK_sockaddr_in {
+typedef ADS_PACKED struct GNU_PACKED SOCK_sockaddr_in {
         short   sin_family;
         u_short sin_port;
         SOCK_in_addr sin_addr;
         char    sin_zero[8];
 } SOCK_sockaddr_in;
+
+CT_ASSERT_UNIQUE_NAME(sizeof(SOCK_sockaddr_in)==16, SOCK_SOCKADDR_IN)
 
 typedef struct SOCK_addrinfo 
 {  
@@ -387,43 +369,6 @@ typedef struct SOCK_timeval {
 
 //--//
 
-struct SOCK_NetworkConfiguration
-{  
-    /// Bits 0-15 regular flags.
-    ///     16-19 Type
-    ///     20-23 SubIndex.
-    UINT32 flags;
-
-    UINT32 ipaddr;
-    UINT32 subnetmask;
-    UINT32 gateway;
-    UINT32 dnsServer1;
-    UINT32 dnsServer2;
-    UINT32 networkInterfaceType;
-    UINT32 macAddressLen;
-    char   macAddressBuffer[64];
-};
-
-struct NETWORK_CONFIG
-{
-    HAL_DRIVER_CONFIG_HEADER Header;
-
-    //--//
-
-    int                       NetworkInterfaceCount;
-    SOCK_NetworkConfiguration NetworkInterfaces[NETWORK_INTERFACE_COUNT];
-    
-    //--//
-
-    static LPCSTR GetDriverName() { return "NETWORK"; }
-};
-
-#define WIRELESS_PASSPHRASE_LENGTH             64
-#define WIRELESS_NETWORKKEY_LENGTH             256
-#define WIRELESS_REKEYINTERNAL_LENGTH          32
-#define WIRELESS_SSID_LENGTH                   32
-
-
 ///
 /// Keep these values in sync with the manged code enumeration Wireless80211.AuthenticationType in wireless.cs
 ///
@@ -470,38 +415,11 @@ struct NETWORK_CONFIG
 #define WIRELESS_FLAG_DATA__value(x)           (((x) & WIRELESS_FLAG_DATA__mask) >> WIRELESS_FLAG_DATA__shift)
 #define WIRELESS_FLAG_DATA__set(x)             (((x) << WIRELESS_FLAG_DATA__shift) & WIRELESS_FLAG_DATA__mask)
     
-
-struct SOCK_WirelessConfiguration
-{  
-    /// Bits 0-3: Authetication, 4-7: Encryption, 8-11: Radio.
-    UINT32        wirelessFlags;
-    char          passPhrase[WIRELESS_PASSPHRASE_LENGTH];
-    UINT32        networkKeyLength;
-    UINT8         networkKey[WIRELESS_NETWORKKEY_LENGTH];
-    UINT32        reKeyLength;
-    UINT8         reKeyInternal[WIRELESS_REKEYINTERNAL_LENGTH];
-    char          ssid[WIRELESS_SSID_LENGTH];
-};
-
-struct WIRELESS_CONFIG
-{
-    HAL_DRIVER_CONFIG_HEADER   Header;
-
-    //--//
-
-    int                        WirelessInterfaceCount;
-    SOCK_WirelessConfiguration WirelessInterfaces[WIRELESS_INTERFACE_COUNT];
-    
-    //--//
-
-    static LPCSTR GetDriverName() { return "WIRELESS"; }
-};
-
 extern const ConfigurationSector g_ConfigurationSector;
 
 //--//
 
-#if defined(LITTLE_ENDIAN)
+#if defined(LITTLE_ENDIAN) || defined(PLATFORM_WINDOWS)
 #define SOCK_htons(x) ( (((x) & 0x000000FFUL) <<  8) | (((x) & 0x0000FF00UL) >>  8) )
 #define SOCK_htonl(x) ( (((x) & 0x000000FFUL) << 24) | (((x) & 0x0000FF00UL) << 8) | (((x) & 0x00FF0000UL) >> 8) | (((x) & 0xFF000000UL) >> 24) )
 #define SOCK_ntohs(x) SOCK_htons(x)
@@ -569,6 +487,9 @@ __inline void SOCK_FD_CLR(int y, SOCK_fd_set* x)
 #endif
 
 
+struct SOCK_NetworkConfiguration;
+struct SOCK_WirelessConfiguration;
+
 //--//
 
 BOOL  Network_Initialize();
@@ -596,6 +517,9 @@ BOOL  SOCKETS_Uninitialize( int ComPortNum );
 int   SOCKETS_Write( int ComPortNum, const char* Data, size_t size );
 int   SOCKETS_Read( int ComPortNum, char* Data, size_t size );
 BOOL  SOCKETS_Flush( int ComPortNum );
+BOOL  SOCKETS_UpgradeToSsl( int ComPortNum, const UINT8* pCACert, UINT32 caCertLen, const UINT8* pDeviceCert, UINT32 deviceCertLen, LPCSTR szTargetHost );
+BOOL  SOCKETS_IsUsingSsl( INT32 ComPortNum );
+
 
 void  SOCKETS_CloseConnections();
 // RTIP

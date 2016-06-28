@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>Ink_pal</AssemblyName>
     <Size>
@@ -33,16 +34,18 @@
     <PlatformIndependentBuild>false</PlatformIndependentBuild>
     <Version>4.0.0.0</Version>
   </PropertyGroup>
-  <Import Project="$(SPOCLIENT)\Framework\Features\LCD_HAL.libcatproj"/>
+  <Import Project="$(SPOCLIENT)\Framework\Features\LCD_HAL.libcatproj" />
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
   <ItemGroup>
-    <SubDirectories Include="Stubs"/>
+    <SubDirectories Include="Stubs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ink_functions.cpp" />
     <Compile Include="ink_driver.cpp" />
     <IncludePaths Include="DeviceCode\include" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="ink_driver.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

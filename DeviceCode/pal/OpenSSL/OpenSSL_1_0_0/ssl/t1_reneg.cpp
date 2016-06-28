@@ -239,8 +239,8 @@ int ssl_parse_serverhello_renegotiate_ext(SSL *s, unsigned char *d, int len,
     int ilen;
 
     /* Check for logic errors */
-    OPENSSL_assert(!expected_len || s->s3->previous_client_finished_len);
-    OPENSSL_assert(!expected_len || s->s3->previous_server_finished_len);
+    TINYCLR_SSL_ASSERT(!expected_len || s->s3->previous_client_finished_len);
+    TINYCLR_SSL_ASSERT(!expected_len || s->s3->previous_server_finished_len);
     
     /* Parse the length byte */
     if(len < 1)

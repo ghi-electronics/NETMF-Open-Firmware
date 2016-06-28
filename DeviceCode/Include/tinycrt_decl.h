@@ -47,7 +47,7 @@ int hal_snprintf_double( char* buffer, size_t len, const char* format, INT64& d 
 #endif
 
 
-#if defined(__GNUC__)
+#if defined(GCC_OLD_VA_LIST)
 int hal_vsnprintf( char* buffer, size_t len, const char* format, va_list arg ); 
 // We need to force the symbol name of the next function to match RVDS one. This is needed for proper linking to the RVDS precompiled libraries
 int hal_vsnprintf( char* buffer, size_t len, const char* format, int* args ) asm("_Z13hal_vsnprintfPcjPKcSt9__va_list");

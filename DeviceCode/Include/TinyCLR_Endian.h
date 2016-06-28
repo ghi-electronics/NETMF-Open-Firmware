@@ -13,7 +13,7 @@
 #ifndef _TINYCLR_ENDIAN_H_
 #define _TINYCLR_ENDIAN_H_
 
-#include <TinyCLR_Types.h>
+#include <TinyHAL_types.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Endian conversion helpers
@@ -77,10 +77,16 @@ __inline INT64 SwapEndian( INT64 u )
 #define SwapEndianIfBE( a ) a
 #define SwapEndianIfBEc32( a ) a
 #define SwapEndianIfBEc16( a ) a
+#define SwapEndianAndAssignIfBE( a, b )
+#define SwapEndianAndAssignIfBEc32( a, b )
+#define SwapEndianAndAssignIfBEc16( a, b )
 #else
 #define SwapEndianIfBE( a ) SwapEndian( a )
 #define SwapEndianIfBEc32( u ) (((u & 0xff000000UL)>>24) | ((u & 0x00ff0000UL)>>8) | ((u&0x0000ff00UL)<<8) | ((u & 0x000000ffUL)<<24))
 #define SwapEndianIfBEc16( u ) (((u&0xff00)>>8)|((u&0x00ff)<<8))
+#define SwapEndianAndAssignIfBE( a, b ) a = SwapEndian( b )
+#define SwapEndianAndAssignIfBEc32( a, u ) a = SwapEndianIfBEc32(u)
+#define SwapEndianAndAssignIfBEc16( a, u ) a = SwapEndianIfBEc16(u)
 #endif
 
 //

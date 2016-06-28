@@ -3,7 +3,7 @@
     <AssemblyName>Network_config_SH7264_RSK</AssemblyName>
     <Size>
     </Size>
-    <ProjectGuid>{60fc7dfd-6540-4686-9e12-ae89536fb2ba}</ProjectGuid>
+    <ProjectGuid>{86083133-ABE6-46B0-B1A5-BA59D0F45FEE}</ProjectGuid>
     <Description>Network configuration library for SH7264_RSK solution</Description>
     <Level>HAL</Level>
     <LibraryFile>Network_config_SH7264_RSK.$(LIB_EXT)</LibraryFile>

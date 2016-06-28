@@ -128,6 +128,68 @@ BOOL DebuggerPort_Flush( COM_HANDLE ComPortNum )
     return FALSE;
 }
 
+BOOL DebuggerPort_IsSslSupported( COM_HANDLE ComPortNum )
+{
+    NATIVE_PROFILE_PAL_COM();
+    switch(ExtractTransport(ComPortNum))
+    {
+        case SOCKET_TRANSPORT:
+            return g_DebuggerPortSslConfig.GetCertificateAuthority != NULL;
+
+        case USART_TRANSPORT:
+        case USB_TRANSPORT:
+        default:
+            break;
+    }
+
+    return FALSE;
+}
+
+BOOL DebuggerPort_UpgradeToSsl( COM_HANDLE ComPortNum, UINT32 flags )
+{
+    switch(ExtractTransport(ComPortNum))
+    {
+        case SOCKET_TRANSPORT:
+            {
+                LPCSTR szTargetHost  = NULL;
+                UINT8* pCACert       = NULL;
+                UINT32 caCertLen     = 0;
+                UINT8* pDeviceCert   = NULL;
+                UINT32 deviceCertLen = 0;
+
+                if(g_DebuggerPortSslConfig.GetCertificateAuthority != NULL)
+                {
+                    g_DebuggerPortSslConfig.GetCertificateAuthority(&pCACert, &caCertLen);
+                }
+
+                if(g_DebuggerPortSslConfig.GetTargetHostName != NULL)
+                {
+                    g_DebuggerPortSslConfig.GetTargetHostName(&szTargetHost);
+                }
+
+                if(g_DebuggerPortSslConfig.GetDeviceCertificate != NULL)
+                {
+                    g_DebuggerPortSslConfig.GetDeviceCertificate(&pDeviceCert, &deviceCertLen);
+                }
+                
+                return SOCKETS_UpgradeToSsl(ConvertCOM_ComPort(ComPortNum), pCACert, caCertLen, pDeviceCert, deviceCertLen, szTargetHost);
+            }
+    }
+
+    return FALSE;
+}
+
+BOOL DebuggerPort_IsUsingSsl( COM_HANDLE ComPortNum )
+{
+        switch(ExtractTransport(ComPortNum))
+        {
+            case SOCKET_TRANSPORT:
+                return SOCKETS_IsUsingSsl(ConvertCOM_ComPort(ComPortNum));
+        }
+        return FALSE;
+}
+
+
 //////////////////////////////////////////////////////////////////////////////////
 
 void CPU_InitializeCommunication()
@@ -148,9 +210,11 @@ void CPU_InitializeCommunication()
 
     if(COM_IsUsb(HalSystemConfig.DebugTextPort))
     {
-        USB_Configure( ConvertCOM_UsbController(HalSystemConfig.DebugTextPort), NULL );
-        USB_Initialize( ConvertCOM_UsbController(HalSystemConfig.DebugTextPort) );
-        USB_OpenStream( ConvertCOM_UsbStream(HalSystemConfig.DebugTextPort), USB_DEBUG_EP_WRITE, USB_DEBUG_EP_READ );
+        if(USB_CONFIG_ERR_OK == USB_Configure( ConvertCOM_UsbController(HalSystemConfig.DebugTextPort), NULL ))
+        {
+            USB_Initialize( ConvertCOM_UsbController(HalSystemConfig.DebugTextPort) );
+            USB_OpenStream( ConvertCOM_UsbStream(HalSystemConfig.DebugTextPort), USB_DEBUG_EP_WRITE, USB_DEBUG_EP_READ );
+        }
     }
 
 
@@ -177,7 +241,10 @@ void CPU_UninitializeCommunication()
     // Close all streams on USB controller 0 except debugger (if it uses a USB stream)
     for( int stream = 0; stream < USB_MAX_QUEUES; stream++ )
     {
-        if(!COM_IsUsb(HalSystemConfig.DebuggerPorts[0]) || (ConvertCOM_UsbStream(HalSystemConfig.DebugTextPort) != stream))
+        // discard output data
+        USB_DiscardData(stream, TRUE);
+        
+        if(!COM_IsUsb(HalSystemConfig.DebuggerPorts[0]) || (ConvertCOM_UsbStream(HalSystemConfig.DebuggerPorts[0]) != stream))
         {
             USB_CloseStream(stream);        // OK for unopen streams
         }

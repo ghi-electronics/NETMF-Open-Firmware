@@ -1,7 +1,7 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <Import Project="$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.Targets" />
 
-  <ItemGroup Condition="'$(PORT_BUILD)'==''">
+  <ItemGroup Condition="EXISTS('$(SPOCLIENT)\Test\Platform\Tools\AutomationTasks\AutomationTasks.csproj')">
     <Project Include="Tools\AutomationTasks\AutomationTasks.csproj" >
       <InProject>false</InProject>
     </Project>
@@ -45,6 +45,10 @@
    <Project Include="Tests\Desktop\MFDeploy\build.dirproj" >
           <InProject>false</InProject>
     </Project>
+
+    <Project Include="Tests\Native_MathMethods\Math\build.dirproj" >
+          <InProject>false</InProject>
+    </Project> 
 
    <!-- DPWS -->
    <Project Include="Tests\CLR\DPWS\build.dirproj" >
@@ -113,7 +117,7 @@
 
   </ItemGroup>
 
-  <ItemGroup Condition="'$(PORT_BUILD)'==''">
+  <ItemGroup Condition="EXISTS('$(SPOCLIENT)\Test\Platform\Setup\EndianFeatures.wixproj')">
 
     <!-- DPWS FixtureTests -->
     <Project Include="Tests\CLR\DPWS\WSDL\DpwsTestFixtures.dpwsproj">

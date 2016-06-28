@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>cpu_cmu_stubs</AssemblyName>
     <ProjectGuid>{3be460d5-c0f8-4c26-a8fc-11958f0fa78e}</ProjectGuid>
@@ -41,6 +42,5 @@
   <ItemGroup>
     <Compile Include="stubs_functions_cmu.cpp" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

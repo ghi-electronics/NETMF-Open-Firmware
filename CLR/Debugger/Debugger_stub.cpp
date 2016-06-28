@@ -48,7 +48,7 @@ void CLR_DBG_Debugger::BroadcastEvent( UINT32 cmd, UINT32 payloadSize, UINT8* pa
 
 void MfReleaseInfo::Init( MfReleaseInfo& mfReleaseInfo, UINT16 major, UINT16 minor, UINT16 build, UINT16 revision, const char *info, size_t infoLen )
 {
-    Version::Init( mfReleaseInfo.version, major, minor, build, revision );
+    MFVersion::Init( mfReleaseInfo.version, major, minor, build, revision );
     mfReleaseInfo.infoString[ 0 ] = 0;
     if ( NULL != info && infoLen > 0 )
     {

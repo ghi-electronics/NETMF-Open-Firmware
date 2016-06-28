@@ -3,6 +3,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
+#include <FS_decl.h>
+#include "..\..\..\DeviceCode\Drivers\FS\FAT\FAT_fs.h"
 
 using namespace System;
 using namespace System::Runtime::InteropServices;
@@ -225,11 +227,11 @@ HRESULT WINDOWS_FILE_SYSTEM_SetAttributes( const VOLUME_ID* volume, LPCWSTR path
     return EmulatorNative::GetIFSDriver()->SetAttributes( volume->volumeId, gcnew System::String( path ), attributes );
 }
 
-HRESULT WINDOWS_FILE_SYSTEM_Format( const VOLUME_ID* volume, UINT32 parameter )
+HRESULT WINDOWS_FILE_SYSTEM_Format( const VOLUME_ID* volume, LPCSTR volumeLabel, UINT32 parameter )
 {
     if(volume->blockStorageDevice != NULL) return CLR_E_FAIL;
     
-    return EmulatorNative::GetIFSDriver()->Format( volume->volumeId, parameter );
+    return EmulatorNative::GetIFSDriver()->Format( volume->volumeId, gcnew System::String(volumeLabel), parameter );
 }
 
 BOOL WINDOWS_FILE_SYSTEM_IsLoadableMedia( BlockStorageDevice* driverInterface, UINT32* numVolumes )
@@ -246,6 +248,11 @@ HRESULT WINDOWS_FILE_SYSTEM_GetSizeInfo( const VOLUME_ID* volume, INT64* totalSi
 HRESULT WINDOWS_FILE_SYSTEM_FlushAll( const VOLUME_ID* volume )
 {
     return EmulatorNative::GetIFSDriver()->FlushAll( volume->volumeId );
+}
+
+HRESULT WINDOWS_FILE_SYSTEM_GetVolumeLabel( const VOLUME_ID* volume, LPSTR volumeLabel, INT32 volumeLabelLen )
+{
+    return EmulatorNative::GetIFSDriver()->GetVolumeLabel( volume->volumeId, (IntPtr)(char*)volumeLabel, (int)volumeLabelLen );
 }
 
 FILESYSTEM_DRIVER_INTERFACE g_WINDOWS_FILE_SYSTEM_DriverInterface = 
@@ -267,9 +274,10 @@ FILESYSTEM_DRIVER_INTERFACE g_WINDOWS_FILE_SYSTEM_DriverInterface =
     &WINDOWS_FILE_SYSTEM_IsLoadableMedia,
     &WINDOWS_FILE_SYSTEM_GetSizeInfo,
     &WINDOWS_FILE_SYSTEM_FlushAll,
+    &WINDOWS_FILE_SYSTEM_GetVolumeLabel,
 
     "WINFS",
-    0,
+    FS_DRIVER_ATTRIBUTE__FORMAT_REQUIRES_ERASE,
 };
 
 //--//
@@ -372,15 +380,40 @@ void FS_MountRemovableVolumes()
 
 //--//
 
-extern FILESYSTEM_DRIVER_INTERFACE g_FAT32_FILE_SYSTEM_DriverInterface;
+FILESYSTEM_DRIVER_INTERFACE g_EMULATOR_FAT32_FILE_SYSTEM_DriverInterface = 
+{    
+    &FAT_FS_Driver::FindOpen,
+    &FAT_FS_Driver::FindNext,
+    &FAT_FS_Driver::FindClose,
+
+    &FAT_FS_Driver::GetFileInfo,
+
+    &FAT_FS_Driver::CreateDirectory,
+    &FAT_FS_Driver::Move,
+    &FAT_FS_Driver::Delete,
+
+    &FAT_FS_Driver::GetAttributes,
+    &FAT_FS_Driver::SetAttributes,    
+
+    &FAT_FS_Driver::Format,
+    &FAT_FS_Driver::IsLoadableMedia, 
+    &FAT_FS_Driver::GetSizeInfo,
+    &FAT_FS_Driver::FlushAll,
+    &FAT_FS_Driver::GetVolumeLabel,
+
+    "FAT",
+    FS_DRIVER_ATTRIBUTE__FORMAT_REQUIRES_ERASE,
+};
+
+
 extern STREAM_DRIVER_INTERFACE     g_FAT32_STREAM_DriverInterface;
 
 //--//
 
 FILESYSTEM_INTERFACES g_AvailableFSInterfaces[] =
 {
-    { &g_WINDOWS_FILE_SYSTEM_DriverInterface, &g_WINDOWS_STREAMING_DriverInterface },
-    { &g_FAT32_FILE_SYSTEM_DriverInterface  , &g_FAT32_STREAM_DriverInterface      },
+    { &g_WINDOWS_FILE_SYSTEM_DriverInterface       , &g_WINDOWS_STREAMING_DriverInterface },
+    { &g_EMULATOR_FAT32_FILE_SYSTEM_DriverInterface, &g_FAT32_STREAM_DriverInterface      },
 };
 
 const size_t g_InstalledFSCount = ARRAYSIZE(g_AvailableFSInterfaces);

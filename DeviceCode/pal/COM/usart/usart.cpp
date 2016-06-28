@@ -784,17 +784,20 @@ BOOL USART_Driver::ConnectEventSink( int ComPortNum, int EventType, void* pConte
 
         HAL_USART_STATE& State = Hal_Usart_State[ComPortNum];
 
+
+        State.PortIndex = ComPortNum;
+        
+        if(ppArg != NULL) *ppArg = (void*)ComPortNum;
+
         if(EventType == USART_EVENT_TYPE_DATA)
         {
             State.UsartDataEventCallback = pfnUsartEvtHandler;
             State.DataContext            = pContext;
-            if(ppArg != NULL) *ppArg     = &State.PortIndex;
         }
         else if(EventType == USART_EVENT_TYPE_ERROR)
         {
             State.UsartErrorEventCallback = pfnUsartEvtHandler;
             State.ErrorContext            = pContext;
-            if(ppArg != NULL) *ppArg      = &State.PortIndex;
         }
 
     }

@@ -3,7 +3,7 @@
 
 
     <!-- ################################################################################ -->
-    <Set Name="Heap_Begin"      Value="0x0001CA00"/>
+    <Set Name="Heap_Begin"      Value="0x00017000"/>
     <Set Name="Heap_End"        Value="0x0001DFF8"/>
     <Set Name="Stack_Bottom"    Value="0x0001E000"/>
     <Set Name="Stack_Top"       Value="0x0001FFF8"/>

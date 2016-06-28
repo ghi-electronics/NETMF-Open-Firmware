@@ -9,7 +9,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <IsMscorlib>true</IsMscorlib>
     <ProjectGuid>{73EAA3D1-45AE-4417-8EB7-A71B7C4A83B0}</ProjectGuid>
-    <NoWarn>$(NoWarn),0169,0649,0659,0660,0661</NoWarn>
+    <NoWarn>$(NoWarn),0169,0649,0659,0660,0661,3001</NoWarn>
     <ComponentGuid>{8ed2587d-e7d2-4766-b70b-c9f3c5c1f503}</ComponentGuid>
     <AssemblyBothEndian>true</AssemblyBothEndian>
   </PropertyGroup>
@@ -25,6 +25,7 @@
     <MMP_STUB_SKIP>false</MMP_STUB_SKIP>
     <MMP_STUB_GenerateSkeletonFile>$(BUILD_TREE_STUBS)\corlib_native</MMP_STUB_GenerateSkeletonFile>
     <MMP_STUB_GenerateSkeletonProject>CorLib</MMP_STUB_GenerateSkeletonProject>
+    <MMP_STUB_LegacySkeletonInterop>true</MMP_STUB_LegacySkeletonInterop>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="System\AppDomain.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="System\SystemException.cs" />
     <Compile Include="System\Text\Decoder.cs" />
     <Compile Include="System\Text\Encoding.cs" />
+    <Compile Include="System\Text\StringBuilder.cs" />
     <Compile Include="System\Text\UTF8Decoder.cs" />
     <Compile Include="System\Text\UTF8Encoding.cs" />
     <Compile Include="System\ThreadAttributes.cs" />
@@ -172,6 +174,8 @@
     <Compile Include="System\Reflection\RuntimeFieldInfo.cs" />
     <Compile Include="System\Reflection\RuntimeMethodInfo.cs" />
     <Compile Include="System\Resources\ResourceManager.cs" />
+    <Compile Include="System\Runtime\CompilerServices\AccessedThroughPropertyAttribute.cs" />
+    <Compile Include="System\Runtime\CompilerServices\ExtensionAttribute.cs" />
     <Compile Include="System\Runtime\CompilerServices\MethodImplAttribute.cs" />
     <Compile Include="System\Runtime\CompilerServices\IndexerNameAttribute.cs" />
     <Compile Include="System\Runtime\CompilerServices\InternalsVisibleToAttribute.cs" />

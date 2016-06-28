@@ -28,6 +28,7 @@
 
 #if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
 #pragma arm section rwdata = "g_SD_BS_Config"
+#pragma arm section rwdata = "g_SD_DeviceRegisters"
 #endif
 
 BlockRange g_SD_BlockStatus[] =
@@ -79,6 +80,9 @@ struct SD_BLOCK_CONFIG g_SD_BS_Config =
 
      &g_SD_DeviceInfo,             // BlockDeviceinfo
 };
+
+struct SD_DEVICE_REGISTERS g_SD_DeviceRegisters;
+
 
 //--//
 #define SD_CS                    MC9328MXL_GPIO::c_Port_B_28

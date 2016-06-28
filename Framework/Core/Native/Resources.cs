@@ -38,6 +38,9 @@ namespace Microsoft.SPOT
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         extern public static object GetObject(System.Resources.ResourceManager rm, Enum id);
 
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        extern public static object GetObject(System.Resources.ResourceManager rm, Enum id, int offset, int length);
+
         private extern static CultureInfo CurrentUICultureInternal
         {
             [MethodImplAttribute(MethodImplOptions.InternalCall)]
@@ -48,7 +51,10 @@ namespace Microsoft.SPOT
         {
             CurrentUICultureInternal = culture;
 
-            s_ewr.Target = culture.Name;
+            if(s_ewr != null)
+            {
+                s_ewr.Target = culture.Name;
+            }
         }
 
         static public string[] GetDelimitedStringResources(ResourceManager rm, Enum resource)

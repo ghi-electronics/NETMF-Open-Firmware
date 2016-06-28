@@ -10,15 +10,6 @@
     <Set Name="Heap_End"        Value="0xA0200000"/>
     <Set Name="Stack_Bottom"    Value="+0"/>
     <Set Name="Stack_Top"       Value="0xA0300000"/>
-	
-	<!-- use internal SRAM for fast execution of application-critical tasks-->
-	<Set Name="IRAM_TC_BaseAddress"	  Value="0x40000040"/>	<!-- skip SRAM vector table -->
-	<Set Name="IRAM_TC_Size"		  Value="0x4000FFFF-%IRAM_TC_BaseAddress%"/>	<!-- Fill up SRAM -->
-	
-	<!-- use internal FLASH for fast execution of application-critical tasks. Just RO code and data! -->
-	<Set Name="IFLASH_TC_BaseAddress"	  Value="0x00020000"/>-->	<!-- skip TinyBooterDecompressor (0x185b0 bytes) -->
-	<Set Name="IFLASH_TC_Size"		  Value="0x5D000"/>-->	
-	
 
     <LoadRegion Name="LR_%TARGETLOCATION%" Base="0xA0000000" Options="ABSOLUTE" Size="0x00040000">
 
@@ -47,15 +38,10 @@
         <ExecRegion Name="ER_IRAM" Base="0x40000000" Options="ABSOLUTE" Size="0x40">
 
         </ExecRegion>
-		
-		<!-- Internal SRAM regions for time-critical data and code -->
-		
-		<ExecRegion Name="ER_IRAM_TC" Base="%IRAM_TC_BaseAddress%" Options="ABSOLUTE" Size="%IRAM_TC_Size%">
-			
-			<FileMapping Name="*" Options="(SectionForInternalSRAM)" />
-			
-		</ExecRegion>
 
+		<ExecRegion Name="ER_IRAM_TC" Base="0x40000040" Options="ABSOLUTE" Size="0x4000FFFF-0x40000040">
+
+        </ExecRegion>
 
         <ExecRegion Name="ER_HEAP_BEGIN" Base="%Heap_Begin%" Options="ABSOLUTE" Size="UNINIT">
             <FileMapping Name="*" Options="(SectionForHeapBegin)" />
@@ -79,19 +65,5 @@
         </ExecRegion>
 
     </LoadRegion>
-	
-	<IfDefined Name="IFLASH_TC_BaseAddress">
-
-        <LoadRegion Name="LR_IFLASH" Base="%IFLASH_TC_BaseAddress%" Options="ABSOLUTE" Size="%IFLASH_TC_Size%">
-
-            <ExecRegion Name="ER_IFLASH" Base="%IFLASH_TC_BaseAddress%" Options="FIXED" Size="%IFLASH_TC_Size%">
-
-				<FileMapping Name="*" Options="(SectionForInternalFLASH)" />
-
-            </ExecRegion>
-
-        </LoadRegion>
-
-    </IfDefined>
 
 </ScatterFile>

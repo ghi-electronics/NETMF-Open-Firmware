@@ -7,6 +7,7 @@
 
   <PropertyGroup>
     <Directory>Test\native\src</Directory>
+    <ProjectGuid>{D1AD99A7-C586-447F-AD7E-6A5556019557}</ProjectGuid>
   </PropertyGroup>
 
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />

@@ -22,8 +22,8 @@ LANGUAGE 0x00, 0x00 //LANG_NEUTRAL, SUBLANG_NEUTRAL
 
 
 1 VERSIONINFO
- FILEVERSION    4, 1, 2821, 0
- PRODUCTVERSION 4, 1, 2821, 0
+ FILEVERSION    4, 2, 0, 0
+ PRODUCTVERSION 4, 2, 0, 0
  FILEFLAGSMASK 0x17L
 
 
@@ -38,17 +38,17 @@ BEGIN
     BEGIN
         BLOCK "040904b0" //US English - Unicode
         BEGIN
-            VALUE "Comments",         "debug" //optional
+            VALUE "Comments",         "Release" //optional
             VALUE "CompanyName",      "Microsoft Corporation"
             VALUE "FileDescription",  ""
-            VALUE "FileVersion",      "4.1.2821.0"
+            VALUE "FileVersion",      "4.2.0.0"
             VALUE "InternalName",     "TFConvert"
             VALUE "LegalCopyright",   "Copyright (C) Microsoft Corporation.  All rights reserved."
             VALUE "LegalTrademarks",  ".NET is a trademark of Microsoft Corporation."
             VALUE "OriginalFilename", "TFConvert"
 //            VALUE "PrivateBuild",   "" //optional
             VALUE "ProductName",      "Microsoft .NET Micro Framework"
-            VALUE "ProductVersion",   "4.1.2821.0"
+            VALUE "ProductVersion",   "4.2.0.0"
 //            VALUE "SpecialBuild",   "" //optional
         END
     END

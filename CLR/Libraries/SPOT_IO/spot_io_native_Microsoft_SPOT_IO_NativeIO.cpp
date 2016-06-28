@@ -8,7 +8,7 @@
 
 //--//
 
-HRESULT Library_spot_io_native_Microsoft_SPOT_IO_NativeIO::Format___STATIC__VOID__STRING__STRING__U4( CLR_RT_StackFrame& stack )
+HRESULT Library_spot_io_native_Microsoft_SPOT_IO_NativeIO::Format___STATIC__VOID__STRING__STRING__STRING__U4( CLR_RT_StackFrame& stack )
 {
     NATIVE_PROFILE_CLR_IO();
     TINYCLR_HEADER();
@@ -17,6 +17,7 @@ HRESULT Library_spot_io_native_Microsoft_SPOT_IO_NativeIO::Format___STATIC__VOID
 
     FileSystemVolume*            volume;
     LPCSTR                       fileSystemName;
+    LPCSTR                       volumeLabel;
     UINT32                       i;
     UINT32                       parameters;
     FILESYSTEM_DRIVER_INTERFACE* originalFS = NULL;
@@ -26,19 +27,20 @@ HRESULT Library_spot_io_native_Microsoft_SPOT_IO_NativeIO::Format___STATIC__VOID
     TINYCLR_CHECK_HRESULT(FindVolume( stack.Arg0(), volume ));
 
     hbFileSystemName = stack.Arg1().DereferenceString();
-    parameters       = stack.Arg2().NumericByRef().u4;
+    volumeLabel      = stack.Arg2().RecoverString();
+    parameters       = stack.Arg3().NumericByRef().u4;
+
+    originalFS       = volume->m_fsDriver;
+    originalStream   = volume->m_streamDriver;
 
     if(!hbFileSystemName)
     {
         needInitialize = TRUE;
 
-        TINYCLR_SET_AND_LEAVE(volume->Format( parameters ));
+        TINYCLR_SET_AND_LEAVE(volume->Format( volumeLabel, parameters ));
     }
 
     fileSystemName = hbFileSystemName->StringText();
-
-    originalFS     = volume->m_fsDriver;
-    originalStream = volume->m_streamDriver;
 
     for (i = 0; i < g_InstalledFSCount; i++)
     {
@@ -55,7 +57,7 @@ HRESULT Library_spot_io_native_Microsoft_SPOT_IO_NativeIO::Format___STATIC__VOID
             volume->m_fsDriver     = g_AvailableFSInterfaces[ i ].fsDriver;
             volume->m_streamDriver = g_AvailableFSInterfaces[ i ].streamDriver;
 
-            TINYCLR_SET_AND_LEAVE(volume->Format( parameters ));
+            TINYCLR_SET_AND_LEAVE(volume->Format( volumeLabel, parameters ));
         }
     }
 
@@ -77,6 +79,10 @@ HRESULT Library_spot_io_native_Microsoft_SPOT_IO_NativeIO::Format___STATIC__VOID
             {
                 hr = CLR_E_FILE_IO;
             }
+        }
+        else
+        {
+            volume->m_fsDriver->GetVolumeLabel(&volume->m_volumeId, volume->m_label, ARRAYSIZE(volume->m_label));
         }
     }
 

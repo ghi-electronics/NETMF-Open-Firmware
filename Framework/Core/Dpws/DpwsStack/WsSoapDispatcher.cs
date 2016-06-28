@@ -49,6 +49,22 @@ namespace Ws.Services.Soap
         object          m_deserializer;
         XmlReader       m_xmlReader;
         string          m_methodName;
+
+        static WsMessage s_OneWayResponse;
+
+        public static WsMessage CreateOneWayResponse()
+        {
+            if (s_OneWayResponse == null)
+            {
+                WsWsaHeader header = new WsWsaHeader(null, null, null, null, null, null);
+
+                header.IsOneWayResponse = true;
+
+                s_OneWayResponse = new WsMessage(header, null, WsPrefix.None);
+            }
+
+            return s_OneWayResponse;
+        }
         
         
         public WsMessage( WsWsaHeader header, object body, WsPrefix prefixes )

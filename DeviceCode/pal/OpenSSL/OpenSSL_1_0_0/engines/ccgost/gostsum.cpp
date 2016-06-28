@@ -11,7 +11,7 @@
 #ifdef OPENSSL_SYS_WINDOWS
 #include <stdio.h>
 #include <stdlib.h>
-#include <sunistd.h>
+#include <unistd.h>
 #include <limits.h>
 #include <fcntl.h>
 #include <string.h>
@@ -125,7 +125,7 @@ int main(int argc,char **argv)
 	if (optind==argc)
 		{
 		char sum[65];
-		if (!hash_stream(&ctx,fileno(OPENSSL_TYPE__FILE_STDIN),sum))
+		if (!hash_stream(&ctx,TINYCLR_SSL_FILENO(OPENSSL_TYPE__FILE_STDIN),sum))
 			{
 			TINYCLR_SSL_PERROR("OPENSSL_TYPE__FILE_STDIN");
 			TINYCLR_SSL_EXIT(1);

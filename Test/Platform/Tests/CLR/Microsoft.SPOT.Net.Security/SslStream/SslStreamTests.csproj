@@ -27,6 +27,9 @@
     <Reference Include="System">
       <HintPath>$(BUILD_TREE_DLL)\System.dll</HintPath>
     </Reference>
+    <Reference Include="System.Security">
+      <HintPath>$(BUILD_TREE_DLL)\System.Security.dll</HintPath>
+    </Reference>
     <Reference Include="System.Net.Security">
       <HintPath>$(BUILD_TREE_DLL)\System.Net.Security.dll</HintPath>
     </Reference>

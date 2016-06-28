@@ -83,3 +83,8 @@ UINT8 USB_GetStatus( int Controller )
 {
     return 0;
 }
+
+void USB_DiscardData( int UsbStream, BOOL fTx )
+{
+}
+

@@ -82,170 +82,170 @@
   <ItemGroup Condition="'$(OPENSSLLIBRARIES)'=='true'">
     <!-- OPEN SSL TESTS -->
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\COM\sockets\openssl\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="openssl_pal.$(LIB_EXT)" />
+    <DriverLibs Include="openssl_pal.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\COM\sockets\dotnetmf.proj" />
     <DriverLibs Include="sockets_pal.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="crypto_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="crypto_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\ssl\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="libssl_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="libssl_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\aes\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="aes_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="aes_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\asn1\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="asn1_openssl.$(LIB_EXT)" />
-    <PlatformIndependentLibs Include="asn1pt2_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="asn1_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="asn1pt2_openssl.$(LIB_EXT)" />
 
      <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\bf\dotNETMF.proj" />
-    <PlatformIndependentLibs Include="bf_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="bf_openssl.$(LIB_EXT)" />
  
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\bio\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="bio_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="bio_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\buffer\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="buffer_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="buffer_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\bn\dotNETMF.proj" />
-    <PlatformIndependentLibs Include="bn_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="bn_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\cast\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="cast_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="cast_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\comp\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="comp_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="comp_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\conf\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="conf_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="conf_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\des\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="des_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="des_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\des\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="des_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="des_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\dh\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="dh_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="dh_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\dsa\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="dsa_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="dsa_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\dso\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="dso_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="dso_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\ecdh\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ecdh_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ecdh_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\ec\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ec_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ec_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\des\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ecdsa_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ecdsa_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\engine\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="engine_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="engine_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\err\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="err_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="err_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\evp\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="evp_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="evp_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\hmac\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="hmac_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="hmac_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\krb5\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="krb5_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="krb5_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\lhash\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="lhash_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="lhash_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\md2\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="md2_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="md2_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\md4\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="md4_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="md4_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\md5\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="md5_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="md5_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\modes\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="modes_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="modes_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\ocsp\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ocsp_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ocsp_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\objects\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="objects_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="objects_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\pem\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="pem_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="pem_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\pkcs7\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="pkcs7_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="pkcs7_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\pkcs12\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="pkcs12_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="pkcs12_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\pqueue\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="pqueue_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="pqueue_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\rand\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="rand_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="rand_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\rc2\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="rc2_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="rc2_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\rc4\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="rc4_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="rc4_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\ripemd\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ripemd_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ripemd_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\rsa\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="rsa_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="rsa_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\seed\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="seed_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="seed_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\sha\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="sha_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="sha_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\stack\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="stack_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="stack_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\ts\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ts_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ts_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\txt_db\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="txt_db_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="txt_db_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\ui\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ui_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ui_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\whrlpool\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="whrlpool_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="whrlpool_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\x509\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="x509_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="x509_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\x509v3\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="x509v3_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="x509v3_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\tinyclr\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ssl_types.$(LIB_EXT)" />
+    <DriverLibs Include="ssl_types.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\tinyclr\test\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ssl_tests.$(LIB_EXT)" />
+    <DriverLibs Include="ssl_tests.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\engines\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="engines_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="engines_openssl.$(LIB_EXT)" />
 
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\engines\ccgost\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ccgost_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ccgost_openssl.$(LIB_EXT)" />
   </ItemGroup>
 
 

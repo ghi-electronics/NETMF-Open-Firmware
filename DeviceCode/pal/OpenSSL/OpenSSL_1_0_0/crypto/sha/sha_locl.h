@@ -394,7 +394,7 @@ static void HASH_BLOCK_DATA_ORDER (SHA_CTX *c, const void *p, size_t num)
 #if !defined(SHA_1) || !defined(SHA1_ASM)
 static void HASH_BLOCK_DATA_ORDER (SHA_CTX *c, const void *p, size_t num)
 	{
-	const unsigned char *data=p;
+	const unsigned char *data=(const unsigned char *)p;
 	register unsigned MD32_REG_T A,B,C,D,E,T,l;
 	int i;
 	SHA_LONG	X[16];

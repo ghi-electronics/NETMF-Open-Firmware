@@ -133,9 +133,11 @@
 #include <stdio.h>
 #endif
 
+//[MS_CHANGE] - make this a global value so that we can reset it.
+volatile int ssl_x509_store_ctx_idx= -1;
+
 int SSL_get_ex_data_X509_STORE_CTX_idx(void)
 	{
-	static volatile int ssl_x509_store_ctx_idx= -1;
 	int got_write_lock = 0;
 
 	CRYPTO_r_lock(CRYPTO_LOCK_SSL_CTX);

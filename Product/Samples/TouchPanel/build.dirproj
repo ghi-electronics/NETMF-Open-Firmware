@@ -7,5 +7,6 @@
     <Project Include="SimpleTouchInput\build.dirproj" />
     <Project Include="StylusCapture\build.dirproj" />
     <Project Include="TouchCalibration\build.dirproj" />
+    <Project Include="TouchScreen\build.dirproj" />
   </ItemGroup>
 </Project>

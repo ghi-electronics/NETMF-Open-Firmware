@@ -45,12 +45,20 @@ namespace Microsoft.SPOT.Emulator.Watchdog
 
         void IWatchdogDriver.Disable()
         {
-            _timer.Change( Timeout.Infinite, Timeout.Infinite );
+            if (_timer != null)
+            {
+                _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            }
         }
 
         bool IWatchdogDriver.ResetCounter()
         {
-            return _timer.Change(_timeout_ms, Timeout.Infinite);
+            if (_timer != null)
+            {
+                return _timer.Change(_timeout_ms, Timeout.Infinite);
+            }
+
+            return false;
         }
 
         void IWatchdogDriver.ResetCpu()

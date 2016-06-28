@@ -3,6 +3,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "spot_hardware_native.cpp"
+#include "spot_hardware_native_Microsoft_SPOT_Hardware_AnalogInput.cpp"
+#include "spot_hardware_native_Microsoft_SPOT_Hardware_AnalogOutput.cpp"
 #include "spot_hardware_native_Microsoft_SPOT_Hardware_Battery.cpp"
 #include "spot_hardware_native_Microsoft_SPOT_Hardware_Battery__ChargerModel.cpp"
 #include "spot_hardware_native_Microsoft_SPOT_Hardware_Cpu.cpp"

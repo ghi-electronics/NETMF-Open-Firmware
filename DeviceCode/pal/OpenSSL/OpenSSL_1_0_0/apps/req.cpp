@@ -709,7 +709,7 @@ bad:
 		
 		if (keyout == NULL)
 			{
-			BIO_printf(bio_err,"writing new private key to OPENSSL_TYPE__FILE_STDOUT\n");
+			BIO_printf(bio_err,"writing new private key to stdout\n");
 			BIO_set_fp(out,OPENSSL_TYPE__FILE_STDOUT,BIO_NOCLOSE);
 #ifdef OPENSSL_SYS_VMS
 			{

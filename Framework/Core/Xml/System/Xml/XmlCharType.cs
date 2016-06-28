@@ -289,11 +289,14 @@ namespace System.Xml
         {
             get
             {
-                lock (s_lock)
+                if (s_CharProperties == null)
                 {
-                    if (s_CharProperties == null)
+                    lock (s_lock)
                     {
-                        InitInstance();
+                        if (s_CharProperties == null)
+                        {
+                            InitInstance();
+                        }
                     }
                 }
 

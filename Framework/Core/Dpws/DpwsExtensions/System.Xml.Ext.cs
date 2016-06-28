@@ -437,7 +437,7 @@ namespace System.Ext.Xml
         //     index or count is less than zero.
         public void WriteBase64(byte[] buffer, int index, int count)
         {
-            throw new NotImplementedException("Not yet implemented");
+            this.WriteString( buffer != null ? System.Convert.ToBase64String(buffer, index, count) : "" );
         }
 
         //
@@ -583,7 +583,7 @@ namespace System.Ext.Xml
                 localNS = " xmlns" + "=" + "\"" + ns + "\"";
             }
             // if there's a prefix and a namespace, prefix tag and write xmlns:prefix=ns
-            else if ((prefix != null || prefix.Length != 0) && (ns != null && ns.Length != 0))
+            else if ((prefix != null && prefix.Length != 0) && (ns != null && ns.Length != 0))
             {
                 localPrefix = prefix + ":";
                 localNS = " xmlns:" + prefix + "=" + "\"" + ns + "\"";
@@ -604,11 +604,14 @@ namespace System.Ext.Xml
             // No reason to push this Element on the ElementStack it is complete
 
             // Set WriterState
-            ElementInfo ei = (ElementInfo)_ElementStack.Pop();
-            ei.State = _WriteState = WriteState.Content;
-            // Signal that this element has content
-            ei.IsEmpty = false;
-            _ElementStack.Push(ei);
+            if (_ElementStack.Count > 0)
+            {
+                ElementInfo ei = (ElementInfo)_ElementStack.Pop();
+                ei.State = _WriteState = WriteState.Content;
+                // Signal that this element has content
+                ei.IsEmpty = false;
+                _ElementStack.Push(ei);
+            }
         }
 
         //
@@ -799,6 +802,8 @@ namespace System.Ext.Xml
 
             string localPrefix = "";
 
+            if(prefix != null && prefix.Length == 0) prefix = null;
+
             // Check for special xmlns processing
             if (prefix == "xmlns" || ns == "http://www.w3.org/2000/xmlns/")
             {
@@ -907,6 +912,7 @@ namespace System.Ext.Xml
             string localNS = "";
             string childPrefix = "";
 
+            if(prefix != null && prefix.Length == 0) prefix = null;
 
             // if prefix == null and ns == null, only localName will write
             // if prefix == null and ns != null, prefix is set to xmlns and ns will be writen
@@ -949,6 +955,10 @@ namespace System.Ext.Xml
                 if(prefix != null && prefix != "")
                 {
                     localPrefix = prefix + ":";
+                }
+                else
+                {
+                    prefix = null;
                 }
             }
 

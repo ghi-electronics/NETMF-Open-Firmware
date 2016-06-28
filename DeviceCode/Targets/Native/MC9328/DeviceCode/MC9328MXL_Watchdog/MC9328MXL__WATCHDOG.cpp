@@ -36,6 +36,9 @@ HRESULT MC9328MXL_WATCHDOG_Driver::Enable( UINT32 TimeoutMilliseconds, WATCHDOG_
     NATIVE_PROFILE_HAL_PROCESSOR_WATCHDOG();
     UINT32 units;
 
+    
+#if !defined(JTAG_DEBUGGING)
+
     MC9328MXL_WATCHDOG& WTDG = MC9328MXL::WTDG();
 
     if(TimeoutMilliseconds == 0) return CLR_E_FAIL;
@@ -67,6 +70,7 @@ HRESULT MC9328MXL_WATCHDOG_Driver::Enable( UINT32 TimeoutMilliseconds, WATCHDOG_
     // load the counter
     WTDG.WSR = MC9328MXL_WATCHDOG::WSR_reload_1;
     WTDG.WSR = MC9328MXL_WATCHDOG::WSR_reload_2;
+#endif
 
     return S_OK;
 }

@@ -4,8 +4,6 @@
 
 BOOL ssl_exit_context_internal(int sslContextHandle )
 {
-    int ret;
-
     if((sslContextHandle >= ARRAYSIZE(g_SSL_Driver.m_sslContextArray)) || (sslContextHandle < 0) || (g_SSL_Driver.m_sslContextArray[sslContextHandle].SslContext == NULL))
     {
         return FALSE;
@@ -19,7 +17,7 @@ BOOL ssl_exit_context_internal(int sslContextHandle )
 
     g_SSL_Driver.m_sslContextCount --;
 
-    return (ret? TRUE: FALSE);
+    return TRUE;
 }
 
 

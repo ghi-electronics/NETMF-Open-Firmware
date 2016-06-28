@@ -84,7 +84,7 @@ foreach (
 	{
 	push(@files,$_);
 
-	$t=TINYCLR_SSL_SPRINTF("\t{FUNC_TYPE_CIPHER,\"%s\",enc_main},\n",$_);
+	$t=sprintf("\t{FUNC_TYPE_CIPHER,\"%s\",enc_main},\n",$_);
 	if    ($_ =~ /des/)  { $t="#ifndef OPENSSL_NO_DES\n${t}#endif\n"; }
 	elsif ($_ =~ /aes/)  { $t="#ifndef OPENSSL_NO_AES\n${t}#endif\n"; }
 	elsif ($_ =~ /camellia/)  { $t="#ifndef OPENSSL_NO_CAMELLIA\n${t}#endif\n"; }

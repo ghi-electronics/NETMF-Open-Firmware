@@ -32,7 +32,11 @@
 #define NETWORK_MEMORY_PROFILE__medium              1
 
 #define NETWORK_MEMORY_POOL__INCLUDE_SSL            1
+#if defined(TCPIP_LWIP)
+#include <pal\net\Network_defines_lwip.h>
+#else
 #include <pal\net\Network_Defines.h>
+#endif
 
 #define NETWORK_USE_LOOPBACK                        1
 #define NETWORK_USE_DHCP                            1
@@ -49,12 +53,16 @@
 #define PLATFORM_SUPPORTS_SOFT_REBOOT   TRUE
 #define SYSTEM_CLOCK_HZ                 16800000
 #define SLOW_CLOCKS_PER_SECOND          16800000
-#define CLOCK_COMMON_FACTOR             1000000
-#define SLOW_CLOCKS_TEN_MHZ_GCD         10000000
+#define CLOCK_COMMON_FACTOR             200000 // old value: 1000000
+#define SLOW_CLOCKS_TEN_MHZ_GCD         400000 //// old value: 10000000
 #define SLOW_CLOCKS_MILLISECOND_GCD     1000
 
 // manually filled in
 // 12 MHz Crystal, cclk = 67.2 MHz, usb_clk = 48 MHz
+// pll_out         = (12MHz * (2 * PLL_MVAL) / PLL_NVAL)
+// cclk            = pll_out / CCLK_DIVIDER
+// usb_clk         = pll_out / USB_DIVIDER 
+// SYSTEM_CLOCK_HZ = cclk / 4 (default divider for perhipherals - timer)
 #define PLL_MVAL                        14
 #define PLL_NVAL                        1
 #define CCLK_DIVIDER                    5
@@ -65,6 +73,7 @@
 #define LPC24XX_UART_PCLK               SYSTEM_CLOCK_HZ
 #define LPC24XX_SPI_PCLK_KHZ            SYSTEM_CLOCK_HZ/1000
 #define LPC24XX_I2C_PCLK_KHZ            SYSTEM_CLOCK_HZ/1000
+#define LPC24XX_DAC_PCLK                SYSTEM_CYCLE_CLOCK_HZ
 
 //external SDRAM, 32MB
 #define SRAM1_MEMORY_Base   0xA0000000

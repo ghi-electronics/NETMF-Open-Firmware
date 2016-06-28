@@ -113,6 +113,18 @@ extern "C" {
 #   undef OPENSSL_SYS_UNIX
 #   define OPENSSL_SYS_WINCE
 #  endif
+//MS:  define OPENSSL_SYS_ARM
+#if defined(OPENSSL_SYSNAME_ARM)
+#undef OPENSSL_SYS_UNIX
+#define OPENSSL_SYS_ARM
+#endif
+
+#if defined(OPENSSL_SYSNAME_SH)
+#undef OPENSSL_SYS_UNIX
+#define OPENSSL_SYS_SH
+#endif
+
+//MS: end
 # endif
 #endif
 
@@ -222,7 +234,7 @@ extern "C" {
 #ifdef OPENSSL_SYS_MSDOS
 # define OPENSSL_UNISTD_IO <io.h>
 # define OPENSSL_DECLARE_EXIT extern void TINYCLR_SSL_EXIT(int);
-#elif defined(OPENSSL_SYS_ARM)
+#elif !defined(OPENSSL_SYS_WINDOWS)
 #define OPENSSL_UNISTD_IO OPENSSL_UNISTD
 #define OPENSSL_DECLARE_EXIT extern void TINYCLR_SSL_EXIT(int);
 #else
@@ -288,5 +300,9 @@ extern "C" {
 
 #ifdef  __cplusplus
 }
-#endif
+#endif
+
+#include "e_os.h"
+#include <tinyclr/ssl_types.h>
+
 #endif

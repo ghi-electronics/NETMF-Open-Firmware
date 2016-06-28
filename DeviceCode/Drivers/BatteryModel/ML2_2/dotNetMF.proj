@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>batterymodel_ML2_2</AssemblyName>
     <ProjectGuid>{c5d2c449-0beb-417e-baf0-9b4e0e15e474}</ProjectGuid>
@@ -41,6 +42,5 @@
   <ItemGroup>
     <Compile Include="ML2_2_config.cpp" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

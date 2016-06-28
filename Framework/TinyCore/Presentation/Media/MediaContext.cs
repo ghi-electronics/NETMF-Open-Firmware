@@ -34,18 +34,23 @@ namespace Microsoft.SPOT.Presentation.Media
         {
             Debug.Assert(dispatcher != null, "Dispatcher required");
 
-            lock (typeof(GlobalLock))
+            MediaContext cm = dispatcher._mediaContext;
+
+            if (cm == null)
             {
-                MediaContext cm = dispatcher._mediaContext;
-
-                if (cm == null)
+                lock (typeof(GlobalLock))
                 {
-                    cm = new MediaContext();
-                    dispatcher._mediaContext = cm;
-                }
+                    cm = dispatcher._mediaContext;
 
-                return cm;
+                    if (cm == null)
+                    {
+                        cm = new MediaContext();
+                        dispatcher._mediaContext = cm;
+                    }
+                }
             }
+
+            return cm;
         }
 
         private class InvokeOnRenderCallback
@@ -79,10 +84,19 @@ namespace Microsoft.SPOT.Presentation.Media
 
             if (_invokeOnRenderCallbacks == null)
             {
-                _invokeOnRenderCallbacks = new ArrayList();
+                lock (this)
+                {
+                    if (_invokeOnRenderCallbacks == null)
+                    {
+                        _invokeOnRenderCallbacks = new ArrayList();
+                    }
+                }
             }
 
-            _invokeOnRenderCallbacks.Add(new InvokeOnRenderCallback(callback, arg));
+            lock (_invokeOnRenderCallbacks)
+            {
+                _invokeOnRenderCallbacks.Add(new InvokeOnRenderCallback(callback, arg));
+            }
 
             PostRender();
         }
@@ -159,10 +173,16 @@ namespace Microsoft.SPOT.Presentation.Media
                             throw new InvalidOperationException("infinite loop");
                         }
 
-                        InvokeOnRenderCallback[] callbacks = new InvokeOnRenderCallback[count];
+                        InvokeOnRenderCallback[] callbacks;
 
-                        _invokeOnRenderCallbacks.CopyTo(callbacks);
-                        _invokeOnRenderCallbacks.Clear();
+                        lock (_invokeOnRenderCallbacks)
+                        {
+                            count = _invokeOnRenderCallbacks.Count;
+                            callbacks = new InvokeOnRenderCallback[count];
+
+                            _invokeOnRenderCallbacks.CopyTo(callbacks);
+                            _invokeOnRenderCallbacks.Clear();
+                        }
 
                         for (int i = 0; i < count; i++)
                         {

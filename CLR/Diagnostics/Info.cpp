@@ -115,6 +115,8 @@ void CLR_Debug::Emit( const char *text, int len )
     static char s_buffer[ 128 ];
     static int  s_chars = 0;
 
+    if(CLR_EE_DBG_IS( RebootPending)) return;
+
     if(len == -1) len = (int)hal_strlen_s( text );
 
 #if defined(PLATFORM_WINDOWS)
@@ -732,10 +734,19 @@ void CLR_RT_DUMP::POST_PROCESS_EXCEPTION( CLR_RT_HeapBlock& ref )
     {
         CLR_RT_HeapBlock* obj = ref.Dereference();
         if(obj != NULL)
-
         {
             CLR_INT32 errorCode = obj[ Library_system_sockets_System_Net_Sockets_SocketException::FIELD___errorCode ].NumericByRef().s4;
             CLR_Debug::Printf( "    #### SocketException ErrorCode = %d\r\n", errorCode ); 
+        }
+    }
+    else if(CLR_RT_ExecutionEngine::IsInstanceOf( ref, g_CLR_RT_WellKnownTypes.m_CryptoException ))
+    {
+        CLR_RT_HeapBlock* obj = ref.Dereference();
+        if(obj != NULL)
+        {
+            // m_errorCode field 
+            CLR_INT32 errorCode = obj[5].NumericByRef().s4;
+            CLR_Debug::Printf( "    #### CryptoException ErrorCode = %d\r\n", errorCode ); 
         }
     }
 }

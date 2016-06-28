@@ -2,7 +2,7 @@
   <PropertyGroup>
     <PKUI_LibraryCategory>
 <LibraryCategory xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="">
-  <Name xmlns="http://schemas.microsoft.com/netmf/InventoryFormat.xsd">SPOT_Hardware__Usb_CLR</Name>
+  <Name xmlns="http://schemas.microsoft.com/netmf/InventoryFormat.xsd">SPOT_Hardware_Usb_CLR</Name>
   <Guid xmlns="http://schemas.microsoft.com/netmf/InventoryFormat.xsd">{69DABCD1-8C9D-485c-8C48-8ECEE7D27473}</Guid>
   <Description xmlns="http://schemas.microsoft.com/netmf/InventoryFormat.xsd" />
   <Level xmlns="http://schemas.microsoft.com/netmf/InventoryFormat.xsd">CLR</Level>
@@ -44,7 +44,7 @@
     </VersionDependency>
     <ComponentType>Feature</ComponentType>
   </FeatureAssociations>
-  <IsTranport xmlns="http://schemas.microsoft.com/netmf/InventoryFormat.xsd">false</IsTranport>
+  <IsTransport xmlns="http://schemas.microsoft.com/netmf/InventoryFormat.xsd">false</IsTransport>
 </LibraryCategory></PKUI_LibraryCategory>
   </PropertyGroup>
   <ItemGroup>

@@ -854,7 +854,7 @@ namespace Ws.SvcUtilCodeGen
                         memberField.Name
                     ),
                     new CodeMethodInvokeExpression(
-                        new CodeTypeReferenceExpression("ConvertBase64"),
+                        new CodeTypeReferenceExpression("Convert"),
                         "FromBase64String",
                         new CodeExpression[] {
                             new CodeMethodInvokeExpression( 
@@ -984,7 +984,7 @@ namespace Ws.SvcUtilCodeGen
                     leftStatement,
                     new CodeMethodInvokeExpression(
                         new CodeMethodReferenceExpression(
-                            new CodeTypeReferenceExpression("ConvertBase64"),
+                            new CodeTypeReferenceExpression("Convert"),
                             "FromBase64String"
                             ),
                         new CodeArrayIndexerExpression(
@@ -1679,12 +1679,19 @@ namespace Ws.SvcUtilCodeGen
                 classRefType = new CodeTypeReferenceExpression(classRefName);
 
             statements.Add(
-                new CodeAssignStatement(
-                    new CodeVariableReferenceExpression(tempListName),
-                    new CodeMethodInvokeExpression(
-                        new CodeTypeReferenceExpression("ConvertBase64"),
-                        "ToBase64String",
-                        new CodeFieldReferenceExpression(classRefType, memberField.Name)
+                new CodeConditionStatement(
+                    new CodeBinaryOperatorExpression(
+                        new CodeFieldReferenceExpression(classRefType, memberField.Name),
+                        CodeBinaryOperatorType.IdentityInequality,
+                        new CodePrimitiveExpression(null)
+                    ),
+                    new CodeAssignStatement(
+                        new CodeVariableReferenceExpression(tempListName),
+                        new CodeMethodInvokeExpression(
+                            new CodeTypeReferenceExpression("Convert"),
+                            "ToBase64String",
+                            new CodeFieldReferenceExpression(classRefType, memberField.Name)
+                        )
                     )
                 )
             );

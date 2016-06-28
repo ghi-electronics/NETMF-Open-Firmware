@@ -424,6 +424,76 @@ namespace Microsoft.SPOT.Platform.Tests
             return (counter == 0) ? MFTestResults.Pass : MFTestResults.Fail;
         }
 
+        [TestMethod]
+        public MFTestResults ParseDouble_Test_x()
+        {
+            Log.Comment("double MinValue = " + double.MinValue.ToString());
+            Log.Comment("double MaxValue = " + double.MaxValue.ToString());
+            //Log.Comment("This currently fails, see 21634  for details");
+
+            Random random = new Random();
+            String[] strArr = new String[] { "0", "-0","+0", 
+                                        "00000     ", "    -00000","   +00000  ", 
+                                        "   0   ", "  -00000  ", 
+                                        "+123", "  +123  ", "   +123", "+123    "};
+            double[] _double = new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 123, 123, 123, 123 };
+
+            int counter = 0;
+            double temp = 0;
+            for (int i = 0; i < strArr.Length; i++)
+            {
+                try
+                {
+                    temp = double.Parse(strArr[i]);
+                }
+                catch (Exception ex)
+                {
+                    Log.Comment(i.ToString() + " Caught : " + ex.Message + " when double.Parse('" + strArr[i] + "')");
+                    counter++;
+                }
+                if (temp != _double[i])
+                {
+                    Log.Comment(i.ToString() + " Expecting " + _double[i] + " but got " + temp);
+                    counter++;
+                }
+            }
+
+            double d = double.Parse("-0.1");
+            if (d != -0.1) counter++;
+
+            d = double.Parse("0.1");
+            if (d != 0.1) counter++;
+
+            d = double.Parse(" -1.1");
+            if (d != -1.1) counter++;
+            
+            d = double.Parse(" -0.0001");
+            if (d != -0.0001) counter++;
+
+            d = double.Parse(" -10.0001");
+            if (d != -10.0001) counter++;
+
+            d = double.Parse("-0.01e-10");
+            if (d != -0.01e-10) counter++;
+
+            d = double.Parse(" ");
+            if (d != 0.0) counter++;
+
+            string t = double.MinValue.ToString();
+            if (double.MinValue != double.Parse(t)) counter++;
+
+            t = double.MaxValue.ToString();
+            if (double.MaxValue != double.Parse(t)) counter++;
+
+            t = float.MinValue.ToString();
+            if (float.MinValue != (float)double.Parse(t)) counter++;
+            
+            t = float.MaxValue.ToString();
+            if (float.MaxValue != (float)double.Parse(t)) counter++;
+
+            return (counter == 0) ? MFTestResults.Pass : MFTestResults.Fail;
+        }
+
         private int CheckUValues(UInt64 start)
         {
             UInt64 newVal = 0;

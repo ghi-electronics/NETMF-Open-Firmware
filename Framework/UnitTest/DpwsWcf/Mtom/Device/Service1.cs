@@ -562,7 +562,7 @@ namespace schemas.datacontract.org.WcfMtomService
                     }
                     else
                     {
-                        MtomDataField.Data = ConvertBase64.FromBase64String(reader.ReadString());
+                        MtomDataField.Data = Convert.FromBase64String(reader.ReadString());
                         reader.ReadEndElement();
                     }
                 }
@@ -768,7 +768,7 @@ namespace schemas.datacontract.org.WcfMtomService
                     }
                     else
                     {
-                        NestedClassField.MyData = ConvertBase64.FromBase64String(reader.ReadString());
+                        NestedClassField.MyData = Convert.FromBase64String(reader.ReadString());
                         reader.ReadEndElement();
                     }
                 }

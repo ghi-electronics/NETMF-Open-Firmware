@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>tinyclr</AssemblyName>
     <ProjectGuid>{3bc4442a-893c-429b-bd99-40dbcef02d17}</ProjectGuid>
@@ -30,7 +31,6 @@
     <MMP_DAT_CreateDatabaseFile>$(BIN_DIR)\tinyclr.dat</MMP_DAT_CreateDatabaseFile>
     <EXEScatterFileDefinition>$(SRC_DIR)\scatterfile_tinyclr_$(COMPILER_TOOL).$(SCATTER_EXT)</EXEScatterFileDefinition>
   </PropertyGroup>
-  <ItemGroup />
   <ItemGroup>
     <Compile Include="allocator.cpp" />
     <Compile Include="tinyclr.cpp" />
@@ -52,8 +52,15 @@
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Debugger.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\I2C.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\InterruptHandler.featureproj" />
-
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Interop.Settings" />
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\MFUpdate\stubs\dotnetMF.proj" />
+    <DriverLibs Include="MFUpdate_PAL_stub.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\ssl\stubs\dotNetMF.proj" />
+    <DriverLibs Include="ssl_pal_stubs.$(LIB_EXT)" />
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\LargeBuffer\stubs\dotNetMF.proj" />
     <DriverLibs Include="LargeBuffer_hal_stubs.$(LIB_EXT)" />
@@ -119,10 +126,6 @@
     <PlatformIndependentLibs Include="SPOT.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT\SPOT_Crypto\dotNetMF_Stub.proj" />
-    <PlatformIndependentLibs Include="SPOT_Crypto_stub.$(LIB_EXT)" />
-  </ItemGroup>
-  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT\SPOT_Messaging\dotNetMF_Stub.proj" />
     <PlatformIndependentLibs Include="SPOT_Messaging_stub.$(LIB_EXT)" />
   </ItemGroup>
@@ -179,6 +182,10 @@
     <DriverLibs Include="lcd_hal_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_DA\dotnetmf.proj" />
+    <DriverLibs Include="cpu_DA_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\stubs\processor\stubs_cache\dotNetMF.proj" />
     <DriverLibs Include="cpu_cache_stubs.$(LIB_EXT)" />
   </ItemGroup>
@@ -231,10 +238,13 @@
     <DriverLibs Include="COM_pal.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
+    <DriverLibs Include="DebuggerPort_SSL_config_stubs.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Config\dotnetmf.proj" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\I2C\stubs\dotNetMF.proj" />
     <DriverLibs Include="i2c_pal_stubs.$(LIB_EXT)" />
   </ItemGroup>
-
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Configuration\dotNetMF.proj" />
     <DriverLibs Include="config_pal.$(LIB_EXT)" />
@@ -287,7 +297,6 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\AT91\DeviceCode\AT91_TIME\dotNetMF.proj" />
     <DriverLibs Include="AT91_TIME.$(LIB_EXT)" />
   </ItemGroup>
-
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Support\CRC\dotNetMF.proj" />
     <PlatformIndependentLibs Include="CRC.$(LIB_EXT)" />
@@ -329,26 +338,30 @@
     <DriverLibs Include="cpu_mmu_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\stubs\Processor\stubs_PWM\dotnetmf.proj" />
+    <DriverLibs Include="cpu_pwm_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\stubs\Processor\stubs_analog\dotnetmf.proj" />
+    <DriverLibs Include="cpu_analog_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\AT91\DeviceCode\AT91_Bootstrap\dotNetMF_SAM7X.proj" />
     <DriverLibs Include="SAM7X_Bootstrap.$(LIB_EXT)" />
   </ItemGroup>
-
-
-  <ItemGroup >
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT_Hardware\SPOT_Serial\dotNetMF.proj" />
     <PlatformIndependentLibs Include="SPOT_Hardware_SerialPort.$(LIB_EXT)" />
   </ItemGroup>
-
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\USART\dotNetMF.proj" />
     <DriverLibs Include="usart_pal.$(LIB_EXT)" />
   </ItemGroup>
-
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\AT91\DeviceCode\AT91_USART\dotNetMF.proj" />
     <DriverLibs Include="AT91_USART.$(LIB_EXT)" />
   </ItemGroup>
-<!--
+  <!--
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\USART\stubs\dotNetMF.proj" />
     <DriverLibs Include="usart_pal_stubs.$(LIB_EXT)" />
@@ -362,7 +375,6 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\stubs\dotNetMF.proj" />
     <DriverLibs Include="sockets_pal_stubs.$(LIB_EXT)" />
   </ItemGroup>
-
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\SAM7S_EK\DeviceCode\USB\dotnetmf.proj" />
     <DriverLibs Include="usb_pal_config_AT91SAM7S.$(LIB_EXT)" />
@@ -372,13 +384,13 @@
     <DriverLibs Include="AT91_USB.$(LIB_EXT)" />
   </ItemGroup>
 
+
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\USB\dotNetMF.proj" />
     <DriverLibs Include="usb_pal.$(LIB_EXT)" />
   </ItemGroup>
-  
-<!--
 
+<!--
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\USB\stubs\dotNetMF.proj" />
     <DriverLibs Include="usb_pal_stubs.$(LIB_EXT)" />
@@ -389,6 +401,8 @@
     <DriverLibs Include="cpu_usb_stubs.$(LIB_EXT)" />
   </ItemGroup>
 -->
+
+
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\SAM7S_EK\DeviceCode\Blockstorage\addDevices\dotNetMF.proj" />
     <DriverLibs Include="BlockStorage_AddDevices_SAM7S_EK.$(LIB_EXT)" />
@@ -396,6 +410,9 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\SAM7S_EK\DeviceCode\Blockstorage\Sam7s_blockstorage\dotnetmf.proj" />
     <DriverLibs Include="Sam7s_BL_config.$(LIB_EXT)" />
+  </ItemGroup>  
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_application.h" />
   </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

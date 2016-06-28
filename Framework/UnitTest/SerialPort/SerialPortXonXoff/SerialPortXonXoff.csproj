@@ -13,6 +13,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.SPOT.Hardware.SerialPort">
+      <HintPath>$(BUILD_TREE_DLL)\Microsoft.SPOT.Hardware.SerialPort.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.SPOT.Hardware">
       <HintPath>$(BUILD_TREE_DLL)\Microsoft.SPOT.Hardware.dll</HintPath>
     </Reference>

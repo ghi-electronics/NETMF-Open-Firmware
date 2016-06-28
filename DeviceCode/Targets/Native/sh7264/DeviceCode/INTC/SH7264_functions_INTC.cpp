@@ -17,10 +17,12 @@
 #include "..\include\iodefine.h"
 #include "..\BlockStorage\USB\USB_BL.h"
 #include "..\GPIO\SH7264_GPIO.h"
+#include "..\I2C\SH7264_I2C.h"
 
 extern void SH7264_TIMER_ISR( UINT32 timer );
 extern void USART_TxISR(UINT32 port   );
 extern void USART_RxISR( UINT32 port  );
+extern void SH7264_I2C_ISR(int intEvent);
 
 //--//
 #pragma section INTTBL
@@ -906,6 +908,10 @@ void INT_TRAPA63(void)
 // 64 Interrupt IRQ0
 void INT_IRQ0(void)
 {
+#ifdef SH7264_TOUCH_PANEL
+	extern void SH7264_TOUCH_ISR(void);
+	SH7264_TOUCH_ISR();
+#endif
     /* sleep() */
 }
 // 65 Interrupt IRQ1

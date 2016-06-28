@@ -549,6 +549,12 @@ namespace Microsoft.SPOT.Emulator.Com
 
         private void OnReadComplete(IAsyncResult ar)
         {
+            if (!_isInitialized || _stream == null)
+            {
+                OnRead();
+                return;
+            }
+
             try
             {
                 int bytesRead = _stream.EndRead(ar);
@@ -978,10 +984,14 @@ namespace Microsoft.SPOT.Emulator.Com
         }
     }
 
+    public delegate void OnEmuSerialPortEvtHandler(int port, uint evt);
+
     public interface ISerialPortToStream
     {
         bool Initialize(int BaudRate, int Parity, int DataBits, int StopBits, int FlowValue);
 
         bool Uninitialize();
+
+        bool SetDataEventHandler( OnEmuSerialPortEvtHandler handler );
     }
 }

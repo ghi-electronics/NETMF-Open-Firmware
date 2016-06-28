@@ -1173,7 +1173,7 @@ kssl_cget_tkt(	/* UPDATE */	KSSL_CTX *kssl_ctx,
 			authenp->length = i2d_KRB5_ENCDATA(
 					ap_req->authenticator, NULL);
 			if (authenp->length  && 
-				(authenp->data = TINYCLR_SSL_MALLOC(authenp->length)))
+				(authenp->data = OPENSSL_malloc(authenp->length)))
 				{
 				unsigned char	*adp = (unsigned char *)authenp->data;
 				authenp->length = i2d_KRB5_ENCDATA(
@@ -1266,7 +1266,7 @@ kssl_TKT2tkt(	/* IN     */	krb5_context	krb5context,
 			gstr_svc->length,  (char *)gstr_svc->data,
 			gstr_host->length, (char *)gstr_host->data)) != 0)
 		{
-		TINYCLR_SSL_FREE(new5ticket);
+		OPENSSL_free(new5ticket);
 		BIO_snprintf(kssl_err->text, KSSL_ERR_MAX,
 			"Error building ticket server principal.\n");
 		kssl_err->reason = SSL_R_KRB5_S_RD_REQ;
@@ -1282,7 +1282,7 @@ kssl_TKT2tkt(	/* IN     */	krb5_context	krb5context,
 	if ((new5ticket->enc_part.ciphertext.data =
 		calloc(1, asn1ticket->encdata->cipher->length)) == NULL)
 		{
-		TINYCLR_SSL_FREE(new5ticket);
+		OPENSSL_free(new5ticket);
 		BIO_snprintf(kssl_err->text, KSSL_ERR_MAX,
 			"Error allocating cipher in krb5ticket.\n");
 		kssl_err->reason = SSL_R_KRB5_S_RD_REQ;
@@ -1885,7 +1885,7 @@ void kssl_krb5_free_data_contents(krb5_context context, krb5_data *data)
 #ifdef KRB5_HEIMDAL
 	data->length = 0;
         if (data->data)
-            TINYCLR_SSL_FREE(data->data);
+            OPENSSL_free(data->data);
 #elif defined(KRB5_MIT_OLD11)
 	if (data->data)  {
 		krb5_xfree(data->data);
@@ -2143,7 +2143,7 @@ krb5_error_code  kssl_check_authent(
  err:
 	if (auth)		KRB5_AUTHENT_free((KRB5_AUTHENT *) auth);
 	if (dec_authent)	KRB5_ENCDATA_free(dec_authent);
-	if (unenc_authent)	TINYCLR_SSL_FREE(unenc_authent);
+	if (unenc_authent)	OPENSSL_free(unenc_authent);
 	EVP_CIPHER_CTX_cleanup(&ciph_ctx);
 	return krb5rc;
 	}
@@ -2189,10 +2189,10 @@ krb5_error_code  kssl_build_principal_2(
 	return 0;
 
  err:
-	if (new_p  &&  new_p[0].data)	TINYCLR_SSL_FREE(new_p[0].data);
-	if (new_p  &&  new_p[1].data)	TINYCLR_SSL_FREE(new_p[1].data);
-	if (new_p)	TINYCLR_SSL_FREE(new_p);
-	if (new_r)	TINYCLR_SSL_FREE(new_r);
+	if (new_p  &&  new_p[0].data)	OPENSSL_free(new_p[0].data);
+	if (new_p  &&  new_p[1].data)	OPENSSL_free(new_p[1].data);
+	if (new_p)	OPENSSL_free(new_p);
+	if (new_r)	OPENSSL_free(new_r);
 	return ENOMEM;
 	}
 

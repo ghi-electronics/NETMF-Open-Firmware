@@ -129,7 +129,7 @@
     <FileMapping Name="*" Options="(i.ClipToVisible__14CLR_GFX_BitmapFiN31R18CLR_GFX_RectAsSizePC14CLR_GFX_BitmapRiT7)"
         Comment="00001270 284 259079 ClipToVisible__14CLR_GFX_BitmapFiN31R18CLR_GFX_RectAsSizePC14CLR_GFX_BitmapRiT7" />
   </If>
-  <If Name="COMPILER_TOOL_VERSION" In="RVDS3.0 RVDS3.1 RVDS4.0">
+  <If Name="COMPILER_TOOL_VERSION" In="RVDS3.0 RVDS3.1 RVDS4.0 RVDS4.1">
     <FileMapping Name="*" Options="(i.IDelayLoop)" Comment="00004a98 24 16 IDelayLoop" />
     <FileMapping Name="*" Options="(i._Z23Time_Sleep_MicroSecondsj)" Comment="_Z23Time_Sleep_MicroSecondsj" />
     <FileMapping Name="*" Options="(i._Z40Time_Sleep_MicroSeconds_InterruptEnabledj)" Comment="_Z40Time_Sleep_MicroSeconds_InterruptEnabledj" />

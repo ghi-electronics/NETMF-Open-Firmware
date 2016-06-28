@@ -17,6 +17,8 @@ HRESULT CLR_RT_HeapBlock_Array::CreateInstance( CLR_RT_HeapBlock& reference, CLR
 
     reference.SetObjectReference( NULL );
 
+    if((CLR_INT32)length < 0) TINYCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
+
     if(reflex.m_kind != REFLECTION_TYPE)
     {
         TINYCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);

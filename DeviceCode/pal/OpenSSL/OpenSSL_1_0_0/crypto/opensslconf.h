@@ -2,12 +2,61 @@
 /* WARNING: Generated automatically from opensslconf.h.in by Configure. */
 
 /* OpenSSL was configured with the following options: */
+//MS:  only define OPENSSL_SYSNAME_WIN32 for WIN32 builds
 #ifndef OPENSSL_SYSNAME_WIN32
-# define OPENSSL_SYSNAME_WIN32
+#define OPENSSL_SYSNAME_WIN32
+#define OPENSSL_NO_DYNAMIC_ENGINE
+#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_NONSTDC_NO_DEPRECATE
+#define MONOLITH
+#define OPENSSL_IMPLEMENTS_strncasecmp
+//#define OPENSSL_NO_STDIO 
 #endif
+
+#if defined(COMPILE_ARM) || defined(COMPILE_THUMB) || defined(COMPILE_THUMB2)
+#undef OPENSSL_SYSNAME_WIN32 
+#ifndef OPENSSL_SYSNAME_ARM 
+#define OPENSSL_SYSNAME_ARM
+#define OPENSSL_NO_DYNAMIC_ENGINE
+#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_NONSTDC_NO_DEPRECATE
+#define MONOLITH
+#define OPENSSL_IMPLEMENTS_strncasecmp
+#define NO_SYS_TYPES_H //no sys/types.h
+#define OPENSSL_NO_POSIX_IO // no sys/stat.h
+//#define OPENSSL_NO_STDIO
+#endif
+#endif
+
+#if defined(COMPILE_SH)
+#undef OPENSSL_SYSNAME_WIN32 
+#ifndef OPENSSL_SYSNAME_SH
+#define OPENSSL_SYSNAME_SH
+#define OPENSSL_NO_DYNAMIC_ENGINE
+#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_NONSTDC_NO_DEPRECATE
+#define MONOLITH
+#define OPENSSL_IMPLEMENTS_strncasecmp
+#define NO_SYS_TYPES_H //no sys/types.h
+#define OPENSSL_NO_POSIX_IO // no sys/stat.h
+//#define OPENSSL_NO_STDIO
+#endif
+#endif
+//MS:end
+
+#define OPENSSL_SMALL_FOOTPRINT 1
+
 #ifndef OPENSSL_DOING_MAKEDEPEND
 
-
+#ifndef OPENSSL_NO_CAMELLIA
+# define OPENSSL_NO_CAMELLIA
+#endif
+#ifndef OPENSSL_NO_CAPIENG
+# define OPENSSL_NO_CAPIENG
+#endif
+#ifndef OPENSSL_NO_CMS
+# define OPENSSL_NO_CMS
+#endif
 #ifndef OPENSSL_NO_GMP
 # define OPENSSL_NO_GMP
 #endif
@@ -42,16 +91,29 @@
 # define OPENSSL_NO_ASM
 #endif
 
+#ifndef OPENSSL_NO_DYNAMIC_ENGINE
+# define OPENSSL_NO_DYNAMIC_ENGINE
+#endif
+
 /* The OPENSSL_NO_* macros are also defined as NO_* if the application
    asks for it.  This is a transient feature that is provided for those
    who haven't had the time to do the appropriate changes in their
    applications.  */
 #ifdef OPENSSL_ALGORITHM_DEFINES
-# if defined(OPENSSL_NO_GMP) && !defined(NO_GMP)
-#  define NO_GMP
-# endif
 # if defined(OPENSSL_NO_IDEA) && !defined(NO_IDEA)
 #  define NO_IDEA
+# endif
+# if defined(OPENSSL_NO_CAMELLIA) && !defined(NO_CAMELLIA)
+#  define NO_CAMELLIA
+# endif
+# if defined(OPENSSL_NO_CAPIENG) && !defined(NO_CAPIENG)
+#  define NO_CAPIENG
+# endif
+# if defined(OPENSSL_NO_CMS) && !defined(NO_CMS)
+#  define NO_CMS
+# endif
+# if defined(OPENSSL_NO_GMP) && !defined(NO_GMP)
+#  define NO_GMP
 # endif
 # if defined(OPENSSL_NO_JPAKE) && !defined(NO_JPAKE)
 #  define NO_JPAKE
@@ -88,8 +150,12 @@
 #endif
 #endif
 
+#if defined(OPENSSL_SYS_ARM) || defined(OPENSSL_SYS_WIN32) || defined(OPENSSL_SYS_SH)
+#undef OPENSSL_UNISTD
+#else
 #undef OPENSSL_UNISTD
 #define OPENSSL_UNISTD <unistd.h>
+#endif
 
 #undef OPENSSL_EXPORT_VAR_AS_FUNCTION
 #define OPENSSL_EXPORT_VAR_AS_FUNCTION
@@ -137,7 +203,7 @@
 
 #if defined(HEADER_BN_H) && !defined(CONFIG_HEADER_BN_H)
 #define CONFIG_HEADER_BN_H
-#define BN_LLONG
+#undef BN_LLONG
 
 /* Should we define BN_DIV2W here? */
 
@@ -151,7 +217,7 @@
 #define CONFIG_HEADER_RC4_LOCL_H
 /* if this is defined data[i] is used instead of *data, this is a %20
  * speedup on x86 */
-#define RC4_INDEX
+#undef RC4_INDEX
 #endif
 
 #if defined(HEADER_BF_LOCL_H) && !defined(CONFIG_HEADER_BF_LOCL_H)

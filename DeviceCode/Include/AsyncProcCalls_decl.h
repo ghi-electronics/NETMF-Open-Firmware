@@ -62,6 +62,7 @@ public:
 
     void Execute() const { Callback.Execute(); }
 
+    bool IsLinked();
     void Enqueue();
     void Abort  ();
 

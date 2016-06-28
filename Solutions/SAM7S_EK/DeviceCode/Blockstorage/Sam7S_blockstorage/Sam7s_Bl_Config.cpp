@@ -76,10 +76,8 @@
 const BlockRange g_SAM7S_BS_BlockRange[] =
 {
     //
-    { BlockRange::BLOCKTYPE_CODE            , 0 , 25 },    
-    { BlockRange::BLOCKTYPE_DEPLOYMENT      , 26, 28 },
-    { BlockRange::BLOCKTYPE_STORAGE_A       , 29, 29 },
-    { BlockRange::BLOCKTYPE_STORAGE_B       , 30, 30 },
+    { BlockRange::BLOCKTYPE_CODE            , 0 , 27 },    
+    { BlockRange::BLOCKTYPE_DEPLOYMENT      , 28, 30 },
     { BlockRange::BLOCKTYPE_CONFIG          , 31, 31 }
 };
 #else

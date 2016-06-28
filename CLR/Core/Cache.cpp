@@ -368,6 +368,18 @@ void CLR_RT_EventCache::EventCache_Initialize()
     }
 
     m_lookup_VirtualMethod.Initialize();
+
+#ifndef TINYCLR_NO_IL_INLINE
+    m_inlineBufferStart = (CLR_RT_InlineBuffer*)g_scratchInlineBuffer;
+
+    num = InlineBufferCount()-1;
+
+    for(int i=0; i<(int)num; i++)
+    {
+        m_inlineBufferStart[i].m_pNext = &m_inlineBufferStart[i+1];
+    }
+    m_inlineBufferStart[num].m_pNext = NULL;
+#endif    
 }
 
 CLR_UINT32 CLR_RT_EventCache::EventCache_Cleanup()
@@ -381,7 +393,7 @@ CLR_UINT32 CLR_RT_EventCache::EventCache_Cleanup()
     {
         TINYCLR_FOREACH_NODE(CLR_RT_HeapBlock_Node,ptr,lst->m_blocks)
         {
-            ptr->MarkDead();
+            ptr->SetDataId( CLR_RT_HEAPBLOCK_RAW_ID(DATATYPE_FREEBLOCK, CLR_RT_HeapBlock::HB_Pinned, ptr->DataSize()) );
             ptr->ClearData();
 
             tot += ptr->DataSize();
@@ -546,6 +558,33 @@ bool CLR_RT_EventCache::FindVirtualMethod( const CLR_RT_TypeDef_Index& cls, cons
     NATIVE_PROFILE_CLR_CORE();
     return m_lookup_VirtualMethod.FindVirtualMethod( cls, mdVirtual, md );
 }
+
+// -- //
+
+#ifndef TINYCLR_NO_IL_INLINE
+bool CLR_RT_EventCache::GetInlineFrameBuffer(CLR_RT_InlineBuffer** ppBuffer)
+{
+    if(m_inlineBufferStart != NULL)
+    {
+        *ppBuffer = m_inlineBufferStart;
+
+        m_inlineBufferStart = m_inlineBufferStart->m_pNext;
+
+        return true;
+    }
+
+    *ppBuffer = NULL;
+
+    return false;
+}
+
+bool CLR_RT_EventCache::FreeInlineBuffer(CLR_RT_InlineBuffer* pBuffer)
+{
+    pBuffer->m_pNext = m_inlineBufferStart;
+    m_inlineBufferStart = pBuffer;
+    return true;
+}
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 

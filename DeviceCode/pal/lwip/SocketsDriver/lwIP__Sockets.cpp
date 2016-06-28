@@ -13,7 +13,7 @@ extern "C"
 #include "lwip\netifapi.h"
 
 #include "lwip\tcp.h"
-#include "arch\errno.h"
+#include <errno.h>
 
 }
 extern const HAL_CONFIG_BLOCK   g_NetworkConfigHeader;
@@ -131,13 +131,18 @@ SOCK_SOCKET LWIP_SOCKETS_Driver::Socket(int family, int type, int protocol)
     switch(protocol)
     {
         case SOCK_IPPROTO_TCP:
-            protocol = NETCONN_TCP;
+            protocol = IPPROTO_TCP;
             break;
         case SOCK_IPPROTO_UDP:
-            protocol = NETCONN_UDP;
+            protocol = IPPROTO_UDP;
             break;
-        case SOCK_IPPROTO_RAW:
-            protocol = NETCONN_RAW;
+        case SOCK_IPPROTO_ICMP:
+            protocol = IP_PROTO_ICMP;
+            break;
+
+        case SOCK_IPPROTO_IGMP:
+            protocol = IP_PROTO_IGMP;
+            break;
     }
     
     return lwip_socket(family, type, protocol);
@@ -367,7 +372,7 @@ int LWIP_SOCKETS_Driver::GetLastError()
 
 static int MARSHAL_SOCK_FDSET_TO_FDSET(SOCK_fd_set *sf, fd_set *f)
 {
-    if(f != NULL) 
+    if(f != NULL && sf != NULL) 
     { 
         FD_ZERO(f);
         
@@ -383,7 +388,7 @@ static int MARSHAL_SOCK_FDSET_TO_FDSET(SOCK_fd_set *sf, fd_set *f)
 
 static void MARSHAL_FDSET_TO_SOCK_FDSET(SOCK_fd_set *sf, fd_set *f)
 {
-    if(sf != NULL) 
+    if(sf != NULL && f != NULL) 
     { 
         sf->fd_count = 0; 
         for(int i=0; i<sf->fd_count; i++) 
@@ -411,16 +416,34 @@ int LWIP_SOCKETS_Driver::Select( int nfds, SOCK_fd_set* readfds, SOCK_fd_set* wr
     fd_set* pW = (writefds  != NULL) ? &write : NULL;
     fd_set* pE = (exceptfds != NULL) ? &excpt : NULL;
 
+    // If the network goes down then we should alert any pending socket actions
+    if(exceptfds != NULL && exceptfds->fd_count > 0)
+    {
+        struct netif *pNetIf = netif_find_interface(g_LWIP_SOCKETS_Driver.m_interfaces[0].m_interfaceNumber);
+
+        if(pNetIf != NULL)
+        {
+            if(!netif_is_up(pNetIf))
+            {
+                if(readfds  != NULL) readfds->fd_count = 0;
+                if(writefds != NULL) writefds->fd_count = 0;
+
+                errno = ENETDOWN;
+
+                return exceptfds->fd_count;
+            }
+        }
+    }
+
     MARSHAL_SOCK_FDSET_TO_FDSET(readfds  , pR);
     MARSHAL_SOCK_FDSET_TO_FDSET(writefds , pW);
     MARSHAL_SOCK_FDSET_TO_FDSET(exceptfds, pE);
 
-    ret = lwip_select(FD_SETSIZE, pR, pW, pE, (struct timeval *)timeout);
+    ret = lwip_select(MEMP_NUM_NETCONN, pR, pW, pE, (struct timeval *)timeout);
 
     MARSHAL_FDSET_TO_SOCK_FDSET(readfds  , pR);
     MARSHAL_FDSET_TO_SOCK_FDSET(writefds , pW);
     MARSHAL_FDSET_TO_SOCK_FDSET(exceptfds, pE);
-    
 
     return ret;
 }
@@ -663,6 +686,8 @@ HRESULT LWIP_SOCKETS_Driver::UpdateAdapterConfiguration( UINT32 interfaceIndex, 
     }
     
     BOOL fEnableDhcp = (0 != (config->flags & SOCK_NETWORKCONFIGURATION_FLAGS_DHCP));
+    BOOL fDynamicDns = (0 != (config->flags & SOCK_NETWORKCONFIGURATION_FLAGS_DYNAMIC_DNS));
+    BOOL fDhcpStarted;
 
     struct netif *pNetIf = netif_find_interface(g_LWIP_SOCKETS_Driver.m_interfaces[interfaceIndex].m_interfaceNumber);
     if (NULL == pNetIf)
@@ -670,48 +695,32 @@ HRESULT LWIP_SOCKETS_Driver::UpdateAdapterConfiguration( UINT32 interfaceIndex, 
         return CLR_E_FAIL;
     }
 
-#if LWIP_DHCP
-    if(0 != (updateFlags & SOCK_NETWORKCONFIGURATION_UPDATE_DHCP))
+    fDhcpStarted = (0 != (pNetIf->flags & NETIF_FLAG_DHCP));
+
+#if LWIP_DNS
+    // when using DHCP do not use the static settings
+    if(0 != (updateFlags & SOCK_NETWORKCONFIGURATION_UPDATE_DNS))
     {
-        if(fEnableDhcp)
-        {   
-            if(ERR_OK != dhcp_start(pNetIf))
+        // if dynamic dns is on, then we will set the corresonding NetIF flag
+        // resetting dhcp if necessary.
+        if(fDynamicDns || (config->dnsServer1 == 0 && config->dnsServer2 == 0))
+        {
+            if(0 == (pNetIf->flags & NETIF_FLAG_DYNAMIC_DNS))
             {
-                return CLR_E_FAIL;
+                pNetIf->flags |= NETIF_FLAG_DYNAMIC_DNS;
+
+                // if dhcp is active, we need to reset in order to get the dynamic
+                // dns
+                if(fEnableDhcp && fDhcpStarted)
+                {
+                    dhcp_stop(pNetIf);
+                    dhcp_start(pNetIf);
+                }
             }
         }
         else
         {
-            dhcp_stop(pNetIf);
-
-            netif_set_addr(pNetIf, (struct ip_addr *) &config->ipaddr, (struct ip_addr *)&config->subnetmask, (struct ip_addr *)&config->gateway);
-
-            Network_PostEvent( NETWORK_EVENT_TYPE_ADDRESS_CHANGED, 0 );
-        }
-    }
-
-    if(fEnableDhcp)
-    {
-        if(0 != (updateFlags & SOCK_NETWORKCONFIGURATION_UPDATE_DHCP_RELEASE))
-        {
-            //netifapi_netif_common(pNetIf, NULL, dhcp_release);
-            dhcp_release(pNetIf);
-        }
-        if(0 != (updateFlags & SOCK_NETWORKCONFIGURATION_UPDATE_DHCP_RENEW))
-        {
-            
-            //netifapi_netif_common(pNetIf, NULL, dhcp_renew);
-            dhcp_renew(pNetIf);
-        }
-    }
-#endif
-
-#if LWIP_DNS
-	// when using DHCP do not use the static settings
-    else if(0 != (updateFlags & SOCK_NETWORKCONFIGURATION_UPDATE_DNS))
-    {
-        if(config->dnsServer1 != 0 || config->dnsServer2 != 0)
-        {
+            // user defined DNS addresses
             if(config->dnsServer1 != 0)
             {
                 u8_t idx = 0;
@@ -724,6 +733,47 @@ HRESULT LWIP_SOCKETS_Driver::UpdateAdapterConfiguration( UINT32 interfaceIndex, 
 
                 dns_setserver(idx, (struct ip_addr *)&config->dnsServer2);
             }
+
+            pNetIf->flags &= ~NETIF_FLAG_DYNAMIC_DNS;
+        }
+    }
+#endif
+
+#if LWIP_DHCP
+    if(0 != (updateFlags & SOCK_NETWORKCONFIGURATION_UPDATE_DHCP))
+    {
+        if(fEnableDhcp)
+        {   
+            if(!fDhcpStarted)
+            {
+                if(ERR_OK != dhcp_start(pNetIf))
+                {
+                    return CLR_E_FAIL;
+                }
+            }
+        }
+        else if(fDhcpStarted)
+        {
+            dhcp_stop(pNetIf);
+
+            netif_set_addr(pNetIf, (struct ip_addr *) &config->ipaddr, (struct ip_addr *)&config->subnetmask, (struct ip_addr *)&config->gateway);
+
+            Network_PostEvent( NETWORK_EVENT_TYPE_ADDRESS_CHANGED, 0 );
+        }
+    }
+
+    if(fEnableDhcp && fDhcpStarted)
+    {
+        if(0 != (updateFlags & SOCK_NETWORKCONFIGURATION_UPDATE_DHCP_RELEASE))
+        {
+            //netifapi_netif_common(pNetIf, NULL, dhcp_release);
+            dhcp_release(pNetIf);
+        }
+        if(0 != (updateFlags & SOCK_NETWORKCONFIGURATION_UPDATE_DHCP_RENEW))
+        {
+            
+            //netifapi_netif_common(pNetIf, NULL, dhcp_renew);
+            dhcp_renew(pNetIf);
         }
     }
 #endif
@@ -740,12 +790,6 @@ HRESULT LWIP_SOCKETS_Driver::UpdateAdapterConfiguration( UINT32 interfaceIndex, 
         g_LWIP_SOCKETS_Driver.m_interfaces[interfaceIndex].m_interfaceNumber = Network_Interface_Open(interfaceIndex);
     }
 
-    if(0 != (config->flags & SOCK_NETWORKCONFIGURATION_FLAGS_DYNAMIC_DNS))
-    {
-        // the rtip stack doesn't support dynamic dns
-        return CLR_E_NOT_SUPPORTED;
-    }
-    
     return S_OK;
 
 }
@@ -1028,9 +1072,11 @@ int LWIP_SOCKETS_Driver::GetNativeError ( int error )
             ret = SOCK_EISCONN;
             break;
 
+#if !defined(__GNUC__) // same as ENOTSOCK for GCC
         case ESHUTDOWN:
             ret = SOCK_ESHUTDOWN;
             break;
+#endif
 
         case ETIMEDOUT:
             ret = SOCK_ETIMEDOUT;

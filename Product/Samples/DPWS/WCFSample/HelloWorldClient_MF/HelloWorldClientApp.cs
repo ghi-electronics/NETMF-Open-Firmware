@@ -51,11 +51,12 @@ namespace Microsoft.SPOT.Sample
             DpwsServiceTypes typeProbes = new DpwsServiceTypes();
             typeProbes.Add(new DpwsServiceType("IServiceHelloWCF", "http://localhost/ServiceHelloWCF"));
 
-            DpwsServiceDescriptions descs = proxy.DiscoveryClient.Probe(typeProbes, 1, 20000);
+            DpwsServiceDescriptions descs = proxy.DiscoveryClient.Probe(typeProbes, 1, 5000);
 
             if(descs.Count > 0)
             {
-                proxy.EndpointAddress = descs[0].XAddrs[0];
+                proxy.EndpointAddress = descs[0].Endpoint.Address.AbsoluteUri;
+                proxy.TransportAddress = descs[0].XAddrs[0];
                 return true;
             }
 
@@ -65,19 +66,22 @@ namespace Microsoft.SPOT.Sample
         public void Run()
         {
 
-            Uri remoteEp = new Uri("http://localhost:8001/ServiceHelloWCF");
+            Uri remoteEp = new Uri("http://localhost:8084/ServiceHelloWCF.svc");
             WS2007HttpBinding binding = new WS2007HttpBinding(new HttpTransportBindingConfig(remoteEp));
+
+            ProtocolVersion ver = new ProtocolVersion11();
+            // To enable WSDiscoveryApril2005 and Soap12WSAddressingAugust2004
+            //ProtocolVersion ver = new ProtocolVersion10();
 
             /// ProtocolVersion11 can be used if the corresponding WCF desktop server application
             /// WcfServer uses wsHttpBinding instead of the custom binding "Soap11AddressingBinding"
-            m_clientProxy = new ServiceHelloWCFClientProxy(binding, new ProtocolVersion11());
+            m_clientProxy = new ServiceHelloWCFClientProxy(binding, ver);
 
             m_clientProxy.IgnoreRequestFromThisIP = false;
 
             if (!Discover(m_clientProxy))
             {
                 Debug.Print("Discovery failed, trying direct address");
-                m_clientProxy.EndpointAddress = "http://localhost:8084/319D0A4D-2253-47DC-AC4A-C1951FF6667D";
             }
 
             HelloWCF req = new HelloWCF();
@@ -95,8 +99,10 @@ namespace Microsoft.SPOT.Sample
             {
                 Debug.Print("DPWS Fault: " + ex.Message);
             }
-
-            m_clientProxy.Dispose();
+            finally
+            {
+                m_clientProxy.Dispose();
+            }
         }
     }
 }

@@ -52,11 +52,11 @@ BOOL FAT_FS_Driver::UnInitializeVolume( const VOLUME_ID* volume )
     return TRUE;
 }
 
-HRESULT FAT_FS_Driver::Format( const VOLUME_ID* volume, UINT32 parameters )
+HRESULT FAT_FS_Driver::Format( const VOLUME_ID* volume, LPCSTR volumeLabel, UINT32 parameters )
 {
     ::Watchdog_GetSetEnabled( FALSE, TRUE );
 
-    HRESULT hr = FAT_LogicDisk::Format( volume, parameters );
+    HRESULT hr = FAT_LogicDisk::Format( volume, volumeLabel, parameters );
 
     ::Watchdog_GetSetEnabled( TRUE, TRUE );
 
@@ -87,6 +87,23 @@ HRESULT FAT_FS_Driver::FlushAll( const VOLUME_ID* volume )
         logicDisk->SectorCache.FlushAll();
         
         return S_OK;
+    }
+
+    return CLR_E_INVALID_DRIVER;
+}
+
+HRESULT FAT_FS_Driver::GetVolumeLabel( const VOLUME_ID* volume, LPSTR volumeLabel, INT32 volumeLabelLen )
+{
+    FAT_LogicDisk* logicDisk = FAT_MemoryManager::GetLogicDisk( volume );
+
+    if(logicDisk)
+    {
+        if(volumeLabelLen < FAT_Directory::DIR_Name__size)
+        {
+            return CLR_E_BUFFER_TOO_SMALL;
+        }
+
+        return logicDisk->GetDiskVolLab( volumeLabel );
     }
 
     return CLR_E_INVALID_DRIVER;
@@ -308,6 +325,7 @@ FILESYSTEM_DRIVER_INTERFACE g_FAT32_FILE_SYSTEM_DriverInterface =
     &FAT_FS_Driver::IsLoadableMedia, 
     &FAT_FS_Driver::GetSizeInfo,
     &FAT_FS_Driver::FlushAll,
+    &FAT_FS_Driver::GetVolumeLabel,
 
     "FAT",
     0,

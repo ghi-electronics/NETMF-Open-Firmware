@@ -204,7 +204,7 @@ void TouchPanel_Driver::PollTouchPoint( void* arg )
                         m_startMovePtr = NULL;
                         m_touchMoveIndex = 0;
                     }
-                    else
+                    else if(m_startMovePtr != point)
                     {
                         m_touchMoveIndex++;
                     }
@@ -226,8 +226,14 @@ void TouchPanel_Driver::PollTouchPoint( void* arg )
             else if((time - m_startMovePtr->time) > (g_TouchPanel_Sampling_Settings.SampleRate.MaxTimeForMoveEvent_ticks))
             {
                 PostManagedEvent(EVENT_TOUCH, TouchPanelStylusMove, m_touchMoveIndex, (UINT32)m_startMovePtr);
-                
-                m_startMovePtr->time = time;
+                      
+                if( m_touchMoveIndex > 1 )
+                {
+                    m_startMovePtr = &m_startMovePtr[m_touchMoveIndex-1];
+                    m_touchMoveIndex = 1;
+                }
+
+                m_startMovePtr->time = time;      
             }
         }
     }
@@ -327,29 +333,32 @@ TouchPoint* TouchPanel_Driver::AddTouchPoint(UINT16 source, UINT16 x, UINT16 y, 
             if (dist2 > g_TouchPanel_Sampling_Settings.MaxFilterDistance) return NULL; 
         }
 
-        if (m_runavgIndex >= g_PAL_RunningAvg_Buffer_Size)
-            m_runavgIndex = 0;
-
-        if (m_runavgCount >= g_PAL_RunningAvg_Buffer_Size)
+        if(g_PAL_RunningAvg_Buffer_Size > 1)
         {
-            m_runavgTotalX -= g_PAL_RunningAvg_Buffer[m_runavgIndex].sx;
-            m_runavgTotalY -= g_PAL_RunningAvg_Buffer[m_runavgIndex].sy;            
+            if (m_runavgIndex >= g_PAL_RunningAvg_Buffer_Size)
+                m_runavgIndex = 0;
+
+            if (m_runavgCount >= g_PAL_RunningAvg_Buffer_Size)
+            {
+                m_runavgTotalX -= g_PAL_RunningAvg_Buffer[m_runavgIndex].sx;
+                m_runavgTotalY -= g_PAL_RunningAvg_Buffer[m_runavgIndex].sy;            
+            }
+            else
+            {
+                m_runavgCount++;
+            }
+
+            m_runavgTotalX += x;
+            m_runavgTotalY += y;
+
+            g_PAL_RunningAvg_Buffer[m_runavgIndex].sx = x;
+            g_PAL_RunningAvg_Buffer[m_runavgIndex].sy = y;
+
+            m_runavgIndex++;
+
+            x = m_runavgTotalX / m_runavgCount;
+            y = m_runavgTotalY / m_runavgCount;
         }
-        else
-        {
-            m_runavgCount++;
-        }
-
-        m_runavgTotalX += x;
-        m_runavgTotalY += y;
-
-        g_PAL_RunningAvg_Buffer[m_runavgIndex].sx = x;
-        g_PAL_RunningAvg_Buffer[m_runavgIndex].sy = y;
-
-        m_runavgIndex++;
-
-        x = m_runavgTotalX / m_runavgCount;
-        y = m_runavgTotalY / m_runavgCount;
 
         ///
         /// This is mainly intended for TouchMove events.  We don't want to add duplicate points
@@ -374,15 +383,18 @@ TouchPoint* TouchPanel_Driver::AddTouchPoint(UINT16 source, UINT16 x, UINT16 y, 
     point.location = location;
     point.contact = contact;
 
-    m_tail ++;
-
-    if(m_tail >= g_PAL_TouchPointBufferSize) m_tail = 0;
-
-    if (m_tail == m_head)
+    if(g_PAL_TouchPointBufferSize > 1)
     {
-        m_head++;
+        m_tail ++;
 
-        if(m_head >= g_PAL_TouchPointBufferSize) m_head = 0;
+        if(m_tail >= g_PAL_TouchPointBufferSize) m_tail = 0;
+
+        if (m_tail == m_head)
+        {
+            m_head++;
+
+            if(m_head >= g_PAL_TouchPointBufferSize) m_head = 0;
+        }
     }
 
     return &point;
@@ -400,7 +412,11 @@ void TouchPanel_Driver::TouchIsrProc( GPIO_PIN pin, BOOL pinState, void* context
         g_TouchPanel_Driver.m_InternalFlags &= ~Contact_Down; /// Toggle contact flag.        
     }
 
-    g_TouchPanel_Driver.PollTouchPoint(NULL);
+    if(g_TouchPanel_Driver.m_touchCompletion.IsLinked())
+    {
+        g_TouchPanel_Driver.m_touchCompletion.Abort();
+    }
+    g_TouchPanel_Driver.m_touchCompletion.EnqueueDelta(0);
 }
 
 HRESULT TouchPanel_Driver::GetTouchPoints(int* pointCount, short* sx, short* sy)
@@ -523,7 +539,7 @@ HRESULT TouchPanel_Driver::GetTouchPoint(UINT32* flags, TouchPoint **point)
 
     GLOBAL_LOCK(irq);
 
-    if (g_TouchPanel_Driver.m_head == g_TouchPanel_Driver.m_tail)
+    if ((g_TouchPanel_Driver.m_head == g_TouchPanel_Driver.m_tail) && g_PAL_TouchPointBufferSize > 1)
         return CLR_E_FAIL;
 
     if (searchFlag == GetTouchPointFlags_LatestPoint)
@@ -540,7 +556,7 @@ HRESULT TouchPanel_Driver::GetTouchPoint(UINT32* flags, TouchPoint **point)
         {
             index = (*flags >> 16);
             index = (index + 1) % g_PAL_TouchPointBufferSize;
-            if (index == g_TouchPanel_Driver.m_tail)
+            if ((index == g_TouchPanel_Driver.m_tail) && g_PAL_TouchPointBufferSize > 1)
                 return CLR_E_FAIL;
         }
         else return CLR_E_NOT_SUPPORTED;

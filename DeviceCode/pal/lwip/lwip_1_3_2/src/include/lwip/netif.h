@@ -80,6 +80,8 @@ extern "C" {
 #define NETIF_FLAG_ETHARP       0x20U
 /** if set, the netif has IGMP capability */
 #define NETIF_FLAG_IGMP         0x40U
+//[MS_CHANGE] -enable dynmaic dns option
+#define NETIF_FLAG_DYNAMIC_DNS  0x80U
 
 /** Generic data structure used for all lwIP network interfaces.
  *  The following fields should be filled in by the initialization

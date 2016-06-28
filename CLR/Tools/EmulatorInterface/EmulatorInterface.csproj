@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <ProductVersion>9.0.21022</ProductVersion>
@@ -9,7 +9,6 @@
     <RootNamespace>Microsoft.SPOT.Emulator</RootNamespace>
     <AssemblyName>Microsoft.SPOT.Emulator.Interface</AssemblyName>
     <ComponentGuid>{743e0402-ea74-4e28-88ba-3a7e93590fdb}</ComponentGuid>
-<!--    <InstallInGAC>true</InstallInGAC> -->
     <DirectoryRef>ToolsDir</DirectoryRef>
     <InstrumentForCoverage>true</InstrumentForCoverage>
   </PropertyGroup>
@@ -35,8 +34,22 @@
     <Compile Include="ISpi.cs" />
     <Compile Include="ITime.cs" />
     <Compile Include="ITouchPanel.cs" />
+    <Compile Include="IUpdateBackupProvider.cs" />
+    <Compile Include="IUpdateProvider.cs" />
+    <Compile Include="IUpdateStorageProvider.cs" />
+    <Compile Include="IUpdateValidationProvider.cs" />
     <Compile Include="IUsb.cs" />
     <Compile Include="IWatchdog.cs" />
+    <Compile Include="IEncryption.cs" />
+    <Compile Include="IDigest.cs" />
+    <Compile Include="ISession.cs" />
+    <Compile Include="ISignature.cs" />
+    <Compile Include="IKeyManagement.cs" />
+    <Compile Include="IProtectedDataStore.cs" />
+    <Compile Include="IRandom.cs" />
     <Compile Include="EmulatorException.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
   </ItemGroup>
 </Project>

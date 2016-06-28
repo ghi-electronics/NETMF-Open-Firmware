@@ -90,13 +90,7 @@ namespace Microsoft.SPOT.Net.NetworkInformation
             if ((wirelessConfiguration.PassPhrase.Length    >= MaxPassPhraseLength) || 
                 (wirelessConfiguration.NetworkKey.Length    >  NetworkKeyLength   ) || 
                 (wirelessConfiguration.ReKeyInternal.Length >  ReKeyInternalLength) || 
-                (wirelessConfiguration.Ssid.Length          >= SsidLength         ) ||
-                (
-                  wirelessConfiguration.NetworkKey.Length != 0  &&
-                  wirelessConfiguration.NetworkKey.Length != 8  && wirelessConfiguration.NetworkKey.Length != 16  && wirelessConfiguration.NetworkKey.Length != 32  &&
-                  wirelessConfiguration.NetworkKey.Length != 64 && wirelessConfiguration.NetworkKey.Length != 128 && wirelessConfiguration.NetworkKey.Length != 256
-                )
-               )
+                (wirelessConfiguration.Ssid.Length          >= SsidLength         ))
             {
                 throw new ArgumentOutOfRangeException();
             }

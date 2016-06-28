@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <ProjectGuid>{d306fb6a-ab78-4d4f-b34f-97c6afb9bdfd}</ProjectGuid>
@@ -40,18 +41,22 @@
   </PropertyGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
   <PropertyGroup>
-    <OutputType >Library</OutputType>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <HFiles Include="SH7216_TIME.h" />
     <Compile Include="SH7216_TIME.cpp" />
     <Compile Include="SH7216_time_functions.cpp" />
   </ItemGroup>
   <PropertyGroup>
     <ARMBUILD_ONLY>true</ARMBUILD_ONLY>
-  </PropertyGroup>  
+  </PropertyGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\SH7216\DeviceCode\TIMER\dotNetMF.proj" />
+  </ItemGroup>
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\devicecode\targets\native\sh7216\devicecode\include\iodefine.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\targets\native\sh7216\devicecode\timer\sh7216_timer.h" />
+    <HFiles Include="sh7216_time.h" />
   </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

@@ -179,7 +179,7 @@ namespace Microsoft.SPOT.Platform.Tests
             Thread.Sleep(1);
             TimeSpan time = DateTime.Now - statusChecker.t2;
             Log.Comment("callback method called within " + time.ToString());
-            if (time.CompareTo(new TimeSpan(0, 0, 0, 0, 10)) < 0)
+            if (time.CompareTo(new TimeSpan(0, 0, 0, 0, 100)) > 0)
             {
                 Log.Comment("The timer didn't start immediately, started after '" + time.ToString() + "'");
                 testResult = MFTestResults.Fail;

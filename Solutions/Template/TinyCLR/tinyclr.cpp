@@ -18,6 +18,11 @@ void ApplicationEntryPoint()
 
     ClrStartup( clrSettings );
 
+#if defined(__GNUC__) && defined(BUILD_RTM)
+    // force the compiler to keep the config sector
+    hal_printf( "Config Version %d.%d\r\n", g_ConfigurationSector.Version.Major, g_ConfigurationSector.Version.Minor );
+#endif
+
 #if !defined(BUILD_RTM)
     debug_printf( "Exiting.\r\n" );
 #else

@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <ADS_WRAPPER Condition="'$(NO_ADS_WRAPPER)'==''">$(SPO_SDK)\tools\make\ADSwrapper.cmd</ADS_WRAPPER>
+    <ADS_WRAPPER Condition="'$(NO_ADS_WRAPPER)'=='' AND '$(ADS_WRAPPER)'==''">$(SPO_SDK)\tools\make\ADSwrapper.cmd</ADS_WRAPPER>
     <TARGETCURRENT>$(SPO_BUILD)\$(INSTRUCTION_SET)\$(TARGETLOCATION)\$(OLD_FLAVOR)\$(TARGETPLATFORM)\bin</TARGETCURRENT>
     <!-- ARM Tools -->
     <CC  >$(ADS_WRAPPER) "$(ADS_TOOLS_BIN)\armcc.exe"</CC>
@@ -26,16 +26,18 @@
     <LINK>$(ADS_WRAPPER) "$(ADS_TOOLS_BIN)\armlink.exe"</LINK>
     <AR  >$(ADS_WRAPPER) "$(ADS_TOOLS_BIN)\armar.exe"</AR>
     <FROMELF>$(ADS_WRAPPER) "$(ADS_TOOLS_BIN)\fromelf.exe"</FROMELF>
-
+<!-- WAIT UNTIL WE HAVE INTEGRATED LWIP 1.4.6
+    <CC_CPP_COMMON_FLAGS>$(CC_CPP_COMMON_FLAGS) -D__errno_h</CC_CPP_COMMON_FLAGS>
+-->
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(COMPILER_TOOL_VERSION)'!='RVDS4.0'">
+  <PropertyGroup Condition="'$(COMPILER_TOOL_VERSION)'!='RVDS4.0' and '$(COMPILER_TOOL_VERSION)'!='RVDS4.1'">
     <CPP >$(ADS_WRAPPER) "$(ADS_TOOLS_BIN)\armcpp.exe"</CPP>	
     <TCC >$(ADS_WRAPPER) "$(ADS_TOOLS_BIN)\tcc.exe"</TCC>
     <TCPP>$(ADS_WRAPPER) "$(ADS_TOOLS_BIN)\tcpp.exe"</TCPP>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(COMPILER_TOOL_VERSION)'=='RVDS4.0'">
+  <PropertyGroup Condition="'$(COMPILER_TOOL_VERSION)'=='RVDS4.0' or '$(COMPILER_TOOL_VERSION)'=='RVDS4.1'">
     <CPP >$(ADS_WRAPPER) "$(ADS_TOOLS_BIN)\armcc.exe"</CPP>	
     <TCC >$(ADS_WRAPPER) "$(ADS_TOOLS_BIN)\armcc.exe"</TCC>
     <TCPP>$(ADS_WRAPPER) "$(ADS_TOOLS_BIN)\armcc.exe"</TCPP>
@@ -62,6 +64,7 @@
     <FROMELF_FLAGS Condition="'$(COMPILER_TOOL_VERSION)'=='RVDS3.0'">$(FROMELF_FLAGS) $(SWTC)no_debug -c</FROMELF_FLAGS>
     <FROMELF_FLAGS Condition="'$(COMPILER_TOOL_VERSION)'=='RVDS3.1'">$(FROMELF_FLAGS) -c</FROMELF_FLAGS>
     <FROMELF_FLAGS Condition="'$(COMPILER_TOOL_VERSION)'=='RVDS4.0'">$(FROMELF_FLAGS) -c</FROMELF_FLAGS>
+    <FROMELF_FLAGS Condition="'$(COMPILER_TOOL_VERSION)'=='RVDS4.1'">$(FROMELF_FLAGS) -c</FROMELF_FLAGS>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(COMPILER_TOOL_VERSION)'=='RVDS3.0'">
@@ -91,7 +94,7 @@
     <LINK_FLAGS>$(LINK_FLAGS) $(SWTC)no_keep_init_arrays $(SWTC)feedback $(BIN_DIR)\$(AssemblyName)_$(TARGETPLATFORM)_$(TARGETLOCATION)_$(FLAVOR)_$(COMPILER_TOOL_VERSION).feedback</LINK_FLAGS>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(COMPILER_TOOL_VERSION)'=='RVDS3.1' or '$(COMPILER_TOOL_VERSION)'=='RVDS4.0'">
+  <PropertyGroup Condition="'$(COMPILER_TOOL_VERSION)'=='RVDS3.1' or '$(COMPILER_TOOL_VERSION)'=='RVDS4.0'  or '$(COMPILER_TOOL_VERSION)'=='RVDS4.1'">
     <POS_DEPENDENT   Condition = "'$(INSTRUCTION_SET)'=='arm'"                                    >$(SWTC)apcs /nointer/noropi/norwpi/noswst</POS_DEPENDENT>
     <POS_INDEPENDENT Condition = "'$(INSTRUCTION_SET)'=='arm'"                                    >$(SWTC)apcs /nointer/ropi/norwpi/noswst</POS_INDEPENDENT>
     <POS_DEPENDENT   Condition = "'$(INSTRUCTION_SET)'=='thumb' or '$(INSTRUCTION_SET)'=='thumb2'">$(SWTC)apcs /interwork/noropi/norwpi/noswst</POS_DEPENDENT>
@@ -134,7 +137,8 @@
     <ARM_TYPE_FLAGS Condition="'$(PlatformIndependentBuild)'!='true' AND '$(DEVICE_TYPE)' != ''">$(SWTC)cpu $(DEVICE_TYPE)</ARM_TYPE_FLAGS>
     <ARM_TYPE_FLAGS Condition="'$(INSTRUCTION_SET)'=='thumb2'        AND '$(DEVICE_TYPE)' != ''">$(SWTC)cpu $(DEVICE_TYPE)</ARM_TYPE_FLAGS>
 
-    <FLOATING_POINT_FLAG Condition="'$(PLATFORM_EMULATED_FLOATINGPOINT)'!='true'"> $(SWTC)fpu softvfp </FLOATING_POINT_FLAG>
+    <!-- Use default fpu specification for Cortex-M4F -->
+    <FLOATING_POINT_FLAG Condition="'$(PLATFORM_EMULATED_FLOATINGPOINT)'!='true' AND '$(DEVICE_TYPE)'!='Cortex-M4.fp'"> $(SWTC)fpu softvfp </FLOATING_POINT_FLAG>
     <FLOATING_POINT_FLAG Condition="'$(PLATFORM_EMULATED_FLOATINGPOINT)'=='true'"> $(SWTC)fpu none </FLOATING_POINT_FLAG>
 
     <AS_CC_CPP_COMMON_FLAGS>$(AS_CC_CPP_COMMON_FLAGS) $(FLOATING_POINT_FLAG) $(ARM_TYPE_FLAGS)</AS_CC_CPP_COMMON_FLAGS>
@@ -171,6 +175,8 @@
 
     <AS_FLAGS>$(AS_FLAGS) $(AS_CC_CPP_COMMON_FLAGS) $(AS_TARGETTYPE_FLAGS) $(AS_INCS) -g $(SWTC)keep</AS_FLAGS>
 
+    <AS_FLAGS>$(AS_FLAGS) @(AS_Defines->'$(SWTC)PD %(filename) SETS \"1\"',' ')</AS_FLAGS>
+
     <AS_SUBDIR>RVD_S</AS_SUBDIR>
 
     <!-- These would have to be conditional for non-Ollie support -->
@@ -197,13 +203,6 @@
     <CC_CPP_COMMON_FLAGS Condition="'$(INSTRUCTION_SET)'=='arm'"     >$(CC_CPP_COMMON_FLAGS) -DCOMPILE_ARM </CC_CPP_COMMON_FLAGS>
     <CC_CPP_COMMON_FLAGS Condition="'$(INSTRUCTION_SET)'=='thumb'"   >$(CC_CPP_COMMON_FLAGS) -DCOMPILE_THUMB </CC_CPP_COMMON_FLAGS>
     <CC_CPP_COMMON_FLAGS Condition="'$(INSTRUCTION_SET)'=='thumb2'"  >$(CC_CPP_COMMON_FLAGS) -DCOMPILE_THUMB2 </CC_CPP_COMMON_FLAGS>
-    <CC_CPP_COMMON_FLAGS Condition="'$(PLATFORM_NO_APPDOMAINS)'=='true'"  >$(CC_CPP_COMMON_FLAGS) -DTINYCLR_NO_APPDOAMINS </CC_CPP_COMMON_FLAGS>
-    <CC_CPP_COMMON_FLAGS Condition="'$(PLATFORM_EMULATED_FLOATINGPOINT)'=='true'"  >$(CC_CPP_COMMON_FLAGS) -DPLATFORM_EMULATED_FLOATINGPOINT </CC_CPP_COMMON_FLAGS>
-
-    <CC_CPP_COMMON_FLAGS Condition="'$(PLATFORM_HEAP_SIZE_THRESHOLD)'!=''"  >$(CC_CPP_COMMON_FLAGS) -DPLATFORM_DEPENDENT_HEAP_SIZE_THRESHOLD=$(PLATFORM_HEAP_SIZE_THRESHOLD)</CC_CPP_COMMON_FLAGS>
-    <CC_CPP_COMMON_FLAGS Condition="'$(PLATFORM_HEAP_SIZE_THRESHOLD_UPPER)'!=''"  >$(CC_CPP_COMMON_FLAGS) -DPLATFORM_DEPENDENT_HEAP_SIZE_THRESHOLD_UPPER=$(PLATFORM_HEAP_SIZE_THRESHOLD_UPPER)</CC_CPP_COMMON_FLAGS>
-
-
 
     <CC_CPP_COMMON_FLAGS Condition="'$(FLAVOR)'=='Instrumented' and '$(NATIVE_PROFILE_CLR)'!=''">$(CC_CPP_COMMON_FLAGS) -DNATIVE_PROFILE_CLR=$(NATIVE_PROFILE_CLR)</CC_CPP_COMMON_FLAGS>
     <CC_CPP_COMMON_FLAGS Condition="'$(FLAVOR)'=='Instrumented' and '$(NATIVE_PROFILE_PAL)'!=''">$(CC_CPP_COMMON_FLAGS) -DNATIVE_PROFILE_PAL=$(NATIVE_PROFILE_PAL)</CC_CPP_COMMON_FLAGS>
@@ -218,6 +217,10 @@
     <CC_CPP_COMMON_FLAGS Condition="'$(ENDIANNESS)'=='be'">$(CC_CPP_COMMON_FLAGS) -DBIG_ENDIAN </CC_CPP_COMMON_FLAGS>
     <CC_CPP_COMMON_FLAGS Condition="'$(PATCH_BUILD)'=='Active'">$(CC_CPP_COMMON_FLAGS) -DPATCH_BUILD </CC_CPP_COMMON_FLAGS>
     <CC_CPP_COMMON_FLAGS Condition="'$(OS_PLATFORM)'=='true'"  >$(CC_CPP_COMMON_FLAGS) -DPLATFORM_ARM_OS_PORT </CC_CPP_COMMON_FLAGS>
+
+    <CC_CPP_COMMON_FLAGS>$(CC_CPP_COMMON_FLAGS) @(TinyCLR_Defines->'-D%(filename)',' ')</CC_CPP_COMMON_FLAGS>
+
+    <CC_CPP_COMMON_FLAGS>$(CC_CPP_COMMON_FLAGS) @(CC_CPP_Defines->'-D%(filename)',' ')</CC_CPP_COMMON_FLAGS>
 
     <CC_CPP_INCS>$(CC_CPP_INCS) -I$(CLRROOT)\$(Directory)</CC_CPP_INCS>
     <CC_CPP_INCS>$(CC_CPP_INCS) -I$(SPO_SDK)\DeviceCode\include</CC_CPP_INCS>
@@ -319,8 +322,8 @@
     <Exec Condition="'@(FilesExist)'!='' " Command="del /q  @(TargetLib->'%(FullPath).manifest', ' ')" ContinueOnError="true" />
   </Target>
 
-  <Target Name="ArmBuildLib" Condition="'$(OutputType)'=='Library'" DependsOnTargets="FindCompileFilesExistence;FindFastCompileFilesExistence;DelBuildLib;ArmCompileC;ArmCompileCPP;ArmAssemble;CreateLibManifest;$(ExtraTargets);" Inputs="@(ObjFiles);@(LIB_FIRSTENTRY_OBJ);@(OEM_TARGETS);@(OEM_TARGETS_OBJ);@(PlatformIndependentLibs->'$(PLATFORM_INDEPENDENT_LIB_DIR)\%(FileName)%(Extension)')" Outputs="@(TargetLib);@(TargetLib->'%(FullPath).manifest')">
-    <Exec Condition="'@(FilesExist)'!='' " Command="$(AR) $(ARFLAGS) @(TargetLib) @(ObjFiles,' ') @(LIB_FIRSTENTRY_OBJ,' ') @(OEM_TARGETS,' ') @(OEM_TARGETS_OBJ,' ') @(PlatformIndependentLibs->'$(PLATFORM_INDEPENDENT_LIB_DIR)\%(FileName)%(Extension)', ' ')"/>
+  <Target Name="ArmBuildLib" Condition="'$(OutputType)'=='Library'" DependsOnTargets="FindCompileFilesExistence;FindFastCompileFilesExistence;DelBuildLib;ArmCompileC;ArmCompileCPP;ArmAssemble;CreateLibManifest;$(ExtraTargets);" Inputs="@(ObjFiles);@(LIB_FIRSTENTRY_OBJ);@(OEM_TARGETS);@(OEM_TARGETS_OBJ);@(DriverLibs->'$(LIB_DIR)\%(FileName)%(Extension)',' ');@(PlatformIndependentLibs->'$(PLATFORM_INDEPENDENT_LIB_DIR)\%(FileName)%(Extension)')" Outputs="@(TargetLib);@(TargetLib->'%(FullPath).manifest')">
+    <Exec WorkingDirectory="$(OBJ_DIR)" Condition="'@(FilesExist)'!='' " Command="$(AR) $(ARFLAGS) @(TargetLib) @(ObjFiles->'%(FileName)%(Extension)', ' ') @(LIB_FIRSTENTRY_OBJ,' ') @(OEM_TARGETS,' ') @(OEM_TARGETS_OBJ,' ') @(DriverLibs->'$(LIB_DIR)\%(FileName)%(Extension)',' ') @(PlatformIndependentLibs->'$(PLATFORM_INDEPENDENT_LIB_DIR)\%(FileName)%(Extension)', ' ')"/>
   </Target>
 
   <Target Name="BuildAXF" Condition="'$(OutputType)'=='Executable'" DependsOnTargets="ArmCompileCPP;ArmCompileC;ArmAssemble;$(ExtraEXETargets);BuildScatterfile;" Inputs="@(EXEInputs);@(InputLibs);@(PlatformIndependentLibs->'$(PLATFORM_INDEPENDENT_LIB_DIR)\%(FileName)%(Extension)');@(DriverLibs->'$(LIB_DIR)\%(FileName)%(Extension)');@(EXEScatterFile)" Outputs="@(EXEOutput)">

@@ -528,6 +528,8 @@ namespace Microsoft.SPOT.Emulator.BlockStorage
         Dat = 0x0080,
         Storage_A = 0x00E0,
         Storage_B = 0x00F0,
+        Simple_A = 0x90,
+        Simple_B = 0xA0,
     }
 
     [Flags]
@@ -557,6 +559,8 @@ namespace Microsoft.SPOT.Emulator.BlockStorage
         Usage_Deployment = Reserved | Usage_ManagedCode | BlockUsage.Deployment, // Deployment area for MFdeploy & Visual Studio
         Usage_Storage_A = Reserved | Usage_Data | BlockUsage.Storage_A,         // Part A of EWR Storage
         Usage_Storage_B = Reserved | Usage_Data | BlockUsage.Storage_B,         // Part B of EWR Storage
+        Usage_SimpleStorage_A = Reserved | Usage_Data | BlockUsage.Simple_A,         // Part A of Simple Storage
+        Usage_SimpleStorage_B = Reserved | Usage_Data | BlockUsage.Simple_B,         // Part B of Simple Storage
         Usage_FileSystem = Usage_Data | BlockUsage.FileSystem,                  // Debug logging data
     }
 
@@ -809,7 +813,7 @@ namespace Microsoft.SPOT.Emulator.BlockStorage
 
                 curRegion.AddressInternal = Address;
 
-                Address += (uint)(curRegion.BytesPerBlock * curRegion.BlockRanges.Length);
+                Address += (uint)(curRegion.BytesPerBlock * curRegion.TotalBlockCount);
             }
         }
 
@@ -854,6 +858,7 @@ namespace Microsoft.SPOT.Emulator.BlockStorage
     public class EmulatorBlockStorageDevice : BlockStorageDevice
     {
         protected EmulatorBlockStorageMemory _memory;
+        protected EmulatorBlockStorageMemory _sectorMetaData;
 
         private String _persistanceFilename = String.Empty;
 
@@ -888,7 +893,17 @@ namespace Microsoft.SPOT.Emulator.BlockStorage
         {
             base.SetupComponent();
 
+            uint sectorSize;
+
+            unsafe
+            {
+                sectorSize = (uint)sizeof( BsSectorMetadata );
+            }
+
+            uint numSectors = Regions[0].TotalBlockCount * Regions[0].BytesPerBlock / BytesPerSector;
+
             _memory = EmulatorBlockStorageMemory.CreateInstance(_persistanceFilename, Regions[0].BytesPerBlock / BytesPerSector, BytesPerSector, (uint)Regions[0].TotalBlockCount, (uint)0, this.SupportsXIP);
+            _sectorMetaData = EmulatorBlockStorageMemory.CreateInstance( _persistanceFilename + ".smd", 1, sectorSize, numSectors, (uint)0, false );
         }
 
         public override void Read(uint address, uint count, byte[] buffer)
@@ -908,12 +923,51 @@ namespace Microsoft.SPOT.Emulator.BlockStorage
 
         public override void GetSectorMetadata(uint address, ref BsSectorMetadata sectorMetadata)
         {
-            // Do we want to test wear leveling in the emulator?
+            uint addr = _sectorMetaData.BytesPerSector * (( address - _baseAddress ) / BytesPerSector);
+
+            byte[] data = new byte[_sectorMetaData.BytesPerSector];
+
+/*
+            // fake bad blocks
+            if(addr == ( (52+2 ) * 64 * _sectorMetaData.BytesPerSector ) || addr == ((52+17) * 64 * _sectorMetaData.BytesPerSector ) ||
+               addr == ( (52+18) * 64 * _sectorMetaData.BytesPerSector ) || addr == ((52+23) * 64 * _sectorMetaData.BytesPerSector ) ||
+               addr == ( (52+24) * 64 * _sectorMetaData.BytesPerSector ) || addr == ((52+25) * 64 * _sectorMetaData.BytesPerSector ) ||
+               addr == ( (52+27) * 64 * _sectorMetaData.BytesPerSector ) || addr == ((52+30) * 64 * _sectorMetaData.BytesPerSector )  )
+            {
+                sectorMetadata.badBlock = 0;
+                sectorMetadata.ECC0 = 0;
+                sectorMetadata.ECC1 = 0;
+                sectorMetadata.oemReserved = 0;
+                sectorMetadata.reserved1 = 0;
+                sectorMetadata.reserved2 = 0;
+
+                return;
+            }
+*/
+
+            _sectorMetaData.Read(addr, _sectorMetaData.BytesPerSector, data);
+
+            GCHandle pinnedMD = GCHandle.Alloc( data, GCHandleType.Pinned );
+            sectorMetadata = (BsSectorMetadata)Marshal.PtrToStructure(
+                pinnedMD.AddrOfPinnedObject(),
+                typeof( BsSectorMetadata ) );
+            pinnedMD.Free();
         }
 
         public override void SetSectorMetadata(uint address, ref BsSectorMetadata sectorMetadata)
         {
-            // Do we want to test wear leveling in the emulator?
+            uint addr = _sectorMetaData.BytesPerSector * ( ( address - _baseAddress ) / BytesPerSector );
+
+            byte[] data = new byte[_sectorMetaData.BytesPerSector];
+
+            GCHandle pinnedMD = GCHandle.Alloc( data, GCHandleType.Pinned );
+            Marshal.StructureToPtr(
+                sectorMetadata,
+                pinnedMD.AddrOfPinnedObject(), 
+                true);
+            pinnedMD.Free();
+
+            _sectorMetaData.Write( addr, (uint)data.Length, data, true );
         }
 
         public override bool IsBlockErased(uint address, uint blockLength)
@@ -927,6 +981,12 @@ namespace Microsoft.SPOT.Emulator.BlockStorage
             
             _memory.EraseBlock(address - _baseAddress, r.BytesPerBlock);
 
+            // erase the sector metadata
+            uint addr = _sectorMetaData.BytesPerSector * ( ( address - _baseAddress ) / BytesPerSector );
+            uint len  = _sectorMetaData.BytesPerSector * _memory.SectorsPerBlock;
+
+            _sectorMetaData.EraseBlock( addr, len );
+            
             Thread.Sleep((int)(MaxBlockEraseTime / 1000));
         }
 
@@ -934,6 +994,7 @@ namespace Microsoft.SPOT.Emulator.BlockStorage
         {
             // This will force persistance to memory, if we gave it a filename earlier
             _memory.Dispose();
+            _sectorMetaData.Dispose();
 
             base.UninitializeComponent();
         }
@@ -1095,7 +1156,7 @@ namespace Microsoft.SPOT.Emulator.BlockStorage
                 Region[] regions = new Region[1];
                 BlockRange[] blocks = new BlockRange[1];
 
-                regions[0] = new Region(sectorsPerBlock, blocks);
+                regions[0] = new Region(sectorsPerBlock*bytesPerSector, blocks);
 
                 blocks[0] = new BlockRange(regions[0], BlockType.Usage_FileSystem, 0, numBlocks);
 
@@ -1654,8 +1715,41 @@ namespace Microsoft.SPOT.Emulator.BlockStorage
     public class EmulatorBlockStorageMemoryFile : EmulatorBlockStorageMemory
     {
         protected FileStream _memory;
+        private static object s_lock = new object();
 
-        private EmulatorBlockStorageMemoryFile() { }
+        static EmulatorBlockStorageMemoryFile()
+        {
+            if(s_eraseBlock == null)
+            {
+                lock(s_lock)
+                {
+                    if(s_eraseBlock == null)
+                    {
+                        s_eraseBlock = new byte[0x20000];
+
+                        for(int i = 0; i < s_eraseBlock.Length; i++)
+                        {
+                            s_eraseBlock[i] = 0xFF;
+                        }
+                    }
+                }
+            }
+
+            if(s_readBlock == null)
+            {
+                lock(s_lock)
+                {
+                    if(s_readBlock == null)
+                    {
+                        s_readBlock = new byte[0x20000];
+                    }
+                }
+            }
+        }
+
+        private EmulatorBlockStorageMemoryFile() 
+        {
+        }
 
         internal protected EmulatorBlockStorageMemoryFile(String filename, uint sectorsPerBlock, uint bytesPerSector, uint numBlocks, uint serialNumber)
         {
@@ -1766,24 +1860,53 @@ namespace Microsoft.SPOT.Emulator.BlockStorage
         {
             _memory.Seek(FileInfoSize + address, SeekOrigin.Begin);
 
-            for (uint i = 0; i < blockLength; i++)
+            uint len = blockLength > s_readBlock.Length ? (uint)s_readBlock.Length : blockLength;
+            
+            while(blockLength > 0)
             {
-                if (_memory.ReadByte() != 0xff)
+                if(_memory.Read(s_readBlock, 0, (int)len) != len)
                 {
                     return false;
+                }
+
+                for(int i = 0; i < len; i++)
+                {
+                    if(s_readBlock[i] != 0xFF)
+                    {
+                        return false;
+                    }
+                }
+
+                blockLength -= len;
+
+                if(blockLength < len)
+                {
+                    len = blockLength;
                 }
             }
 
             return true;
         }
 
+        static byte[] s_eraseBlock = null;
+        static byte[] s_readBlock = null;
+
         public override void EraseBlock(uint address, uint blockLength)
         {
             _memory.Seek(FileInfoSize + address, SeekOrigin.Begin);
 
-            for (uint i = 0; i < blockLength; i++)
+            uint len = blockLength > s_eraseBlock.Length ? (uint)s_eraseBlock.Length : blockLength; 
+
+            while(blockLength > 0)
             {
-                _memory.WriteByte(0xff);
+                _memory.Write(s_eraseBlock, 0, (int)len);
+
+                blockLength -= len;
+
+                if(blockLength < len)
+                {
+                    len = blockLength;
+                }
             }
         }
 

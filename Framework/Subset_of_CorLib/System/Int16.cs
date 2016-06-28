@@ -18,12 +18,12 @@ namespace System
 
         public override String ToString()
         {
-            return Number.Format((int)m_value, true, "G", NumberFormatInfo.CurrentInfo);
+            return Number.Format(m_value, true, "G", NumberFormatInfo.CurrentInfo);
         }
 
         public String ToString(String format)
         {
-            return Number.Format((int)m_value, true, format, NumberFormatInfo.CurrentInfo);
+            return Number.Format(m_value, true, format, NumberFormatInfo.CurrentInfo);
         }
 
         public static short Parse(String s)

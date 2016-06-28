@@ -104,7 +104,7 @@ DSA_SIG *gost_do_sign(const unsigned char *dgst,int dlen, DSA *dsa)
 int pack_sign_cc(DSA_SIG *s,int order,unsigned char *sig, size_t *siglen)
 	{
 	*siglen = 2*order;
-	memset(sig,0,*siglen);
+	TINYCLR_SSL_MEMSET(sig,0,*siglen);
 	store_bignum(s->r, sig,order);
 	store_bignum(s->s, sig + order,order);
 	dump_signature("serialized",sig,*siglen);

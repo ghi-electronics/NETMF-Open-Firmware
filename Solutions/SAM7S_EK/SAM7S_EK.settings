@@ -10,10 +10,14 @@
     <PLATFORM>SAM7S_EK</PLATFORM>
     <IsSolutionWizardVisible>True</IsSolutionWizardVisible>
     <ENDIANNESS>le</ENDIANNESS>
-    <PLATFORM_NO_APPDOMAINS>true</PLATFORM_NO_APPDOMAINS>
-    <PLATFORM_EMULATED_FLOATINGPOINT>true</PLATFORM_EMULATED_FLOATINGPOINT>
     <NO_BOOTLOADER_COMPRESSION>true</NO_BOOTLOADER_COMPRESSION>
+    <PLATFORM_EMULATED_FLOATINGPOINT>true</PLATFORM_EMULATED_FLOATINGPOINT>
   </PropertyGroup>
+  <ItemGroup>
+    <TinyCLR_Defines Include="PLATFORM_EMULATED_FLOATINGPOINT=1" />
+    <TinyCLR_Defines Include="TINYCLR_NO_APPDOMAINS=1" />
+    <TinyCLR_Defines Include="PLATFORM_NO_CLR_TRACE=1" />
+  </ItemGroup>   
   <ItemGroup>
     <IncludePaths Include="Solutions\SAM7S_EK" />
   </ItemGroup>

@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="TinyCLR_Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <AssemblyName>Microsoft.SPOT.Native</AssemblyName>
@@ -13,9 +14,7 @@
     <NoWarn>$(NoWarn),0169,0649,1591</NoWarn>
     <AssemblyBothEndian>true</AssemblyBothEndian>
   </PropertyGroup>
-
   <Import Project="$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.CSharp.Targets" />
-
   <PropertyGroup>
     <!-- MMP_PE overridden options -->
     <MMP_PE_NoBitmapCompression>true</MMP_PE_NoBitmapCompression>
@@ -23,10 +22,9 @@
     <MMP_STUB_SKIP>false</MMP_STUB_SKIP>
     <MMP_STUB_GenerateSkeletonFile>$(BUILD_TREE_STUBS)\spot_native</MMP_STUB_GenerateSkeletonFile>
     <MMP_STUB_GenerateSkeletonProject>SPOT</MMP_STUB_GenerateSkeletonProject>
+    <MMP_STUB_LegacySkeletonInterop>true</MMP_STUB_LegacySkeletonInterop>
   </PropertyGroup>
-  
   <ItemGroup>
-    <Compile Include="Crypto.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="Delegates.cs" />
     <Compile Include="EventArgs.cs" />
@@ -45,17 +43,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Native_Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="X509Certificate.cs" />
     <EmbeddedResource Include="Native_Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Native_Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  
   <ItemGroup>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
-
   <ItemGroup>
     <MMP_PE_ExcludeClassByName Include="Microsoft.SPOT.PublishInApplicationDirectoryAttribute">
       <InProject>false</InProject>
@@ -64,7 +61,6 @@
       <InProject>false</InProject>
     </MMP_PE_ExcludeClassByName>
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>

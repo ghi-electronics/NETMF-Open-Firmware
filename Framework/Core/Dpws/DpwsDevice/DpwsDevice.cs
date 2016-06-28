@@ -273,7 +273,7 @@ namespace Dpws.Device
 
             // Add metadata get service endpoint
             m_discoMexService = new DpwsDeviceMexService(v);
-            m_hostedServices.Add(m_discoMexService);
+            m_hostedServices.DiscoMexService = m_discoMexService;
 
             // Add direct probe service endpoint
             if(m_discoveryService != null) m_hostedServices.Add(m_discoveryService);
@@ -321,12 +321,12 @@ namespace Dpws.Device
             m_httpServiceHost.Start(ctx);
             System.Ext.Console.Write("Http service host started...");
 
-            // Send hello greeting
-            if(m_discoGreeting != null) m_discoGreeting.SendGreetingMessage(true);
-
             // Start Udp service host
             WsUdpServiceHost.Instance.Start(ctx);
             System.Ext.Console.Write("Udp service host started...");
+
+            // Send hello greeting
+            if (m_discoGreeting != null) m_discoGreeting.SendGreetingMessage(true);
 
             // Start the event subscription manager
             m_eventQManager = new DpwsWseEventSinkQMgr();
@@ -345,11 +345,11 @@ namespace Dpws.Device
         {
             if(!m_isStarted) throw new InvalidOperationException();
 
-            WsUdpServiceHost.Instance.Stop();
-            System.Ext.Console.Write("Udp service host stopped...");
-
             // Send bye
             if (m_discoGreeting != null) m_discoGreeting.SendGreetingMessage(false);
+
+            WsUdpServiceHost.Instance.Stop();
+            System.Ext.Console.Write("Udp service host stopped...");
 
             m_eventQManager.Stop();
             System.Ext.Console.Write("Event subscription manager stopped...");

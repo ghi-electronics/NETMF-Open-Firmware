@@ -7,6 +7,7 @@ using System.Threading;
 using System.Collections;
 using System.Runtime.CompilerServices;
 
+using Microsoft.SPOT.Touch;
 using Microsoft.SPOT.Input;
 using Microsoft.SPOT.Presentation.Media;
 
@@ -1240,12 +1241,12 @@ namespace Microsoft.SPOT.Presentation
 
             if ((flags & (Flags.InvalidMeasure | Flags.MeasureInProgress)) == 0)
             {
+                _flags |= Flags.InvalidMeasure;
+
                 if ((flags & Flags.NeverMeasured) == 0)
                 {
                     LayoutManager.CurrentLayoutManager.MeasureQueue.Add(this);
                 }
-
-                _flags |= Flags.InvalidMeasure;
             }
         }
 
@@ -1263,12 +1264,12 @@ namespace Microsoft.SPOT.Presentation
 
             if ((flags & (Flags.InvalidArrange | Flags.ArrangeInProgress)) == 0)
             {
+                _flags |= Flags.InvalidArrange;
+
                 if ((flags & Flags.NeverArranged) == 0)
                 {
                     LayoutManager.CurrentLayoutManager.ArrangeQueue.Add(this);
                 }
-
-                _flags |= Flags.InvalidArrange;
             }
         }
 
@@ -1560,9 +1561,7 @@ namespace Microsoft.SPOT.Presentation
                         for (int i = 0; i < n; i++)
                         {
                             UIElement child = children[i];
-                            if (child.Visibility == Visibility.Visible
-                                && child._renderWidth > 0
-                                && child._renderHeight > 0)
+                            if (child.IsRenderable())
                             {
                                 child.RenderRecursive(dc);
                             }
@@ -1574,24 +1573,25 @@ namespace Microsoft.SPOT.Presentation
             {
                 dc.PopClippingRectangle();
                 dc.Translate(-_offsetX, -_offsetY);
+
+                //-------------------------------------------------------------------------------
+                // Reset the render flags.
+
+                _flags &= ~(Flags.IsSubtreeDirtyForRender | Flags.IsDirtyForRender);
             }
-
-            //-------------------------------------------------------------------------------
-            // Reset the render flags.
-
-            _flags &= ~(Flags.IsSubtreeDirtyForRender | Flags.IsDirtyForRender);
         }
 
         internal static void PropagateFlags(UIElement e, Flags flags)
         {
             while ((e != null) && ((e._flags & flags) == 0))
             {
+                e._flags |= flags;
+
                 if ((e._flags & Flags.ShouldPostRender) != 0)
                 {
                     MediaContext.From(e.Dispatcher).PostRender();
                 }
 
-                e._flags |= flags;
                 e = e._parent;
             }
         }

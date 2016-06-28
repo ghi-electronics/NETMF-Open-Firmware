@@ -36,5 +36,14 @@
     <Setting Name="PlugIns" Type="System.String" Scope="User">
       <Value Profile="(Default)">PlugIn</Value>
     </Setting>
+    <Setting Name="EraseSectors" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Deployment; StorageA; StorageB</Value>
+    </Setting>
+    <Setting Name="SslCert" Type="System.String" Scope="User">
+      <Value Profile="(Default)">NetMFDeviceCert.pfx</Value>
+    </Setting>
+    <Setting Name="SslRequireClientCert" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

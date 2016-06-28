@@ -323,7 +323,7 @@ void sk_sort(_STACK *st)
 		 * type** with type**, so we leave the casting until absolutely
 		 * necessary (ie. "now"). */
 		comp_func=(int (*)(const void *,const void *))(st->comp);
-		qsort(st->data,st->num,sizeof(char *), comp_func);
+		TINYCLR_SSL_QSORT(st->data,st->num,sizeof(char *), comp_func);
 		st->sorted=1;
 		}
 	}

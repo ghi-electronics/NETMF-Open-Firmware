@@ -421,6 +421,12 @@ lwip_connect(int s, const struct sockaddr *name, socklen_t namelen)
     ip_addr_debug_print(SOCKETS_DEBUG, &remote_addr);
     LWIP_DEBUGF(SOCKETS_DEBUG, (" port=%"U16_F")\n", ntohs(remote_port)));
 
+    //[MS_CHANGE] - make sure we don't signal the socket for send before we finish
+    // the connect for TCP
+    if(sock->conn->type == NETCONN_TCP)
+    {
+        sock->sendevent = 0;
+    }
     err = netconn_connect(sock->conn, &remote_addr, ntohs(remote_port));
   }
 
@@ -513,6 +519,27 @@ lwip_recvfrom(int s, void *mem, size_t len, int flags,
       /* No data was left from the previous operation, so we try to get
       some from the network. */
       sock->lastdata = buf = netconn_recv(sock->conn);
+
+      // [MS_CHANGE] - enable blocking sockets for SSL handshake
+      if(buf == NULL && 0 == (sock->flags & O_NONBLOCK))
+      {
+        u32_t sem = 0;
+        int v;
+
+        int timeout = sock->conn->recv_timeout;
+
+        if(timeout == 0) timeout = 5000;
+
+        for(v=timeout/100; v>=0; v--)
+        {
+            sys_arch_sem_wait( (sys_sem_t)&sem, 100); 
+
+            sock->lastdata = buf = netconn_recv(sock->conn);
+
+            if(buf != NULL) break;
+        }
+      }
+
       LWIP_DEBUGF(SOCKETS_DEBUG, ("lwip_recvfrom: netconn_recv netbuf=%p\n", (void*)buf));
 
       if (!buf) {
@@ -781,19 +808,13 @@ lwip_socket(int domain, int type, int protocol)
   /* create a netconn */
   switch (type) {
   case SOCK_RAW:
-    //[MS_CHANGE] - make sure type is correct
-    if(protocol != NETCONN_RAW) 
-    {
-       set_errno(EINVAL);
-       return -1;
-    }
     conn = netconn_new_with_proto_and_callback(NETCONN_RAW, (u8_t)protocol, event_callback);
     LWIP_DEBUGF(SOCKETS_DEBUG, ("lwip_socket(%s, SOCK_RAW, %d) = ",
                                  domain == PF_INET ? "PF_INET" : "UNKNOWN", protocol));
     break;
   case SOCK_DGRAM:
     //[MS_CHANGE] - make sure type is correct
-    if(protocol != NETCONN_UDP && protocol != NETCONN_UDPLITE) 
+    if(protocol != IPPROTO_UDP && protocol != IPPROTO_UDPLITE) 
     {
        set_errno(EINVAL);
        return -1;
@@ -805,7 +826,7 @@ lwip_socket(int domain, int type, int protocol)
     break;
   case SOCK_STREAM:
     //[MS_CHANGE] - make sure type is correct
-    if(protocol != NETCONN_TCP) 
+    if(protocol != IPPROTO_TCP) 
     {
        set_errno(EINVAL);
        return -1;
@@ -1186,6 +1207,7 @@ lwip_getaddrname(int s, struct sockaddr *name, socklen_t *namelen, u8_t local)
   struct lwip_socket *sock;
   struct sockaddr_in sin;
   struct ip_addr naddr;
+  u16_t port;
 
   sock = get_socket(s);
   if (!sock)
@@ -1196,7 +1218,9 @@ lwip_getaddrname(int s, struct sockaddr *name, socklen_t *namelen, u8_t local)
   sin.sin_family = AF_INET;
 
   /* get the IP address and port */
-  netconn_getaddr(sock->conn, &naddr, &sin.sin_port, local);
+  netconn_getaddr(sock->conn, &naddr, &port, local);
+
+  sin.sin_port = port;
 
   LWIP_DEBUGF(SOCKETS_DEBUG, ("lwip_getaddrname(%d, addr=", s));
   ip_addr_debug_print(SOCKETS_DEBUG, &naddr);
@@ -1453,7 +1477,7 @@ lwip_getsockopt_internal(void *arg)
 #if LWIP_TCP
         if(sock->conn->type == NETCONN_TCP)
         {
-            *(int*)optval = (optname == SO_LINGER ? sock->conn->pcb.tcp->linger : !sock->conn->pcb.tcp->linger);
+            *(int*)optval = (optname == SO_LINGER ? sock->conn->pcb.tcp->linger.l_linger / 1000 : !sock->conn->pcb.tcp->linger.l_onoff);
         }
 #endif
         break;
@@ -1846,12 +1870,33 @@ lwip_setsockopt_internal(void *arg)
     switch (optname) {
 
     // [MS_CHANGE] - add linger functionality
-    case SO_LINGER:
     case SO_DONTLINGER:
 #if LWIP_TCP
         if(sock->conn->type == NETCONN_TCP)
         {
-            sock->conn->pcb.tcp->linger = (optname == SO_LINGER ? *(u32_t*)optval : !*(u32_t*)optval);
+            s32_t value = *(s32_t*)optval;
+
+            sock->conn->pcb.tcp->linger.l_onoff  = value == 0 ? 1 : 0;
+        }
+#endif
+        break;
+    case SO_LINGER:
+#if LWIP_TCP
+        if(sock->conn->type == NETCONN_TCP)
+        {
+            s32_t value = *(s32_t*)optval;
+
+            if(value < 0)
+            {
+                // Linger OFF
+                // graceful no block
+                sock->conn->pcb.tcp->linger.l_onoff  = 0;
+            }
+            else
+            {
+                sock->conn->pcb.tcp->linger.l_onoff  = 1;
+                sock->conn->pcb.tcp->linger.l_linger = value * 1000;
+            }
         }
 #endif
         break;

@@ -56,8 +56,8 @@ size_t tinyclr_ssl_fwrite ( const void * ptr, size_t size, size_t count, void * 
 int tinyclr_ssl_gettimeofday(void *tp, void *tzp)
 {
     time_t localtime = Time_GetLocalTime(); //100nanoseconds 
-    ((struct TINYCLR_SSL_TIMEVAL*)tp)->tv_sec = localtime / 10000000; //for seconds 
-    ((struct TINYCLR_SSL_TIMEVAL*)tp)->tv_usec = (localtime % 10000000) / 1000; //for microseconds
+    ((struct TINYCLR_SSL_TIMEVAL*)tp)->tv_sec  = (long)localtime / 10000000; //for seconds 
+    ((struct TINYCLR_SSL_TIMEVAL*)tp)->tv_usec = (long)(localtime % 10000000) / 1000; //for microseconds
     return 0;
 };
 
@@ -69,29 +69,41 @@ int tinyclr_ssl_chmod(const char *filename, int pmode )
 struct servent *tinyclr_ssl_getservbyname(const char *name, const char *proto)
 {
     // TODO - temp workaround
-#ifndef TCPIP_LWIP 
+#if SOCKETS_MAX_COUNT!=1
+#ifndef TCPIP_LWIP
     return getservbyname(name, proto);
 #else
     debug_printf("tinyclr_ssl_getservbyname(%s,%s) stubbed for LWIP!\r\n",name,proto);
     return NULL;
 #endif
+#else
+    return NULL;
+#endif
 }
 struct hostent *tinyclr_ssl_gethostbyname(const char *name)
 {
-#ifndef TCPIP_LWIP 
+#if SOCKETS_MAX_COUNT!=1
+#ifndef TCPIP_LWIP
     return gethostbyname(name);
 #else
     debug_printf("tinyclr_ssl_gethostbyname(%s) stubbed for LWIP!\r\n",name);
     // undefined symbol, how is that possible ? return lwip_gethostbyname(name);
     return NULL;
 #endif
+#else
+    return NULL;
+#endif
 }
 struct hostent *tinyclr_ssl_gethostbyaddr(const char *addr, int length, int type)
 {
-#ifndef TCPIP_LWIP 
+#if SOCKETS_MAX_COUNT!=1
+#ifndef TCPIP_LWIP
     return gethostbyaddr(addr, length, type);
 #else
     debug_printf("tinyclr_ssl_gethostbyaddr(%s,%d,%d) stubbed for LWIP!\r\n",addr,length,type);
+    return NULL;
+#endif
+#else
     return NULL;
 #endif
 }
@@ -104,17 +116,60 @@ pid_t tinyclr_ssl_getpid()
 void tinyclr_qsort ( void * base, size_t num, size_t size, 
     int ( * comparator ) ( const void *, const void * ) )
 {
+    if(num <= 1) return;
+
+    // TODO:     
+
     return;
 }
+
+int hal_fprintf_ssl(OPENSSL_TYPE__FILE* x, const char* format, ... )
+{
+    va_list arg_ptr;
+    int     chars;
+
+    va_start( arg_ptr, format );
+
+    chars = hal_vprintf( format, arg_ptr );
+
+    va_end( arg_ptr );
+
+    return chars;
+}
+
+INT64 s_TimeUntil1900 = 0;
+
+static const INT64 MF_TIME_TO_SECONDS = 10000000LL; //// convert from 100nanosecond ticks to seconds
     
-// localtime as returned here is milliseconds elapsed since 1/1/1601 rather
-// than that C library standard of milliseconds elapsed wince 1/1/1970. However
+// localtime as returned here is seconds elapsed since 1/1/1601 rather
+// than that C library standard of seconds elapsed wince 1/1/1970. However
 // the following implementation of localtime and gmtime handle this correctly.
 time_t tinyclr_time ( time_t * timer )
 {
     INT64 tim = Time_GetLocalTime();
-    time_t localtime = (time_t)(tim / 10000); // convert from 100nano to milli seconds
+    time_t localtime;
+
+    if(s_TimeUntil1900 == 0)
+    {
+        SYSTEMTIME st;
+
+        memset(&st, 0, sizeof(st));
+
+        st.wMonth = 1;
+        st.wDay  = 1;
+        st.wYear = 1900;
+
+        s_TimeUntil1900 = Time_FromSystemTime(&st);
+    }
+
+    tim -= s_TimeUntil1900;
+
+    tim = (tim / MF_TIME_TO_SECONDS); // convert from 100nano to seconds
+
+    localtime = (time_t)tim;
+
     if (timer != NULL) *timer = localtime;
+    
     return localtime;
 }
 
@@ -122,16 +177,16 @@ time_t tinyclr_time ( time_t * timer )
 struct tm * tinyclr_localtime ( const time_t * timer )
 {
     SYSTEMTIME systime;
-    INT64 tim = (INT64)(*timer);
-    INT64 localtime = tim*10000; // convert from milli to 100nano seconds
+    INT64 tim = (INT64)(UINT32)(*timer);
+    INT64 localtime = tim * MF_TIME_TO_SECONDS + s_TimeUntil1900; // convert from seconds to 100nano seconds
     Time_ToSystemTime(localtime, &systime); 
     g_timestruct.tm_hour = systime.wHour;
     g_timestruct.tm_mday = systime.wDay;
     g_timestruct.tm_min = systime.wMinute;
-    g_timestruct.tm_mon = systime.wMonth;
+    g_timestruct.tm_mon = systime.wMonth - 1; // SYSTEMTIME structure is one based and struct tm is zero based
     g_timestruct.tm_sec = systime.wSecond;
     g_timestruct.tm_wday = systime.wDayOfWeek;
-    g_timestruct.tm_year = systime.wYear - 1900; // years since 1900
+    g_timestruct.tm_year = systime.wYear - 1900; // struct tm records years since 1900
     return &g_timestruct;
 }
 
@@ -139,17 +194,18 @@ struct tm * tinyclr_localtime ( const time_t * timer )
 struct tm * tinyclr_gmtime ( const time_t * timer )
 {
     SYSTEMTIME systime;
-    INT64 offset = Time_GetTimeZoneOffset() * 600000000; //convert from min to 100nanoseconds
-    INT64 tim = (INT64)(*timer);
-    INT64 utctime = tim*10000 + offset;
+    INT64 offset = Time_GetTimeZoneOffset() * 60; // convert to seconds
+
+    INT64 tim = (INT64)(UINT32)(*timer);
+    INT64 utctime = (tim + offset) * MF_TIME_TO_SECONDS + s_TimeUntil1900; // convert to seconds since 1900
     Time_ToSystemTime(utctime, &systime); 
     g_timestruct.tm_hour = systime.wHour;
     g_timestruct.tm_mday = systime.wDay;
     g_timestruct.tm_min = systime.wMinute;
-    g_timestruct.tm_mon = systime.wMonth;
+    g_timestruct.tm_mon = systime.wMonth - 1; // SYSTEMTIME structure is one based and struct tm is zero based
     g_timestruct.tm_sec = systime.wSecond;
     g_timestruct.tm_wday = systime.wDayOfWeek;
-    g_timestruct.tm_year = systime.wYear - 1900; // years since 1900
+    g_timestruct.tm_year = systime.wYear - 1900; // struct tm records years since 1900
     return &g_timestruct;
 }
 
@@ -159,11 +215,11 @@ time_t tinyclr_mktime ( struct tm * timeptr )
     systime.wHour = timeptr->tm_hour;
     systime.wDay = timeptr->tm_mday;
     systime.wMinute = timeptr->tm_min;
-    systime.wMonth = timeptr->tm_mon;
+    systime.wMonth = timeptr->tm_mon + 1;  // SYSTEMTIME structure is one based and struct tm is zero based
     systime.wSecond = timeptr->tm_sec;
     systime.wDayOfWeek = timeptr->tm_wday;
-    systime.wYear = timeptr->tm_yday;
-    time_t localtime = Time_FromSystemTime(&systime) / 10000; //convert from 100nano to milliseconds
+    systime.wYear = timeptr->tm_year + 1900; // struct tm records years since 1900
+    time_t localtime = (time_t)((Time_FromSystemTime(&systime) - s_TimeUntil1900) / MF_TIME_TO_SECONDS); //convert from 100nano to seconds
     return localtime;
 }
 

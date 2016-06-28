@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ResultFailure" xml:space="preserve">
     <value>Failure</value>
@@ -166,7 +166,7 @@
     <value>Where FLAG is:</value>
   </data>
   <data name="OpenFileDialogFilterSREC" xml:space="preserve">
-    <value>SREC files (*.hex)|ER_FLASH;ER_RAM;ER_CONFIG;ER_DAT;ER_ResetVector;*.hex</value>
+    <value>SREC files (*.hex); NetMF Updates(*.nmf)|ER_FLASH;ER_RAM;ER_CONFIG;ER_DAT;ER_ResetVector;*.hex;*.nmf</value>
   </data>
   <data name="SecondaryDnsAddress" xml:space="preserve">
     <value>Secondary DNS Address</value>
@@ -303,7 +303,7 @@
   <data name="WarningPlugInPending" xml:space="preserve">
     <value>Plug-in command pending, please wait</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="MFDeployIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\MFDeployIcon.ico;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -535,5 +535,11 @@ Copyright (c) 2007 Microsoft Corporation All rights reserved.</value>
   </data>
   <data name="ErrorAppSettings" xml:space="preserve">
     <value>Error: Invalid Application Settings: {0}</value>
+  </data>
+  <data name="HelpInterfaceWinUsb" xml:space="preserve">
+    <value>- Identifies WinUSB port name for device.</value>
+  </data>
+  <data name="TransportWinUsb" xml:space="preserve">
+    <value>WINUSB</value>
   </data>
 </root>

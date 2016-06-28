@@ -478,7 +478,7 @@ namespace Ws.Services.Mtom
 
             if(m_curPos == m_length) return null;
             
-            int idx = Array.IndexOf(m_buffer, '\r', startPos);
+            int idx = Array.IndexOf(m_buffer, '\r', startPos, m_length - startPos);
 
             if(idx >= 0)
             {

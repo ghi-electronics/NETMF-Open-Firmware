@@ -208,6 +208,8 @@ namespace Microsoft.SPOT.Emulator.I2c
                 return false;
             }
 
+            if (address == 0x02) return true; //adderss 0x02 is can be used for differentbus format
+
             switch (address & 0x78)
             {
                 case 0x00: // Top 4 address bits are 0 -> reserve

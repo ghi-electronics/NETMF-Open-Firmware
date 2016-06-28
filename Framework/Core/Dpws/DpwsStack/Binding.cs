@@ -50,9 +50,9 @@ namespace Ws.Services.Binding
         /// </summary>
         public static readonly TimeSpan DefaultOpenTimeout    = new TimeSpan(0, 0, 10);
         /// <summary>
-        /// Default close timeout (1 minute).
+        /// Default close timeout (10 seconds).
         /// </summary>
-        public static readonly TimeSpan DefaultCloseTimeout   = new TimeSpan(0, 1,  0);
+        public static readonly TimeSpan DefaultCloseTimeout   = new TimeSpan(0, 0, 10);
         /// <summary>
         /// Default receive timeout (5 minutes).
         /// </summary>
@@ -180,8 +180,12 @@ namespace Ws.Services.Binding
             // Clone binding context so that properties added by the send/receive
             // do not persist beyond this request
             BindingContext ctx = m_context.Clone();
-            
+
+            ctx.ContextObject = m_context.ContextObject;
+
             SendMessage(request, ctx);
+
+            m_context.ContextObject = ctx.ContextObject;
         }
 
         /// <summary>
@@ -231,7 +235,7 @@ namespace Ws.Services.Binding
     {
         WsMessage    m_message;
         ReplyChannel m_channel;
-        BindingContext m_context;
+        internal BindingContext m_context;
 
         /// <summary>
         /// A RequestContext object is created by the ReplyChannel when a request is received.
@@ -452,7 +456,10 @@ namespace Ws.Services.Binding
 
                 for (int i = 0; i < len; i++)
                 {
-                    this.BindingProperties.Add(bindingProperties[i]);
+                    if(!WebHeaderCollection.IsRestricted(bindingProperties[i].Name))
+                    {
+                        this.BindingProperties.Add(bindingProperties[i]);
+                    }
                 }
             }
         }
@@ -525,11 +532,6 @@ namespace Ws.Services.Binding
     {
         private Binding()
         {
-        }
-
-        public Binding Clone()
-        {
-            return (Binding)base.MemberwiseClone();
         }
 
         /// <summary>

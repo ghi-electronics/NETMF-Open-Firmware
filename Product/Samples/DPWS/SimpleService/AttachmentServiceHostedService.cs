@@ -49,11 +49,6 @@ namespace schemas.example.org.AttachmentService
             // Add event sources here
         }
         
-        public AttachmentService(IAttachmentService service) : 
-                this(service, new ProtocolVersion10())
-        {
-        }
-        
         public virtual WsMessage OneWayAttachment(WsMessage request)
         {
             // Build request object
@@ -62,12 +57,14 @@ namespace schemas.example.org.AttachmentService
             reqDcs.BodyParts = request.BodyParts;
             OneWayAttachmentRequest req;
             req = ((OneWayAttachmentRequest)(reqDcs.ReadObject(request.Reader)));
+            request.Reader.Dispose();
+            request.Reader = null;
 
             // Call service operation to process request.
             m_service.OneWayAttachment(req);
 
-            // Return null response for oneway messages
-            return null;
+            // Return a OneWayResponse message for oneway messages
+            return WsMessage.CreateOneWayResponse();
         }
         
         public virtual WsMessage TwoWayAttachment(WsMessage request)
@@ -78,6 +75,8 @@ namespace schemas.example.org.AttachmentService
             reqDcs.BodyParts = request.BodyParts;
             TwoWayAttachmentRequest req;
             req = ((TwoWayAttachmentRequest)(reqDcs.ReadObject(request.Reader)));
+            request.Reader.Dispose();
+            request.Reader = null;
 
             // Create response object
             // Call service operation to process request and return response.

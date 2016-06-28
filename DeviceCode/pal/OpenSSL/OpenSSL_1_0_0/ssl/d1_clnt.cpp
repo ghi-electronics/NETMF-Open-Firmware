@@ -944,7 +944,7 @@ int dtls1_send_client_key_exchange(SSL *s)
 				p+= authp->length;
 				n+= authp->length + 2;
 				
-				TINYCLR_SSL_FREE(authp->data);
+				OPENSSL_free(authp->data);
 				authp->data = NULL;
 				authp->length = 0;
 				}

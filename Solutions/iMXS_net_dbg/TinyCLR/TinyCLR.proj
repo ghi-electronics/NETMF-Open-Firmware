@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>tinyclr</AssemblyName>
     <ProjectGuid>{41b300e5-eb02-4f7e-99b1-ff85ee0d350e}</ProjectGuid>
@@ -30,7 +31,6 @@
     <MMP_DAT_CreateDatabaseFile>$(BIN_DIR)\tinyclr.dat</MMP_DAT_CreateDatabaseFile>
     <EXEScatterFileDefinition>$(SRC_DIR)\scatterfile_tinyclr_$(COMPILER_TOOL).$(SCATTER_EXT)</EXEScatterFileDefinition>
   </PropertyGroup>
-  <ItemGroup />
   <ItemGroup>
     <Compile Include="allocator.cpp" />
     <Compile Include="tinyclr.cpp" />
@@ -49,7 +49,6 @@
   <Import Project="$(SPOCLIENT)\Framework\Features\Serialization.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\SOCKETS_Port.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\serial_port.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Crypto.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\I2C.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\Network.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\SSL.featureproj" />
@@ -63,8 +62,12 @@
   <Import Project="$(SPOCLIENT)\Framework\Features\InterruptHandler.featureproj" />
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Interop.Settings" />
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\drivers\LargeBuffer\stubs\dotnetmf.proj"/>
-    <DriverLibs Include="LargeBuffer_hal_stubs.$(LIB_EXT)"/>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\MFUpdate\stubs\dotnetMF.proj" />
+    <DriverLibs Include="MFUpdate_PAL_stub.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\drivers\LargeBuffer\stubs\dotnetmf.proj" />
+    <DriverLibs Include="LargeBuffer_hal_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Core\dotNetMF.proj" />
@@ -141,10 +144,6 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT\dotNetMF.proj" />
     <PlatformIndependentLibs Include="SPOT.$(LIB_EXT)" />
-  </ItemGroup>
-  <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT\SPOT_Crypto\dotNetMF.proj" />
-    <PlatformIndependentLibs Include="SPOT_Crypto.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT\SPOT_Serialization\dotNetMF.proj" />
@@ -281,6 +280,10 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\dotNetMF.proj" />
     <DriverLibs Include="COM_pal.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <DriverLibs Include="DebuggerPort_SSL_config_stubs.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Config\dotnetmf.proj" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\I2C\dotNetMF.proj" />
@@ -495,8 +498,28 @@
     <PlatformIndependentLibs Include="SPOT_Messaging_stub.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_DA\dotnetmf.proj" />
+    <DriverLibs Include="cpu_DA_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\stubs\Processor\stubs_PWM\dotnetmf.proj" />
+    <DriverLibs Include="cpu_pwm_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\stubs\Processor\stubs_analog\dotnetmf.proj" />
+    <DriverLibs Include="cpu_analog_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\MC9328\DeviceCode\MC9328MXL_PerformanceCounter\dotNetMF.proj" />
     <DriverLibs Include="MC9328MXL_PerformanceCounter.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Double\dotNetMF.proj" />
+    <DriverLibs Include="native_double_pal.$(LIB_EXT)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_application.h" />
   </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

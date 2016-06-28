@@ -571,7 +571,7 @@ static int cca_rsa_pub_enc(int flen, const unsigned char *from,
 	long exitDataLength = 0;
 	unsigned char exitData[8];
 	long ruleArrayLength = 1;
-	unsigned char ruleArray[] = "PKCS-1.2";
+	unsigned char ruleArray[8] = "PKCS-1.2";
 	long dataStructureLength = 0;
 	unsigned char dataStructure[8];
 	long outputLength = RSA_size(rsa);
@@ -600,7 +600,7 @@ static int cca_rsa_priv_dec(int flen, const unsigned char *from,
 	long exitDataLength = 0;
 	unsigned char exitData[8];
 	long ruleArrayLength = 1;
-	unsigned char ruleArray[] = "PKCS-1.2";
+	unsigned char ruleArray[8] = "PKCS-1.2";
 	long dataStructureLength = 0;
 	unsigned char dataStructure[8];
 	long outputLength = RSA_size(rsa);
@@ -629,7 +629,7 @@ static int cca_rsa_verify(int type, const unsigned char *m, unsigned int m_len,
 	long exitDataLength = 0;
 	unsigned char exitData[8];
 	long ruleArrayLength = 1;
-	unsigned char ruleArray[] = "PKCS-1.1";
+	unsigned char ruleArray[8] = "PKCS-1.1";
 	long keyTokenLength;
 	unsigned char* keyToken = (unsigned char*)RSA_get_ex_data(rsa, hndidx);
 	long length = SSL_SIG_LEN;
@@ -752,7 +752,7 @@ static int cca_rsa_sign(int type, const unsigned char *m, unsigned int m_len,
 	long exitDataLength = 0;
 	unsigned char exitData[8];
 	long ruleArrayLength = 1;
-	unsigned char ruleArray[] = "PKCS-1.1";
+	unsigned char ruleArray[8] = "PKCS-1.1";
 	long outputLength=256;
 	long outputBitLength;
 	long keyTokenLength;

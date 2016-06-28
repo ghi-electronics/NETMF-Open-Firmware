@@ -1,6 +1,15 @@
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+//
+//                   ** WARNING! ** 
+//    This file was generated automatically by a tool.
+//    Re-running the tool will overwrite this file.
+//    You should copy this file to a custom location
+//    before adding any customization in the copy to
+//    prevent loss of your changes when the tool is
+//    re-run.
+//
+//-----------------------------------------------------------------------------
+
 
 #ifndef _CORLIB_NATIVE_H_
 #define _CORLIB_NATIVE_H_
@@ -16,6 +25,18 @@ struct Library_corlib_native_System_Object
     //--//
 
 };
+
+/* // THIS CLASS IS BUILT INTO mscorlib and we need to offset static fields accordingly
+struct Library_corlib_native__<PrivateImplementationDetails>{4B8EAD93-DDEB-433E-BB4A-6ECBAB495BC6}
+{
+    static const int FIELD_STATIC__$$method0x60003e4-1 = 0;
+    static const int FIELD_STATIC__$$method0x60003e4-2 = 1;
+
+
+    //--//
+
+};
+*/
 
 struct Library_corlib_native_System_ValueType
 {
@@ -134,7 +155,7 @@ struct Library_corlib_native_System_Array__SZArrayEnumerator
 
 struct Library_corlib_native_System_Globalization_Resources_CultureInfo
 {
-    static const int FIELD_STATIC__manager = 0;
+    static const int FIELD_STATIC__manager = 2;
 
 
     //--//
@@ -145,11 +166,10 @@ struct Library_corlib_native_System_AppDomain
 {
     static const int FIELD__m_appDomain    = 1;
     static const int FIELD__m_friendlyName = 2;
-    
+
     TINYCLR_NATIVE_DECLARE(GetAssemblies___SZARRAY_SystemReflectionAssembly);
     TINYCLR_NATIVE_DECLARE(LoadInternal___SystemReflectionAssembly__STRING__BOOLEAN__I4__I4__I4__I4);
     TINYCLR_NATIVE_DECLARE(CreateDomain___STATIC__SystemAppDomain__STRING);
-
     TINYCLR_NATIVE_DECLARE(Unload___STATIC__VOID__SystemAppDomain);
 
     //--//
@@ -193,8 +213,8 @@ struct Library_corlib_native_System_MulticastDelegate
 
 struct Library_corlib_native_System_Boolean
 {
-    static const int FIELD_STATIC__FalseString = 1;
-    static const int FIELD_STATIC__TrueString  = 2;
+    static const int FIELD_STATIC__FalseString = 3;
+    static const int FIELD_STATIC__TrueString  = 4;
 
     static const int FIELD__m_value = 1;
 
@@ -279,6 +299,16 @@ struct Library_corlib_native_System_Collections_Stack
 
 };
 
+struct Library_corlib_native_System_Convert
+{
+    static const int FIELD_STATIC__s_rgchBase64Encoding = 5;
+    static const int FIELD_STATIC__s_rgbBase64Decode = 6;
+
+
+    //--//
+
+};
+
 struct Library_corlib_native_System_TimeZone
 {
     static const int FIELD__m_id = 1;
@@ -300,9 +330,9 @@ struct Library_corlib_native_System_CurrentSystemTimeZone
 
 struct Library_corlib_native_System_DateTime
 {
-    static const int FIELD_STATIC__MinValue      = 3;
-    static const int FIELD_STATIC__MaxValue      = 4;
-    static const int FIELD_STATIC__ticksAtOrigin = 5;
+    static const int FIELD_STATIC__MinValue      = 7;
+    static const int FIELD_STATIC__MaxValue      = 8;
+    static const int FIELD_STATIC__ticksAtOrigin = 9;
 
     static const int FIELD__m_ticks = 1;
 
@@ -346,6 +376,11 @@ struct Library_corlib_native_System_Double
 {
     static const int FIELD__m_value = 1;
 
+    TINYCLR_NATIVE_DECLARE(CompareTo___STATIC__I4__R8__R8);
+    TINYCLR_NATIVE_DECLARE(IsInfinity___STATIC__BOOLEAN__R8);
+    TINYCLR_NATIVE_DECLARE(IsNaN___STATIC__BOOLEAN__R8);
+    TINYCLR_NATIVE_DECLARE(IsNegativeInfinity___STATIC__BOOLEAN__R8);
+    TINYCLR_NATIVE_DECLARE(IsPositiveInfinity___STATIC__BOOLEAN__R8);
 
     //--//
 
@@ -368,9 +403,10 @@ struct Library_corlib_native_System_Globalization_CultureInfo
     static const int FIELD__m_name       = 3;
     static const int FIELD__m_rm         = 4;
     static const int FIELD__m_parent     = 5;
-
+   
     TINYCLR_NATIVE_DECLARE(get_CurrentUICultureInternal___STATIC__SystemGlobalizationCultureInfo);
     TINYCLR_NATIVE_DECLARE(set_CurrentUICultureInternal___STATIC__VOID__SystemGlobalizationCultureInfo);
+    TINYCLR_NATIVE_DECLARE(GetAssemblies___STATIC__SZARRAY_SystemReflectionAssembly);
 
     //--//
 
@@ -437,8 +473,8 @@ struct Library_corlib_native_System_Globalization_NumberFormatInfo
 
 struct Library_corlib_native_System_Guid
 {
-    static const int FIELD_STATIC__m_rand = 6;
-    static const int FIELD_STATIC__Empty  = 7;
+    static const int FIELD_STATIC__m_rand = 10;
+    static const int FIELD_STATIC__Empty  = 11;
 
     static const int FIELD__m_data        = 1;
 
@@ -476,10 +512,27 @@ struct Library_corlib_native_System_Int64
 
 struct Library_corlib_native_System_Math
 {
-    TINYCLR_NATIVE_DECLARE(Round___STATIC__R8__R8);
+    TINYCLR_NATIVE_DECLARE(Acos___STATIC__R8__R8);
+    TINYCLR_NATIVE_DECLARE(Asin___STATIC__R8__R8);
+    TINYCLR_NATIVE_DECLARE(Atan___STATIC__R8__R8);
+    TINYCLR_NATIVE_DECLARE(Atan2___STATIC__R8__R8__R8);
     TINYCLR_NATIVE_DECLARE(Ceiling___STATIC__R8__R8);
+    TINYCLR_NATIVE_DECLARE(Cos___STATIC__R8__R8);
+    TINYCLR_NATIVE_DECLARE(Cosh___STATIC__R8__R8);
+    TINYCLR_NATIVE_DECLARE(IEEERemainder___STATIC__R8__R8__R8);
+    TINYCLR_NATIVE_DECLARE(Exp___STATIC__R8__R8);
     TINYCLR_NATIVE_DECLARE(Floor___STATIC__R8__R8);
+    TINYCLR_NATIVE_DECLARE(Log___STATIC__R8__R8);
+    TINYCLR_NATIVE_DECLARE(Log10___STATIC__R8__R8);
     TINYCLR_NATIVE_DECLARE(Pow___STATIC__R8__R8__R8);
+    TINYCLR_NATIVE_DECLARE(Round___STATIC__R8__R8);
+    TINYCLR_NATIVE_DECLARE(Sign___STATIC__I4__R8);
+    TINYCLR_NATIVE_DECLARE(Sin___STATIC__R8__R8);
+    TINYCLR_NATIVE_DECLARE(Sinh___STATIC__R8__R8);
+    TINYCLR_NATIVE_DECLARE(Sqrt___STATIC__R8__R8);
+    TINYCLR_NATIVE_DECLARE(Tan___STATIC__R8__R8);
+    TINYCLR_NATIVE_DECLARE(Tanh___STATIC__R8__R8);
+    TINYCLR_NATIVE_DECLARE(Truncate___STATIC__R8__R8);
 
     //--//
 
@@ -531,6 +584,7 @@ struct Library_corlib_native_System_Reflection_AssemblyName
 
 
     //--//
+
 };
 
 struct Library_corlib_native_System_Reflection_MethodBase
@@ -607,8 +661,20 @@ struct Library_corlib_native_System_Resources_ResourceManager
     static const int FIELD__m_rmFallback     = 6;
 
     TINYCLR_NATIVE_DECLARE(GetObjectInternal___OBJECT__I2);
+    TINYCLR_NATIVE_DECLARE(GetObjectInternal___OBJECT__I2__I4__I4);
     TINYCLR_NATIVE_DECLARE(FindResource___STATIC__I4__STRING__SystemReflectionAssembly);
     TINYCLR_NATIVE_DECLARE(GetObject___STATIC__OBJECT__SystemResourcesResourceManager__SystemEnum);
+
+    //--//
+
+    TINYCLR_NATIVE_DECLARE(GetObject___STATIC__OBJECT__SystemResourcesResourceManager__SystemEnum__I4__I4);    
+
+};
+
+struct Library_corlib_native_System_Runtime_CompilerServices_AccessedThroughPropertyAttribute
+{
+    static const int FIELD__propertyName = 1;
+
 
     //--//
 
@@ -744,8 +810,9 @@ struct Library_corlib_native_System_Single
 
 struct Library_corlib_native_System_String
 {
-    static const int FIELD_STATIC__Empty = 8;
+    static const int FIELD_STATIC__Empty = 12;
 
+    TINYCLR_NATIVE_DECLARE(CompareTo___I4__OBJECT);
     TINYCLR_NATIVE_DECLARE(get_Chars___CHAR__I4);
     TINYCLR_NATIVE_DECLARE(ToCharArray___SZARRAY_CHAR);
     TINYCLR_NATIVE_DECLARE(ToCharArray___SZARRAY_CHAR__I4__I4);
@@ -760,7 +827,6 @@ struct Library_corlib_native_System_String
     TINYCLR_NATIVE_DECLARE(_ctor___VOID__SZARRAY_CHAR__I4__I4);
     TINYCLR_NATIVE_DECLARE(_ctor___VOID__SZARRAY_CHAR);
     TINYCLR_NATIVE_DECLARE(_ctor___VOID__CHAR__I4);
-    TINYCLR_NATIVE_DECLARE(CompareTo___I4__OBJECT);
     TINYCLR_NATIVE_DECLARE(CompareTo___I4__STRING);
     TINYCLR_NATIVE_DECLARE(IndexOf___I4__CHAR);
     TINYCLR_NATIVE_DECLARE(IndexOf___I4__CHAR__I4);
@@ -820,6 +886,19 @@ struct Library_corlib_native_System_String
     static HRESULT ConvertToCharArray( LPCSTR szText           , CLR_RT_HeapBlock& ref, CLR_RT_HeapBlock_Array*& array, int startIndex, int length );
 };
 
+struct Library_corlib_native_System_Text_StringBuilder
+{
+    static const int FIELD__m_MaxCapacity = 1;
+    static const int FIELD__m_ChunkChars = 2;
+    static const int FIELD__m_ChunkLength = 3;
+    static const int FIELD__m_ChunkPrevious = 4;
+    static const int FIELD__m_ChunkOffset = 5;
+
+
+    //--//
+
+};
+
 struct Library_corlib_native_System_Text_UTF8Decoder
 {
     TINYCLR_NATIVE_DECLARE(Convert___VOID__SZARRAY_U1__I4__I4__SZARRAY_CHAR__I4__I4__BOOLEAN__BYREF_I4__BYREF_I4__BYREF_BOOLEAN);
@@ -831,9 +910,13 @@ struct Library_corlib_native_System_Text_UTF8Decoder
 struct Library_corlib_native_System_Text_UTF8Encoding
 {
     TINYCLR_NATIVE_DECLARE(GetBytes___SZARRAY_U1__STRING);
+    TINYCLR_NATIVE_DECLARE(GetBytes___I4__STRING__I4__I4__SZARRAY_U1__I4);
     TINYCLR_NATIVE_DECLARE(GetChars___SZARRAY_CHAR__SZARRAY_U1);
+    TINYCLR_NATIVE_DECLARE(GetChars___SZARRAY_CHAR__SZARRAY_U1__I4__I4);
 
     //--//
+
+    static HRESULT Helper__GetChars(CLR_RT_StackFrame& stack, bool fIndexed);
 
 };
 
@@ -896,6 +979,7 @@ struct Library_corlib_native_System_Threading_Thread
     static const int FIELD__m_Priority  = 2;
     static const int FIELD__m_Thread    = 3;
     static const int FIELD__m_AppDomain = 4;
+    static const int FIELD__m_Id        = 5;
 
     TINYCLR_NATIVE_DECLARE(_ctor___VOID__SystemThreadingThreadStart);
     TINYCLR_NATIVE_DECLARE(Start___VOID);
@@ -904,6 +988,7 @@ struct Library_corlib_native_System_Threading_Thread
     TINYCLR_NATIVE_DECLARE(Resume___VOID);
     TINYCLR_NATIVE_DECLARE(get_Priority___SystemThreadingThreadPriority);
     TINYCLR_NATIVE_DECLARE(set_Priority___VOID__SystemThreadingThreadPriority);
+    TINYCLR_NATIVE_DECLARE(get_ManagedThreadId___I4);
     TINYCLR_NATIVE_DECLARE(get_IsAlive___BOOLEAN);
     TINYCLR_NATIVE_DECLARE(Join___VOID);
     TINYCLR_NATIVE_DECLARE(Join___BOOLEAN__I4);
@@ -943,9 +1028,9 @@ struct Library_corlib_native_System_Threading_Timer
 
 struct Library_corlib_native_System_TimeSpan
 {
-    static const int FIELD_STATIC__Zero     = 9;
-    static const int FIELD_STATIC__MaxValue = 10;
-    static const int FIELD_STATIC__MinValue = 11;
+    static const int FIELD_STATIC__Zero     = 13;
+    static const int FIELD_STATIC__MaxValue = 14;
+    static const int FIELD_STATIC__MinValue = 15;
 
     static const int FIELD__m_ticks = 1;
 

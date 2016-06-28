@@ -27,7 +27,7 @@
 //--//
 
 #if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
-#pragma arm section rwdata = "g_SD_BS_Config"
+#pragma arm section rwdata = "g_SAM9_SD_BS_Config"
 #endif
 
 BlockRange g_SD_BlockStatus[] =
@@ -65,11 +65,7 @@ BlockDeviceInfo  g_SD_DeviceInfo=
     g_SD_BlkRegion,                    //const BlockRegionInfo* pRegions;
 };
 
-#if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
-#pragma arm section rwdata
-#endif
-
-struct SD_BLOCK_CONFIG g_SD_BS_Config =
+struct SD_BLOCK_CONFIG g_SAM9_SD_BS_Config =
 {
     {
         SD_WP_GPIO_PIN,            // GPIO_PIN             Pin;
@@ -78,6 +74,11 @@ struct SD_BLOCK_CONFIG g_SD_BS_Config =
 
      &g_SD_DeviceInfo,             // BlockDeviceinfo
 };
+
+#if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
+#pragma arm section rwdata
+#endif
+
 
 //--//
 #define SD_CS                    AT91_GPIO_Driver::PA4
@@ -94,10 +95,10 @@ struct SD_BLOCK_CONFIG g_SD_BS_Config =
 #define SD_LOW_VOLTAGE_FLAG      FALSE
 
 #if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
-#pragma arm section rodata = "g_SD_BS"
+#pragma arm section rwdata = "g_SAM9_SD_BS"
 #endif
 
-struct BlockStorageDevice g_SD_BS;
+struct BlockStorageDevice g_SAM9_SD_BS;
 
 struct SD_BL_CONFIGURATION g_SD_BL_Config =
 {      
@@ -111,6 +112,10 @@ struct SD_BL_CONFIGURATION g_SD_BL_Config =
         SD_CS_SETUP_USEC,
         SD_CS_HOLD_USEC,
         SD_MODULE,
+        {
+            GPIO_PIN_NONE,
+            FALSE,
+        }
     },
     
     SD_INSERT_ISR_PIN,
@@ -118,33 +123,51 @@ struct SD_BL_CONFIGURATION g_SD_BL_Config =
     TRUE,                   // State_After_Erase will be filled at initialization
     SD_LOW_VOLTAGE_FLAG,
     
-    &g_SD_BS,
+    &g_SAM9_SD_BS,
 };
 
 
 #if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
-#pragma arm section rodata 
+#pragma arm section rwdata 
 #endif 
 
 //--//
 
+struct SD_DEVICE_REGISTERS g_SD_DeviceRegisters;
+
+/*
 #if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
-#pragma arm section rodata = "g_SD_BS_Driver"
+#pragma arm section rodata = "g_SD_DeviceRegisters"
+#endif
+
+struct SD_DEVICE_REGISTERS g_SD_DeviceRegisters;
+
+#if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
+#pragma arm section rodata 
+#endif 
+*/
+
+//--//
+
+/*
+#if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
+#pragma arm section rwdata = "g_SD_BS_Driver"
 #endif
 
 struct SD_BS_Driver g_SD_BS_Driver;
 
 #if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
-#pragma arm section rodata 
+#pragma arm section rwdata 
 #endif 
+*/
 
 //--//
 
 #if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
-#pragma arm section rodata = "g_SD_BS_DeviceTable"
+#pragma arm section rodata = "g_SAM9_SD_BS_DeviceTable"
 #endif
 
-struct IBlockStorageDevice g_SD_BS_DeviceTable = 
+struct IBlockStorageDevice g_SAM9_SD_BS_DeviceTable = 
 {
     &SD_BS_Driver::ChipInitialize, 
     &SD_BS_Driver::ChipUnInitialize, 

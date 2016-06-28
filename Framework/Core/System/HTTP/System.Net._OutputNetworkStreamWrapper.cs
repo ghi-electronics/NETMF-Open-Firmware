@@ -135,6 +135,12 @@ namespace System.Net
         /// </summary>
         public override void Flush()
         {
+            if (m_headersSend != null)
+            {
+                // Calls HttpListenerResponse.SendHeaders. HttpListenerResponse.SendHeaders sets m_headersSend to null.
+                m_headersSend();
+            }
+
             m_Stream.Flush();
         }
 

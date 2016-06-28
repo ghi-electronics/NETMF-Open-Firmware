@@ -57,6 +57,8 @@ namespace Microsoft.SPOT.Hardware
             [MethodImplAttribute(MethodImplOptions.InternalCall)]
             get;
         }
+
+        public static readonly bool IsEmulator = (SystemID.SKU == 3);
     }
 }
 

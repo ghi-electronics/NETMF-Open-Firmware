@@ -38,7 +38,7 @@
   <FeatureAssociations Name="Network (LWIP)" Guid="{31DBB847-F042-4d95-A7FD-8132623961C7}" ProjectPath="$(SPOCLIENT)\Framework\Features\Network_LWIP.featureproj" Conditional="" xmlns="http://schemas.microsoft.com/netmf/InventoryFormat.xsd">
     <ComponentType>Feature</ComponentType>
   </FeatureAssociations>
-  <IsTranport xmlns="http://schemas.microsoft.com/netmf/InventoryFormat.xsd">false</IsTranport>
+  <IsTransport xmlns="http://schemas.microsoft.com/netmf/InventoryFormat.xsd">false</IsTransport>
 </LibraryCategory></PKUI_LibraryCategory>
   </PropertyGroup>
   <ItemGroup>

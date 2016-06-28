@@ -39,12 +39,12 @@ namespace Microsoft.SPOT.Platform.Tests
         }
 
         private ManualResetEvent timerEvent = new ManualResetEvent(false);
-        DateTime timerTime;
         TimeSpan utcTimeShiftAmount = new TimeSpan(5, 0, 0);
-        private void TimerCallback(object state)
+        DateTime timerTime;
+        private void TimerCallback( object state )
         {
             TimeSpan diff = DateTime.UtcNow - timerTime;
-            if ((diff.Seconds >= 25) && (diff.Seconds <= 55))
+            if(( diff.Seconds >= 25 ) && ( diff.Seconds <= 55 ))
             {
                 timerEvent.Set();
             }
@@ -58,28 +58,28 @@ namespace Microsoft.SPOT.Platform.Tests
             {
                 timerEvent.Reset();
                 /// Save the current time shifted by 5 hours.
-                
+
                 timerTime = DateTime.UtcNow - utcTimeShiftAmount;
-                using (Timer t = new Timer(new TimerCallback(TimerCallback), null, new TimeSpan(0, 0, 30), new TimeSpan(-TimeSpan.TicksPerMillisecond)))
+                using(Timer t = new Timer( new TimerCallback( TimerCallback ), null, new TimeSpan( 0, 0, 30 ), new TimeSpan( -TimeSpan.TicksPerMillisecond ) ))
                 {
                     /// We shift the utc back by 5 hours.
-                    TimeService.SetUtcTime(timerTime.Ticks); 
-                    
+                    TimeService.SetUtcTime( timerTime.Ticks );
+
                     /// timer should still fire after 30 seconds even though absolute time has been manipulated.
-                    if (!timerEvent.WaitOne(2 * 60 * 1000, false))
+                    if(!timerEvent.WaitOne( 2 * 60 * 1000, false ))
                     {
                         result = MFTestResults.Fail;
                     }
 
                     /// Reset the changes.
-                    TimeService.SetUtcTime((DateTime.UtcNow + utcTimeShiftAmount).Ticks);
+                    TimeService.SetUtcTime( ( DateTime.UtcNow + utcTimeShiftAmount ).Ticks );
 
-                    t.Change(-1, -1);
+                    t.Change( -1, -1 );
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                Log.Exception("Unexpected exception", ex);
+                Log.Exception( "Unexpected exception", ex );
                 result = MFTestResults.Fail;
             }
 
@@ -92,8 +92,8 @@ namespace Microsoft.SPOT.Platform.Tests
             MFTestResults result = MFTestResults.Pass;
             try
             {
-                byte[] primaryServer = new byte[] { 157, 54, 86, 20 };
-                byte[] alternateServer = new byte[] { 10, 192, 53, 107 };
+                byte[] primaryServer = new byte[] { 192, 43, 244, 18 };
+                byte[] alternateServer = new byte[] { 129, 6, 15, 28 };
                 TimeServiceSettings settings = new TimeServiceSettings();
                 settings.PrimaryServer = primaryServer;
                 settings.AlternateServer = alternateServer;
@@ -127,6 +127,21 @@ namespace Microsoft.SPOT.Platform.Tests
             return result;
         }
 
+        private void UpdateTimeNow()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                TimeServiceStatus status = TimeService.UpdateNow(new byte[] { 192, 43, 244, 18 }, 10);
+
+                if (status.Flags == TimeServiceStatus.TimeServiceStatusFlags.SyncSucceeded)
+                {
+                    break;
+                }
+
+                Thread.Sleep(100);
+            }
+        }
+
         [TestMethod]
         public MFTestResults TimeServiceUpdateTest0()
         {
@@ -134,10 +149,10 @@ namespace Microsoft.SPOT.Platform.Tests
             try
             {
                 /// Now call UpdateNow this should set the time back to correct one.
-                TimeServiceStatus status = TimeService.UpdateNow(new byte[] { 157, 54, 86, 20 }, 10);
+                UpdateTimeNow();
 
                 DateTime now = DateTime.Now;
-
+                DateTime nowEbs = now;
                 // 
                 // SKU == 3 indicates the device is the emulator.
                 //
@@ -145,7 +160,7 @@ namespace Microsoft.SPOT.Platform.Tests
                 {
                     /// EBS bug returns value in local time instead of UTC.
                     /// Remove following line once they fixed the bug.
-                    now = now.AddHours(7);
+                    nowEbs = nowEbs.AddHours( 7 );
                 }
 
                 TimeService.SetUtcTime(119600064000000000); /// 1/1/1980.
@@ -153,17 +168,18 @@ namespace Microsoft.SPOT.Platform.Tests
                 DateTime old = DateTime.Now;
                                                             
                 /// Now call UpdateNow this should set the time back to correct one.
-                status = TimeService.UpdateNow(new byte[] { 157, 54, 86, 20 }, 10);
+                UpdateTimeNow();                
 
                 DateTime end = DateTime.Now;
 
-                TimeSpan diff = end < now ?  now - end : end - now;
-                TimeSpan diff2 = now - old;
+                TimeSpan diff    = end < now    ? now    - end : end - now;
+                TimeSpan diffEbs = end < nowEbs ? nowEbs - end : end - nowEbs;
+                TimeSpan diff2   = now - old;
 
                 // ten minutes (DNS may take a while)
-                if(diff > new TimeSpan(0, 10, 0) && diff2 > new TimeSpan(20*365,0,0,0))
+                if(( diff > new TimeSpan( 0, 10, 0 ) && diffEbs > new TimeSpan( 0, 10, 0 ) ) && diff2 > new TimeSpan( 20 * 365, 0, 0, 0 ))
                 {
-                    throw new ArgumentException("Update time invalid.");
+                    throw new ArgumentException( "Update time invalid." );
                 }
             }
             catch (Exception ex)
@@ -185,7 +201,7 @@ namespace Microsoft.SPOT.Platform.Tests
                 timerEvent.Reset();
 
                 TimeService.SystemTimeChanged += handler;
-                TimeService.UpdateNow(new byte[] { 157, 54, 86, 20 }, 10);
+                UpdateTimeNow();
                 if (!timerEvent.WaitOne(60 * 1000, false)) /// Wait some time for the event to be fired.
                 {
                     result = MFTestResults.Fail;
@@ -217,7 +233,7 @@ namespace Microsoft.SPOT.Platform.Tests
                 syncEvent.Reset();
 
                 TimeService.TimeSyncFailed += handler;
-                TimeService.UpdateNow(new byte[] { 0, 0, 0, 0 }, 10);
+                UpdateTimeNow();
                 if (!syncEvent.WaitOne(5 * 1000, false)) /// Wait some time for the event to be fired.
                 {
                     result = MFTestResults.Skip;
@@ -306,8 +322,8 @@ namespace Microsoft.SPOT.Platform.Tests
 
                 TimeService.SystemTimeChanged += handler;
 
-                byte[] primaryServer = new byte[] { 157, 54, 86, 20 };
-                byte[] alternateServer = new byte[] { 10, 192, 53, 107 };
+                byte[] primaryServer = new byte[] { 192, 43, 244, 18 };
+                byte[] alternateServer = new byte[] { 129, 6, 15, 28 };
                 TimeServiceSettings settings = new TimeServiceSettings();
                 settings.PrimaryServer = primaryServer;
                 settings.AlternateServer = alternateServer;
@@ -321,12 +337,17 @@ namespace Microsoft.SPOT.Platform.Tests
                 if (!timerEvent.WaitOne(60 * 1000, false))
                 {
                     result = MFTestResults.Fail;
-                }                
+                }
             }
             catch (Exception ex)
             {
                 Log.Exception("Unexpected exception", ex);
                 result = MFTestResults.Fail;
+            }
+            finally
+            {
+                TimeService.SystemTimeChanged -= handler;
+                TimeService.Stop();
             }
 
             return result;
@@ -347,8 +368,8 @@ namespace Microsoft.SPOT.Platform.Tests
 
                 TimeService.SetUtcTime(119600064000000000); /// 1/1/1980.
                 /// 
-                byte[] primaryServer = new byte[] { 157, 54, 86, 20 };
-                byte[] alternateServer = new byte[] { 10, 192, 53, 107 };
+                byte[] primaryServer = new byte[] { 192, 43, 244, 18 };
+                byte[] alternateServer = new byte[] { 129, 6, 15, 28 };
                 TimeServiceSettings settings = new TimeServiceSettings();
                 settings.PrimaryServer = primaryServer;
                 settings.AlternateServer = alternateServer;
@@ -359,7 +380,7 @@ namespace Microsoft.SPOT.Platform.Tests
                 TimeService.Settings = settings;
                 TimeService.Start(); /// This should fire a sync event right away.
 
-                Thread.Sleep(10 * 1000); /// Sleep for some time, we should have time synced by now.
+                Thread.Sleep(5 * 1000); /// Sleep for some time, we should have time synced by now.
                                          
                 if (now.Year == 1980)
                 {
@@ -370,6 +391,10 @@ namespace Microsoft.SPOT.Platform.Tests
             {
                 Log.Exception("Unexpected exception", ex);
                 result = MFTestResults.Fail;
+            }
+            finally
+            {
+                TimeService.Stop();
             }
 
             return result;
@@ -390,21 +415,36 @@ namespace Microsoft.SPOT.Platform.Tests
 
                 TimeService.SetUtcTime(119600064000000000); /// 1/1/1980.
                 /// 
-                byte[] primaryServer = new byte[] { 157, 54, 86, 20 };
-                byte[] alternateServer = new byte[] { 10, 192, 53, 107 };
+                byte[] primaryServer = new byte[] { 192, 43, 244, 18 };
+                byte[] alternateServer = new byte[] { 129, 6, 15, 28 };
                 TimeServiceSettings settings = new TimeServiceSettings();
                 settings.PrimaryServer = primaryServer;
                 settings.AlternateServer = alternateServer;
                 settings.Tolerance = 100;
                 settings.RefreshTime = 60;
+                TimeServiceStatus status = null;
+
+                timerEvent.Reset();
+
+                TimeService.SystemTimeChanged += new SystemTimeChangedEventHandler( TimeService_SystemTimeChanged );
 
                 /// Save the settings.
                 TimeService.Settings = settings;
                 TimeService.Start(); /// This should fire a sync event right away.
 
-                Thread.Sleep(10 * 1000); /// Sleep for some time, we should have time synced by now.
-                                         
-                TimeServiceStatus status = TimeService.LastSyncStatus;
+                timerEvent.WaitOne( 5000, false );
+                /// 
+                for (int i = 0; i < 10; i++)
+                {
+                    status = TimeService.LastSyncStatus;
+
+                    if (status.Flags == TimeServiceStatus.TimeServiceStatusFlags.SyncSucceeded)
+                    {
+                        break;
+                    }
+
+                    timerEvent.WaitOne( 1000, false );
+                }
 
                 if (status.CurrentTimeUTC.Year != DateTime.UtcNow.Year)
                 {
@@ -415,6 +455,12 @@ namespace Microsoft.SPOT.Platform.Tests
             {
                 Log.Exception("Unexpected exception", ex);
                 result = MFTestResults.Fail;
+            }
+            finally
+            {
+                TimeService.SystemTimeChanged -= new SystemTimeChangedEventHandler( TimeService_SystemTimeChanged );
+
+                TimeService.Stop();
             }
 
             return result;

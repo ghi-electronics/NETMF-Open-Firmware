@@ -75,9 +75,10 @@ namespace Microsoft.SPOT.Emulator.FS
         int Delete(uint fsId, string path);
         int GetAttributes(uint fsId, string path, ref uint attributes);
         int SetAttributes(uint fsId, string path, uint attributes);
-        int Format(uint fsId, uint parameter);
+        int Format(uint fsId, string volumeLabel, uint parameter);
         int GetSizeInfo(uint fsId, ref long totalSize, ref long totalFreeSpace);
         int FlushAll(uint fsId);
+        int GetVolumeLabel(uint fsId, IntPtr volumeLabel, int volumeLabelLen);
     }
 }
 

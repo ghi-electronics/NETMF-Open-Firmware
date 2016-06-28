@@ -96,8 +96,8 @@ static const char *x509_usage[]={
 " -keyform arg    - private key format - default PEM\n",
 " -CAform arg     - CA format - default PEM\n",
 " -CAkeyform arg  - CA key format - default PEM\n",
-" -in arg         - input file - default OPENSSL_TYPE__FILE_STDIN\n",
-" -out arg        - output file - default OPENSSL_TYPE__FILE_STDOUT\n",
+" -in arg         - input file - default stdin\n",
+" -out arg        - output file - default stdout\n",
 " -passin arg     - private key password source\n",
 " -serial         - print serial number value\n",
 " -subject_hash   - print subject hash value\n",
@@ -558,7 +558,6 @@ bad:
 	if (reqfile)
 		{
 		EVP_PKEY *pkey;
-		X509_CINF *ci;
 		BIO *in;
 
 		if (!sign_flag && !CA_flag)
@@ -626,7 +625,6 @@ bad:
 		print_name(bio_err, "subject=", X509_REQ_get_subject_name(req), nmflag);
 
 		if ((x=X509_new()) == NULL) goto end;
-		ci=x->cert_info;
 
 		if (sno == NULL)
 			{

@@ -38,6 +38,8 @@
     <DriverLibs Include="asyncproccall_pal.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\COM\dotnetmf.proj" />
     <DriverLibs Include="COM_pal.$(LIB_EXT)" />
+    <DriverLibs Include="DebuggerPort_SSL_config_stubs.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Config\dotnetmf.proj" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\COM\USB\dotnetmf.proj" />
     <DriverLibs Include="usb_pal.$(LIB_EXT)" />
     <RequiredProjects Include="..\DeviceCode\USB\dotnetmf.proj" />
@@ -87,8 +89,6 @@
     <DriverLibs Include="cpu_intc_stubs.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_Power\dotnetmf.proj" />
     <DriverLibs Include="cpu_power_stubs.$(LIB_EXT)" />
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_Security\dotnetmf.proj" />
-    <DriverLibs Include="cpu_security_stubs.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_SPI\dotnetmf.proj" />
     <DriverLibs Include="cpu_spi_stubs.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_Time\dotnetmf.proj" />

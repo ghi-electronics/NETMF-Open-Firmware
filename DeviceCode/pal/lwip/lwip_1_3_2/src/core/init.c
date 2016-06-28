@@ -252,6 +252,11 @@ extern struct mib_list_rootnode tcpconntree_root;
 extern struct udp_pcb *dns_pcb;
 #endif
 
+#if LWIP_RAW
+extern struct raw_pcb *raw_pcbs;
+#endif
+
+
 //[MS_CHANGE] - add lwip_init_globals for stack re-initialization
 //                          this method re-initializes the critical global variables
 //                          in the stack when reset happens
@@ -264,6 +269,10 @@ lwip_init_globals(void)
 
 #if LWIP_UDP
     udp_pcbs = NULL;
+#endif
+
+#if LWIP_RAW
+    raw_pcbs = NULL;
 #endif
 
 #if LWIP_SNMP

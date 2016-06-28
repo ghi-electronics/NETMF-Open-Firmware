@@ -97,7 +97,7 @@ unsigned long ASN1_STRING_get_default_mask(void)
  * default:   the default value, Printable, T61, BMP.
  */
 
-int ASN1_STRING_set_default_mask_asc(char *p)
+int ASN1_STRING_set_default_mask_asc(const char *p)
 {
 	unsigned long mask;
 	char *end;
@@ -278,13 +278,13 @@ main()
 
 	if (last_nid != 0)
 		{
-		TINYCLR_SSL_FPRINTF("Table order OK\n");
+		TINYCLR_SSL_PRINTF("Table order OK\n");
 		TINYCLR_SSL_EXIT(0);
 		}
 
 	for (tmp = tbl_standard, i = 0;
 		i < sizeof(tbl_standard)/sizeof(ASN1_STRING_TABLE); i++, tmp++)
-			TINYCLR_SSL_FPRINTF("Index %d, NID %d, Name=%s\n", i, tmp->nid,
+			TINYCLR_SSL_PRINTF("Index %d, NID %d, Name=%s\n", i, tmp->nid,
 							OBJ_nid2ln(tmp->nid));
 
 }

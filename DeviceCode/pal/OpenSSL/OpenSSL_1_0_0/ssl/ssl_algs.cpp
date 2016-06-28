@@ -65,9 +65,6 @@
 
 int SSL_library_init(void)
 	{
-	//[MS_CHANGE] - Call OBJ_NAME_init here to initialize global
-        // variables (LHASH values) 
-	OBJ_NAME_init();
 
 #ifndef OPENSSL_NO_DES
 	EVP_add_cipher(EVP_des_cbc());
@@ -110,6 +107,14 @@ int SSL_library_init(void)
 	EVP_add_digest_alias(SN_sha1,"ssl3-sha1");
 	EVP_add_digest_alias(SN_sha1WithRSAEncryption,SN_sha1WithRSA);
 #endif
+#ifndef OPENSSL_NO_SHA256
+	EVP_add_digest(EVP_sha224());
+	EVP_add_digest(EVP_sha256());
+#endif
+#ifndef OPENSSL_NO_SHA512
+	EVP_add_digest(EVP_sha384());
+	EVP_add_digest(EVP_sha512());
+#endif
 #if !defined(OPENSSL_NO_SHA) && !defined(OPENSSL_NO_DSA)
 	EVP_add_digest(EVP_dss1()); /* DSA with sha1 */
 	EVP_add_digest_alias(SN_dsaWithSHA1,SN_dsaWithSHA1_2);
@@ -125,9 +130,6 @@ int SSL_library_init(void)
 	EVP_add_digest(EVP_dss());
 #endif
 #ifndef OPENSSL_NO_COMP
-	//[MS_CHANGE] - added SSL_COMP_init to zero out global
-	// variables for soft reboot 
-	SSL_COMP_init();
 	/* This will initialise the built-in compression algorithms.
 	   The value returned is a STACK_OF(SSL_COMP), but that can
 	   be discarded safely */

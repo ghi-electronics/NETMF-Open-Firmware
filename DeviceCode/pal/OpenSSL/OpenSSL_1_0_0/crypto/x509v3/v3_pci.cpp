@@ -134,7 +134,12 @@ static int process_pci_value(CONF_VALUE *val,
 			unsigned char *tmp_data2 =
 				string_to_hex(val->value + 4, &val_len);
 
-			if (!tmp_data2) goto err;
+			if (!tmp_data2) 
+				{
+				X509V3err(X509V3_F_PROCESS_PCI_VALUE,X509V3_R_ILLEGAL_HEX_DIGIT);
+				X509V3_conf_err(val);
+				goto err;
+				}
 
 			tmp_data = (unsigned char*)OPENSSL_realloc((*policy)->data,
 				(*policy)->length + val_len + 1);
@@ -146,9 +151,18 @@ static int process_pci_value(CONF_VALUE *val,
 				(*policy)->length += val_len;
 				(*policy)->data[(*policy)->length] = '\0';
 				}
+			else
+				{
+				OPENSSL_free(tmp_data2);
+				/* realloc failure implies the original data space is b0rked too! */
+				(*policy)->data = NULL;
+				(*policy)->length = 0;
+				X509V3err(X509V3_F_PROCESS_PCI_VALUE,ERR_R_MALLOC_FAILURE);
+				X509V3_conf_err(val);
+				goto err;
+				}
+			OPENSSL_free(tmp_data2);
 			}
-		//MS: only include if OPENSSL_NO_STDIO has not been declared
-#ifndef OPENSSL_NO_FP_API
 		else if (TINYCLR_SSL_STRNCMP(val->value, "file:", 5) == 0)
 			{
 			unsigned char buf[2048];
@@ -177,6 +191,7 @@ static int process_pci_value(CONF_VALUE *val,
 				(*policy)->length += n;
 				(*policy)->data[(*policy)->length] = '\0';
 				}
+			BIO_free_all(b);
 
 			if (n < 0)
 				{
@@ -185,7 +200,6 @@ static int process_pci_value(CONF_VALUE *val,
 				goto err;
 				}
 			}
-#endif
 		else if (TINYCLR_SSL_STRNCMP(val->value, "text:", 5) == 0)
 			{
 			val_len = TINYCLR_SSL_STRLEN(val->value + 5);
@@ -198,6 +212,15 @@ static int process_pci_value(CONF_VALUE *val,
 					val->value + 5, val_len);
 				(*policy)->length += val_len;
 				(*policy)->data[(*policy)->length] = '\0';
+				}
+			else
+				{
+				/* realloc failure implies the original data space is b0rked too! */
+				(*policy)->data = NULL;
+				(*policy)->length = 0;
+				X509V3err(X509V3_F_PROCESS_PCI_VALUE,ERR_R_MALLOC_FAILURE);
+				X509V3_conf_err(val);
+				goto err;
 				}
 			}
 		else

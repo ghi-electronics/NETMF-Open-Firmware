@@ -104,7 +104,7 @@ DSA_SIG *gost2001_do_sign(const unsigned char *dgst,int dlen, EC_KEY *eckey)
 	EC_POINT *C=NULL;
 	BN_CTX *ctx = BN_CTX_new();	
 	BN_CTX_start(ctx);
-	OPENSSL_assert(dlen==32);
+	TINYCLR_SSL_ASSERT(dlen==32);
 	newsig=DSA_SIG_new();
 	if (!newsig) 
 		{

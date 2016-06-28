@@ -281,11 +281,11 @@ int pkey_GOST01cp_decrypt(EVP_PKEY_CTX *pctx, unsigned char *key, size_t * key_l
 		
 	param = get_encryption_params(gkt->key_agreement_info->cipher);
 	gost_init(&ctx,param->sblock);	
-	OPENSSL_assert(gkt->key_agreement_info->eph_iv->length==8);
+	TINYCLR_SSL_ASSERT(gkt->key_agreement_info->eph_iv->length==8);
 	TINYCLR_SSL_MEMCPY(wrappedKey,gkt->key_agreement_info->eph_iv->data,8);
-	OPENSSL_assert(gkt->key_info->encrypted_key->length==32);
+	TINYCLR_SSL_ASSERT(gkt->key_info->encrypted_key->length==32);
 	TINYCLR_SSL_MEMCPY(wrappedKey+8,gkt->key_info->encrypted_key->data,32);
-	OPENSSL_assert(gkt->key_info->imit->length==4);
+	TINYCLR_SSL_ASSERT(gkt->key_info->imit->length==4);
 	TINYCLR_SSL_MEMCPY(wrappedKey+40,gkt->key_info->imit->data,4);	
 	VKO_compute_key(sharedKey,32,EC_KEY_get0_public_key((const EC_KEY*)EVP_PKEY_get0(peerkey)),
 		(EC_KEY*)EVP_PKEY_get0(priv),wrappedKey);

@@ -238,7 +238,7 @@ BOOL AT91_AIC_Driver::ActivateInterrupt(UINT32 Irq_Index, BOOL Fast, HAL_CALLBAC
 BOOL AT91_AIC_Driver::DeactivateInterrupt( UINT32 Irq_Index )
 {
     // figure out the interrupt
-    IRQ_VECTORING* IsrVector = 0; //IRQToIRQVector( Irq_Index );
+    IRQ_VECTORING* IsrVector = IRQToIRQVector( Irq_Index );
 
     if(!IsrVector)
         return FALSE;

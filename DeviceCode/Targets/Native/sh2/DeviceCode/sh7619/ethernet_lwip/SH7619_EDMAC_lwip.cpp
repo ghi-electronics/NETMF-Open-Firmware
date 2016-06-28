@@ -285,59 +285,88 @@ void SH7619_EDMAC_LWIP_recv(struct netif *pNetIf)
     }
 }
 
-UINT16 Send_Packet(EmacTDescriptor *epTxTd, char* buf, UINT16 length)
+INT16 Send_Packet(EmacTDescriptor *epTxTd, char* buf, INT16 length)
 {  
-
-    UINT16 TotalLength = length;
-    UINT16 FrameLength ;//= ((length <= EMAC_TX_UNITSIZE) ? length : EMAC_TX_UNITSIZE);
-
-    while(TotalLength != 0)
-    {
-        FrameLength = ((TotalLength <= EMAC_TX_UNITSIZE) ? TotalLength : EMAC_TX_UNITSIZE);
-        TotalLength -= FrameLength;
+    //UINT16 TotalLength = length;
+    INT16 FrameLength = ((length <= EMAC_TX_UNITSIZE) ? length : EMAC_TX_UNITSIZE);
+ 
+    //while(TotalLength != 0)
+    //{
+        //FrameLength = ((TotalLength <= EMAC_TX_UNITSIZE) ? TotalLength : EMAC_TX_UNITSIZE);
+        //TotalLength -= FrameLength;
         if(epTxTd->status & ACT != 0)
             return -1;
         memcpy(epTxTd->TRBA, buf, FrameLength);
-        epTxTd->RDL = FrameLength;
-    }
+        epTxTd->TDRBL = FrameLength;
+    //}
     return( FrameLength );
 }
 
-err_t SH7619_EDMAC_LWIP_xmit(struct netif *pNetIf, struct pbuf *pPBuf)
-{
-    UINT16  length = 0;
-
+void Frame_Xmit(struct pbuf *pPBuf, BOOL startPacket)
+{  
+    INT16  length = 0;
+ 
     EmacTDescriptor *pTxTd;
-
-    UINT8 *pDst;
     
-    char* send_packet;
-    UINT16  count;
-    long    flag = FP1;
-    UINT16  size = length;
-
-    GLOBAL_LOCK(encIrq);
-
-    if (!pNetIf || !pPBuf)
-    {
-        return ERR_ARG;
-    }   
-
-    length = pPBuf->tot_len;
-
-
-    if (length > SH7619_EDMAC_MAX_FRAME_SIZE) // (ETHERSIZE+4))
-    {
-        debug_printf("xmit - length is too large, truncated \r\n" );
-        length = SH7619_EDMAC_MAX_FRAME_SIZE; // ETHERSIZE+4;         /* what a terriable hack! */
-    }
-
+    INT16  count;
+    long    flag = 0;
+    
+    length = pPBuf->len;
+            
+    if(startPacket)
+        flag = FP1;
+            
     for( count = 0 ; length > 0 ; length -= count )
     {  
         // Pointers to the current TxTd
         pTxTd = *(txTd.td + txTd.head);
-        while( (count = Send_Packet(pTxTd, (char *)pPBuf->payload, pPBuf->len)) < 0 ) {};
+        while( (count = Send_Packet(pTxTd, (char *)pPBuf->payload + (pPBuf->len - length), length)) < 0 ) {};
+        if((count == length) && (pPBuf->tot_len == pPBuf->len))
+        {
+            flag |= FP0;
+        }
+        pTxTd->status = (pTxTd->status & DL) | flag | ACT;
+        flag = 0;
+ 
+        // Driver manage the ring buffer
+        CIRC_INC(txTd.head, TX_BUFFERS)
+    }
+}
 
+err_t SH7619_EDMAC_LWIP_xmit(struct netif *pNetIf, struct pbuf *pPBuf)
+{
+    INT16  length = 0;
+    BOOL startPacket = TRUE;
+ 
+    GLOBAL_LOCK(encIrq);
+ 
+    if (!pNetIf || !pPBuf)
+    {
+        return ERR_ARG;
+    }   
+ 
+    length = pPBuf->tot_len;
+ 
+    if (length > SH7619_EDMAC_MAX_FRAME_SIZE) // (ETHERSIZE+4))
+    {
+        debug_printf("xmit - length is too large, truncated \r\n" );
+        length = SH7619_EDMAC_MAX_FRAME_SIZE; // ETHERSIZE+4;
+    }
+            
+    while(length > 0)
+    {
+        Frame_Xmit(pPBuf, startPacket);
+        startPacket = FALSE;
+        length -= pPBuf->len;
+        pPBuf = pPBuf->next;
+    }
+ 
+    /*for( count = 0 ; length > 0 ; length -= count )
+    {  
+        // Pointers to the current TxTd
+        pTxTd = *(txTd.td + txTd.head);
+        while( (count = Send_Packet(pTxTd, (char *)pPBuf->payload, pPBuf->len)) < 0 ) {};
+ 
         
         if( count == length )
         {
@@ -345,25 +374,23 @@ err_t SH7619_EDMAC_LWIP_xmit(struct netif *pNetIf, struct pbuf *pPBuf)
         }
         pTxTd->status = (pTxTd->status & DL) | flag | ACT;
         flag = 0;
-
+ 
         // Driver manage the ring buffer
         CIRC_INC(txTd.head, TX_BUFFERS)
-
+ 
         pPBuf = pPBuf->next;
-
-    }
-
-
+ 
+    }*/
+    
     // Now start to transmit if it is not already done
     if( EDTRR0 == 0x00000000 )
     {
         EDTRR0 = 0x00000001;
     }
-
+ 
     return ERR_OK;
-
+ 
 }
-
 
 BOOL SH7619_EDMAC_LWIP_SetupDevice(struct netif *pNetIf)
 {
@@ -439,7 +466,7 @@ void SH7619_EDMAC_LWIP_Init()
     {
         txTd.td[Index]->TRBA = (char*)Malloc_Buf(EMAC_TX_UNITSIZE);
         txTd.td[Index]->status = 0;
-        txTd.td[Index]->TDRBL = EMAC_TX_UNITSIZE;
+        txTd.td[Index]->TDRBL = 0;
         txTd.td[Index]->RDL = 0;        
     }
     txTd.td[TX_BUFFERS - 1]->status |= DL;
@@ -543,7 +570,7 @@ void Flush_All(struct netif *pNetIf)
     for(Index = 0; Index < TX_BUFFERS; Index++) 
     {
         txTd.td[Index]->status = 0;
-        txTd.td[Index]->TDRBL = EMAC_TX_UNITSIZE;
+        txTd.td[Index]->TDRBL = 0;
         txTd.td[Index]->RDL = 0;        
     }
     txTd.td[TX_BUFFERS - 1]->status |= DL;

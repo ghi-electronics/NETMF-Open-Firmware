@@ -6,15 +6,22 @@ using System.IO;
 using _DBG = Microsoft.SPOT.Debugger;
 using _WP = Microsoft.SPOT.Debugger.WireProtocol;
 using System.Threading;
+using System.Text.RegularExpressions;
+using System.Security.Cryptography.X509Certificates;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 
 namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
 {
     [Flags]
     public enum EraseOptions
     {
-        Deployment  = 0x01,
-        UserStorage = 0x02,
-        FileSystem  = 0x04,
+        Deployment    = 0x01,
+        UserStorage   = 0x02,
+        FileSystem    = 0x04,
+        Firmware      = 0x08,
+        UpdateStorage = 0x10,
+        SimpleStorage = 0x20,
     }
 
     public enum PingConnectionType
@@ -22,6 +29,7 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
         TinyCLR,
         TinyBooter,
         NoConnection,
+        MicroBooter,
     }
 
     public class DebugOutputEventArgs : EventArgs
@@ -65,17 +73,28 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
 
         private _DBG.WireProtocol.ReleaseInfo m_releaseInfo;
     }
-    
+
     public class MFDevice : IDisposable
     {
         private _DBG.Engine m_eng;
         private _DBG.PortDefinition m_port;
         private _DBG.PortDefinition m_portTinyBooter;
         private bool disposed;
+        private string m_CurrentNoise = "";
 
         public delegate void OnProgressHandler(long value, long total, string status);
         public event OnProgressHandler OnProgress;
         public AutoResetEvent EventCancel = new AutoResetEvent(false);
+        private AutoResetEvent m_evtMicroBooter = new AutoResetEvent(false);
+        private AutoResetEvent m_evtMicroBooterError = new AutoResetEvent(false);
+        private ManualResetEvent m_evtMicroBooterStart = new ManualResetEvent(false);
+
+        private Dictionary<uint, string> m_execSrecHash = new Dictionary<uint, string>();
+
+        private Dictionary<uint, int> m_srecHash = new Dictionary<uint, int>();
+
+        private X509Certificate2 m_serverCert = null;
+        private bool m_requireClientCert = false;
 
         private MFDevice()
         {
@@ -86,16 +105,78 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
             Dispose(false);
         }
 
-        internal _DBG.Engine DbgEngine { get { return m_eng; } }
+        internal _DBG.Engine DbgEngine 
+        { 
+            get 
+            {
+                if (m_eng == null)
+                {
+                    Connect(500, true);
+                }
+
+                return m_eng; 
+            } 
+        }
+
+        private Regex m_srecExpr = new Regex(@"<MB>([\d\w]+)</MB>");
 
         private void OnNoiseHandler(byte[] data, int index, int count)
         {
-            if (OnDebugText != null)
+            string text = System.Text.ASCIIEncoding.ASCII.GetString(data, index, count);
+
+            if (m_evtMicroBooterStart.WaitOne(0))
             {
-                OnDebugText(this, new DebugOutputEventArgs(System.Text.ASCIIEncoding.ASCII.GetString(data, index, count)));
+                m_CurrentNoise += text;
+                int idxEnd = 0;
+
+                Match m = m_srecExpr.Match(m_CurrentNoise);
+
+                while(m.Success)
+                {
+                    string key = m.Groups[1].Value;
+
+                    if (string.Compare(key, "ERROR", true) == 0)
+                    {
+                        m_evtMicroBooterError.Set();
+                    }
+                    else
+                    {
+                        try
+                        {
+                            uint addr = uint.Parse(key, System.Globalization.NumberStyles.HexNumber);
+                            if (!m_srecHash.ContainsKey(addr))
+                            {
+                                m_srecHash[addr] = 1;
+
+                                if (OnProgress != null)
+                                {
+                                    OnProgress(m_srecHash.Count, m_totalSrecs, string.Format(Properties.Resources.StatusFlashing, key));
+                                }
+                            }
+
+                            m_evtMicroBooter.Set();
+                        }
+                        catch { }
+                    }
+
+                    idxEnd = m.Index + m.Length;
+
+                    m = m.NextMatch();
+                }
+
+                m_CurrentNoise = m_CurrentNoise.Substring(idxEnd);
+            }
+            else
+            {
+                m_CurrentNoise = "";
+
+                if (OnDebugText != null)
+                {
+                    OnDebugText(this, new DebugOutputEventArgs(text));
+                }
             }
         }
-        private void OnMessage(_DBG.WireProtocol.IncomingMessage msg, string text)
+        public void OnMessage(_DBG.WireProtocol.IncomingMessage msg, string text)
         {
             if (OnDebugText != null)
             {
@@ -168,10 +249,38 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
             m_portTinyBooter = tinyBooterPort;
         }
 
+        internal bool CheckForMicroBooter()
+        {
+            if(m_eng == null) return false;
+
+            try
+            {
+                m_evtMicroBooterStart.Set();
+                m_evtMicroBooterError.Reset();
+
+                // try to see if we are connected to MicroBooter
+                for (int retry = 0; retry < 5; retry++)
+                {
+                    m_eng.SendRawBuffer(System.Text.ASCIIEncoding.ASCII.GetBytes("xx\n"));
+
+                    if (m_evtMicroBooterError.WaitOne(100))
+                    {
+                        return true;
+                    }
+                }
+            }
+            finally
+            {
+                m_evtMicroBooterStart.Reset();
+            }
+
+            return false;
+        }
+
         internal bool Connect( int timeout_ms, bool tryConnect )
         {
             // to use user cancel event, so that cancel button is more responsive
-            int retries = timeout_ms/100;
+            int retries = m_port is _DBG.PortDefinition_Tcp ? 2 : timeout_ms/100;
             int loops = 1;
             
             if (retries == 0) retries = 1;
@@ -195,38 +304,52 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
 
                         m_eng.OnNoise += new _DBG.NoiseEventHandler(OnNoiseHandler);
                         m_eng.OnMessage += new _DBG.MessageEventHandler(OnMessage);
+
+                        m_eng.Start();
                     }
 
-                    if (!m_eng.IsConnected)
+                    if (tryConnect)
                     {
-                        m_eng.Start();
-                        if (tryConnect)
-                        {
-                            for (int j = retries; j > 0; j-=5)
-                            {
-                                if (m_eng.TryToConnect(5, 100, true, _DBG.ConnectionSource.Unknown))
-                                {
-                                    //UNLOCK DEVICE in secure way?
-                                    m_eng.UnlockDevice(m_data);
-                                    break;
-                                }
+                        if (CheckForMicroBooter())
+                            return true;
 
-                                if (EventCancel.WaitOne(0, false)) throw new MFUserExitException();
-                            }
-                            if (m_eng.IsConnected)
+                        for (int j = retries; j > 0; j--)
+                        {
+                            if (m_eng.TryToConnect(0, timeout_ms / retries, true, _DBG.ConnectionSource.Unknown))
                             {
+                                //UNLOCK DEVICE in secure way?
+                                m_eng.UnlockDevice(m_data);
                                 break;
                             }
-                            else
+
+                            if (EventCancel.WaitOne(0, false)) throw new MFUserExitException();
+                        }
+                        if (m_eng.IsConnected)
+                        {
+                            /*
+                            if (m_serverCert != null && m_eng.UpgradeConnectionToSsl(0, m_serverCert, m_requireClientCert))
                             {
-                                Disconnect();
+                                if (OnDebugText != null)
+                                {
+                                    OnDebugText(this, new DebugOutputEventArgs("Using SSL Connection!!!"));
+                                }
                             }
+                            */
+
+                            break;
                         }
                         else
                         {
-                            break;
+                            Disconnect();
                         }
                     }
+                    else
+                    {
+                        break;
+                    }
+                }
+                catch (ThreadAbortException)
+                {
                 }
                 catch (MFUserExitException)
                 {
@@ -248,6 +371,7 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
                 m_eng.OnMessage -= new _DBG.MessageEventHandler(OnMessage);
 
                 m_eng.Stop();
+                m_eng.Dispose();
                 m_eng = null;
             }
             return true;
@@ -296,6 +420,29 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
             GC.SuppressFinalize(this);
         }
 
+        public bool UseSsl( X509Certificate2 cert, bool fRequireClientCert )
+        {
+            m_serverCert = cert;
+            m_requireClientCert = fRequireClientCert;
+
+            /*
+            if (m_serverCert != null && m_eng != null && m_eng.IsConnected)
+            {
+                if (m_eng.UpgradeConnectionToSsl(0, m_serverCert, m_requireClientCert))
+                {
+                    if (OnDebugText != null)
+                    {
+                        OnDebugText(this, new DebugOutputEventArgs("Using SSL Connection!!!"));
+                    }
+
+                    return true;
+                }
+            }
+            */
+
+            return false;
+        }
+
         /// <summary>
         /// Attempt to establish a connection with TinyBooter (with reboot if necessary)
         /// </summary>
@@ -304,28 +451,7 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
         {
             bool ret = false;
 
-            if (m_eng == null)
-            {
-                _DBG.PortDefinition pd = m_portTinyBooter;
-
-                try
-                {
-                    if (m_eng == null)
-                    {
-                        m_eng = new _DBG.Engine(pd);
-
-                        m_eng.OnNoise += new _DBG.NoiseEventHandler(OnNoiseHandler);
-                        m_eng.OnMessage += new _DBG.MessageEventHandler(OnMessage);
-
-                        m_eng.Start();
-                        m_eng.TryToConnect(5, 100, true, _DBG.ConnectionSource.Unknown);
-                    }
-                }
-                catch
-                {
-                }
-            }
-
+            if (!Connect(500, true)) return false;
 
             if (m_eng != null)
             {
@@ -336,15 +462,24 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
                 // tinyBooter is only com port so
                 if (m_port is _DBG.PortDefinition_Tcp)
                 {
+                    _DBG.PortDefinition pdTmp = m_port;
+
                     Disconnect();
 
-                    m_port = m_portTinyBooter;
-
-                    // digi takes forever to reset
-                    if (!Connect(60000, true))
+                    try
                     {
-                        Console.WriteLine(Properties.Resources.ErrorUnableToConnectToTinyBooterSerial);
-                        return false;
+                        m_port = m_portTinyBooter;
+
+                        // digi takes forever to reset
+                        if (!Connect(60000, true))
+                        {
+                            Console.WriteLine(Properties.Resources.ErrorUnableToConnectToTinyBooterSerial);
+                            return false;
+                        }
+                    }
+                    finally
+                    {
+                        m_port = pdTmp;
                     }
                 }
                 bool fConnected = false;
@@ -386,7 +521,7 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
 
             if (options == null || options.Length == 0)
             {
-                optionFlags = (EraseOptions.Deployment | EraseOptions.FileSystem | EraseOptions.UserStorage);
+                optionFlags = (EraseOptions.Deployment | EraseOptions.FileSystem | EraseOptions.UserStorage | EraseOptions.SimpleStorage | EraseOptions.UpdateStorage);
             }
             else
             {
@@ -396,15 +531,18 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
                 }
             }
 
-            if (!m_eng.TryToConnect(5, 100, true, _DBG.ConnectionSource.Unknown))
+            if (!Connect(500, true))
             {
                 throw new MFDeviceNoResponseException();
             }
 
-            if (!IsClrDebuggerEnabled())
+            if (!IsClrDebuggerEnabled() || 0 != (optionFlags & EraseOptions.Firmware))
             {
                 fReset = (Ping() == PingConnectionType.TinyCLR);
-                ConnectToTinyBooter();
+                if (!ConnectToTinyBooter())
+                {
+                    throw new MFTinyBooterConnectionFailureException();
+                }
             }
 
             _WP.Commands.Monitor_FlashSectorMap.Reply reply = m_eng.GetFlashSectorMap();
@@ -442,6 +580,22 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
                             total++;
                         }
                         break;
+                    case _WP.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_UPDATE:
+                        if (EraseOptions.UpdateStorage == (optionFlags & EraseOptions.UpdateStorage))
+                        {
+                            eraseSectors.Add(fsd);
+                            total++;
+                        }
+                        break;
+
+                    case _WP.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_SIMPLE_A:
+                    case _WP.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_SIMPLE_B:
+                        if (EraseOptions.SimpleStorage == (optionFlags & EraseOptions.SimpleStorage))
+                        {
+                            eraseSectors.Add(fsd);
+                            total++;
+                        }
+                        break;
 
                     case _WP.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_STORAGE_A:
                     case _WP.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_STORAGE_B:
@@ -459,18 +613,26 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
                             total++;
                         }
                         break;
+
+                    case _WP.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_CONFIG:
+                    case _WP.Commands.Monitor_FlashSectorMap.c_MEMORY_USAGE_CODE:
+                        if (EraseOptions.Firmware == (optionFlags & EraseOptions.Firmware))
+                        {
+                            eraseSectors.Add(fsd);
+                            total++;
+                        }
+                        break;
                 }
 
             }
 
-
             foreach (_WP.Commands.Monitor_FlashSectorMap.FlashSectorData fsd in eraseSectors)
             {
+                if (OnProgress != null) OnProgress(value, total, string.Format(Properties.Resources.StatusEraseSector, fsd.m_address));
+
                 ret &= m_eng.EraseMemory(fsd.m_address, fsd.m_size);
 
                 value++;
-
-                if (OnProgress != null) OnProgress(value, total, string.Format(Properties.Resources.StatusEraseSector, fsd.m_address));
             }
 
             // reset if we specifically entered tinybooter for the erase
@@ -484,7 +646,6 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
                 if (OnProgress != null) OnProgress(0, 0, Properties.Resources.StatusRebooting);
                 
                 m_eng.RebootDevice(_DBG.Engine.RebootOption.RebootClrOnly);
-                m_eng.ResumeExecution();
             }
 
             return ret;
@@ -496,21 +657,49 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
         public PingConnectionType Ping()
         {            
             PingConnectionType ret = PingConnectionType.NoConnection;
+            if (m_eng == null)
+            {
+                Connect(1000, true);
+            }
+
             if (m_eng != null)
             {
-                _WP.Commands.Monitor_Ping.Reply reply = m_eng.GetConnectionSource();
-
-                if( reply != null)
+                try
                 {
-                    switch(reply.m_source)
+                    if (CheckForMicroBooter())
                     {
-                        case _WP.Commands.Monitor_Ping.c_Ping_Source_TinyCLR:
-                            ret = PingConnectionType.TinyCLR;
-                            break;
-                        case _WP.Commands.Monitor_Ping.c_Ping_Source_TinyBooter:
-                            ret = PingConnectionType.TinyBooter;
-                            break;
+                        return PingConnectionType.MicroBooter;
                     }
+
+                    if (Connect(200, true))
+                    {
+                        _WP.Commands.Monitor_Ping.Reply reply = m_eng.GetConnectionSource();
+
+                        if (reply != null)
+                        {
+                            switch (reply.m_source)
+                            {
+                                case _WP.Commands.Monitor_Ping.c_Ping_Source_TinyCLR:
+                                    ret = PingConnectionType.TinyCLR;
+                                    break;
+                                case _WP.Commands.Monitor_Ping.c_Ping_Source_TinyBooter:
+                                    ret = PingConnectionType.TinyBooter;
+                                    break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Disconnect();
+                    }
+                }
+                catch (ThreadAbortException)
+                {
+                }
+                catch
+                {
+                    Disconnect();
+                    //Connect(1000, true);
                 }
             }
             return ret;
@@ -528,6 +717,525 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
             
             _WP.Commands.Monitor_OemInfo.Reply reply = m_eng.GetMonitorOemInfo();
             return reply == null ? null : new OemMonitorInfo(reply);
+        }
+
+        private bool PreProcesSREC(string srecFile)
+        {
+            if (!File.Exists(srecFile)) return false;
+
+            try
+            {
+                using (TextReader tr = File.OpenText(srecFile))
+                {
+                    using (TextWriter tw = File.CreateText(srecFile + ".ext"))
+                    {
+                        const int c_MaxRecords = 8; 
+                        int iRecord = 0;
+                        int currentCRC = 0;
+                        int iDataLength = 0;
+                        string s7rec = "";
+                        StringBuilder sb = new StringBuilder();
+
+                        while (tr.Peek() != -1)
+                        {
+                            string s1 = tr.ReadLine();
+
+                            // we only support s7, s3 records
+                            if (s1.ToLower().StartsWith("s7"))
+                            {
+                                s7rec = s1;
+                                continue;
+                            }
+
+                            if (!s1.ToLower().StartsWith("s3")) continue;
+
+                            string crcData;
+
+                            if (iRecord == 0)
+                            {
+                                crcData = s1.Substring(4, s1.Length - 6);
+                            }
+                            else
+                            {
+                                crcData = s1.Substring(12, s1.Length - 14);
+                            }
+                            
+                            iDataLength += crcData.Length / 2; // 2 chars per byte
+
+                            if (iRecord == 0)
+                            {
+                                sb.Append(s1.Substring(0, 2));
+                            }
+                            sb.Append(crcData);
+
+                            iRecord++;
+
+                            for (int i = 0; i < crcData.Length - 1; i += 2)
+                            {
+                                currentCRC += Byte.Parse(crcData.Substring(i, 2), System.Globalization.NumberStyles.HexNumber);
+                            }
+
+                            if (iRecord == c_MaxRecords)
+                            {
+                                iDataLength += 1; // crc
+
+                                sb = sb.Insert(2, string.Format("{0:X02}", iDataLength));
+
+                                currentCRC += (iDataLength & 0xFF) + ((iDataLength >> 8) & 0xFF);
+
+                                // write crc
+                                sb.Append(string.Format("{0:X02}", (0xFF - (0xFF & currentCRC))));
+
+                                tw.WriteLine(sb.ToString());
+
+                                currentCRC  = 0;
+                                iRecord     = 0;
+                                iDataLength = 0;
+                                sb.Length   = 0;
+                            }
+                        }
+
+                        if (iRecord != 0)
+                        {
+                            iDataLength += 1; // crc
+
+                            sb = sb.Insert(2, string.Format("{0:X02}", iDataLength));
+
+                            currentCRC += (iDataLength & 0xFF) + ((iDataLength >> 8) & 0xFF);
+
+                            // write crc
+                            sb.Append(string.Format("{0:X02}", (0xFF - (0xFF & currentCRC))));
+
+                            tw.WriteLine(sb.ToString());
+                        }
+
+                        if (s7rec != "")
+                        {
+                            tw.WriteLine(s7rec);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                if (File.Exists(srecFile + ".ext"))
+                {
+                    File.Delete(srecFile + ".ext");
+                }
+                return false;
+            }
+
+            return true;
+        }
+
+        private Dictionary<uint, string> ParseSrecFile(string srecFile, out uint entryPoint, out uint imageSize)
+        {
+            entryPoint = 0;
+            imageSize = 0;
+            Dictionary<uint, string> recs = new Dictionary<uint, string>();
+
+            if (!File.Exists(srecFile)) return null;
+
+            FileInfo fi = new FileInfo(srecFile);
+
+            try
+            {
+                int total = 0;
+                using (TextReader tr = File.OpenText(srecFile))
+                {
+                    while (tr.Peek() != -1)
+                    {
+                        string s1 = tr.ReadLine();
+
+                        string addr = s1.Substring(4, 8);
+
+                        // we only support s7, s3 records
+                        if (s1.ToLower().StartsWith("s7"))
+                        {
+                            entryPoint = uint.Parse(addr, System.Globalization.NumberStyles.HexNumber);
+                        }
+                        else if (s1.ToLower().StartsWith("s3"))
+                        {
+                            total += s1.Length - 14;
+                            recs[uint.Parse(addr, System.Globalization.NumberStyles.HexNumber)] = s1;
+                        }
+                    }
+                }
+
+                imageSize = (uint)total;
+            }
+            catch
+            {
+                return null;
+            }
+
+            return recs;
+        }
+
+        private int m_totalSrecs = 0;
+        private bool DeploySREC(string srecFile, ref uint entryPoint)
+        {
+            entryPoint = 0;
+            uint imageSize = 0;
+            m_srecHash.Clear();
+            m_execSrecHash.Clear();
+
+            if (File.Exists(srecFile))
+            {
+                if (File.Exists(srecFile + ".ext"))
+                {
+                    File.Delete(srecFile + ".ext");
+                }
+
+                if (PreProcesSREC(srecFile) && File.Exists(srecFile + ".ext"))
+                {
+                    srecFile += ".ext";
+                }
+
+                Dictionary<uint, string> recs = ParseSrecFile(srecFile, out entryPoint, out imageSize);
+
+                try
+                {
+                    int sleepTime = 5000;
+                    UInt32 imageAddr = 0xFFFFFFFF;
+
+                    m_totalSrecs = recs.Count;
+
+                    m_evtMicroBooterStart.Set();
+                    m_evtMicroBooter.Reset();
+                    m_evtMicroBooterError.Reset();
+
+                    while(recs.Count > 0)
+                    {
+                        List<uint> remove = new List<uint>();
+
+                        const int c_MaxPipeline = 4;
+                        int pipe = c_MaxPipeline;
+
+                        uint []keys = new uint[recs.Count];
+                        
+                        recs.Keys.CopyTo(keys, 0);
+
+                        Array.Sort<uint>(keys);
+
+                        if (keys[0] < imageAddr) imageAddr = keys[0];
+
+                        foreach(uint key in keys)
+                        {
+                            if (m_srecHash.ContainsKey(key))
+                            {
+                                remove.Add(key);
+                                continue;
+                            }
+
+                            m_eng.SendRawBuffer(System.Text.ASCIIEncoding.ASCII.GetBytes("\n"));
+
+                            m_eng.SendRawBuffer(System.Text.ASCIIEncoding.ASCII.GetBytes(recs[key]));
+
+                            m_eng.SendRawBuffer(System.Text.ASCIIEncoding.ASCII.GetBytes("\n"));
+
+                            if (pipe-- <= 0)
+                            {
+                                m_evtMicroBooter.WaitOne(sleepTime);
+                                pipe = c_MaxPipeline;
+                            }
+                        }
+
+                        int cnt = remove.Count;
+
+                        if(cnt > 0)
+                        {
+                            for(int i=0; i<cnt; i++)
+                            {
+                                recs.Remove(remove[i]);
+                            }
+                        }
+                    }
+
+
+                    if (imageAddr != 0)
+                    {
+                        string basefile = Path.GetFileNameWithoutExtension(srecFile);
+
+                        // srecfile might be .bin.ext (for srec updates)
+                        if (!string.IsNullOrEmpty(Path.GetExtension(basefile)))
+                        {
+                            basefile = Path.GetFileNameWithoutExtension(basefile);
+                        }
+                        string path = Path.GetDirectoryName(srecFile);
+                        string binFile = "";
+                        string symdefFile = "";
+
+                        if (path.ToLower().EndsWith("\\tinyclr.hex"))
+                        {
+                            binFile    = Path.GetDirectoryName(path) + "\\tinyclr.bin\\" + basefile;
+                            symdefFile = Path.GetDirectoryName(path) + "\\tinyclr.symdefs";
+                        }
+                        else
+                        {
+                            binFile    = Path.GetDirectoryName(srecFile) + "\\" + basefile + ".bin";
+                            symdefFile = Path.GetDirectoryName(srecFile) + "\\" + basefile + ".symdefs";
+                        }
+
+                        // send image crc
+                        if (File.Exists(binFile) && File.Exists(symdefFile))
+                        {
+                            FileInfo fiBin = new FileInfo(binFile);
+                            UInt32 imageCRC = 0;
+
+                            using (TextReader trSymdef = File.OpenText(symdefFile))
+                            {
+                                while (trSymdef.Peek() != -1)
+                                {
+                                    string line = trSymdef.ReadLine();
+                                    if (line.Contains("LOAD_IMAGE_CRC"))
+                                    {
+                                        int idxEnd = line.IndexOf(' ', 2);
+                                        imageCRC = UInt32.Parse(line.Substring(2, idxEnd-2), System.Globalization.NumberStyles.HexNumber);
+                                    }
+                                }
+                            }
+
+                            m_execSrecHash[entryPoint] = string.Format("<CRC>{0:X08},{1:X08},{2:X08},{3:X08}</CRC>\n", imageAddr, fiBin.Length, imageCRC, entryPoint);
+                        }
+                    }
+
+                    return true;
+                }
+                finally
+                {
+                    m_evtMicroBooterStart.Reset();
+                }
+            }
+
+            return false;
+        }
+
+        private bool CanUpgradeToSsl()
+        {
+            if(m_port == null || m_eng == null) return false;
+
+            if (m_port is _DBG.PortDefinition_Tcp && m_serverCert != null)
+            {
+                return m_eng.IsUsingSsl || m_eng.CanUpgradeToSsl();
+            }
+
+            return false;
+        }
+
+        public bool UpgradeToSsl()
+        {
+            if (CanUpgradeToSsl())
+            {
+                if (m_eng.IsUsingSsl)
+                {
+                    return true;
+                }
+                else
+                {
+                    IAsyncResult iar = m_eng.UpgradeConnectionToSsl_Begin(m_serverCert, m_requireClientCert);
+
+                    if (0 == WaitHandle.WaitAny(new WaitHandle[] { iar.AsyncWaitHandle, EventCancel }, 10000))
+                    {
+                        try
+                        {
+                            if (m_eng.UpgradeConnectionToSSL_End(iar))
+                            {
+                                return true;
+                            }
+                        }
+                        catch
+                        {
+                        }
+
+                        // dispose the engine since we attempted an ssl connection
+                        m_eng.Dispose();
+                        m_eng = null;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private bool DeployMFUpdate(string zipFile)
+        {
+            const int c_PacketSize = 1024;
+
+            if (File.Exists(zipFile))
+            {
+                byte []packet = new byte[c_PacketSize];
+                try
+                {
+                    int handle = -1;
+                    int idx = 0;
+                    FileInfo fi = new FileInfo(zipFile);
+                    int numPkts = ((int)fi.Length + c_PacketSize - 1) / c_PacketSize;
+
+                    byte[] hashData = UTF8Encoding.UTF8.GetBytes(fi.Name + fi.LastWriteTimeUtc.ToString());
+
+                    uint updateId = CRC.ComputeCRC(hashData, 0, hashData.Length, 0);
+                    uint imageCRC = 0;
+
+                    byte[] sig = null;
+
+                    Console.WriteLine(updateId);
+
+                    if (m_eng.StartUpdate("NetMF", 4, 2, updateId, 0, 0, (uint)fi.Length, (uint)c_PacketSize, 0, ref handle))
+                    {
+                        byte[] resp = new byte[4];
+                        uint authType;
+                        IAsyncResult iar = null;
+
+                        if(!m_eng.UpdateAuthCommand(handle, 1, null, ref resp) || resp.Length < 4) return false;
+
+                        using (MemoryStream ms = new MemoryStream(resp))
+                        using (BinaryReader br = new BinaryReader(ms)) 
+                        {
+                            authType = br.ReadUInt32();
+                        }
+
+
+                        byte[] pubKey = null;
+
+                        if (m_serverCert != null)
+                        {
+                            RSACryptoServiceProvider rsa = m_serverCert.PrivateKey as RSACryptoServiceProvider;
+
+                            if(rsa != null)
+                            {
+                                pubKey = rsa.ExportCspBlob(false);
+                            }
+                        }
+
+                        if (!m_eng.UpdateAuthenticate(handle, pubKey))
+                        {
+                            return false;
+                        }
+
+                        if (authType == 1 && m_serverCert != null)
+                        {
+                            iar = m_eng.UpgradeConnectionToSsl_Begin(m_serverCert, m_requireClientCert);
+
+                            if(0 == WaitHandle.WaitAny(new WaitHandle[]{ iar.AsyncWaitHandle, EventCancel }, 10000))
+                            {
+                                try
+                                {
+                                    if (!m_eng.UpgradeConnectionToSSL_End(iar))
+                                    {
+                                        m_eng.Dispose();
+                                        m_eng = null;
+                                        return false;
+                                    }
+                                }
+                                catch
+                                {
+                                    m_eng.Dispose();
+                                    m_eng = null;
+                                    return false;
+                                }
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+
+                        RSAPKCS1SignatureFormatter alg = null;
+                        HashAlgorithm hash = null;
+                        byte[] hashValue = null;
+                        
+                        try
+                        {
+                            if (m_serverCert != null)
+                            {
+                                alg = new RSAPKCS1SignatureFormatter(m_serverCert.PrivateKey);
+                                alg.SetHashAlgorithm("SHA1");
+                                hash = new SHA1CryptoServiceProvider();
+                                hashValue = new byte[hash.HashSize/8];
+                            }
+                        }
+                        catch
+                        {
+                        }
+
+                        using (FileStream fs = File.OpenRead(zipFile))
+                        {
+                            int read;
+
+                            while (0 != (read = fs.Read(packet, 0, c_PacketSize)))
+                            {
+                                byte[] pkt = packet;
+                                if (read < c_PacketSize)
+                                {
+                                    pkt = new byte[read];
+
+                                    Array.Copy(packet, pkt, read);
+                                }
+
+                                uint crc = CRC.ComputeCRC(pkt, 0, pkt.Length, 0);
+
+                                if (!m_eng.AddPacket(handle, (uint)idx++, pkt, CRC.ComputeCRC(pkt, 0, pkt.Length, 0))) return false;
+
+                                imageCRC = CRC.ComputeCRC(pkt, 0, pkt.Length, imageCRC);
+
+                                if(hash != null)
+                                {
+                                    if(idx == numPkts)
+                                    {
+                                        hash.TransformFinalBlock(pkt, 0, read);
+                                    }
+                                    else
+                                    {
+                                        byte[] hashTmp = new byte[read];
+                                        hash.TransformBlock(pkt, 0, read, hashTmp, 0);
+                                    }
+                                }
+
+                                if (OnProgress != null)
+                                {
+                                    OnProgress(idx, numPkts, string.Format(Properties.Resources.StatusFlashing, idx));
+                                }
+                            }
+                        }
+
+                        if (alg != null)
+                        {
+                            sig = alg.CreateSignature(hash);
+                        }
+                        else
+                        {
+                            sig = new byte[4];
+                            using (MemoryStream ms = new MemoryStream(sig))
+                            using (BinaryWriter br = new BinaryWriter(ms)) 
+                            {
+                                br.Write(imageCRC);
+                            }
+                        }
+
+                        if (m_eng.InstallUpdate(handle, sig))
+                        {
+                            return true;
+                        }
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+
+            return false;
+        }
+
+        public bool DeployUpdate(string comprFilePath)
+        {
+            if (m_eng.ConnectionSource == _DBG.ConnectionSource.TinyCLR)
+            {
+                if (DeployMFUpdate(comprFilePath)) return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -549,6 +1257,11 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
             if (m_eng == null) throw new MFDeviceNoResponseException();
 
             // make sure we know who we are talking to
+            if (CheckForMicroBooter())
+            {
+                return DeploySREC(filePath, ref entryPoint);
+            }
+
             m_eng.TryToConnect(1, 100, true, _DBG.ConnectionSource.Unknown);
 
             bool sigExists = File.Exists(signatureFile);
@@ -630,6 +1343,30 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
         public bool Execute(uint entryPoint)
         {
             if (m_eng == null) throw new MFDeviceNoResponseException(); 
+            if (CheckForMicroBooter())
+            {
+                if (m_execSrecHash.ContainsKey(entryPoint))
+                {
+                    string execRec = (string)m_execSrecHash[entryPoint];
+                    bool fRet = false;
+
+                    for (int retry = 0; retry < 10; retry++)
+                    {
+                        m_eng.SendRawBuffer(System.Text.ASCIIEncoding.ASCII.GetBytes(execRec));
+                        m_eng.SendRawBuffer(System.Text.ASCIIEncoding.ASCII.GetBytes("\n"));
+
+                        if (m_evtMicroBooter.WaitOne(1000))
+                        {
+                            fRet = true;
+                            break;
+                        }
+                    }
+
+                    return fRet;
+                }
+
+                return false;
+            }
             
             _WP.Commands.Monitor_Ping.Reply reply = m_eng.GetConnectionSource();
 
@@ -659,25 +1396,16 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
 
             if(!coldBoot)
             {
-                bool fOK = false;
                 try
                 {
-                    if(m_eng.TryToReconnect(true))
-                    {
-                        m_eng.ResumeExecution();
-                        fOK = true;
-                    }
+                    Thread.Sleep(200);
                 }
                 catch
                 {
                 }
 
-                if(!fOK)
-                {
-                    this.Disconnect();
-                    this.Connect(1000, true);
-                }
-                
+                this.Disconnect();
+                this.Connect(1000, true);                
             }
         }
         /// <summary>

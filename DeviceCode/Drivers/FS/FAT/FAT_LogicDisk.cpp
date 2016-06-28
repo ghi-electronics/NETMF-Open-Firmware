@@ -28,14 +28,14 @@
 UINT32 FAT_LogicDisk::ReadFAT( UINT32 clusIndex )
 {
 
-    if(clusIndex > m_totalClusterCount + 1)
+    if(clusIndex >= (m_totalClusterCount + CLUSTER_START))
         return CLUST_ERROR;
 
 
     UINT32 sectorsOffset = clusIndex / m_entriesPerSector;
     UINT32 dataOffset    = clusIndex % m_entriesPerSector;
 
-    UINT8* fat = SectorCache.GetSector( m_FATBaseSector[0] + sectorsOffset );
+    UINT8* fat = SectorCache.GetSector( m_FATBaseSector[0] + sectorsOffset, FALSE );
 
     if(!fat) return CLUST_ERROR;
 
@@ -71,8 +71,11 @@ UINT32 FAT_LogicDisk::ReadFAT( UINT32 clusIndex )
 // Returns: old value
 UINT32 FAT_LogicDisk::WriteFAT( UINT32 clusIndex, UINT32 value )
 {
-    if( clusIndex > m_totalClusterCount + 1)
+    if(clusIndex >= (m_totalClusterCount + CLUSTER_START))
+    {
+        ASSERT(FALSE);
         return CLUST_ERROR;
+    }
 
     UINT32  sectorsOffset = clusIndex / m_entriesPerSector;
     UINT32  dataOffset    = clusIndex % m_entriesPerSector;
@@ -82,6 +85,8 @@ UINT32 FAT_LogicDisk::WriteFAT( UINT32 clusIndex, UINT32 value )
     {
         value = (m_isFAT16) ? CLUST_FAT16_EOFE : CLUST_FAT32_EOFE;
     }
+
+    ASSERT((m_FATBaseSector[0] + sectorsOffset) < m_FATBaseSector[1]);
 
     for(int i = 0; i < 2; i++)
     {
@@ -111,7 +116,6 @@ UINT32 FAT_LogicDisk::WriteFAT( UINT32 clusIndex, UINT32 value )
             fat32[1]=(UINT8)((newValue >>8)  & 0xff);
             fat32[2]=(UINT8)((newValue >>16) & 0xff);
             fat32[3]=(UINT8)((newValue >>24) & 0xff);
-            
         }
     }
 
@@ -221,9 +225,9 @@ BOOL FAT_LogicDisk::MountDisk()
 
     //Sanity check for the sizes
     if(((UINT64)m_diskSize < (UINT64)(m_totalSectorCount * m_bytesPerSector)) || // Actual disk size has to be greater or equal to the size used by the FS
-       (fatEntriesCount < (m_totalClusterCount + 1))) // FAT needs to fit all the clusters
+       (fatEntriesCount < (m_totalClusterCount + CLUSTER_START - 1))) // FAT needs to fit all the clusters
     {
-
+        ASSERT(FALSE);
         return FALSE;
     }
 
@@ -253,7 +257,7 @@ BOOL FAT_LogicDisk::MountDisk()
 // Remarks:
 // 
 // Returns:
-HRESULT FAT_LogicDisk::FormatHelper( UINT32 parameters )
+HRESULT FAT_LogicDisk::FormatHelper( LPCSTR volumeLabel, UINT32 parameters )
 {
     static const UINT32 DskTableFAT16[][2] =
     {
@@ -279,9 +283,16 @@ HRESULT FAT_LogicDisk::FormatHelper( UINT32 parameters )
 
     //------//
 
-    BYTE buffer[512];
-    memset( buffer, 0, 512 );
+    ByteAddress beginBlock;
 
+    UINT32 regionIndex, rangeIndex;
+
+    const BlockRegionInfo *pBlockRegionInfo;
+
+    const BlockDeviceInfo *tmpBlockDeviceInfo = m_blockStorageDevice->GetDeviceInfo();
+
+    BYTE buffer[DEFAULT_SECTOR_SIZE];
+    memset( buffer, 0, DEFAULT_SECTOR_SIZE );
 
     FAT_DBR* dbr = (FAT_DBR*)&(buffer[0]);
 
@@ -390,7 +401,6 @@ HRESULT FAT_LogicDisk::FormatHelper( UINT32 parameters )
         if(!useFAT16) tmpVal2 /= 2;
 
         fatSz = (tmpVal1 + (tmpVal2 - 1)) / tmpVal2;
-
     }
 
     if(useFAT16)
@@ -408,8 +418,15 @@ HRESULT FAT_LogicDisk::FormatHelper( UINT32 parameters )
         
         dbr->DBRUnion.FAT16.BS_VolID[2] = (date     ) & 0xFF;
         dbr->DBRUnion.FAT16.BS_VolID[3] = (date >>8 ) & 0xFF;
-        
-        memcpy( dbr->DBRUnion.FAT16.BS_VolLab    , "MFDISK     ", 11 );
+
+        if(volumeLabel != NULL)
+        {
+            memcpy( dbr->DBRUnion.FAT16.BS_VolLab, volumeLabel, hal_strlen_s(volumeLabel));
+        }
+        else
+        {
+            memcpy( dbr->DBRUnion.FAT16.BS_VolLab, "MFDISK     ", 11 );
+        }
         memcpy( dbr->DBRUnion.FAT16.BS_FilSysType, "FAT16   "   ,  8 );
         
     }
@@ -438,7 +455,14 @@ HRESULT FAT_LogicDisk::FormatHelper( UINT32 parameters )
         dbr->DBRUnion.FAT32.BS_VolID[3] = (date >>8 ) & 0xFF;
 
 
-        memcpy( dbr->DBRUnion.FAT32.BS_VolLab    , "MFDISK     ", 11 );
+        if(volumeLabel != NULL)
+        {
+            memcpy( dbr->DBRUnion.FAT32.BS_VolLab, volumeLabel, hal_strlen_s(volumeLabel));
+        }
+        else
+        {
+            memcpy( dbr->DBRUnion.FAT32.BS_VolLab, "MFDISK     ", 11 );
+        }
         memcpy( dbr->DBRUnion.FAT32.BS_FilSysType, "FAT32   "   ,  8 );
 
     }
@@ -449,8 +473,64 @@ HRESULT FAT_LogicDisk::FormatHelper( UINT32 parameters )
 
     //--//
 
+    //find sector address for first BLOCKTYPE_FILESYSTEM  block 
+    if(m_blockStorageDevice->FindForBlockUsage(BlockUsage::FILESYSTEM, beginBlock, regionIndex, rangeIndex))
+    {
+        FileSystemVolume* pVolume = FileSystemVolumeList::GetFirstVolume();
+
+        while(pVolume != NULL)
+        {
+            if(pVolume->m_volumeId.blockStorageDevice == m_blockStorageDevice && pVolume->m_volumeId.volumeId == m_volumeId)
+            {
+                break;
+            }
+
+            pVolume = FileSystemVolumeList::GetNextVolume(*pVolume);
+        }
+
+        if(pVolume == NULL || pVolume->m_fsDriver == NULL || (0 != (pVolume->m_fsDriver->Flags & FS_DRIVER_ATTRIBUTE__FORMAT_REQUIRES_ERASE)))
+        {
+            BOOL fDone = FALSE;
+            
+            for(UINT32 reg=regionIndex; reg<tmpBlockDeviceInfo->NumRegions; reg++)
+            {
+                //in next regions to find the end of BLOCKTYPE_FILESYSTEM blocks
+                pBlockRegionInfo = &tmpBlockDeviceInfo->Regions[reg];
+
+                //in begin region to find the end of BLOCKTYPE_FILESYSTEM blocks
+                for(UINT32 j = rangeIndex; j < pBlockRegionInfo->NumBlockRanges; j++)
+                {
+                    const BlockRange* pRange = &pBlockRegionInfo->BlockRanges[j];
+
+                    if(pRange->IsFileSystem())
+                    {
+                        UINT32 blkAddr = pBlockRegionInfo->BlockAddress(pRange->StartBlock);
+                        int cnt = pRange->EndBlock - pRange->StartBlock + 1;
+
+                        while(cnt--)
+                        {
+                            m_blockStorageDevice->EraseBlock( blkAddr );
+
+                            blkAddr += pBlockRegionInfo->BytesPerBlock;
+                        }
+                    }
+                    else
+                    {
+                        fDone = TRUE;
+                        break;
+                    }
+                }
+
+                if(fDone) break;
+
+                rangeIndex = 0;
+            }
+        }
+    }
+
+
     // Zero out all sectors first
-    UINT32 sectorsNeeded = dbr->Get_BPB_RsvdSecCnt() + (2 * fatSz) + rootDirSectors; //BPB_RsvdSecCnt BPB_NumFATs * FATSz + RootDirSectors
+    UINT32 sectorsNeeded = dbr->Get_BPB_RsvdSecCnt() + (dbr->BPB_NumFATs * fatSz) + rootDirSectors; //BPB_RsvdSecCnt BPB_NumFATs * FATSz + RootDirSectors
     if(!useFAT16) sectorsNeeded += dbr->BPB_SecPerClus; // for the FAT32 root directory
 
     if(!m_blockStorageDevice->Memset( m_baseAddress, 0, sectorsNeeded * DEFAULT_SECTOR_SIZE ))
@@ -460,7 +540,7 @@ HRESULT FAT_LogicDisk::FormatHelper( UINT32 parameters )
 
 
     // Write the first DBR
-    if(!m_blockStorageDevice->Write( m_baseAddress, 512, buffer, TRUE ))
+    if(!m_blockStorageDevice->Write( m_baseAddress, DEFAULT_SECTOR_SIZE, buffer, TRUE ))
     {
         return CLR_E_FILE_IO;
     }
@@ -469,7 +549,7 @@ HRESULT FAT_LogicDisk::FormatHelper( UINT32 parameters )
     if(!useFAT16)
     {
 
-        if(!m_blockStorageDevice->Write( m_baseAddress + 6 * DEFAULT_SECTOR_SIZE, 512, buffer, TRUE ))
+        if(!m_blockStorageDevice->Write( m_baseAddress + 6 * DEFAULT_SECTOR_SIZE, DEFAULT_SECTOR_SIZE, buffer, TRUE ))
         {
         
             return CLR_E_FILE_IO;
@@ -479,8 +559,8 @@ HRESULT FAT_LogicDisk::FormatHelper( UINT32 parameters )
         
         fsInfo->Initialize( m_totalClusterCount - 1, 3 );
 
-        if(!m_blockStorageDevice->Write( m_baseAddress + 1 * DEFAULT_SECTOR_SIZE, 512, buffer, TRUE ) ||
-           !m_blockStorageDevice->Write( m_baseAddress + 7 * DEFAULT_SECTOR_SIZE, 512, buffer, TRUE ))
+        if(!m_blockStorageDevice->Write( m_baseAddress + 1 * DEFAULT_SECTOR_SIZE, DEFAULT_SECTOR_SIZE, buffer, TRUE ) ||
+           !m_blockStorageDevice->Write( m_baseAddress + 7 * DEFAULT_SECTOR_SIZE, DEFAULT_SECTOR_SIZE, buffer, TRUE ))
         {
 
             return CLR_E_FILE_IO;
@@ -488,7 +568,7 @@ HRESULT FAT_LogicDisk::FormatHelper( UINT32 parameters )
     }
     
     // Write the first entries of the FAT table
-    memset( buffer, 0, 512 );
+    memset( buffer, 0, DEFAULT_SECTOR_SIZE );
 
     if(useFAT16)
     {
@@ -524,8 +604,8 @@ HRESULT FAT_LogicDisk::FormatHelper( UINT32 parameters )
     }
 
 
-    if(!m_blockStorageDevice->Write( m_baseAddress + m_FATBaseSector[0] * DEFAULT_SECTOR_SIZE, 512, buffer, TRUE ) ||
-       !m_blockStorageDevice->Write( m_baseAddress + m_FATBaseSector[1] * DEFAULT_SECTOR_SIZE, 512, buffer, TRUE ))
+    if(!m_blockStorageDevice->Write( m_baseAddress + m_FATBaseSector[0] * DEFAULT_SECTOR_SIZE, DEFAULT_SECTOR_SIZE, buffer, TRUE ) ||
+       !m_blockStorageDevice->Write( m_baseAddress + m_FATBaseSector[1] * DEFAULT_SECTOR_SIZE, DEFAULT_SECTOR_SIZE, buffer, TRUE ))
     {
     
         return CLR_E_FILE_IO;
@@ -549,22 +629,24 @@ HRESULT FAT_LogicDisk::GetDiskVolLab( LPSTR label )
 {
     if(!label) return CLR_E_NULL_REFERENCE;
 
-    FAT_EntryEnumerator entryEnum;
-    FAT_FILE fileInfo;
+    UINT8 buffer[DEFAULT_SECTOR_SIZE];
 
-    entryEnum.Initialize( this, m_rootSectorStart, 0 );
-
-    while(fileInfo.Parse( this, &entryEnum ) == S_OK)
+    if(m_blockStorageDevice->Read( m_baseAddress, DEFAULT_SECTOR_SIZE, buffer ))
     {
-        FAT_Directory* dirEntry = fileInfo.GetDirectoryEntry();
+        FAT_DBR* dbr = (FAT_DBR*)buffer;
 
-        if(dirEntry->DIR_Attr == ATTR_VOLUME_ID)
+        if(dbr->Get_BPB_RootEntCnt() == 512)
         {
-            memcpy( label, dirEntry->DIR_Name, FAT_Directory::DIR_Name__size );
-            label[FAT_Directory::DIR_Name__size] = '\0';
-
-            return S_OK;
+            memcpy(label, dbr->DBRUnion.FAT16.BS_VolLab, ARRAYSIZE(dbr->DBRUnion.FAT16.BS_VolLab));
+            label[ARRAYSIZE(dbr->DBRUnion.FAT16.BS_VolLab)] = 0;
         }
+        else
+        {
+            memcpy(label, dbr->DBRUnion.FAT32.BS_VolLab, ARRAYSIZE(dbr->DBRUnion.FAT32.BS_VolLab));
+            label[ARRAYSIZE(dbr->DBRUnion.FAT32.BS_VolLab)] = 0;
+        }
+                    
+        return S_OK;
     }
 
     label[0] = '\0';
@@ -585,7 +667,7 @@ HRESULT FAT_LogicDisk::GetDiskVolLab( LPSTR label )
 // Returns:
 UINT64 FAT_LogicDisk::GetDiskTotalSize()
 {
-    return m_totalClusterCount * m_sectorsPerCluster * m_bytesPerSector;
+    return (m_sectorCount - m_firstDataSector) * m_bytesPerSector;
 }
 
 
@@ -619,10 +701,12 @@ UINT64 FAT_LogicDisk::GetDiskFreeSize()
 //       Sectors
 UINT32 FAT_LogicDisk::ClusToSect( UINT32 clusIndex )
 {
-    if(clusIndex == CLUSTER_NOT_A_CLUSTER)
+    if(clusIndex < CLUSTER_START)
     {
         return m_rootSectorStart;
     }
+
+    ASSERT(clusIndex >= CLUSTER_START && clusIndex < (m_totalClusterCount + CLUSTER_START));
 
     return (m_firstDataSector + (clusIndex - CLUSTER_START) * m_sectorsPerCluster);
 }
@@ -665,9 +749,9 @@ UINT32 FAT_LogicDisk::SectToClus( UINT32 sectIndex )
 UINT32 FAT_LogicDisk::GetNextFreeClus( BOOL clear )
 {
     UINT32 start      = m_nextFree;
-    UINT32 maxCluster = m_totalClusterCount + 1;
+    UINT32 maxCluster = m_totalClusterCount + CLUSTER_START;
 
-    if(start > maxCluster)
+    if(start >= maxCluster)
     {
         start = CLUSTER_START;
     }
@@ -675,7 +759,7 @@ UINT32 FAT_LogicDisk::GetNextFreeClus( BOOL clear )
     UINT32 clusIndex = GetNextFreeClusHelper( start, maxCluster );
 
     // If we reach the end and still didn't find a free cluster, start from the beginning
-    if(clusIndex == CLUST_ERROR)
+    if(clusIndex == CLUST_ERROR && start != CLUSTER_START)
     {
         clusIndex = GetNextFreeClusHelper( CLUSTER_START, start );
     }
@@ -705,13 +789,10 @@ UINT32 FAT_LogicDisk::GetNextFreeClusHelper( UINT32 fromClus, UINT32 toClus )
 
     UINT32 clusIndex = fromClus;
     
-    UINT8* fat;
+    UINT8* fat = SectorCache.GetSector( m_FATBaseSector[0] + sectorsOffset, TRUE, FALSE );
 
-    while(TRUE)
+    while(clusIndex < toClus)
     {
-        // the data is directly read from storage in byte order of little endian format.
-        fat = SectorCache.GetSector( m_FATBaseSector[0] + sectorsOffset );
-
         if(!fat) return CLUST_ERROR;
 
         if (m_isFAT16)
@@ -719,7 +800,7 @@ UINT32 FAT_LogicDisk::GetNextFreeClusHelper( UINT32 fromClus, UINT32 toClus )
             //FAT16
             fat = (UINT8*)((size_t)fat + sizeof(UINT16)*dataOffset);
 
-            while(dataOffset < m_entriesPerSector && clusIndex <= toClus)
+            while(dataOffset < m_entriesPerSector && clusIndex < toClus)
             {
 
                 UINT16 data16 = fat[0] + (UINT16)(fat[1] <<8);
@@ -739,7 +820,7 @@ UINT32 FAT_LogicDisk::GetNextFreeClusHelper( UINT32 fromClus, UINT32 toClus )
             // FAT32
             fat = (UINT8*)((size_t)fat + sizeof(UINT32)*dataOffset);
 
-            while(dataOffset < m_entriesPerSector && clusIndex <= toClus)
+            while(dataOffset < m_entriesPerSector && clusIndex < toClus)
             {
 
                 UINT32 data32 = fat[0] + (UINT32)(fat[1] <<8) + (UINT32)(fat[2] <<16) +(UINT32)(fat[3] <<24);
@@ -757,6 +838,9 @@ UINT32 FAT_LogicDisk::GetNextFreeClusHelper( UINT32 fromClus, UINT32 toClus )
         }
         dataOffset = 0;
         sectorsOffset++;
+
+        // the data is directly read from storage in byte order of little endian format.
+        fat = SectorCache.GetSector( m_FATBaseSector[0] + sectorsOffset, FALSE, FALSE );
     }
 
     return CLUST_ERROR;
@@ -784,10 +868,11 @@ HRESULT FAT_LogicDisk::GetNextSect( UINT32 *clusIndex, UINT32 *sectIndex, UINT32
     UINT32 sect = *sectIndex + 1;
 
     // For FAT16 Root directory
-    if(oldClusIndex == CLUSTER_NOT_A_CLUSTER)
+    if(oldClusIndex < CLUSTER_START)
     {
         if(sect < m_firstDataSector)
         {
+            *clusIndex = SectToClus(sect);
             *sectIndex = sect;
             return S_OK;
         }
@@ -805,10 +890,8 @@ HRESULT FAT_LogicDisk::GetNextSect( UINT32 *clusIndex, UINT32 *sectIndex, UINT32
 
         if(GetClusType( clus ) != CLUSTYPE_DATA)
         {
-
             if(flag & GetNextSect__CREATE)
             {
-
                 clus = GetNextFreeClus( (flag & GetNextSect__CLEAR) ? TRUE : FALSE );
 
                 if(clus == CLUST_ERROR)
@@ -820,18 +903,18 @@ HRESULT FAT_LogicDisk::GetNextSect( UINT32 *clusIndex, UINT32 *sectIndex, UINT32
             }
             else
             {
-
                 return CLR_E_FILE_IO;
             }
         }
 
-
+        if(clus < CLUSTER_START)
+        {
+            return CLR_E_FILE_IO;
+        }
+        
         *sectIndex = ClusToSect( clus );
         *clusIndex = clus;
-
-
     }
-
     
     return S_OK;
 }
@@ -957,10 +1040,14 @@ BOOL FAT_LogicDisk::SearchCurDir( UINT32 clusIndex, LPCWSTR fileName, UINT32 fil
 
     while(fileInfo->Parse( this, &entryEnum ) == S_OK)
     {
-
-        if(fileInfo->IsFileName( fileName, fileNameLen ) && fileInfo->GetDirectoryEntry()->DIR_Attr != ATTR_VOLUME_ID)
+        if(fileInfo->IsFileName( fileName, fileNameLen ))
         {
-            return TRUE;
+            FAT_Directory* dirEntry =  fileInfo->GetDirectoryEntry( FALSE );
+
+            if(dirEntry != NULL && dirEntry->DIR_Attr != ATTR_VOLUME_ID)
+            {
+                return TRUE;
+            }
         }
     }
 
@@ -1028,10 +1115,8 @@ FAT_Directory* FAT_LogicDisk::GetFile( LPCWSTR path, UINT32 pathLen, FAT_FILE* f
                 return NULL;
             }
 
-
             if(fileInfo->Create( this, clusIndex, path, fileLen, attributes ) != S_OK)
             {
-
                 return NULL;
             }
         }
@@ -1040,11 +1125,11 @@ FAT_Directory* FAT_LogicDisk::GetFile( LPCWSTR path, UINT32 pathLen, FAT_FILE* f
             return NULL;
         }
 
-
-        dirEntry = fileInfo->GetDirectoryEntry();
+        dirEntry = fileInfo->GetDirectoryEntry( FALSE );
         
         if(!dirEntry) return NULL;
 
+#ifndef FAT_FS__DO_NOT_UPDATE_FILE_ACCESS_TIME
         if(flags) 
         {
             UINT16 date,time;
@@ -1067,8 +1152,8 @@ FAT_Directory* FAT_LogicDisk::GetFile( LPCWSTR path, UINT32 pathLen, FAT_FILE* f
             {
                 dirEntry->Set_DIR_LstAccDate(date);
             }
-        }
-            
+        }            
+#endif
 
         // if we're not at the last segment, or we wants only directory 
         if((pathLen > 0) || (flags & GetFile__GET_DIRECTORY_ONLY))
@@ -1111,6 +1196,8 @@ BOOL FAT_LogicDisk::PopulateDiskSize()
 
     const BlockDeviceInfo *tmpBlockDeviceInfo = m_blockStorageDevice->GetDeviceInfo();
 
+    m_diskSize = 0;
+
     
     //find sector address for first BLOCKTYPE_FILESYSTEM  block 
     if(m_blockStorageDevice->FindForBlockUsage(BlockUsage::FILESYSTEM, beginBlock, regionIndex, rangeIndex))
@@ -1127,7 +1214,7 @@ BOOL FAT_LogicDisk::PopulateDiskSize()
 
             if(!pRange->IsFileSystem())
             {
-                m_sectorCount = (UINT32)(m_diskSize / tmpBlockDeviceInfo->BytesPerSector);
+                m_sectorCount = (UINT32)(m_diskSize / DEFAULT_SECTOR_SIZE);
                 return TRUE;
             }
 
@@ -1135,7 +1222,7 @@ BOOL FAT_LogicDisk::PopulateDiskSize()
             
         }
 
-        m_sectorCount = (UINT32)(m_diskSize / tmpBlockDeviceInfo->BytesPerSector);
+        m_sectorCount = (UINT32)(m_diskSize / DEFAULT_SECTOR_SIZE);
         
         return TRUE;
     }
@@ -1219,13 +1306,13 @@ OnError:
 
 void FAT_LogicDisk::PopulateFreeCount()
 {
-    BYTE buffer[512];
+    BYTE buffer[DEFAULT_SECTOR_SIZE];
 
     m_freeCount = 0;
     m_nextFree  = 0;
 
     // try to read the first byte of the root directory sector
-    if(!m_blockStorageDevice->Read( m_baseAddress + m_rootSectorStart * m_bytesPerSector, 1, buffer ))
+    if(!m_blockStorageDevice->Read( m_baseAddress + m_rootSectorStart * m_bytesPerSector, 4, buffer ))
     {
         m_freeCount = 0xFFFFFFFF;
         m_nextFree = 0;
@@ -1254,13 +1341,13 @@ void FAT_LogicDisk::PopulateFreeCount()
     UINT32 startAddress = m_baseAddress + m_FATBaseSector[0] * m_bytesPerSector;
     
     UINT32 c = 0;
-    UINT32 lastIndex = m_totalClusterCount + 1;
+    UINT32 lastIndex = m_totalClusterCount + CLUSTER_START - 1;
 
     ::Watchdog_GetSetEnabled( FALSE, TRUE );
 
     while(TRUE)
     {
-        if(!m_blockStorageDevice->Read( startAddress, 512, buffer ))
+        if(!m_blockStorageDevice->Read( startAddress, DEFAULT_SECTOR_SIZE, buffer ))
         {
             m_freeCount = 0xFFFFFFFF;
             m_nextFree = 0;
@@ -1269,13 +1356,14 @@ void FAT_LogicDisk::PopulateFreeCount()
             return;
         }
 
-        startAddress += 512;
+        startAddress += DEFAULT_SECTOR_SIZE;
 
         if(m_isFAT16)
         {
             UINT16* fat = (UINT16*)&buffer[0];
 
-            for(int i = 0; i < 512 / sizeof(UINT16); i++, c++)            {
+            for(int i = 0; i < DEFAULT_SECTOR_SIZE / sizeof(UINT16); i++, c++)
+            {
                 if(fat[i] == CLUST_NONE)
                 {
                     m_freeCount++;
@@ -1297,7 +1385,8 @@ void FAT_LogicDisk::PopulateFreeCount()
         {
             UINT32* fat = (UINT32*)&buffer[0];
 
-            for(int i = 0; i < 512 / sizeof(UINT32); i++, c++)            {
+            for(int i = 0; i < DEFAULT_SECTOR_SIZE / sizeof(UINT32); i++, c++)
+            {
                 if(fat[i] == CLUST_NONE)
                 {
                     m_freeCount++;
@@ -1350,25 +1439,34 @@ BOOL FAT_LogicDisk::IsLoadableMedia( BlockStorageDevice* driverInterface, UINT32
     return result;
 }
 
-HRESULT FAT_LogicDisk::Format( const VOLUME_ID *volume, UINT32 parameters )
+HRESULT FAT_LogicDisk::Format( const VOLUME_ID *volume, LPCSTR volumeLabel, UINT32 parameters )
 {
     TINYCLR_HEADER();
-    
-    FAT_LogicDisk logicDisk;
-    
+
+    FAT_LogicDisk tmpLogicDisk;
+    FAT_LogicDisk* logicDisk = FAT_MemoryManager::GetLogicDisk( volume );
+
+    if(logicDisk == NULL)
+    {
+        logicDisk = &tmpLogicDisk;
+    }    
+    else
+    {
+        logicDisk->UninitDisk();
+    }
+
     //InitDisk return FALSE when there's no BLOCKTYPE_FILESYSTEM blocks
 
-    if(!logicDisk.InitDisk( volume ))
+    if(!logicDisk->InitDisk( volume ))
     {
         TINYCLR_SET_AND_LEAVE(CLR_E_FILE_IO);
     }
 
-    TINYCLR_CHECK_HRESULT(logicDisk.FormatHelper( parameters ));
-
+    TINYCLR_CHECK_HRESULT(logicDisk->FormatHelper( volumeLabel, parameters ));
 
     TINYCLR_CLEANUP();
 
-    logicDisk.UninitDisk(); // regardless of the result, need to uninitialize, or we leak memory
+    logicDisk->UninitDisk(); // regardless of the result, need to uninitialize, or we leak memory
 
     TINYCLR_CLEANUP_END();
 }
@@ -1398,14 +1496,6 @@ HRESULT FAT_LogicDisk::Open( LPCWSTR path, UINT32 *handle )
         TINYCLR_SET_AND_LEAVE(CLR_E_TOO_MANY_OPEN_HANDLES);
     }
 
-
-    UINT16 date,time;
-    UINT8 timeTenth;
-
-    FAT_Utility::GetCurrentFATTime( &date, &time, &timeTenth );
-
-    dirEntry->Set_DIR_LstAccDate(date);
-    
     TINYCLR_NOCLEANUP();
 }
 
@@ -1720,7 +1810,8 @@ HRESULT FAT_LogicDisk::DeleteAll( UINT32 clusIndex )
     //loop through all dirEntry
     while(fileInfo.Parse( this, &entryEnum ) == S_OK)
     {
-        dirEntry = fileInfo.GetDirectoryEntry();
+        dirEntry = fileInfo.GetDirectoryEntry( FALSE );
+        
         if(!dirEntry) TINYCLR_SET_AND_LEAVE(CLR_E_FILE_IO);
 
         startCluster = dirEntry->GetFstClus();
@@ -1773,6 +1864,7 @@ void FAT_LogicDisk::InitMount( FAT_DBR* dbr, BOOL isFAT16 )
     m_bytesPerSector    = dbr->Get_BPB_BytsPerSec();
     m_sectorsPerCluster = dbr->BPB_SecPerClus;
     m_entriesPerSector  = m_bytesPerSector / ((isFAT16) ? 2 : 4);
+    m_sectorCount       = (UINT32)(m_diskSize / m_bytesPerSector);
 
     UINT32 rootDirSectors = ((dbr->Get_BPB_RootEntCnt() * 32) + (m_bytesPerSector - 1)) / m_bytesPerSector;
     UINT32 fatSz = (isFAT16) ? dbr->Get_BPB_FATSz16() : dbr->DBRUnion.FAT32.Get_BPB_FATSz32();
@@ -1783,7 +1875,7 @@ void FAT_LogicDisk::InitMount( FAT_DBR* dbr, BOOL isFAT16 )
     m_FATBaseSector[1]  = m_FATBaseSector[0] + fatSz;
     m_firstDataSector   = dbr->Get_BPB_RsvdSecCnt() + (fatSz * dbr->BPB_NumFATs) + rootDirSectors;
 
-    m_totalClusterCount = (totSec - m_firstDataSector) / m_sectorsPerCluster;;
+    m_totalClusterCount = (totSec - m_firstDataSector + (m_sectorsPerCluster-1)) / m_sectorsPerCluster;
     m_totalSectorCount  = totSec;
 
     m_sectorFSInfo      = (isFAT16) ? 0 : dbr->DBRUnion.FAT32.Get_BPB_FSInfo();

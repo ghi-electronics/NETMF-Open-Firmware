@@ -358,6 +358,29 @@ namespace Ws.SvcUtilCodeGen
                 );
             }
 
+            // Add request.Reader.Dispose() method call
+            codeMethod.Statements.Add( 
+                new CodeMethodInvokeExpression(
+                    new CodeFieldReferenceExpression( 
+                        new CodeVariableReferenceExpression("request"), 
+                        "Reader"
+                    ),
+                    "Dispose", new CodeExpression[] { }
+                )
+            );
+
+            // reqest.Reader = null;
+            codeMethod.Statements.Add(
+                new CodeAssignStatement(
+                    new CodeFieldReferenceExpression( 
+                        new CodeVariableReferenceExpression("request"), 
+                        "Reader"
+                    ),
+                    new CodePrimitiveExpression(null)
+                )
+            );
+                
+
             // Set the request param. If the request is void don't pass anything.
             CodeExpression[] reqParams = reqTypeName == "void" ? new CodeExpression[] { } : new CodeExpression[] { new CodeVariableReferenceExpression("req") };
 
@@ -378,9 +401,16 @@ namespace Ws.SvcUtilCodeGen
                 );
 
                 codeMethod.Statements.Add(new CodeSnippetStatement(""));
-                codeMethod.Statements.Add(new CodeCommentStatement("Return null response for oneway messages"));
+                codeMethod.Statements.Add(new CodeCommentStatement("Return a OneWayResponse message for oneway messages"));
                 // Generated Code: return null;
-                codeMethod.Statements.Add(new CodeMethodReturnStatement(new CodePrimitiveExpression(null)));
+                codeMethod.Statements.Add(
+                    new CodeMethodReturnStatement(
+                        new CodeMethodInvokeExpression(
+                            new CodeVariableReferenceExpression("WsMessage"),
+                            "CreateOneWayResponse"
+                        )
+                    )
+                );
                 return codeMethod;
             }
 

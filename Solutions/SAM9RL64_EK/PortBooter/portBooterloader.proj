@@ -106,8 +106,8 @@
     <DriverLibs Include="cpu_cmu_stubs.$(LIB_EXT)" />
   </ItemGroup>
 <!--  <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\dotNetMF.proj" />
-    <DriverLibs Include="COM_pal.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\stubs\dotNetMF.proj" />
+    <DriverLibs Include="COM_pal_stubs.$(LIB_EXT)" />
   </ItemGroup>-->
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\COM\stubs\dotNetMF.proj" />
@@ -244,11 +244,6 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_PreStackInit\dotNetMF.proj" />
     <DriverLibs Include="cpu_prestackinit_stubs.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\drivers\stubs\processor\stubs_security\dotNetMF.proj" />
-    <DriverLibs Include="cpu_security_stubs.$(LIB_EXT)" />
-  </ItemGroup>
-  
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\stubs\dotNetMF.proj" />
     <DriverLibs Include="sockets_pal_stubs.$(LIB_EXT)" />

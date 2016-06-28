@@ -178,6 +178,7 @@ CLR_UINT32 CLR_RT_GarbageCollector::ExecuteGarbageCollection()
     if(s_CLR_RT_fTrace_MemoryStats >= c_CLR_RT_Trace_Info)
     {
         int countBlocks[ DATATYPE_FIRST_INVALID ]; TINYCLR_CLEAR(countBlocks);
+        int countArryBlocks[ DATATYPE_FIRST_INVALID ]; TINYCLR_CLEAR(countArryBlocks);
         int dt;
 
         TINYCLR_FOREACH_NODE(CLR_RT_HeapCluster,hc,g_CLR_RT_ExecutionEngine.m_heap)
@@ -191,6 +192,26 @@ CLR_UINT32 CLR_RT_GarbageCollector::ExecuteGarbageCollection()
                 if(dt < DATATYPE_FIRST_INVALID)
                 {
                     countBlocks[ dt ] += ptr->DataSize();
+
+                    if(dt == DATATYPE_SZARRAY)
+                    {
+                        CLR_RT_HeapBlock_Array* arr = (CLR_RT_HeapBlock_Array*)ptr;
+
+                        if(arr != NULL)
+                        {
+                            dt = arr->m_typeOfElement;
+
+                            if(dt < DATATYPE_FIRST_INVALID)
+                            {
+                                countArryBlocks[ dt ] += ptr->DataSize();
+                            }
+                            else
+                            {
+                                CLR_Debug::Printf("!!!!Unknown array type: %d\r\n", dt);
+                            }
+                        }
+
+                    }
                 }
 
                 ptr += ptr->DataSize();
@@ -203,6 +224,17 @@ CLR_UINT32 CLR_RT_GarbageCollector::ExecuteGarbageCollection()
             if(countBlocks[ dt ])
             {
                 CLR_Debug::Printf( "Type %02X (%-20s): %6d bytes\r\n", dt, c_CLR_RT_DataTypeLookup[ dt ].m_name, countBlocks[ dt ] * sizeof(CLR_RT_HeapBlock) );
+
+                if(dt == DATATYPE_SZARRAY)
+                {
+                    for(int dt2 = DATATYPE_VOID; dt2 < DATATYPE_FIRST_INVALID; dt2++)
+                    {
+                        if(countArryBlocks[ dt2 ])
+                        {
+                            CLR_Debug::Printf( "  Type %02X (%-20s): %6d bytes\r\n", dt2, c_CLR_RT_DataTypeLookup[ dt2 ].m_name, countArryBlocks[ dt2 ] * sizeof(CLR_RT_HeapBlock) );
+                        }
+                    }
+                }
             }
         }
     }
@@ -686,6 +718,14 @@ void CLR_RT_GarbageCollector::Thread_Mark( CLR_RT_Thread* th )
 #if defined(TINYCLR_VALIDATE_APPDOMAIN_ISOLATION)                    
         (void)g_CLR_RT_ExecutionEngine.SetCurrentAppDomain( stack->m_appDomain );
 #endif
+#ifndef TINYCLR_NO_IL_INLINE
+        if(stack->m_inlineFrame)
+        {
+            CheckMultipleBlocks( stack->m_inlineFrame->m_frame.m_args     , stack->m_inlineFrame->m_frame.m_call.m_target->numArgs   );
+            CheckMultipleBlocks( stack->m_inlineFrame->m_frame.m_locals   , stack->m_inlineFrame->m_frame.m_call.m_target->numLocals );
+            CheckMultipleBlocks( stack->m_inlineFrame->m_frame.m_evalStack, (int)(stack->m_inlineFrame->m_frame.m_evalPos - stack->m_inlineFrame->m_frame.m_evalStack));
+        }
+#endif
         CheckMultipleBlocks( stack->m_arguments, stack->m_call.m_target->numArgs   );
         CheckMultipleBlocks( stack->m_locals   , stack->m_call.m_target->numLocals );
         CheckMultipleBlocks( stack->m_evalStack, stack->TopValuePosition()         );
@@ -783,7 +823,7 @@ void CLR_RT_GarbageCollector::RecoverEventsFromGC()
 
 //--//
 
-void CLR_RT_GarbageCollector::Heap_ComputeAliveVsDeadRatio()
+CLR_UINT32 CLR_RT_GarbageCollector::Heap_ComputeAliveVsDeadRatio()
 {
     NATIVE_PROFILE_CLR_CORE();
     CLR_UINT32 totalBytes = 0;
@@ -806,5 +846,7 @@ void CLR_RT_GarbageCollector::Heap_ComputeAliveVsDeadRatio()
 
     m_totalBytes = totalBytes;
     m_freeBytes  = freeBlocks * sizeof(CLR_RT_HeapBlock);
+
+    return m_freeBytes;
 }
 

@@ -1407,6 +1407,7 @@ void enc28j60_soft_reset(SPI_CONFIGURATION* spiConf)
 {
     NATIVE_PROFILE_HAL_DRIVERS_ETHERNET();
     UINT8 byteData;
+    UINT16 shortData;
 
     /* First turn off RX/TX */
     enc28j60_select_bank( spiConf, ENC28J60_CONTROL_REGISTER_BANK0);
@@ -1437,15 +1438,14 @@ void enc28j60_soft_reset(SPI_CONFIGURATION* spiConf)
     enc28j60_write_spi(spiConf, ENC28J60_SPI_BIT_FIELD_CLEAR_OPCODE, ENC28J60_ECON2, &byteData, 1);
     
     /* Reset PHY */
-    byteData = 1 << ENC28J60_PHCON1_PRST;
-    enc28j60_write_spi(spiConf, ENC28J60_SPI_BIT_FIELD_SET_OPCODE, ENC28J60_PHCON1, &byteData, 1);
+    enc28j60_write_phy_register(spiConf, ENC28J60_PHCON1, (UINT16)(1ul << ENC28J60_PHCON1_PRST));
 
     do
     {
         HAL_Time_Sleep_MicroSeconds(100);
 
-        enc28j60_read_spi(spiConf, ENC28J60_SPI_READ_CONTROL_REGISTER_OPCODE, ENC28J60_PHCON1, &byteData, 1, 0);
-    } while((byteData & (1 << ENC28J60_PHCON1_PRST)) != 0);
+        shortData = enc28j60_read_phy_register(spiConf, ENC28J60_PHCON1);
+    } while((shortData & (1 << ENC28J60_PHCON1_PRST)) != 0);
 
     byteData = ((1 << ENC28J60_EIE_INTIE_BIT) | (1 << ENC28J60_EIE_PKTIE_BIT) | (1 << ENC28J60_EIE_TXIE_BIT) |(1 << ENC28J60_EIE_TXERIE_BIT));
     enc28j60_write_spi(spiConf, ENC28J60_SPI_BIT_FIELD_CLEAR_OPCODE, ENC28J60_EIE, &byteData, 1);    

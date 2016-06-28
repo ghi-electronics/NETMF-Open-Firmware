@@ -96,6 +96,7 @@ static const EVP_PKEY_METHOD *standard_methods[] =
 #endif
 	&hmac_pkey_meth,
 	};
+
 DECLARE_OBJ_BSEARCH_CMP_FN(const EVP_PKEY_METHOD *, const EVP_PKEY_METHOD *,
 			   pmeth);
 
@@ -138,6 +139,8 @@ static EVP_PKEY_CTX *int_ctx_new(EVP_PKEY *pkey, ENGINE *e, int id)
 		id = pkey->ameth->pkey_id;
 		}
 #ifndef OPENSSL_NO_ENGINE
+	if (pkey && pkey->engine)
+		e = pkey->engine;
 	/* Try to find an ENGINE which implements this method */
 	if (e)
 		{
@@ -181,6 +184,7 @@ static EVP_PKEY_CTX *int_ctx_new(EVP_PKEY *pkey, ENGINE *e, int id)
 	ret->operation = EVP_PKEY_OP_UNDEFINED;
 	ret->pkey = pkey;
 	ret->peerkey = NULL;
+	ret->pkey_gencb = 0;
 	if (pkey)
 		CRYPTO_add(&pkey->references,1,CRYPTO_LOCK_EVP_PKEY);
 	ret->data = NULL;
@@ -460,7 +464,7 @@ void EVP_PKEY_meth_set_keygen(EVP_PKEY_METHOD *pmeth,
 	pmeth->keygen = keygen;
 	}
 
-extern "C" void EVP_PKEY_meth_set_sign(EVP_PKEY_METHOD *pmeth,
+void EVP_PKEY_meth_set_sign(EVP_PKEY_METHOD *pmeth,
 	int (*sign_init)(EVP_PKEY_CTX *ctx),
 	int (*sign)(EVP_PKEY_CTX *ctx, unsigned char *sig, size_t *siglen,
 					const unsigned char *tbs, size_t tbslen))
@@ -469,7 +473,7 @@ extern "C" void EVP_PKEY_meth_set_sign(EVP_PKEY_METHOD *pmeth,
 	pmeth->sign = sign;
 	}
 
-extern "C" void EVP_PKEY_meth_set_verify(EVP_PKEY_METHOD *pmeth,
+void EVP_PKEY_meth_set_verify(EVP_PKEY_METHOD *pmeth,
 	int (*verify_init)(EVP_PKEY_CTX *ctx),
 	int (*verify)(EVP_PKEY_CTX *ctx, const unsigned char *sig, size_t siglen,
 					const unsigned char *tbs, size_t tbslen))
@@ -488,7 +492,7 @@ void EVP_PKEY_meth_set_verify_recover(EVP_PKEY_METHOD *pmeth,
 	pmeth->verify_recover = verify_recover;
 	}
 
-extern "C" void EVP_PKEY_meth_set_signctx(EVP_PKEY_METHOD *pmeth,
+void EVP_PKEY_meth_set_signctx(EVP_PKEY_METHOD *pmeth,
 	int (*signctx_init)(EVP_PKEY_CTX *ctx, EVP_MD_CTX *mctx),
 	int (*signctx)(EVP_PKEY_CTX *ctx, unsigned char *sig, size_t *siglen,
 					EVP_MD_CTX *mctx))

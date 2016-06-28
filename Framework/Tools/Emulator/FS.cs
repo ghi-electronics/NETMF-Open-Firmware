@@ -392,11 +392,11 @@ namespace Microsoft.SPOT.Emulator.FS
             return 0;
         }
 
-        int IFSDriver.Format(uint volumeId, uint parameter)
+        int IFSDriver.Format(uint volumeId, string volumeLabel, uint parameter)
         {
             try
             {
-                GetManagedFileSystem(volumeId).Format(parameter);
+                GetManagedFileSystem(volumeId).Format(volumeLabel, parameter);
             }
             catch (Exception e)
             {
@@ -432,6 +432,22 @@ namespace Microsoft.SPOT.Emulator.FS
             }
 
             return 0;
+        }
+
+        int IFSDriver.GetVolumeLabel(uint volumeId, IntPtr volumeName, int volumeNameLen)
+        {
+            string label = GetManagedFileSystem(volumeId).GetVolumeLabel();
+
+            if (label == null) return 0;
+
+            byte[] data = UTF8Encoding.UTF8.GetBytes(label);
+
+            int len = Math.Min(volumeNameLen, data.Length);
+
+            Marshal.Copy(data, 0, volumeName, len);
+
+            return len;
+            
         }
 
         #endregion
@@ -905,7 +921,7 @@ namespace Microsoft.SPOT.Emulator.FS
             throw new NotImplementedException();
         }
 
-        public virtual void Format(uint parameter)
+        public virtual void Format(string volumeLabel, uint parameter)
         {
             throw new NotImplementedException();
         }
@@ -916,6 +932,11 @@ namespace Microsoft.SPOT.Emulator.FS
         }
 
         public virtual void FlushAll()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual string GetVolumeLabel()
         {
             throw new NotImplementedException();
         }
@@ -1005,16 +1026,33 @@ namespace Microsoft.SPOT.Emulator.FS
                 {
                     FileInfo fi = new FileInfo(_files[_fileIndex]);
 
-                    fileInfo.Attributes = WindowsFileSystem.ResolveAttributes(fi.Attributes);
-                    fileInfo.CreationTime = fi.CreationTime.ToFileTime();
-                    fileInfo.LastAccessTime = fi.LastAccessTime.ToFileTime();
-                    fileInfo.LastWriteTime = fi.LastWriteTime.ToFileTime();
-                    fileInfo.Size = fi.Length;
-                    fileInfo.FileName = fi.Name;
+                    if(fi.Name == "_vol_")
+                    {
+                        _fileIndex++;
 
-                    _fileIndex++;
+                        if(_fileIndex < _files.Length)
+                        {
+                            fi = new FileInfo(_files[_fileIndex]);
+                        }
+                        else
+                        {
+                            fi = null;
+                        }
+                    }
 
-                    return true;
+                    if(fi != null)
+                    {
+                        fileInfo.Attributes = WindowsFileSystem.ResolveAttributes(fi.Attributes);
+                        fileInfo.CreationTime = fi.CreationTime.ToFileTime();
+                        fileInfo.LastAccessTime = fi.LastAccessTime.ToFileTime();
+                        fileInfo.LastWriteTime = fi.LastWriteTime.ToFileTime();
+                        fileInfo.Size = fi.Length;
+                        fileInfo.FileName = fi.Name;
+
+                        _fileIndex++;
+
+                        return true;
+                    }
                 }
 
                 fileInfo.Attributes = 0;
@@ -1284,7 +1322,7 @@ namespace Microsoft.SPOT.Emulator.FS
             File.SetAttributes(ConvertMFPathToPath(path), (FileAttributes)attributes);
         }
 
-        public override void Format(uint parameter)
+        public override void Format(string volumeName, uint parameter)
         {
             /// By formatting we mean wipe out emulated folder
             /// content. Under certain circumstances this may prove to be
@@ -1295,6 +1333,15 @@ namespace Microsoft.SPOT.Emulator.FS
             /// recursive code that tries to mitigate as much as possible.
             DirectoryDelete(_root);
             Directory.CreateDirectory(_root);
+
+            if(!string.IsNullOrEmpty(volumeName))
+            {
+                using(FileStream fs = File.Create(_root + "\\_vol_", 128))
+                {
+                    byte[] bytes = UTF8Encoding.UTF8.GetBytes(volumeName);
+                    fs.Write( bytes, 0, bytes.Length );
+                }
+            }
         }
 
         public override void GetSizeInfo(out long totalSize, out long totalFreeSpace)
@@ -1310,6 +1357,26 @@ namespace Microsoft.SPOT.Emulator.FS
 
         public override void FlushAll()
         {
+        }
+
+        public override string GetVolumeLabel()
+        {
+            string volPath = _root + "\\_vol_";
+            string volName = null;
+            
+            if(File.Exists(volPath))
+            {
+                using(FileStream fs = File.Open(volPath, FileMode.Open))
+                {
+                    byte[] bytes = new byte[fs.Length];
+
+                    fs.Read(bytes, 0, (int)fs.Length);
+
+                    volName = UTF8Encoding.UTF8.GetString(bytes);
+                }
+            }
+
+            return volName;
         }
 
         private void DirectoryDelete(string folderPath)

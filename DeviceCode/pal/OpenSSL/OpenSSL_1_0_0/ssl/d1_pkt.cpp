@@ -198,6 +198,9 @@ dtls1_copy_record(SSL *s, pitem *item)
     s->packet_length = rdata->packet_length;
     TINYCLR_SSL_MEMCPY(&(s->s3->rbuf), &(rdata->rbuf), sizeof(SSL3_BUFFER));
     TINYCLR_SSL_MEMCPY(&(s->s3->rrec), &(rdata->rrec), sizeof(SSL3_RECORD));
+	
+	/* Set proper sequence number for mac calculation */
+	TINYCLR_SSL_MEMCPY(&(s->s3->read_sequence[2]), &(rdata->packet[5]), 6);
     
     return(1);
     }
@@ -295,9 +298,6 @@ dtls1_process_buffered_records(SSL *s)
     item = pqueue_peek(s->d1->unprocessed_rcds.q);
     if (item)
         {
-        DTLS1_RECORD_DATA *rdata;
-        rdata = (DTLS1_RECORD_DATA *)item->data;
-        
         /* Check if epoch is current. */
         if (s->d1->unprocessed_rcds.epoch != s->d1->r_epoch)
             return(1);  /* Nothing to do. */
@@ -416,7 +416,8 @@ dtls1_process_record(SSL *s)
 			goto err;
 
 		/* otherwise enc_err == -1 */
-		goto decryption_failed_or_bad_record_mac;
+		al=SSL_AD_BAD_RECORD_MAC;
+		goto f_err;
 		}
 
 #ifdef TLS_DEBUG
@@ -436,7 +437,7 @@ TINYCLR_SSL_PRINTF("\n");
 		/* !clear => s->read_hash != NULL => mac_size != -1 */
 		int t;
 		t=EVP_MD_CTX_size(s->read_hash);
-		OPENSSL_assert(t >= 0);
+		TINYCLR_SSL_ASSERT(t >= 0);
 		mac_size=t;
 
 		if (rr->length > SSL3_RT_MAX_COMPRESSED_LENGTH+mac_size)
@@ -446,7 +447,7 @@ TINYCLR_SSL_PRINTF("\n");
 			SSLerr(SSL_F_DTLS1_PROCESS_RECORD,SSL_R_PRE_MAC_LENGTH_TOO_LONG);
 			goto f_err;
 #else
-			goto decryption_failed_or_bad_record_mac;
+			goto err;
 #endif			
 			}
 		/* check the MAC for rr->input (it's in mac_size bytes at the tail) */
@@ -457,14 +458,14 @@ TINYCLR_SSL_PRINTF("\n");
 			SSLerr(SSL_F_DTLS1_PROCESS_RECORD,SSL_R_LENGTH_TOO_SHORT);
 			goto f_err;
 #else
-			goto decryption_failed_or_bad_record_mac;
+			goto err;
 #endif
 			}
 		rr->length-=mac_size;
 		i=s->method->ssl3_enc->mac(s,md,0);
 		if (i < 0 || TINYCLR_SSL_MEMCMP(md,&(rr->data[rr->length]),mac_size) != 0)
 			{
-			goto decryption_failed_or_bad_record_mac;
+			goto err;
 			}
 		}
 
@@ -506,14 +507,6 @@ TINYCLR_SSL_PRINTF("\n");
 	dtls1_record_bitmap_update(s, &(s->d1->bitmap));/* Mark receipt of record. */
 	return(1);
 
-decryption_failed_or_bad_record_mac:
-	/* Separate 'decryption_failed' alert was introduced with TLS 1.0,
-	 * SSL 3.0 only has 'bad_record_mac'.  But unless a decryption
-	 * failure is directly visible from the ciphertext anyway,
-	 * we should not reveal which kind of error occured -- this
-	 * might become visible to an attacker (e.g. via logfile) */
-	al=SSL_AD_BAD_RECORD_MAC;
-	SSLerr(SSL_F_DTLS1_PROCESS_RECORD,SSL_R_DECRYPTION_FAILED_OR_BAD_RECORD_MAC);
 f_err:
 	ssl3_send_alert(s,SSL3_AL_FATAL,al);
 err:
@@ -535,19 +528,16 @@ int dtls1_get_record(SSL *s)
 	int ssl_major,ssl_minor;
 	int i,n;
 	SSL3_RECORD *rr;
-	SSL_SESSION *sess;
 	unsigned char *p = NULL;
 	unsigned short version;
 	DTLS1_BITMAP *bitmap;
 	unsigned int is_next_epoch;
 
 	rr= &(s->s3->rrec);
-	sess=s->session;
 
 	/* The epoch may have changed.  If so, process all the
 	 * pending records.  This is a non-blocking operation. */
-	if ( ! dtls1_process_buffered_records(s))
-            return 0;
+	dtls1_process_buffered_records(s);
 
 	/* if we're renegotiating, then there may be buffered records */
 	if (dtls1_get_processed_record(s))
@@ -669,21 +659,25 @@ again:
 	if (rr->length == 0) goto again;
 
 	/* If this record is from the next epoch (either HM or ALERT),
-	 * buffer it since it cannot be processed at this time. Records
-	 * from the next epoch are marked as received even though they
-	 * are not processed, so as to prevent any potential resource
-	 * DoS attack */
+	 * and a handshake is currently in progress, buffer it since it
+	 * cannot be processed at this time. */
 	if (is_next_epoch)
 		{
-		dtls1_record_bitmap_update(s, bitmap);
-		dtls1_buffer_record(s, &(s->d1->unprocessed_rcds), rr->seq_num);
+		if (SSL_in_init(s) || s->in_handshake)
+			{
+			dtls1_buffer_record(s, &(s->d1->unprocessed_rcds), rr->seq_num);
+			}
 		rr->length = 0;
 		s->packet_length = 0;
 		goto again;
 		}
 
-	if ( ! dtls1_process_record(s))
-		return(0);
+	if (!dtls1_process_record(s))
+		{
+		rr->length = 0;
+		s->packet_length = 0;  /* dump this record */
+		goto again;   /* get another record */
+		}
 
 	dtls1_clear_timeouts(s);  /* done waiting */
 	return(1);
@@ -811,7 +805,7 @@ start:
 		 * buffer the application data for later processing rather
 		 * than dropping the connection.
 		 */
-		dtls1_buffer_record(s, &(s->d1->buffered_app_data), 0);
+		dtls1_buffer_record(s, &(s->d1->buffered_app_data), rr->seq_num);
 		rr->length = 0;
 		goto start;
 		}
@@ -1047,7 +1041,7 @@ start:
 										 frag_off, &found);
 				if ( ! found  && SSL_in_init(s))
 					{
-					/* TINYCLR_SSL_FPRINTF( stderr,"in init = %d\n", SSL_in_init(s)); */
+					/* TINYCLR_SSL_FPRINTF( OPENSSL_TYPE__FILE_STDERR,"in init = %d\n", SSL_in_init(s)); */
 					/* requested a message not yet sent, 
 					   send an alert ourselves */
 					ssl3_send_alert(s,SSL3_AL_WARNING,
@@ -1331,7 +1325,7 @@ int dtls1_write_bytes(SSL *s, int type, const void *buf, int len)
 	{
 	int i;
 
-	OPENSSL_assert(len <= SSL3_RT_MAX_PLAIN_LENGTH);
+	TINYCLR_SSL_ASSERT(len <= SSL3_RT_MAX_PLAIN_LENGTH);
 	s->rwstate=SSL_NOTHING;
 	i=do_dtls1_write(s, type, (const unsigned char*)buf, len, 0);
 	return i;
@@ -1351,7 +1345,7 @@ int do_dtls1_write(SSL *s, int type, const unsigned char *buf, unsigned int len,
 	 * out.  This will happen with non blocking IO */
 	if (s->s3->wbuf.left != 0)
 		{
-		OPENSSL_assert(0); /* XDTLS:  want to see if we ever get here */
+		TINYCLR_SSL_ASSERT(0); /* XDTLS:  want to see if we ever get here */
 		return(ssl3_write_pending(s,type,buf,len));
 		}
 
@@ -1629,7 +1623,7 @@ int dtls1_dispatch_alert(SSL *s)
 	if (i <= 0)
 		{
 		s->s3->alert_dispatch=1;
-		/* TINYCLR_SSL_FPRINTF( stderr, "not done with alert\n" ); */
+		/* TINYCLR_SSL_FPRINTF( OPENSSL_TYPE__FILE_STDERR, "not done with alert\n" ); */
 		}
 	else
 		{

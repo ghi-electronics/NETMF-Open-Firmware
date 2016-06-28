@@ -80,6 +80,7 @@
 //
 //Network SOCKET
 
+#ifdef SH7264_RSK_ETHERNET
 #define NETWORK_INTERFACE_COUNT                     1
 
 #define PLATFORM_DEPENDENT__SOCKETS_MAX_SEND_LENGTH 8192
@@ -87,7 +88,12 @@
 #define NETWORK_MEMORY_PROFILE__medium              1
 
 #define NETWORK_MEMORY_POOL__INCLUDE_SSL            1
+
+#ifdef TCPIP_LWIP
+#include <pal\net\Network_Defines_LWIP.h>
+#else
 #include <pal\net\Network_Defines.h>
+#endif
 
 //#define NETWORK_USE_LOOPBACK                        1
 //#define NETWORK_USE_DHCP                            1
@@ -98,7 +104,7 @@
 #define PLATFORM_DEPENDENT__NETWORK_DNS_MAX_DELAY  32
 #define PLATFORM_DEPENDENT__NETWORK_DNS_RETRIES    3
 
-#define PLATFORM_DEPENDENT__SOCKETS_MAX_COUNT      64
+#endif
 
 //Network SOCKET
 

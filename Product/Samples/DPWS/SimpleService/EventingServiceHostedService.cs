@@ -19,7 +19,6 @@ using Ws.Services;
 using Ws.Services.WsaAddressing;
 using Ws.Services.Xml;
 using Ws.Services.Binding;
-using Ws.Services.Mtom;
 using Ws.Services.Soap;
 
 namespace schemas.example.org.EventingService
@@ -45,12 +44,7 @@ namespace schemas.example.org.EventingService
             EventSources.Add(new DpwsWseEventSource("eve", "http://schemas.example.org/EventingService", "IntegerEvent"));
             this.AddEventServices();
         }
-        
-        public EventingService() : 
-                this(new ProtocolVersion10())
-        {
-        }
-        
+               
         public virtual void SimpleEvent(SimpleEventRequest eventReq)
         {
 

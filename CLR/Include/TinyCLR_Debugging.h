@@ -240,7 +240,17 @@ struct CLR_DBG_Commands
     static const UINT32 c_Debugging_Resolve_Method                 = 0x00020053; // Resolves a method to a string.
     static const UINT32 c_Debugging_Resolve_VirtualMethod          = 0x00020054; // Resolves a virtual method to the actual implementation.
     static const UINT32 c_Debugging_Resolve_AppDomain              = 0x00020055; // Resolves an AppDomain to it's name, and list its loaded assemblies.
-                                                                 
+
+
+    static const UINT32 c_Debugging_MFUpdate_Start                 = 0x00020056; // 
+    static const UINT32 c_Debugging_MFUpdate_AddPacket             = 0x00020057; // 
+    static const UINT32 c_Debugging_MFUpdate_Install               = 0x00020058; // 
+    static const UINT32 c_Debugging_MFUpdate_AuthCommand           = 0x00020059; // 
+    static const UINT32 c_Debugging_MFUpdate_Authenticate          = 0x00020060; // 
+    static const UINT32 c_Debugging_MFUpdate_GetMissingPkts        = 0x00020061; // 
+
+    static const UINT32 c_Debugging_UpgradeToSsl                   = 0x00020069; //
+
     //--//                                                       
                                                                  
     static const UINT32 c_Debugging_Lcd_NewFrame                   = 0x00020070; // Reports a new frame sent to the LCD.
@@ -303,7 +313,7 @@ struct CLR_DBG_Commands
         struct ClrInfo
         {
             MfReleaseInfo m_clrReleaseInfo;
-            Version       m_TargetFrameworkVersion;
+            MFVersion     m_TargetFrameworkVersion;
         };
         
         union ReplyUnion
@@ -390,6 +400,100 @@ struct CLR_DBG_Commands
             CLR_UINT32 m_address;
         };
     };
+
+    struct Debugging_UpgradeToSsl
+    {
+        CLR_UINT32 m_flags;
+
+        struct Reply
+        {
+            CLR_UINT32 m_success;
+        };
+    };
+
+
+    struct Debugging_MFUpdate_Start
+    {
+        char       m_provider[64];
+        CLR_UINT32 m_updateId;
+        CLR_UINT32 m_updateType;
+        CLR_UINT32 m_updateSubType;
+        CLR_UINT32 m_updateSize;
+        CLR_UINT32 m_updatePacketSize;
+        CLR_UINT16 m_versionMajor;
+        CLR_UINT16 m_versionMinor;
+
+        struct Reply
+        {
+            CLR_INT32 m_updateHandle;
+        };
+    };
+
+    struct Debugging_MFUpdate_AuthCommand
+    {
+        CLR_UINT32 m_updateHandle;
+        CLR_UINT32 m_authCommand;
+        CLR_UINT32 m_authArgsSize;
+        CLR_UINT8  m_authArgs[1];
+
+        struct Reply
+        {
+            CLR_INT32  m_success;
+            CLR_UINT32 m_responseSize;
+            CLR_UINT8  m_response[1];
+        };
+    };
+
+    struct Debugging_MFUpdate_Authenticate
+    {
+        CLR_UINT32 m_updateHandle;
+        CLR_UINT32 m_authenticationLen;
+        CLR_UINT8  m_authenticationData[1];
+
+        struct Reply
+        {
+            CLR_INT32 m_success;
+        };
+    };
+
+    struct Debugging_MFUpdate_GetMissingPkts
+    {
+        CLR_UINT32 m_updateHandle;
+        
+        struct Reply
+        {
+            CLR_INT32 m_success;
+            CLR_INT32  m_missingPktCount;
+            CLR_UINT32 m_missingPkts[1];
+        };
+    };
+
+    struct Debugging_MFUpdate_AddPacket
+    {
+        CLR_INT32 m_updateHandle;
+        CLR_UINT32 m_packetIndex;
+        CLR_UINT32 m_packetValidation;
+        CLR_UINT32 m_packetLength;
+        CLR_UINT8 m_packetData[1];
+
+        struct Reply
+        {
+            CLR_UINT32 m_success;
+        };
+    };
+
+    struct Debugging_MFUpdate_Install
+    {
+        CLR_INT32 m_updateHandle;
+        CLR_UINT32 m_updateValidationSize;
+        CLR_UINT8 m_updateValidation[1];
+
+        struct Reply
+        {
+            CLR_UINT32 m_success;
+        };
+    };
+    
 
     struct Debugging_Execution_BreakpointDef
     {
@@ -949,7 +1053,7 @@ private:
     CLR_RT_AppDomain*  GetAppDomainFromID ( CLR_UINT32 id );
 #endif
 
-    CLR_RT_StackFrame* CheckStackFrame    ( CLR_UINT32 pid, CLR_UINT32 depth                                                        );
+    CLR_RT_StackFrame* CheckStackFrame    ( CLR_UINT32 pid, CLR_UINT32 depth, bool& isInline                                        );
     HRESULT            CreateListOfThreads(                 CLR_DBG_Commands::Debugging_Thread_List ::Reply*& cmdReply, int& totLen );
     HRESULT            CreateListOfCalls  ( CLR_UINT32 pid, CLR_DBG_Commands::Debugging_Thread_Stack::Reply*& cmdReply, int& totLen );
 
@@ -987,6 +1091,15 @@ public:
     static bool Debugging_Execution_ChangeConditions    ( WP_Message* msg, void* owner );
 
     static bool Debugging_Execution_Allocate            ( WP_Message* msg, void* owner );
+
+    static bool Debugging_UpgradeToSsl                  ( WP_Message* msg, void* owner );
+
+    static bool Debugging_MFUpdate_Start                ( WP_Message* msg, void* owner );
+    static bool Debugging_MFUpdate_AuthCommand          ( WP_Message* msg, void* owner );
+    static bool Debugging_MFUpdate_Authenticate         ( WP_Message* msg, void* owner );
+    static bool Debugging_MFUpdate_GetMissingPkts       ( WP_Message* msg, void* owner );
+    static bool Debugging_MFUpdate_AddPacket            ( WP_Message* msg, void* owner );
+    static bool Debugging_MFUpdate_Install              ( WP_Message* msg, void* owner );
 
 #if defined(TINYCLR_ENABLE_SOURCELEVELDEBUGGING)
     static bool Debugging_Execution_Breakpoints         ( WP_Message* msg, void* owner );

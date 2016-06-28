@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
+#include <TinySupport.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -24,7 +25,7 @@
 
 //--//
 
-int LZ77_Decompress( UINT8* inBuf, int inSize, UINT8* outBuf, int outSize )
+int LZ77_Decompress( UINT8* inBuf, int inSize, UINT8* outBuf, int outSize, WRITE_MEMORY_FUNCT writeMem, READ_MEMORY_FUNCT readMem)
 {
     UINT8* inBufEnd  = inBuf  + inSize;
     UINT8* outBufEnd = outBuf + outSize;
@@ -37,15 +38,19 @@ int LZ77_Decompress( UINT8* inBuf, int inSize, UINT8* outBuf, int outSize )
         window[ counter ] = ' ';
     }
 
-#define CHECKEDREAD(x)  if(inBuf  >= inBufEnd ) return -1; x
-#define CHECKEDWRITE(x) if(outBuf >= outBufEnd) return -1; x
+//#define CHECKEDREAD(x)  if(inBuf  >= inBufEnd ) { DebugBreak(); return -1; } x
+//#define CHECKEDWRITE(x) if(outBuf >= outBufEnd) { DebugBreak(); return -1; } x
+#define CHECKEDREAD(x,y)  if(inBuf  >= inBufEnd ) return -1; if(readMem  != NULL) readMem ( (UINT32)y, 1, &x ); else  x = *y
+#define CHECKEDWRITE(x,y) if(outBuf >= outBufEnd) return -1; if(writeMem != NULL) writeMem( (UINT32)x, 1, &y ); else *x =  y
 
     while(inBuf < inBufEnd)
     {
         //
         // Get BitMap and data following it.
         //
-        CHECKEDREAD(UINT8 bitMap = *inBuf++);
+        UINT8 bitMap;
+        
+        CHECKEDREAD(bitMap, inBuf++);
 
         //
         // Go through and decode data.
@@ -57,8 +62,11 @@ int LZ77_Decompress( UINT8* inBuf, int inSize, UINT8* outBuf, int outSize )
             //
             if(!BITSET(bitMap, counter))
             {
-                CHECKEDREAD(UINT8 byte1 = *inBuf++);
-                CHECKEDREAD(UINT8 byte2 = *inBuf++);
+                UINT8 byte1;
+                UINT8 byte2;
+                
+                CHECKEDREAD(byte1, inBuf++);
+                CHECKEDREAD(byte2, inBuf++);
 
                 int length = LENGTH(byte2);
                 int offset = OFFSET(byte1, byte2);
@@ -72,7 +80,7 @@ int LZ77_Decompress( UINT8* inBuf, int inSize, UINT8* outBuf, int outSize )
 
                     window[ FAKE2REAL_POS(currPos) ] = byte1;
 
-                    CHECKEDWRITE(*outBuf++ = byte1);
+                    CHECKEDWRITE(outBuf++, byte1);
 
                     currPos++;
                     offset++; 
@@ -81,11 +89,13 @@ int LZ77_Decompress( UINT8* inBuf, int inSize, UINT8* outBuf, int outSize )
             }
             else
             {
-                CHECKEDREAD(UINT8 byte1 = *inBuf++);
+                UINT8 byte1;
+                
+                CHECKEDREAD(byte1, inBuf++);
 
                 window[ FAKE2REAL_POS(currPos) ] = byte1;
 
-                CHECKEDWRITE(*outBuf++ = byte1);
+                CHECKEDWRITE(outBuf++, byte1);
 
                 currPos++;
             }
@@ -96,6 +106,12 @@ int LZ77_Decompress( UINT8* inBuf, int inSize, UINT8* outBuf, int outSize )
 #undef CHECKEDWRITE
 
     return 1;
+}
+
+
+int LZ77_Decompress( UINT8* inBuf, int inSize, UINT8* outBuf, int outSize)
+{
+    return LZ77_Decompress(inBuf, inSize, outBuf, outSize, NULL, NULL);
 }
 
 //--//
@@ -183,10 +199,18 @@ struct LZ77_Compressor
         if(_wfopen_s(&stream, szFile, L"wb" ) == 0)
 #endif
         {
+            INT32 mod = (prefixLength + vec.size()) % 4;
             fRes = true;
 
             if(prefix && fwrite( prefix , prefixLength, 1, stream ) != 1) fRes = false;
             if(          fwrite( &vec[0], vec.size()  , 1, stream ) != 1) fRes = false;
+
+            if(mod != 0)
+            {
+                byte tmp[4] = {0x00, 0x00, 0x00, 0x00};
+
+                fwrite( tmp, 1, 4 - mod, stream );
+            }
 
             fclose( stream );
         }

@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>piezo_pal</AssemblyName>
     <Size>
@@ -37,7 +38,7 @@
   <Import Project="$(SPOCLIENT)\Framework\features\PiezoConfig_PAL.libcatproj" />
   <PropertyGroup />
   <ItemGroup>
-    <SubDirectories Include="Stubs"/>
+    <SubDirectories Include="Stubs" />
   </ItemGroup>
   <ItemGroup>
     <FastCompileCPPFile Include="piezo_fastcompile.cpp" />
@@ -46,6 +47,8 @@
     <Compile Include="piezo_config.cpp" />
     <IncludePaths Include="DeviceCode\include" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="piezo.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

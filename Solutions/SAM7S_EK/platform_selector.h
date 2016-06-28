@@ -155,8 +155,6 @@
 //
 ////////////////////////////////////////////////
 
-#define TINYCLR_NO_APPDOAMINS  	1
-
 #include <processor_selector.h>
 
 #endif // PLATFORM_ARM_SAM7S_EK

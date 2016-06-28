@@ -71,7 +71,7 @@ namespace Ws.Services.Utilities
             }
 
 #if DEBUG
-            System.Ext.Console.Write((curTime - m_lastTime).ToString());
+            System.Ext.Console.Write(((curTime - m_lastTime)/10000).ToString() + "ms");
             m_lastTime = curTime;
 #endif
         }
@@ -112,7 +112,7 @@ namespace Ws.Services.Utilities
             {
                 System.Ext.Console.Write(message);
             }
-            System.Ext.Console.Write((curTime - startTime).ToString());
+            System.Ext.Console.Write(((curTime - startTime)/10000).ToString() + "ms");
         }
     }
 }

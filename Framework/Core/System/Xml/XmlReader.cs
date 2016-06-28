@@ -523,6 +523,9 @@ namespace System.Xml
 
                         if (bytesRead == 0)
                         {
+                            // complete the read (since it was expecting data)
+                            ReadInternal(0);
+                            
                             if (_isDone)
                             {
                                 CleanUp(ReadState.EndOfFile);

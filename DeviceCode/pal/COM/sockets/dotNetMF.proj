@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectPath>$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\dotNetMF.proj</ProjectPath>
     <AssemblyName>sockets_pal</AssemblyName>
@@ -44,7 +45,9 @@
     <Compile Include="sockets.cpp" />
     <IncludePaths Include="DeviceCode\include" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="sockets.h" />
+  </ItemGroup>
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Network_Config_HAL.libcatproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\NetworkStack_PAL.libcatproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\SSL_PAL.libcatproj" />

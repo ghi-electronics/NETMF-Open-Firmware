@@ -2,6 +2,8 @@
 ; Copyright (c) Microsoft Corporation.  All rights reserved.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+    PRESERVE8
+    THUMB
     EXPORT  IDelayLoop
     EXPORT  IDelayLoop2
 

@@ -32,9 +32,21 @@ namespace Dpws.Device.Services
     /// </remarks>
     public class DpwsWseSubscriptionMgr
     {
-        private Binding m_binding;
-        private IRequestChannel m_reqChannel;
         private readonly ProtocolVersion m_version;
+        private bool m_persistEventConnections;
+        private Hashtable m_evtChannelLookup;
+
+        private class EventChannel
+        {
+            internal EventChannel(IRequestChannel chan)
+            {
+                RefCount = 1;
+                Channel = chan;
+            }
+            
+            internal int RefCount;
+            internal IRequestChannel Channel;
+        }
         
         /// <summary>
         /// Creates an instance of the Subscription manager class.
@@ -46,10 +58,20 @@ namespace Dpws.Device.Services
         /// </remarks>
         public DpwsWseSubscriptionMgr(Binding binding, ProtocolVersion version)
         {
-            m_binding = binding.Clone();
             m_version = version;
+            m_persistEventConnections = false;
+            m_evtChannelLookup = new Hashtable();
+        }
 
-            m_reqChannel = binding.CreateClientChannel(new ClientBindingContext(version));
+        /// <summary>
+        /// Persists the TCP connection for registered event handlers.
+        /// </summary>
+        public bool PersistEventConnections
+        {
+            set
+            {
+                m_persistEventConnections = value;
+            }
         }
 
         /// <summary>
@@ -99,7 +121,16 @@ namespace Dpws.Device.Services
                     msgEvt.Header = new WsWsaHeader(msgEvt.Header.Action, msgEvt.Header.RelatesTo, eventSink.NotifyTo.Address.AbsoluteUri,
                         null, null, eventSink.NotifyTo.RefParameters);
 
-                    SendEvent(msgEvt, eventSink.NotifyTo.Address);
+                    if(m_persistEventConnections)
+                    {
+                        eventSink.RequestChannel.RequestOneWay(msgEvt);
+                    }
+                    else
+                    {
+                        eventSink.RequestChannel.Open();
+                        eventSink.RequestChannel.RequestOneWay(msgEvt);
+                        eventSink.RequestChannel.Close();
+                    }
                 }
                 catch (Exception e)
                 {
@@ -118,24 +149,13 @@ namespace Dpws.Device.Services
                     }
 
                     // Remove event sink from event source list
+                    if(m_persistEventConnections)
+                    {
+                        eventSink.RequestChannel.Close();
+                    }
                     eventSinks.RemoveAt(i);
                 }
             }
-        }
-
-        /// <summary>
-        /// Called by for each active event sink to send an event message to a listening client.
-        /// </summary>
-        /// <param name="eventMessage">Byte array containing the event message soap envelope.</param>
-        /// <param name="notifyToAddress"></param>
-        private void SendEvent(WsMessage eventMessage, Uri notifyToAddress)
-        {
-            // Parse the http transport address
-            m_binding.Transport.EndpointAddress = notifyToAddress;
-
-            m_reqChannel.Open();
-            m_reqChannel.RequestOneWay(eventMessage);
-            m_reqChannel.Close();
         }
 
         /// <summary>
@@ -155,7 +175,16 @@ namespace Dpws.Device.Services
                 return;
             }
 
-            SendEvent(SubscriptionEndResponse(eventSink, subEndType, subMangerID), eventSink.EndTo.Address);
+            if(m_persistEventConnections)
+            {
+                eventSink.RequestChannel.Request(SubscriptionEndResponse(eventSink, subEndType, subMangerID));
+            }
+            else
+            {
+                eventSink.RequestChannel.Open();
+                eventSink.RequestChannel.Request(SubscriptionEndResponse(eventSink, subEndType, subMangerID));
+                eventSink.RequestChannel.Close();
+            }
         }
 
         /// <summary>
@@ -230,7 +259,7 @@ namespace Dpws.Device.Services
                 }
                 else if (toUri.Scheme == "http")
                 {
-                    endpointAddress = "urn:uuid:" + toUri.AbsoluteUri;
+                    endpointAddress = "urn:uuid:" + toUri.AbsolutePath;
                 }
                 else
                     endpointAddress = toAddress;
@@ -348,6 +377,26 @@ namespace Dpws.Device.Services
                     {
                         DpwsWseEventSource eventSource = eventSources[ii];
                         eventSink.StartTime = DateTime.Now.Ticks;
+                        Uri key =  eventSink.NotifyTo.Address;
+
+                        if(m_evtChannelLookup.Contains(key))
+                        {
+                            EventChannel ec = (EventChannel)m_evtChannelLookup[key];
+                            eventSink.RequestChannel = ec.Channel;
+                            Interlocked.Increment(ref ec.RefCount);
+                        }
+                        else
+                        {
+                            WS2007HttpBinding binding = new WS2007HttpBinding(new HttpTransportBindingConfig(eventSink.NotifyTo.Address, m_persistEventConnections));
+                            eventSink.RequestChannel = binding.CreateClientChannel(new ClientBindingContext(m_version));
+
+                            if(m_persistEventConnections)
+                            {
+                                eventSink.RequestChannel.Open();
+                            }
+
+                            m_evtChannelLookup[key] = new EventChannel(eventSink.RequestChannel);
+                        }
                         eventSource.EventSinks.Add(eventSink);
                     }
                 }
@@ -362,6 +411,26 @@ namespace Dpws.Device.Services
                         if ((eventSource = eventSources[filterList[ii]]) != null)
                         {
                             eventSink.StartTime = DateTime.Now.Ticks;
+                            Uri key =  eventSink.NotifyTo.Address;
+
+                            if(m_evtChannelLookup.Contains(key))
+                            {
+                                EventChannel ec = (EventChannel)m_evtChannelLookup[key];
+                                eventSink.RequestChannel = ec.Channel;
+                                Interlocked.Increment(ref ec.RefCount);
+                            }
+                            else
+                            {
+                                WS2007HttpBinding binding = new WS2007HttpBinding(new HttpTransportBindingConfig(eventSink.NotifyTo.Address, m_persistEventConnections));
+                                eventSink.RequestChannel = binding.CreateClientChannel(new ClientBindingContext(m_version));
+
+                                if(m_persistEventConnections)
+                                {
+                                    eventSink.RequestChannel.Open();
+                                }
+
+                                m_evtChannelLookup[key] = new EventChannel(eventSink.RequestChannel);
+                            }
                             eventSource.EventSinks.Add(eventSink);
                         }
                         else
@@ -464,7 +533,16 @@ namespace Dpws.Device.Services
                         
                         if (eventSink != null)
                         {
+                            Uri key = eventSink.NotifyTo.Address;
+
                             eventSourceFound = true;
+
+                            EventChannel ec = (EventChannel)m_evtChannelLookup[key];
+
+                            if(m_persistEventConnections && 0 == Interlocked.Decrement(ref ec.RefCount))
+                            {
+                                eventSink.RequestChannel.Close();
+                            }
                             eventSource.EventSinks.Remove(eventSink);
                         }
                     }

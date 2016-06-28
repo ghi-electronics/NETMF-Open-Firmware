@@ -28,6 +28,15 @@ namespace schemas.example.org.EventingService
     [DataContract(Namespace="http://schemas.example.org/EventingService")]
     public class SimpleEventRequest
     {
+        
+        [DataMember(Order=0, IsNillable=true)]
+        public byte[] Param;
+        
+        [DataMember(IsNillable=true, IsRequired=false)]
+        public XmlElement[] Any;
+        
+        [DataMember(IsNillable=true, IsRequired=false)]
+        public XmlAttribute[] AnyAttr;
     }
     
     public class SimpleEventRequestDataContractSerializer : DataContractSerializer
@@ -49,7 +58,29 @@ namespace schemas.example.org.EventingService
             if (IsParentStartElement(reader, false, true))
             {
                 SimpleEventRequestField = new SimpleEventRequest();
+                SimpleEventRequestField.AnyAttr = ReadAnyAttribute(reader);
                 reader.Read();
+                if (IsChildStartElement(reader, "Param", true, true))
+                {
+                    reader.Read();
+                    string[] Param_List = reader.ReadString().Split();
+                    if ((this._CompressByteArrays 
+                                || ((Param_List.Length == 1) 
+                                && (Param_List[0].Length > 2))))
+                    {
+                        SimpleEventRequestField.Param = Convert.FromBase64String(Param_List[0]);
+                    }
+                    else
+                    {
+                        SimpleEventRequestField.Param = new byte[Param_List.Length];
+                        for (int i = 0; (i < Param_List.Length); i = (i + 1))
+                        {
+                            SimpleEventRequestField.Param[i] = XmlConvert.ToByte(Param_List[i]);
+                        }
+                    }
+                    reader.ReadEndElement();
+                }
+                SimpleEventRequestField.Any = ReadAnyElement(reader, false);
                 reader.ReadEndElement();
             }
             return SimpleEventRequestField;
@@ -60,6 +91,34 @@ namespace schemas.example.org.EventingService
             SimpleEventRequest SimpleEventRequestField = ((SimpleEventRequest)(graph));
             if (WriteParentElement(writer, true, true, graph))
             {
+                WriteAnyAttribute(writer, SimpleEventRequestField.AnyAttr);
+                if (WriteChildElement(writer, "Param", true, true, SimpleEventRequestField.Param))
+                {
+                    string Param_List = "";
+                    if (this._CompressByteArrays)
+                    {
+                        if ((SimpleEventRequestField.Param != null))
+                        {
+                            Param_List = Convert.ToBase64String(SimpleEventRequestField.Param);
+                        }
+                        writer.WriteString(Param_List);
+                    }
+                    else
+                    {
+                        for (int i = 0; (i < SimpleEventRequestField.Param.Length); i = (i + 1))
+                        {
+                            Param_List = (Param_List + XmlConvert.ToString(SimpleEventRequestField.Param[i]));
+                            if ((i 
+                                        < (SimpleEventRequestField.Param.Length - 1)))
+                            {
+                                Param_List = (Param_List + " ");
+                            }
+                        }
+                        writer.WriteString(Param_List);
+                    }
+                    writer.WriteEndElement();
+                }
+                WriteAnyElement(writer, SimpleEventRequestField.Any, false);
                 writer.WriteEndElement();
             }
             return;

@@ -85,10 +85,10 @@ struct CLR_RT_HeapBlock
     static const int        HB_DoubleShift = 16;
 
     static const CLR_INT32  HB_FloatUnit   = (1 << HB_FloatShift );
-    static const CLR_INT64  HB_DoubleUnit  = (1 << HB_DoubleShift);
+    static const CLR_INT64  HB_DoubleUnit  = (ULONGLONGCONSTANT(1) << HB_DoubleShift);
 
     static const CLR_INT32  HB_FloatMask   = ((1 << HB_FloatShift) - 1);
-    static const CLR_INT64  HB_DoubleMask  = ((1 << HB_DoubleShift) - 1);
+    static const CLR_INT64  HB_DoubleMask  = ((ULONGLONGCONSTANT(1) << HB_DoubleShift) - 1);
 
 #endif
 
@@ -174,11 +174,11 @@ private:
                 U8& operator=( const CLR_UINT64 num )
                 {
 #if !defined(BIG_ENDIAN)
-                    _L = (CLR_UINT32)((0x00000000FFFFFFFFULL & num)      );
-                    _H = (CLR_UINT32)((0xFFFFFFFF00000000ULL & num) >> 32);
+                    _L = (CLR_UINT32)((ULONGLONGCONSTANT(0x00000000FFFFFFFF) & num)      );
+                    _H = (CLR_UINT32)((ULONGLONGCONSTANT(0xFFFFFFFF00000000) & num) >> 32);
 #else
-                    _L = (CLR_UINT32) (( 0x00000000FFFFFFFFULL & num)       );
-                    _H = (CLR_UINT32) (( 0xFFFFFFFF00000000ULL & num) >> 32 );
+                    _L = (CLR_UINT32) (( ULONGLONGCONSTANT(0x00000000FFFFFFFF) & num)       );
+                    _H = (CLR_UINT32) (( ULONGLONGCONSTANT(0xFFFFFFFF00000000) & num) >> 32 );
 #endif
                     return *this;
                 }
@@ -327,11 +327,11 @@ private:
                 S8& operator=( const CLR_INT64 num )
                 {
 #if !defined(BIG_ENDIAN)
-                    _L = (CLR_UINT32) (( 0x00000000FFFFFFFFULL & num)       );
-                    _H = (CLR_UINT32) (( 0xFFFFFFFF00000000ULL & num) >> 32 );
+                    _L = (CLR_UINT32) (( ULONGLONGCONSTANT(0x00000000FFFFFFFF) & num)       );
+                    _H = (CLR_UINT32) (( ULONGLONGCONSTANT(0xFFFFFFFF00000000) & num) >> 32 );
 #else
-                    _L = (CLR_UINT32) (( 0x00000000FFFFFFFFULL & num)       );
-                    _H = (CLR_UINT32) (( 0xFFFFFFFF00000000ULL & num) >> 32 );
+                    _L = (CLR_UINT32) (( ULONGLONGCONSTANT(0x00000000FFFFFFFF) & num)       );
+                    _H = (CLR_UINT32) (( ULONGLONGCONSTANT(0xFFFFFFFF00000000) & num) >> 32 );
 #endif
                     return *this;
                 }
@@ -570,19 +570,19 @@ private:
 /// code will not work with the UINT32* conversion, it requires you 
 /// to copy byte by byte.
 ///
-                    CLR_UINT8* src = (CLR_UINT8*)num;
+                    CLR_UINT8* src = (CLR_UINT8*)&num;
                     CLR_UINT8* dst = (CLR_UINT8*)&_H;
                     int i;
                     
                     for(i=0; i<sizeof(CLR_UINT32); i++)
                     {
-                        *tmp++ = *src++;
+                        *dst++ = *src++;
                     }
 
                     dst = (CLR_UINT8*)&_L;
                     for(i=0; i<sizeof(CLR_UINT32); i++)
                     {
-                        *tmp++ = *src++;
+                        *dst++ = *src++;
                     }
 #else
                     CLR_UINT32* tmp= (CLR_UINT32 *) &num;
@@ -658,21 +658,19 @@ private:
 
 #else  
  /// not using floating point lib, emulated one
+
+#if defined(BIG_ENDIAN)
+            CLR_UINT32 padR4; 
+#endif
  
             struct R4 {
                
-#if !defined(BIG_ENDIAN)
                 CLR_INT32  _L;
-#else
-                CLR_UINT32 padR4; 
-                CLR_INT32  _L; 
-#endif
 
                 operator CLR_INT32 () const
                 {
                     return _L;
                 }
-
 
                 R4& operator=( const CLR_INT32 num )
                 {
@@ -681,48 +679,35 @@ private:
                 }
                 R4& operator+=( const R4& num )
                 {
-                    CLR_INT32 value = (CLR_INT32)*this;    // uses conversion
-                    value += (CLR_INT32)num;                // uses conversion and then built-in type double
-                    *this = value;                          // uses assignment operator (operator=)
+                    _L += num._L;
                     return *this;
                 }
 
                 R4& operator-=( const R4& num )
                 {
-                    CLR_INT32 value = (CLR_INT32)*this;   // uses conversion
-                    value -= (CLR_INT32)num;              // uses conversion and then built-in type double
-                    *this = value;                         // uses assignment operator (operator=)
-                    return *this;
+                    _L -= num._L;
+                   return *this;
                 }
 
 
                 R4& operator%=( const R4& num )
                 {
-                    CLR_INT32 value = (CLR_INT32)*this;   // uses conversion
-                    value = (CLR_INT32)(value % (CLR_INT32)num) ;           // uses conversion and then built-in type double
-                    *this = value;                        // uses assignment operator (operator=)
-
+                    _L %= num._L;
                     return *this;
                 }
 
 
                 R4 operator*( const R4& num )
                 {
-                    CLR_INT32 value = (CLR_INT32 )*this;    // uses conversion
                     R4  ret_value;
-
-                    
-                    value = (CLR_INT32)(((CLR_INT64)value  * (CLR_INT64)num) >> HB_FloatShift );
-                    ret_value = value;                      // uses assignment operator (operator=)
+                    ret_value._L = (CLR_INT32)(((CLR_INT64)_L * (CLR_INT64)num._L) >> HB_FloatShift );
                     return ret_value;
                 }
 
                 R4 operator/( const R4& num )
                 {
-                    CLR_INT32 value = (CLR_INT32)*this;    // uses conversion
                     R4 ret_value;
-                    value = (CLR_INT32)(((CLR_INT64)value << HB_FloatShift)  / (CLR_INT64)num); 
-                    ret_value = value;                      // uses assignment operator (operator=)
+                    ret_value._L = (CLR_INT32)((((CLR_INT64)_L) << HB_FloatShift)  / (CLR_INT64)num._L); 
                     return ret_value;
                 }
 
@@ -745,16 +730,14 @@ private:
                     return ((CLR_INT64)_H << 32 | (CLR_INT64)_L );
                 }
 
-
-
                 R8& operator=( const CLR_INT64 num )
                 {
 #if !defined(BIG_ENDIAN)
-                    _L = (CLR_UINT32) (( 0x00000000FFFFFFFFULL & num)       );
-                    _H = (CLR_UINT32) (( 0xFFFFFFFF00000000ULL & num) >> 32 );
+                    _L = (CLR_UINT32) (( ULONGLONGCONSTANT(0x00000000FFFFFFFF) & num)       );
+                    _H = (CLR_UINT32) (( ULONGLONGCONSTANT(0xFFFFFFFF00000000) & num) >> 32 );
 #else
-                    _L = (CLR_UINT32) (( 0x00000000FFFFFFFFULL & num)       );
-                    _H = (CLR_UINT32) (( 0xFFFFFFFF00000000ULL & num) >> 32 );
+                    _L = (CLR_UINT32) (( ULONGLONGCONSTANT(0x00000000FFFFFFFF) & num)       );
+                    _H = (CLR_UINT32) (( ULONGLONGCONSTANT(0xFFFFFFFF00000000) & num) >> 32 );
 #endif
                     return *this;
                 }
@@ -762,16 +745,16 @@ private:
                 R8& operator+=( const R8& num )
                 {
                     CLR_INT64 value = (CLR_INT64)*this; // uses conversion
-                    value += (CLR_INT64)num;            // uses conversion and then built-in type __int64
-                    *this = value;                      // uses assignment operator (operator=)
+                    value += (CLR_INT64)num;            
+                    *this = value;
                     return *this;
                 }
 
                 R8& operator-=( const R8& num )
                 {
                     CLR_INT64 value = (CLR_INT64)*this; // uses conversion
-                    value -= (CLR_INT64)num;             // uses conversion and then built-in type __int64
-                    *this = value;                       // uses assignment operator (operator=)
+                    value -= (CLR_INT64)num;
+                    *this = value;
                     return *this;
                 }
 
@@ -807,8 +790,13 @@ private:
 
 #undef ACCUMULATE
 
-                    if(fNegate) ret_value = -(CLR_INT64)res;
-                    else        ret_value =  (CLR_INT64)res;
+                    ret_value = (CLR_INT64)res;
+
+                    if(fNegate && (CLR_INT64)ret_value != 0)
+                    {
+                        ret_value = -(CLR_INT64)ret_value;
+                    }
+                    
                     return ret_value;
                 }
 
@@ -817,7 +805,7 @@ private:
                     CLR_INT64 value = (CLR_INT64)*this;
                     R8 ret_value;
 
-                    value = (value << HB_DoubleShift) / num ; 
+                    value = (value / num) << HB_DoubleShift; 
 
                     ret_value = value;                    
 
@@ -826,22 +814,22 @@ private:
 
                 bool operator==( const R8& num )
                 {
-                    CLR_INT64 value = (CLR_INT64)*this; // uses conversion
+                    CLR_INT64 value = (CLR_INT64)*this;             // uses conversion
                     return ( value == (CLR_INT64)num );
                 }
 
 
                 bool operator==( const CLR_INT64 num )
                 {
-                    CLR_INT64 value = (CLR_INT64)*this; // uses conversion
+                    CLR_INT64 value = (CLR_INT64)*this;             // uses conversion
                     return ( value == num );
                 }
                 R8& operator%=( const R8& num )
                 {
-                    CLR_INT64 value = (CLR_INT64)*this;   // uses conversion
+                    CLR_INT64 value = (CLR_INT64)*this;             // uses conversion
                     
-                    value = (CLR_INT64)((value % (CLR_INT64)num)) ;           // uses conversion and then built-in type double
-                    *this = value;                  // uses assignment operator (operator=)
+                    value = (CLR_INT64)((value % (CLR_INT64)num)) ; // uses conversion and then built-in type double
+                    *this = value;                                  // uses assignment operator (operator=)
 
                     return *this;
                 }
@@ -1009,8 +997,8 @@ public:
 #else
     void SetFloat  ( const CLR_INT32   num ) { CLR_RT_HEAPBLOCK_ASSIGN_FLOAT32           (DATATYPE_R4, num); }
     void SetDouble ( const CLR_INT64&  num ) { CLR_RT_HEAPBLOCK_ASSIGN_FLOAT64           (DATATYPE_R8, num); }
-    void SetFloatIEEE754 ( const CLR_UINT32  num );
-    void SetDoubleIEEE754( const CLR_UINT64& num );
+    HRESULT SetFloatIEEE754 ( const CLR_UINT32  num );
+    HRESULT SetDoubleIEEE754( const CLR_UINT64& num );
 #endif
 
 
@@ -2173,7 +2161,7 @@ struct CLR_RT_HeapBlock_WeakReference : public CLR_RT_HeapBlock_Node // OBJECT H
     static HRESULT CreateInstance( CLR_RT_HeapBlock_WeakReference*& weakref );
 
     static void RecoverObjects    ( CLR_RT_DblLinkedList& lstHeap                          );
-    static bool PrepareForRecovery( CLR_RT_HeapBlock_Node* ptr, CLR_RT_HeapBlock_Node* end );
+    static bool PrepareForRecovery( CLR_RT_HeapBlock_Node* ptr, CLR_RT_HeapBlock_Node* end, CLR_UINT32 blockSize );
 
     HRESULT SetTarget( CLR_RT_HeapBlock& targetReference );
     HRESULT GetTarget( CLR_RT_HeapBlock& targetReference );
@@ -2373,7 +2361,13 @@ struct CLR_RT_Persistence_Manager
 
     //--//
 
+#undef DECL_POSTFIX
+#if defined(TINYCLR_TRACE_PERSISTENCE)
+#define DECL_POSTFIX
+#else
 #define DECL_POSTFIX {}
+#endif
+
     static void Trace_Emit( LPSTR szText ) DECL_POSTFIX;
 
     static void Trace_Printf( LPCSTR format, ... ) DECL_POSTFIX;

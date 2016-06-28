@@ -24,6 +24,8 @@ namespace Microsoft.SPOT.Tasks
         public MetaDataProcessor()
         {
             m_bag = new Hashtable();
+
+            this.LegacySkeletonInterop = false;
         }
 
         private object GetWithDefault(string name, object val)
@@ -137,6 +139,12 @@ namespace Microsoft.SPOT.Tasks
         {
             get { return (string) m_bag["GenerateSkeletonProject"]; }
             set { m_bag["GenerateSkeletonProject"] = value; }
+        }
+
+        public bool LegacySkeletonInterop
+        {
+            get { return (bool) m_bag["LegacySkeletonInterop"]; }
+            set { m_bag["LegacySkeletonInterop"] = value; }
         }
 
         public string GenerateDependency
@@ -289,7 +297,7 @@ namespace Microsoft.SPOT.Tasks
 
                     if(Directory.Exists(path))
                     {
-                        string ver = m_bag.ContainsKey("TargetFrameworkVersion") ? (string)m_bag["TargetFrameworkVersion"] : "v4.1";
+                        string ver = m_bag.ContainsKey("TargetFrameworkVersion") ? (string)m_bag["TargetFrameworkVersion"] : "v4.2";
 
                         filenameMDP = Path.Combine(Path.Combine( path, ver ), "MetaDataProcessor.exe");
 
@@ -509,7 +517,7 @@ namespace Microsoft.SPOT.Tasks
             AppendSwitchFiles(commandLine, "-generateStringsTable", this.GenerateStringsTable);
             AppendSwitchFiles(commandLine, "-generate_dependency", this.GenerateDependency);
             AppendCreateDatabase(commandLine);
-            AppendSwitchFileStrings(commandLine, "-generate_skeleton", this.GenerateSkeletonFile, this.GenerateSkeletonName, this.GenerateSkeletonProject);
+            AppendSwitchFileStrings(commandLine, "-generate_skeleton", this.GenerateSkeletonFile, this.GenerateSkeletonName, this.GenerateSkeletonProject, this.LegacySkeletonInterop ? "TRUE" : "FALSE");
             AppendRefreshAssemblyCommand(commandLine);
         }
 

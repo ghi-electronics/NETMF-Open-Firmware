@@ -20,7 +20,13 @@
 #define FAT_TIME_MINUTE_SHIFT        5
 #define FAT_TIME_SECOND_MASK         0x1F
 #define FAT_TIME_SECOND_SHIFT        0
-#define FAT_TIME_SECOND_MULTIPLIER   2
+#define FAT_TIME_SECOND_MULTIPLIER   2 
+
+#ifndef FAT_TIME_SECOND_GRANULARITY
+#define FAT_TIME_SECOND_GRANULARITY  1 // only update every 8 seconds (This needs be multiple of two because of macro below)
+#endif //FAT_TIME_SECOND_GRANULARITY
+
+#define FAT_TIME_SECOND_CALC_GRANULARITY(x) ((x) & ~(FAT_TIME_SECOND_GRANULARITY-1))
 
 struct FAT_Utility
 {

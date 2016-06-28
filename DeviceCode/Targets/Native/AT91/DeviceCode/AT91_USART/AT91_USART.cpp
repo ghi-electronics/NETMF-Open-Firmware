@@ -498,7 +498,7 @@ void AT91_USART_Driver::GetPins(int comPort, GPIO_PIN& rxPin, GPIO_PIN& txPin, G
             rxPin =  (GPIO_PIN)AT91_RXD0;
             txPin =  (GPIO_PIN)AT91_TXD0;
             ctsPin = (GPIO_PIN)AT91_CTS0;
-            rtsPin = (GPIO_PIN)AT91_RST0;            
+            rtsPin = (GPIO_PIN)AT91_RTS0;            
              break;
 #endif
 #if ( AT91_MAX_USART > 2)            

@@ -27,8 +27,8 @@
 #  define MYALLOC(size) OPENSSL_malloc(size)
 #  define MYFREE(ptr) OPENSSL_free(ptr)
 # else
-#  define MYALLOC(size) TINYCLR_SSL_MALLOC(size)
-#  define MYFREE(ptr) TINYCLR_SSL_FREE(ptr)
+#  define MYALLOC(size) OPENSSL_malloc(size)
+#  define MYFREE(ptr) OPENSSL_free(ptr)
 # endif
 #endif
 /* Following functions are various bit meshing routines used in

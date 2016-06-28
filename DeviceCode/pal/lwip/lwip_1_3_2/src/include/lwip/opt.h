@@ -48,6 +48,8 @@
 
 #include "lwip\debug.h"
 
+#include <errno.h>
+
 /*
    -----------------------------------------------
    ---------- Platform specific locking ----------
@@ -60,7 +62,7 @@
  * allocation and deallocation.
  */
 #ifndef SYS_LIGHTWEIGHT_PROT
-#define SYS_LIGHTWEIGHT_PROT            0
+#define SYS_LIGHTWEIGHT_PROT            1
 #endif
 
 /** 
@@ -478,7 +480,7 @@ extern void* private_realloc(void* ptr, unsigned int size);
  * on recv operations, you also have to set IP_SOF_BROADCAST_RECV=1.
  */
 #ifndef IP_SOF_BROADCAST
-#define IP_SOF_BROADCAST                1
+#define IP_SOF_BROADCAST                0
 #endif
 
 /**
@@ -486,7 +488,7 @@ extern void* private_realloc(void* ptr, unsigned int size);
  * filter on recv operations.
  */
 #ifndef IP_SOF_BROADCAST_RECV
-#define IP_SOF_BROADCAST_RECV           1
+#define IP_SOF_BROADCAST_RECV           0
 #endif
 
 /*
@@ -947,7 +949,7 @@ extern void* private_realloc(void* ptr, unsigned int size);
  * whenever the link changes (i.e., link down)
  */
 #ifndef LWIP_NETIF_LINK_CALLBACK
-#define LWIP_NETIF_LINK_CALLBACK        0
+#define LWIP_NETIF_LINK_CALLBACK        1
 #endif
 
 /**

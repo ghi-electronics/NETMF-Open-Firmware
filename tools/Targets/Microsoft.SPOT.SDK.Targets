@@ -56,6 +56,10 @@
     <WiXDefines Include="ProdVerRevision">
       <Value>$(RevisionNumber)</Value>
     </WiXDefines>
+    <WiXDefines Include="ProdReleaseName">
+      <Value>$(ReleaseName)</Value>
+    </WiXDefines>
+    
 
     <WiXDefines Include="ProdVer">
       <Value>$(MFSDKProductVersion)</Value>
@@ -112,7 +116,7 @@
   -->
   <Choose>
     <!--Standard WiX Project?-->
-    <When Condition=" '$(MSBuildProjectExtension)' == '.wixproj' AND '$(PORT_BUILD)' == '' ">
+    <When Condition=" '$(MSBuildProjectExtension)' == '.wixproj' AND !EXISTS('$(SPOCLIENT)\tools\build\Microsoft.SPOT.Tasks.Internal.dll') ">
 
       <PropertyGroup>
         <DoCandle>true</DoCandle>
@@ -190,7 +194,7 @@
     </When>
 
     <!--C# Project with WiX component-->
-    <When Condition=" ('$(MSBuildProjectExtension)' == '.csproj' Or '$(MSBuildProjectExtension)' == '.vbproj') And '$(ComponentGuid)' != '' And '$(PORT_BUILD)' == '' ">
+    <When Condition=" ('$(MSBuildProjectExtension)' == '.csproj' Or '$(MSBuildProjectExtension)' == '.vbproj') And '$(ComponentGuid)' != '' And !EXISTS('$(SPOCLIENT)\tools\build\Microsoft.SPOT.Tasks.Internal.dll') ">
 
       <PropertyGroup>
         <DoCandle>true</DoCandle>
@@ -244,7 +248,7 @@
     </When>
 
     <!--SDK Solution Project-->
-    <When Condition=" '$(MSBuildProjectExtension)' == '.slnproj' And '$(ComponentGuid)' != '' And '$(PORT_BUILD)' == '' ">
+    <When Condition=" '$(MSBuildProjectExtension)' == '.slnproj' And '$(ComponentGuid)' != '' And !EXISTS('$(SPOCLIENT)\tools\build\Microsoft.SPOT.Tasks.Internal.dll') ">
 
       <PropertyGroup>
         <DoCandle>true</DoCandle>
@@ -299,7 +303,7 @@
     <CleanDependsOn>$(CleanDependsOn);CleanCDImage</CleanDependsOn>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(DOCPROJ)' != '' ">
+  <PropertyGroup Condition=" '$(DOCPROJ)' != '' AND EXISTS('$(XBUILDEXE)')">
     <BuildDependsOn>XBuild;GenerateCHM;$(BuildDependsOn)</BuildDependsOn>
     <CleanDependsOn>$(CleanDependsOn);CleanXBuild</CleanDependsOn>
   </PropertyGroup>
@@ -515,7 +519,7 @@
 
   <!-- Creates VS Solutions and Projects for MF SDK from Dev Projects-->
   <Target Name="SDKSolution"
-          Condition=" '$(PORT_BUILD)' == '' "
+          Condition=" !EXISTS('$(SPOCLIENT)\tools\build\Microsoft.SPOT.Tasks.Internal.dll') "
           DependsOnTargets="SDKSolutionInputs"
           Inputs="@(ProjectFile);@(ProjectChild);@(WiXFragmentIncludeFile);@(WiXComponentIncludeFile);@(ProjectDependency)"
           Outputs="@(ProjectFile->'$(IntermediateOutputPath)%(filename)%(extension)');
@@ -565,8 +569,8 @@
   <!-- Creates a fragment containing a single
        component for installing an assembly -->
   <Target Name="AssemblyFragment"
-          Condition=" '$(PORT_BUILD)' == '' "
-          Inputs="$(MSBuildProjectFullPath);@(WiXComponentFiles);@(WiXFragmentIncludeFile);@(WiXComponentIncludeFile)"
+          Condition="!EXISTS('$(SPOCLIENT)\tools\build\Microsoft.SPOT.Tasks.Internal.dll')"
+          Inputs="$(MSBuildProjectFullPath);@(WiXComponentFiles);@(WiXFragmentIncludeFile);@(WiXComponentIncludeFile);@(WiXPostFragmentIncludeFile)"
           Outputs="$(AssemblyFragmentWxs)">
 
     <CreateAssemblyFragment
@@ -636,7 +640,7 @@
 
   <!-- WiX Candle -->
   <Target Name="Candle"
-          Condition="'$(PORT_BUILD)'==''"
+          Condition="!EXISTS('$(SPOCLIENT)\tools\build\Microsoft.SPOT.Tasks.Internal.dll')"
           Inputs="$(CandleInput);@(WixSource)"
           Outputs="@(WiXSource->'$(OUTPUT_WIXOBJ_DIR)%(filename).wixobj')">
 
@@ -708,6 +712,7 @@
       InputWixObjects="@(WiXObjectEndian)"
       FileTypes="@(FileType)"
       PrintFiles="false"
+      WorkingDirectory="$(OutputWixObjClient)"
       >
       <Output TaskParameter="FoundObjects" ItemName="WiXObjectEndian"/>
       <Output TaskParameter="FoundFiles" ItemName="FoundFileOfType"/>
@@ -715,7 +720,7 @@
 
     <CreateSymbolRequest
       Condition=" '$(SymbolProject)' != '' "
-      Files="@(FoundFileOfType)"
+      Files="@(FoundFileOfType);@(FoundFileOfTypeLE)"
       FileTypes="@(SymbolType)"
       SymbolWorkingDirectory="$(BUILD_TREE_SERVER)\Symbols\$(SymbolProject)"
       InputFiles="$(IndexFile);$(ArchiveFile)"
@@ -730,6 +735,7 @@
       Outputs="$(LitLibEndian)">
 <!--      <Message Text="Execute LitEndian $(LIT_EXE) $(LitCmdLine) $(LitLibEndian) @(WiXObjectEndian, ' ') "/> -->
     <Exec
+      WorkingDirectory="$(OutputWixObjClient)"
       Command="$(LIT_EXE) $(LitCmdLine) $(LitLibEndian) @(WiXObjectEndian, ' ')" />
   </Target>
 
@@ -762,7 +768,7 @@
       JobDescription="$(CodeSignJobDescInternal)"
       JobKeywords="$(CodeSignJobKeywInternal)"
       Certificate="23"
-      Approvers="jonka;jamesweb;smaillet;jamesmat;jefsimon"
+      Approvers="lorenzte;zachl;colinmil"
       DisplayName="$(CodeSignDisplayNameInternal)"
       DisplayURL="http://msdn.microsoft.com/embedded/netmf"
       />
@@ -790,7 +796,7 @@
   </PropertyGroup>
 
   <Target
-    Condition=" '$(PORT_BUILD)' == '' "
+    Condition="!EXISTS('$(SPOCLIENT)\tools\build\Microsoft.SPOT.Tasks.Internal.dll')"
     Name="Light"
     DependsOnTargets="$(LightDependsOn)"
     Inputs="$(LitLibEndian);$(LitLibNonEndian);@(WiXLibrary);$(WixLocalization)"
@@ -821,7 +827,7 @@
       JobDescription="$(CodeSignJobDescMSI)"
       JobKeywords="$(CodeSignJobKeywMSI)"
       Certificate="23"
-      Approvers="jonka;fmokren;aldenl;jamesweb;jamesmat;jefsimon"
+      Approvers="lorenzte;zachl;colinmil"
       DisplayName="$(CodeSignDisplayNameMSI)"
       DisplayURL="http://msdn.microsoft.com/embedded/netmf"/>
   </Target>

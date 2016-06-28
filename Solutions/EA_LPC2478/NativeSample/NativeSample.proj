@@ -36,7 +36,7 @@
     <IncludePaths Include="DeviceCode\pal\lwip\SocketsDriver" />
     <IncludePaths Include="DeviceCode\pal\lwip\TinyCLR" />
     <IncludePaths Include="DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\" />
-    <IncludePaths Include="DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\inc32" />
+    <IncludePaths Include="DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\include\" />
     <IncludePaths Include="DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto" />
     <IncludePaths Include="DeviceCode\pal\COM\sockets\openssl" />
     <IncludePaths Include="DeviceCode\Drivers\Ethernet\loopback_lwip" />    <ScatterFileReferences Include="$(SRC_DIR)\scatterfile_tools_$(COMPILER_TOOL).xml" />
@@ -105,6 +105,10 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\dotNetMF.proj" />
     <DriverLibs Include="COM_pal.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <DriverLibs Include="DebuggerPort_SSL_config_stubs.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Config\dotnetmf.proj" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Configuration\dotNetMF.proj" />
@@ -197,6 +201,10 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\EA_LPC2478\DeviceCode\bootstrap\dotNetMF.proj" />
     <DriverLibs Include="LPC24XX_Bootstrap_HAL_EA_LPC2478.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\LPC24XX\DeviceCode\PWM\dotNetMF.proj" />
+    <DriverLibs Include="LPC24XX_PWM.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\BlockStorage\Flash\SST39WF_16\dotNetMF.proj" />

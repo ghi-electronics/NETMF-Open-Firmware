@@ -77,3 +77,8 @@ UINT8 USB_GetStatus( int Controller )
     return USB_DEVICE_STATE_NO_CONTROLLER;
 }
 
+void USB_DiscardData( int UsbStream, BOOL fTx )
+{
+}
+
+

@@ -47,23 +47,33 @@
 extern "C" {
 #endif
 
+//[MSCHANGE] - in_addr needs to be packed because sockaddr_in is packed 
+// This is required for to assure proper alignment when casting from sockaddr 
+// to sockaddr_in 
 /* members are in network byte order */
+PACK_STRUCT_BEGIN
 struct sockaddr_in {
-  u8_t sin_len;
-  u8_t sin_family;
-  u16_t sin_port;
-  struct in_addr sin_addr;
-  char sin_zero[8];
-};
+  PACK_STRUCT_FIELD(u8_t sin_len);
+  PACK_STRUCT_FIELD(u8_t sin_family);
+  PACK_STRUCT_FIELD(u16_t sin_port);
+  PACK_STRUCT_FIELD(struct in_addr sin_addr);
+  PACK_STRUCT_FIELD(char sin_zero[8]);
+} PACK_STRUCT_STRUCT;
+PACK_STRUCT_END
 
+
+typedef char __CT_ASSERT__SOCKADDR_IN[sizeof(struct sockaddr_in)==16 ? 1: -1];
+    
 struct sockaddr {
   u8_t sa_len;
   u8_t sa_family;
   char sa_data[14];
 };
 
+typedef char __CT_ASSERT__SOCKADDR[sizeof(struct sockaddr)==16 ? 1: -1];
+
 #ifndef socklen_t
-#  define socklen_t u32_t
+#define socklen_t u32_t
 #endif
 
 /* Socket protocol types (TCP/UDP/RAW) */

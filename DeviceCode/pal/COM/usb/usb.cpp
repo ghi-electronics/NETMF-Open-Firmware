@@ -4,6 +4,8 @@
 
 #include "USB.h"
 
+#define USB_FLUSH_RETRY_COUNT 1000
+
 //--//
 
 #if defined(BUILD_RTM)
@@ -131,6 +133,11 @@ UINT8 USB_GetStatus( int Controller )
     return USB_Driver::GetStatus( Controller );
 }
 
+void USB_DiscardData( int UsbStream, BOOL fTx )
+{
+    USB_Driver::DiscardData(UsbStream, fTx);
+}
+
 //--//
 
 int USB_Driver::GetControllerCount()
@@ -215,7 +222,6 @@ BOOL USB_Driver::Initialize( int Controller )
         }
 
         State->ControllerNum = Controller;
-        State->Initialized   = TRUE;
         State->CurrentState  = USB_DEVICE_STATE_UNINITIALIZED;
 
 
@@ -247,7 +253,6 @@ BOOL USB_Driver::Initialize( int Controller )
 
         if( S_OK != CPU_USB_Initialize( Controller ) )
         {
-            State->Initialized = FALSE;
             return FALSE;       // If Hardware initialization fails
         }
 
@@ -260,6 +265,8 @@ BOOL USB_Driver::Initialize( int Controller )
             USB_OpenStream( ConvertCOM_UsbStream(HalSystemConfig.DebuggerPorts[0]), USB_DEBUG_EP_WRITE, USB_DEBUG_EP_READ );    
         }
 #endif
+
+        State->Initialized   = TRUE;
 
         return TRUE;
     }
@@ -282,8 +289,10 @@ int USB_Driver::Configure( int Controller, const USB_DYNAMIC_CONFIGURATION* Conf
         return USB_CONFIG_ERR_NO_CONTROLLER;
 
     // Cannot alter the configuration while the Controller is running
+#if !defined(USB_ALLOW_CONFIGURATION_OVERRIDE)
     if( State->Initialized )
         return USB_CONFIG_ERR_STARTED;
+#endif
 
     // If the default configuration is to be used
     if( Config == NULL )
@@ -441,6 +450,9 @@ BOOL USB_Driver::Uninitialize( int Controller )
     State->Initialized = FALSE;
 
     CPU_USB_Uninitialize( Controller );
+
+    // for soft reboot allow the USB to be off for at least 100ms
+    HAL_Time_Sleep_MicroSeconds(100000); // 100ms
 
     return TRUE;
 }
@@ -757,6 +769,8 @@ BOOL USB_Driver::Flush( int UsbStream )
     int Controller  = ConvertCOM_UsbController ( UsbStream );
     int StreamIndex = ConvertCOM_UsbStreamIndex( UsbStream );
     int endpoint;
+    int retries = USB_FLUSH_RETRY_COUNT;
+    int queueCnt;
     USB_CONTROLLER_STATE * State = CPU_USB_GetState( Controller );
 
     if( NULL == State || StreamIndex >= USB_MAX_QUEUES )
@@ -777,8 +791,10 @@ BOOL USB_Driver::Flush( int UsbStream )
         return FALSE;
     }
 
+    queueCnt = State->Queues[endpoint]->NumberOfElements();
+    
     // interrupts were disabled or USB interrupt was disabled for whatever reason, so force the flush
-    while(State->Queues[endpoint]->IsEmpty() == false)
+    while(State->Queues[endpoint]->IsEmpty() == false && retries > 0)
     {
         CPU_USB_StartOutput( State, endpoint );
 
@@ -787,6 +803,15 @@ BOOL USB_Driver::Flush( int UsbStream )
         {
             HAL_Time_Sleep_MicroSeconds_InterruptEnabled(500); // don't call Events_WaitForEventsXXX because it will turn off interrupts
         }
+
+        int cnt = State->Queues[endpoint]->NumberOfElements();
+        retries  = (queueCnt == cnt) ? retries-1: USB_FLUSH_RETRY_COUNT;
+        queueCnt = cnt;
+    }
+
+    if(retries <=0)
+    {
+        State->Queues[endpoint]->Initialize();
     }
 
     return TRUE;
@@ -859,6 +884,40 @@ UINT8 USB_Driver::GetStatus( int Controller )
         return USB_DEVICE_STATE_UNINITIALIZED;
     
     return State->CurrentState;
+}
+
+void USB_Driver::DiscardData( int UsbStream, BOOL fTx )
+{
+    int Controller  = ConvertCOM_UsbController ( UsbStream );
+    int StreamIndex = ConvertCOM_UsbStreamIndex( UsbStream );
+    int endpoint;
+    USB_CONTROLLER_STATE *State = CPU_USB_GetState( Controller );
+
+    if( State == NULL )
+        return;
+
+    if( !State->Initialized || State->Configuration == NULL )
+        return;
+
+    if(fTx)
+    {
+        endpoint = State->streams[StreamIndex].TxEP;
+    }
+    else
+    {
+        endpoint = State->streams[StreamIndex].RxEP;
+    }
+    
+    // If no Read side to stream (or if not yet open)
+    if( endpoint == USB_NULL_ENDPOINT || State->Queues[endpoint] == NULL )
+    {
+        return;
+    }
+
+    if( State->Queues[endpoint] )
+    {
+        State->Queues[endpoint]->Initialize();
+    }
 }
 
 //--//
@@ -1251,8 +1310,6 @@ UINT8 USB_HandleConfigurationRequests( USB_CONTROLLER_STATE* State, USB_SETUP_PA
     {
         if(State->FirstGetDescriptor)
         {
-            ASSERT(type == USB_DEVICE_DESCRIPTOR_TYPE);
-
             State->FirstGetDescriptor = FALSE;
 
             State->Expected = __min(State->Expected, State->PacketSize);

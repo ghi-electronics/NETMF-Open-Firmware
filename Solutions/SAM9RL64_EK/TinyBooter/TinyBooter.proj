@@ -104,6 +104,10 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\dotNetMF.proj" />
     <DriverLibs Include="COM_pal.$(LIB_EXT)" />
   </ItemGroup>
+  <ItemGroup>
+    <DriverLibs Include="DebuggerPort_SSL_config_stubs.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Config\dotnetmf.proj" />
+  </ItemGroup>
  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\Watchdog\stubs\dotNetMF.proj" />
     <DriverLibs Include="Watchdog_pal_stubs.$(LIB_EXT)" />
@@ -229,11 +233,6 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_PreStackInit\dotNetMF.proj" />
     <DriverLibs Include="cpu_prestackinit_stubs.$(LIB_EXT)" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\drivers\stubs\processor\stubs_security\dotNetMF.proj" />
-    <DriverLibs Include="cpu_security_stubs.$(LIB_EXT)" />
   </ItemGroup>
   
   <ItemGroup>

@@ -8,54 +8,6 @@
 
 #include <TinyCLR_Interop.h>
 
-#if defined(PLATFORM_WINDOWS) 
-#pragma comment(lib,"crypto")
-#endif
-
-#include <crypto.h>
-
-typedef BOOL (*CryptoFpn)( BYTE *Key, BYTE *IV, DWORD cbIVSize, BYTE* pPlainText, DWORD cbPlainText, BYTE *pCypherText, DWORD cbCypherText );
-
-struct Library_spot_native_Microsoft_SPOT_CryptoState
-{
-    struct Buffer
-    {
-        CLR_RT_HeapBlock_Array* m_array;
-        int                     m_offset;
-        int                     m_count;
-
-        HRESULT Parse   ( CLR_RT_HeapBlock* ptr           );
-        HRESULT Allocate( CLR_RT_HeapBlock& ref, int size );
-
-        CLR_UINT8* Data();
-    };
-
-    Buffer                  m_dataIn;
-    Buffer                  m_dataOut;
-    CLR_RT_HeapBlock_Array* m_IV;
-    KeySeed                 m_keySymmetric;
-    RSAKey                  m_keyAsymmetric;
-    void*                   m_handle;
-    CRYPTO_RESULT           m_res;
-
-    //--//
-   
-    void Init();
-    void Cleanup();
-
-    HRESULT LoadSymmetricKey ( CLR_RT_StackFrame& stack );
-    HRESULT LoadAsymmetricKey( CLR_RT_StackFrame& stack );
-    
-    BOOL          Execute( CryptoFpn fpn );
-    CRYPTO_RESULT StepRSA(               );
-
-    static void GetSeed     ( KeySeed& seed );
-    static void GetDeviceKey( UINT8*   key  );
-    static void GetDeviceKey( RSAKey&  key  );
-
-
-};
-
 struct Library_spot_native_Microsoft_SPOT_Reflection
 {
     TINYCLR_NATIVE_DECLARE(GetTypesImplementingInterface___STATIC__SZARRAY_mscorlibSystemType__mscorlibSystemType);
@@ -133,37 +85,6 @@ struct Library_spot_native_Microsoft_SPOT_BaseEvent
 
     //--//
 
-};
-
-struct Library_spot_native_Microsoft_SPOT_Cryptography_Key_RSA
-{
-    static const int FIELD__m_modulus  = 1;
-    static const int FIELD__m_exponent = 2;
-
-    TINYCLR_NATIVE_DECLARE(Encrypt___SZARRAY_U1__SZARRAY_U1__I4__I4__SZARRAY_U1);
-    TINYCLR_NATIVE_DECLARE(Decrypt___SZARRAY_U1__SZARRAY_U1__I4__I4__SZARRAY_U1);
-    TINYCLR_NATIVE_DECLARE(VerifySignature___BOOLEAN__SZARRAY_U1__I4__I4__SZARRAY_U1__I4__I4);
-
-    //--//
-
-    static HRESULT AdvanceState( CLR_RT_StackFrame& stack, RSAOperations op );
-
-
-};
-
-struct Library_spot_native_Microsoft_SPOT_Cryptography_Key_TinyEncryptionAlgorithm
-{
-    static const int FIELD__m_value           = 1;
-    static const int FIELD__m_doublyEncrypted = 2;
-
-    TINYCLR_NATIVE_DECLARE(Encrypt___SZARRAY_U1__SZARRAY_U1__I4__I4__SZARRAY_U1);
-    TINYCLR_NATIVE_DECLARE(Decrypt___SZARRAY_U1__SZARRAY_U1__I4__I4__SZARRAY_U1);
-    TINYCLR_NATIVE_DECLARE(get_Signature___SZARRAY_U1);
-    TINYCLR_NATIVE_DECLARE(GetActivationString___STRING__U2__U2);
-
-    //--//
-
-    static HRESULT Initialize( CLR_RT_StackFrame& stack, Library_spot_native_Microsoft_SPOT_CryptoState& st, bool fKeyOnly, int resultLength );
 };
 
 struct Library_spot_native_Microsoft_SPOT_Debug
@@ -252,6 +173,8 @@ struct Library_spot_native_Microsoft_SPOT_GenericEvent
 
 struct Library_spot_native_Microsoft_SPOT_Hardware_SystemInfo
 {
+    static const int FIELD_STATIC__IsEmulator = 1;
+
     TINYCLR_NATIVE_DECLARE(GetSystemVersion___STATIC__VOID__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4);
     TINYCLR_NATIVE_DECLARE(get_OEMString___STATIC__STRING);
     TINYCLR_NATIVE_DECLARE(get_IsBigEndian___STATIC__BOOLEAN);
@@ -319,7 +242,7 @@ struct Library_spot_native_Microsoft_SPOT_Messaging_Message
 
 struct Library_spot_native_Microsoft_SPOT_Native_Resources
 {
-    static const int FIELD_STATIC__manager = 1;
+    static const int FIELD_STATIC__manager = 2;
 
 
     //--//
@@ -328,9 +251,10 @@ struct Library_spot_native_Microsoft_SPOT_Native_Resources
 
 struct Library_spot_native_Microsoft_SPOT_ResourceUtility
 {
-    static const int FIELD_STATIC__s_ewr = 2;
+    static const int FIELD_STATIC__s_ewr = 3;
 
     TINYCLR_NATIVE_DECLARE(GetObject___STATIC__OBJECT__mscorlibSystemResourcesResourceManager__mscorlibSystemEnum);
+    TINYCLR_NATIVE_DECLARE(GetObject___STATIC__OBJECT__mscorlibSystemResourcesResourceManager__mscorlibSystemEnum__I4__I4);    
     TINYCLR_NATIVE_DECLARE(set_CurrentUICultureInternal___STATIC__VOID__mscorlibSystemGlobalizationCultureInfo);
 
     //--//
@@ -431,6 +355,23 @@ struct Library_spot_native_Microsoft_SPOT_Messaging_Message__RemotedException
 {
     static const int FIELD__m_message = 1;
 
+
+    //--//
+
+};
+
+struct Library_spot_native_System_Security_Cryptography_X509Certificates_X509Certificate
+{
+    static const int FIELD__m_certificate = 1;
+    static const int FIELD__m_password = 2;
+    static const int FIELD__m_issuer = 3;
+    static const int FIELD__m_subject = 4;
+    static const int FIELD__m_effectiveDate = 5;
+    static const int FIELD__m_expirationDate = 6;
+    static const int FIELD__m_handle = 7;
+    static const int FIELD__m_sessionHandle = 8;
+
+    TINYCLR_NATIVE_DECLARE(ParseCertificate___STATIC__VOID__SZARRAY_U1__STRING__BYREF_STRING__BYREF_STRING__BYREF_mscorlibSystemDateTime__BYREF_mscorlibSystemDateTime);
 
     //--//
 

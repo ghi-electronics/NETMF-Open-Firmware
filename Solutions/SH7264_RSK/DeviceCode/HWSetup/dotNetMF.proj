@@ -1,7 +1,7 @@
 <Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>SH7264_RSK_hwsetup</AssemblyName>
-    <ProjectGuid>{8D8634AF-7EC3-4a3a-BA2A-E1287914BB43}</ProjectGuid>
+    <ProjectGuid>{E6D1733C-EA70-4BA9-A6A4-E57AAA2BA068}</ProjectGuid>
     <Size>
     </Size>
     <Description>SH7264 M3A-HS64 Hardware Setup</Description>

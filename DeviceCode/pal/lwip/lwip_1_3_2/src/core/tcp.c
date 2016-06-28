@@ -658,19 +658,22 @@ tcp_slowtmr(void)
       }
     }
     /* Check if this PCB has stayed too long in FIN-WAIT-2 */
-    if (pcb->state == FIN_WAIT_2) {
-      if ((u32_t)(tcp_ticks - pcb->tmr) >
+    // [MS_CHANGE] - check for PCBs that have stayed too long in CLOSING 
+    //               which is between FIN-WAIT-1 and FIN-WAIT-2
+    if (pcb->state == FIN_WAIT_2 || pcb->state == FIN_WAIT_1 || pcb->state == CLOSING) {
+      // [MS_CHANGE] - add linger functionality
+      if(pcb->linger.l_onoff) {
+        if((u32_t)(tcp_ticks - pcb->tmr) >
+            (pcb->linger.l_linger / TCP_SLOW_INTERVAL)) {
+          ++pcb_remove;
+          LWIP_DEBUGF(TCP_DEBUG, ("tcp_slowtmr: removing pcb stuck in FIN-WAIT-2\n"));
+        }
+      }    
+      else if ((u32_t)(tcp_ticks - pcb->tmr) >
           TCP_FIN_WAIT_TIMEOUT / TCP_SLOW_INTERVAL) {
         ++pcb_remove;
         LWIP_DEBUGF(TCP_DEBUG, ("tcp_slowtmr: removing pcb stuck in FIN-WAIT-2\n"));
       }
-      // [MS_CHANGE] - add linger functionality
-      else if((u32_t)(tcp_ticks - pcb->tmr) >
-          pcb->linger / TCP_SLOW_INTERVAL) {
-        ++pcb_remove;
-        LWIP_DEBUGF(TCP_DEBUG, ("tcp_slowtmr: removing pcb stuck in FIN-WAIT-2\n"));
-      }
-
     }
 
     /* Check if KEEPALIVE should be sent */
@@ -785,12 +788,19 @@ tcp_slowtmr(void)
     LWIP_ASSERT("tcp_slowtmr: TIME-WAIT pcb->state == TIME-WAIT", pcb->state == TIME_WAIT);
     pcb_remove = 0;
 
-    /* Check if this PCB has stayed long enough in TIME-WAIT */
-    if ((u32_t)(tcp_ticks - pcb->tmr) > 2 * TCP_MSL / TCP_SLOW_INTERVAL) {
-      ++pcb_remove;
+    // [MS_CHANGE] - add linger functionality
+    if(pcb->linger.l_onoff) {
+      if((u32_t)(tcp_ticks - pcb->tmr) >
+          (pcb->linger.l_linger / TCP_SLOW_INTERVAL)) {
+        ++pcb_remove;
+        LWIP_DEBUGF(TCP_DEBUG, ("tcp_slowtmr: removing pcb stuck in TIME-WAIT\n"));
+      }
     }
-    
-
+    /* Check if this PCB has stayed long enough in TIME-WAIT */
+    else if ((u32_t)(tcp_ticks - pcb->tmr) > 2 * TCP_MSL / TCP_SLOW_INTERVAL) {
+      ++pcb_remove;
+        LWIP_DEBUGF(TCP_DEBUG, ("tcp_slowtmr: removing pcb stuck in TIME-WAIT\n"));
+    }
 
     /* If the PCB should be removed, do it. */
     if (pcb_remove) {
@@ -972,6 +982,21 @@ tcp_kill_prio(u8_t prio)
       mprio = pcb->prio;
     }
   }
+
+  // [MS_CHNANGE] - Finally, try to free a PCB that has been in FIN-1
+  //                or CLOSING state the longest
+  if (inactive == NULL) {
+    for(pcb = tcp_active_pcbs; pcb != NULL; pcb = pcb->next) {
+      if(pcb->state == FIN_WAIT_2 || pcb->state == FIN_WAIT_1 || pcb->state == CLOSING)
+      {
+        if ((u32_t)(tcp_ticks - pcb->tmr) >= inactivity) {
+          inactivity = tcp_ticks - pcb->tmr;
+          inactive = pcb;
+        }
+      }
+    }
+  }
+
   if (inactive != NULL) {
     LWIP_DEBUGF(TCP_DEBUG, ("tcp_kill_prio: killing oldest PCB %p (%"S32_F")\n",
            (void *)inactive, inactivity));
@@ -998,6 +1023,7 @@ tcp_kill_timewait(void)
       inactive = pcb;
     }
   }
+
   if (inactive != NULL) {
     LWIP_DEBUGF(TCP_DEBUG, ("tcp_kill_timewait: killing oldest TIME-WAIT PCB %p (%"S32_F")\n",
            (void *)inactive, inactivity));
@@ -1063,6 +1089,10 @@ tcp_alloc(u8_t prio)
     pcb->lastack = iss;
     pcb->snd_lbb = iss;   
     pcb->tmr = tcp_ticks;
+
+    //[MS_CHANGE] - add linger option to pcb
+    pcb->linger.l_onoff = 0;
+    pcb->linger.l_linger = 5000;
 
     pcb->polltmr = 0;
 

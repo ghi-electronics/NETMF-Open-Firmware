@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>tinyclr</AssemblyName>
     <ProjectGuid>{d4f3eed7-343b-4732-8365-5bfd9f8a4618}</ProjectGuid>
@@ -30,7 +31,6 @@
     <MMP_DAT_CreateDatabaseFile>$(BIN_DIR)\tinyclr.dat</MMP_DAT_CreateDatabaseFile>
     <EXEScatterFileDefinition>$(SRC_DIR)\scatterfile_tinyclr_$(COMPILER_TOOL).$(SCATTER_EXT)</EXEScatterFileDefinition>
   </PropertyGroup>
-  <ItemGroup />
   <ItemGroup>
     <Compile Include="allocator.cpp" />
     <Compile Include="tinyclr.cpp" />
@@ -46,7 +46,6 @@
   <Import Project="$(SPOCLIENT)\Framework\Features\FileSystem.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\Serialization.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\BlockStorage.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Crypto.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\serial_port.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\Graphics.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\TinyCore.featureproj" />
@@ -55,15 +54,20 @@
   <Import Project="$(SPOCLIENT)\Framework\Features\DataStorage.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Debugger.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\Xml.featureproj" />
+  <Import Project="$(SPOCLIENT)\Framework\Features\PWM.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\InterruptHandler.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\Diagnostics.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\SerialPort.featureproj" />
-  <Import Condition="'$(TCP_IP_STACK)'=='' or '$(TCP_IP_STACK)'=='RTIP'" Project="$(SPOCLIENT)\Framework\Features\Network.featureproj" />
+  <Import Condition="'$(TCP_IP_STACK)'=='RTIP'" Project="$(SPOCLIENT)\Framework\Features\Network.featureproj" />
   <Import Condition="'$(TCP_IP_STACK)'=='LWIP'" Project="$(SPOCLIENT)\Framework\Features\Network_LWIP.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\RPC.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\SSL.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\SPI.featureproj" />
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Interop.Settings" />
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\MFUpdate\stubs\dotnetMF.proj" />
+    <DriverLibs Include="MFUpdate_PAL_stub.$(LIB_EXT)" />
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\StartupLib\dotNetMF.proj" />
     <PlatformIndependentLibs Include="CLRStartup.$(LIB_EXT)" />
@@ -85,12 +89,12 @@
     <PlatformIndependentLibs Include="SPOT.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT\SPOT_Crypto\dotNetMF.proj" />
-    <PlatformIndependentLibs Include="SPOT_Crypto.$(LIB_EXT)" />
-  </ItemGroup>
-  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT_Hardware\SPOT_Serial\dotNetMF.proj" />
     <PlatformIndependentLibs Include="SPOT_Hardware_SerialPort.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT_Hardware\SPOT_PWM\dotNetMF.proj" />
+    <PlatformIndependentLibs Include="SPOT_Hardware_PWM.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\core\HeapPersistence\dotNetMF.proj" />
@@ -173,6 +177,10 @@
     <DriverLibs Include="batterycharger_hal_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_DA\dotnetmf.proj" />
+    <DriverLibs Include="cpu_DA_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_usb\dotNetMF.proj" />
     <DriverLibs Include="cpu_usb_stubs.$(LIB_EXT)" />
   </ItemGroup>
@@ -225,6 +233,10 @@
     <DriverLibs Include="COM_pal.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
+    <DriverLibs Include="DebuggerPort_SSL_config_stubs.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Config\dotnetmf.proj" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Configuration\dotNetMF.proj" />
     <DriverLibs Include="config_pal.$(LIB_EXT)" />
   </ItemGroup>
@@ -237,6 +249,10 @@
     <DriverLibs Include="cpu_ebiu_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\stubs\Processor\stubs_analog\dotnetmf.proj" />
+    <DriverLibs Include="cpu_analog_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Events\dotNetMF.proj" />
     <DriverLibs Include="events_pal.$(LIB_EXT)" />
   </ItemGroup>
@@ -247,6 +263,10 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\LPC24XX\DeviceCode\GPIO\dotNetMF.proj" />
     <DriverLibs Include="LPC24XX_GPIO.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\LPC24XX\DeviceCode\PWM\dotNetMF.proj" />
+    <DriverLibs Include="LPC24XX_PWM.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Graphics\dotNetMF.proj" />
@@ -285,8 +305,8 @@
     <DriverLibs Include="LPC24XX_Power.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\LPC24XX\DeviceCode\PreStackInit\dotNetMF.proj" />
-    <DriverLibs Include="LPC24XX_PreStackInit.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_PreStackInit\dotNetMF.proj" />
+    <DriverLibs Include="cpu_prestackinit_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\LPC24XX\DeviceCode\Security\dotNetMF.proj" />
@@ -380,22 +400,18 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Backlight\stubs\dotNetMF.proj" />
     <DriverLibs Include="backlight_hal_stubs.$(LIB_EXT)" />
   </ItemGroup>
-
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\FS\FAT\dotNetMF.proj" />
     <DriverLibs Include="FS_FAT.$(LIB_EXT)" />
   </ItemGroup>
-
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\EA_LPC2478\DeviceCode\FS\dotnetmf.proj" />
     <DriverLibs Include="FS_Config_EA_LPC2478.$(LIB_EXT)" />
   </ItemGroup>
-
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\fs\dotNetMF.proj" />
     <DriverLibs Include="fs_pal.$(LIB_EXT)" />
   </ItemGroup>
-
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\FS\stubs\config\dotnetmf.proj" />
     <DriverLibs Include="FS_Config_stubs.$(LIB_EXT)" />
@@ -432,78 +448,74 @@
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\System_Xml\dotNetMF.proj" />
     <PlatformIndependentLibs Include="System_Xml.$(LIB_EXT)" />
   </ItemGroup>
-
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\EA_LPC2478\DeviceCode\network\config\dotNetMF.proj" />
     <DriverLibs Include="Network_Config_HAL_EA_LPC2478.$(LIB_EXT)" />
   </ItemGroup>
-
   <!-- RTIP Stack Libraries -->
-  <ItemGroup Condition="'$(TCP_IP_STACK)'=='' or '$(TCP_IP_STACK)'=='RTIP'">
+  <ItemGroup Condition="'$(TCP_IP_STACK)'=='RTIP'">
     <RequiredProjects Include="$(SPOCLIENT)\devicecode\drivers\timeservice\rtip\dotNetMF.proj" />
     <DriverLibs Include="timeservice_hal_rtip.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TCP_IP_STACK)'=='' or '$(TCP_IP_STACK)'=='RTIP'">
+  <ItemGroup Condition="'$(TCP_IP_STACK)'=='RTIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Ethernet\Loopback\dotNetMF.proj" />
     <DriverLibs Include="ETHERNET_loopback.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TCP_IP_STACK)'=='' or '$(TCP_IP_STACK)'=='RTIP'">
+  <ItemGroup Condition="'$(TCP_IP_STACK)'=='RTIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\dotNetMF.proj" />
     <DriverLibs Include="sockets_pal.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TCP_IP_STACK)'=='' or '$(TCP_IP_STACK)'=='RTIP'">
+  <ItemGroup Condition="'$(TCP_IP_STACK)'=='RTIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\ssl\dotNetMF.proj" />
     <DriverLibs Include="Ssl_pal.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TCP_IP_STACK)'=='' or '$(TCP_IP_STACK)'=='RTIP'">
+  <ItemGroup Condition="'$(TCP_IP_STACK)'=='RTIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\rtip\lib\dotNetMF_sockets.proj" />
     <DriverLibs Include="sockets_hal.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TCP_IP_STACK)'=='' or '$(TCP_IP_STACK)'=='RTIP'">
+  <ItemGroup Condition="'$(TCP_IP_STACK)'=='RTIP'">
     <RequiredProjects Include="$(SPOCLIENT)\devicecode\pal\rtip\lib\dotNetMF_dhcp.proj" />
     <DriverLibs Include="sockets_dhcp.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TCP_IP_STACK)'=='' or '$(TCP_IP_STACK)'=='RTIP'">
+  <ItemGroup Condition="'$(TCP_IP_STACK)'=='RTIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\rtip\lib\dotNetMF_udp.proj" />
     <DriverLibs Include="sockets_hal_udp.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TCP_IP_STACK)'=='' or '$(TCP_IP_STACK)'=='RTIP'">
+  <ItemGroup Condition="'$(TCP_IP_STACK)'=='RTIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\rtip\SocketsDriver\dotnetmf.proj" />
     <DriverLibs Include="sockets_rtip_pal.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TCP_IP_STACK)'=='' or '$(TCP_IP_STACK)'=='RTIP'">
+  <ItemGroup Condition="'$(TCP_IP_STACK)'=='RTIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\rtip\TinyCLR\dotnetmf.proj" />
     <DriverLibs Include="sockets_hal_async.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TCP_IP_STACK)'=='' or '$(TCP_IP_STACK)'=='RTIP'">
+  <ItemGroup Condition="'$(TCP_IP_STACK)'=='RTIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\rtip\lib\dotNetMF_ssl.proj" />
     <DriverLibs Include="sockets_ssl.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TCP_IP_STACK)'=='' or '$(TCP_IP_STACK)'=='RTIP'">
+  <ItemGroup Condition="'$(TCP_IP_STACK)'=='RTIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\rtip\lib\dotNetMF_sntp.proj" />
     <DriverLibs Include="sockets_sntp.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TCP_IP_STACK)'=='' or '$(TCP_IP_STACK)'=='RTIP'">
+  <ItemGroup Condition="'$(TCP_IP_STACK)'=='RTIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\rtip\lib\dotNetMF_tcp.proj" />
     <DriverLibs Include="sockets_hal_tcp.$(LIB_EXT)" />
   </ItemGroup>
-
   <!-- RTIPStack Libraries for Ethernet adapters -->
-  <ItemGroup Condition="'$(TCP_IP_STACK)'=='' or '$(TCP_IP_STACK)'=='RTIP'">
+  <ItemGroup Condition="'$(TCP_IP_STACK)'=='RTIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\LPC24XX\DeviceCode\EMAC\dotNetMF.proj" />
     <DriverLibs Include="LPC24XX_EMAC.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TCP_IP_STACK)'=='' or '$(TCP_IP_STACK)'=='RTIP'">
+  <ItemGroup Condition="'$(TCP_IP_STACK)'=='RTIP'">
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\EA_LPC2478\DeviceCode\EPHY\dotNetMF.proj" />
     <DriverLibs Include="DP83848_EA_LPC2478.$(LIB_EXT)" />
   </ItemGroup>
-
   <!-- lwIP STACK LIBRARIES -->
   <ItemGroup Condition="'$(TCP_IP_STACK)'=='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\devicecode\drivers\timeservice\stubs\dotNetMF.proj" />
     <DriverLibs Include="timeservice_hal_stubs.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup  Condition="'$(TCP_IP_STACK)'=='LWIP'">
+  <ItemGroup Condition="'$(TCP_IP_STACK)'=='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets_lwip\dotNetMF.proj" />
     <DriverLibs Include="sockets_pal_lwip.$(LIB_EXT)" />
   </ItemGroup>
@@ -539,7 +551,6 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Ethernet\Loopback_lwip\dotNetMF.proj" />
     <DriverLibs Include="ETHERNET_loopback_lwip.$(LIB_EXT)" />
   </ItemGroup>
-
   <!-- lwIP STACK LIBRARIES for Ethernet adapters -->
   <ItemGroup Condition="'$(TCP_IP_STACK)'=='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\LPC24XX\DeviceCode\EMAC_lwip\dotNetMF.proj" />
@@ -549,7 +560,6 @@
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\EA_LPC2478\DeviceCode\EPHY_LWIP\dotNetMF.proj" />
     <DriverLibs Include="DP83848_EA_LPC2478_LWIP.$(LIB_EXT)" />
   </ItemGroup>
-
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT\SPOT_Messaging\dotNetMF.proj" />
     <PlatformIndependentLibs Include="SPOT_Messaging.$(LIB_EXT)" />
@@ -561,24 +571,30 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\LPC24XX\deviceCode\SPI\dotNetMF.proj" />
     <DriverLibs Include="LPC24XX_SPI.$(LIB_EXT)" />
-  </ItemGroup>  
-
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\EA_LPC2478\DeviceCode\bootstrap\dotNetMF.proj" />
     <DriverLibs Include="LPC24XX_Bootstrap_HAL_EA_LPC2478.$(LIB_EXT)" />
   </ItemGroup>
-
-   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\CLR\Core\IOPort\dotNetMF.proj" />
-    <PlatformIndependentLibs Include="IOPort.$(LIB_EXT)" />
-  </ItemGroup>
-
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\LPC24XX\deviceCode\DAC\dotNetMF.proj" />
     <DriverLibs Include="LPC24XX_DAC.$(LIB_EXT)" />
   </ItemGroup>
-
-<!-- defined in the featureproj
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Double\dotNetMF.proj" />
+    <DriverLibs Include="native_double_pal.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_application.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\arm_util.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\cpu.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\cpu_definitions.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\smartptr_fiq_arm.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\targets\native\lpc24xx\devicecode\lcdc\lpc24xx_lcdc.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\targets\native\lpc24xx\devicecode\lpc24xx.h" />
+    <HFiles Include="$(SPOCLIENT)\Solutions\$(PLATFORM)\tft-g240320ltsw-118w.h" />
+  </ItemGroup>
+  <!-- defined in the featureproj
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\EA_LPC2478\DeviceCode\Interop\Microsoft_SPOT_MP3Decoder\NativeCode\MP3Decoder\dotNetMF.proj" />
     <DriverLibs Include="Mp3Decoder.$(LIB_EXT)" />
@@ -588,6 +604,5 @@
     <DriverLibs Include="DAC.$(LIB_EXT)" />
   </ItemGroup>
 -->
-
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

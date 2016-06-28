@@ -22,7 +22,7 @@
 #define _NET_DECL_H_
 
 #include <tinyhal.h>
-#include <network_defines.h>
+#include "network_defines.h"
 
 #ifdef PLATFORM_DEPENDENT__NETWORK_MEMORY_POOL__SIZE
 #define NETWORK_MEMORY_POOL__SIZE PLATFORM_DEPENDENT__NETWORK_MEMORY_POOL__SIZE

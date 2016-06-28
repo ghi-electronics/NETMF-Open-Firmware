@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
+#include <pkcs11\cryptokiPAL.h>
 
 using namespace System;
 using namespace System::Runtime::InteropServices;
@@ -27,13 +28,36 @@ BOOL SSL_Uninitialize()
 {
     return EmulatorNative::GetISslDriver()->Uninitialize();
 }
+
+extern CK_RV Cryptoki_GetSlotIDFromSession(CK_SESSION_HANDLE session, CK_SLOT_ID_PTR pSlotID, CryptokiSession** ppSession);
+
 BOOL SSL_ServerInit( INT32 sslMode, INT32 sslVerify, const char* certificate, INT32 cert_len, const char* szCertPwd, INT32& sslContextHandle )
 { 
+    if(cert_len == sizeof(INT32))
+    {
+        CryptokiSession* pSession;
+        CK_SLOT_ID slotID;
+        
+        if(CKR_OK != Cryptoki_GetSlotIDFromSession(sslContextHandle, &slotID, &pSession)) return FALSE;
+
+        sslContextHandle = (INT32)pSession->Context.TokenCtx;
+    }
+    
     return EmulatorNative::GetISslDriver()->ServerInit( sslMode, sslVerify, (IntPtr)(void*)certificate, cert_len, (IntPtr)(void*)szCertPwd, (int%)sslContextHandle );
 }
 
 BOOL SSL_ClientInit( INT32 sslMode, INT32 sslVerify, const char* certificate, INT32 cert_len, const char* szCertPwd,INT32& sslContextHandle )
 { 
+    if(cert_len == sizeof(INT32))
+    {
+        CryptokiSession* pSession;
+        CK_SLOT_ID slotID;
+        
+        if(CKR_OK != Cryptoki_GetSlotIDFromSession(sslContextHandle, &slotID, &pSession)) return FALSE;
+
+        sslContextHandle = (INT32)pSession->Context.TokenCtx;
+    }
+
     return EmulatorNative::GetISslDriver()->ClientInit( sslMode, sslVerify, (IntPtr)(void*)certificate, cert_len, (IntPtr)(void*)szCertPwd, (int%)sslContextHandle );
 }
 

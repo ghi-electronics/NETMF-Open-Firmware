@@ -34,7 +34,7 @@ namespace Dpws.Client.Discovery
         private DpwsClient m_parent;
 
         private const int MulticastUdpRepeat = 4;
-        private const int UdpUpperDelay      = 500;
+        private const int UdpUpperDelay      = 3000;
         private const int UdpMinDelay        = 50;
         private const int UdpMaxDelay        = 250;
 
@@ -45,8 +45,8 @@ namespace Dpws.Client.Discovery
         /// </summary>
         internal DpwsDiscoveryClient(DpwsClient parent, ProtocolVersion v)
         {
-            // Arbitrary available port value for default ws-discovery response port
-            m_discoResponsePort = 15357;
+            // Discovery Port defined by http://www.iana.org/assignments/port-numbers as Web Services for Devices
+            m_discoResponsePort = 5357;
             m_receiveTimeout    = 5000;
             m_version = v;
             m_parent = parent;
@@ -213,7 +213,7 @@ namespace Dpws.Client.Discovery
         /// Dpws multicast address, 239.255.255.250:3702. Any service that implements types specified in the
         /// filters parameter should respond with a ProbeMatches message. The ProbeMatches mesgage is unicast
         /// back to the that client that made the request. If a null filter is supplied any Dpws complient
-        /// service should reply with a ProbeMatches reponse. Probe waits DpwsDiceoveryCleint.ReceiveTimout
+        /// service should reply with a ProbeMatches reponse. Probe waits DpwsDiscoveryClient.ReceiveTimout
         /// for probe matches.
         /// </remarks>
         /// <returns>
@@ -222,7 +222,7 @@ namespace Dpws.Client.Discovery
         /// </returns>
         public DpwsServiceDescriptions Probe(DpwsServiceTypes filters)
         {
-            return Probe(filters, 0, -1);
+            return Probe(filters, 5, m_receiveTimeout);
         }
 
         /// <summary>
@@ -267,12 +267,16 @@ namespace Dpws.Client.Discovery
             // Create a new UdpClient
             using(Socket udpClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
-                IPEndPoint localEP = new IPEndPoint(IPAddress.Parse(WsNetworkServices.GetLocalIPV4Address()), m_discoResponsePort);
-                udpClient.Bind(localEP);
-
                 // Very important - Set default multicast interface for the underlying socket
-                udpClient.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, (int)WsNetworkServices.GetLocalIPV4AddressValue());
+
+                uint       ipLocal = WsNetworkServices.GetLocalIPV4AddressValue();
+                IPAddress  localIP = IPAddress.Parse(WsNetworkServices.GetLocalIPV4Address());
+                IPEndPoint localEP = new IPEndPoint(localIP, 0);
+                
+                udpClient.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, (int)ipLocal);
                 udpClient.ReceiveTimeout = timeout;
+
+                udpClient.Bind(localEP);
 
                 // Random back off implemented as per soap over udp specification
                 // for unreliable multicast message exchange
@@ -396,7 +400,7 @@ namespace Dpws.Client.Discovery
                     m_version.DiscoveryNamespace + "/Probe",      // Action
                     null,                                         // RelatesTo
                     serviceAddress,                               // To
-                    m_version.AnonymousUri, null, null);          // ReplyTo, From, Any
+                    (m_version is ProtocolVersion11?  m_version.AnonymousUri : null), null, null);          // ReplyTo, From, Any
 
                 header.MustUnderstand = true;
 
@@ -607,12 +611,15 @@ namespace Dpws.Client.Discovery
             // Create a new UdpClient
             using(Socket udpClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
-                IPEndPoint localEP = new IPEndPoint(IPAddress.Parse(WsNetworkServices.GetLocalIPV4Address()), m_discoResponsePort);
-                udpClient.Bind(localEP);
+                uint       ipLocal = WsNetworkServices.GetLocalIPV4AddressValue();
+                IPAddress  localIP = IPAddress.Parse(WsNetworkServices.GetLocalIPV4Address());
+                IPEndPoint localEP = new IPEndPoint(localIP, 0);
 
                 // Very important - Set default multicast interface for the underlying socket
-                udpClient.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, (int)WsNetworkServices.GetLocalIPV4AddressValue());
-                udpClient.ReceiveTimeout = m_receiveTimeout;
+                udpClient.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, (int)ipLocal);
+                udpClient.ReceiveTimeout = (int)timeout;
+
+                udpClient.Bind(localEP);
 
                 // Random back off implemented as per soap over udp specification
                 // for unreliable multicast message exchange
@@ -702,8 +709,11 @@ namespace Dpws.Client.Discovery
                     }
                     else
                     {
-                        backoff = backoff * 2;
-                        backoff = backoff > UdpUpperDelay ? UdpUpperDelay : backoff;
+                        backoff = backoff * (i*2);
+                        if (backoff > UdpUpperDelay)
+                        {
+                            backoff = UdpUpperDelay;
+                        }
                     }
 
                     try
@@ -722,7 +732,7 @@ namespace Dpws.Client.Discovery
 
             th.Start();
 
-            Thread.Sleep(1);
+            Thread.Sleep(0);
 
             return th;
         }

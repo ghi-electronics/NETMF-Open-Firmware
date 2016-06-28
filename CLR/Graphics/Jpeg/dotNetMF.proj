@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>Graphics_Jpeg</AssemblyName>
     <Size>
@@ -43,19 +44,6 @@
     <ExtraFlags Condition="'$(INSTRUCTION_SET)'=='BLACKFIN'"> -D_NO_CPP_INLINES </ExtraFlags>
   </PropertyGroup>
   <ItemGroup>
-    <HFiles Include="jchuff.h" />
-    <HFiles Include="jconfig.h" />
-    <HFiles Include="jdct.h" />
-    <HFiles Include="jdhuff.h" />
-    <HFiles Include="jerror.h" />
-    <HFiles Include="jinclude.h" />
-    <HFiles Include="jmemsys.h" />
-    <HFiles Include="jmorecfg.h" />
-    <HFiles Include="jpegint.h" />
-    <HFiles Include="jpeglib.h" />
-    <HFiles Include="jversion.h" />
-    <HFiles Include="mcbcr.h" />
-    <HFiles Include="transupp.h" />
     <Compile Include="Graphics_Jpeg.c" />
     <Compile Include="jbytearraydatasrc.c" />
     <Compile Include="jcapimin.c" />
@@ -109,8 +97,38 @@
     <Compile Include="pfint.c" />
     <Compile Include="piint.c" />
     <Compile Include="transupp.c" />
-    <ExtraProjects Include="dotNetMF_Stub.proj"/>
+    <ExtraProjects Include="dotNetMF_Stub.proj" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\clr\graphics\graphics.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\clr_defines.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_application.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_debugging.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_errorcodes.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_graphics.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_hardware.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_interop.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_messaging.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_platformdef.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_profiling.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_runtime.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_runtime__heapblock.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_runtime__serialization.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_types.h" />
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_win32.h" />
+    <HFiles Include="jchuff.h" />
+    <HFiles Include="jconfig.h" />
+    <HFiles Include="jdct.h" />
+    <HFiles Include="jdhuff.h" />
+    <HFiles Include="jerror.h" />
+    <HFiles Include="jinclude.h" />
+    <HFiles Include="jmemsys.h" />
+    <HFiles Include="jmorecfg.h" />
+    <HFiles Include="jpegint.h" />
+    <HFiles Include="jpeglib.h" />
+    <HFiles Include="jversion.h" />
+    <HFiles Include="mcbcr.h" />
+    <HFiles Include="transupp.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

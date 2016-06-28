@@ -111,7 +111,7 @@
 
 #ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 2	/* On VMS, you need to define this to get
-				   the declaration of fileno().  The value
+				   the declaration of TINYCLR_SSL_FILENO().  The value
 				   2 is to make sure no function defined
 				   in POSIX-2 is left undefined. */
 #endif
@@ -121,7 +121,7 @@
 #include <stdlib.h>
 #include <string.h>
 #if !defined(OPENSSL_SYSNAME_WIN32) && !defined(NETWARE_CLIB)
-//#include <strings.h>
+#include <strings.h>
 #endif
 #include <sys/types.h>
 #include <ctype.h>
@@ -260,6 +260,8 @@ int args_from_file(char *file, int *argc, char **argv[])
 
 int str2fmt(char *s)
 	{
+	if (s == NULL)
+		return FORMAT_UNDEF;
 	if 	((*s == 'D') || (*s == 'd'))
 		return(FORMAT_ASN1);
 	else if ((*s == 'T') || (*s == 't'))
@@ -380,13 +382,12 @@ void program_name(char *in, char *out, int size)
 
 int chopup_args(ARGS *arg, char *buf, int *argc, char **argv[])
 	{
-	int num,len,i;
+	int num,i;
 	char *p;
 
 	*argc=0;
 	*argv=NULL;
 
-	len=TINYCLR_SSL_STRLEN(buf);
 	i=0;
 	if (arg->count == 0)
 		{
@@ -689,10 +690,10 @@ static char *app_get_pass(BIO *err, char *arg, int keepbio)
 			btmp = BIO_new(BIO_f_buffer());
 			pwdbio = BIO_push(btmp, pwdbio);
 #endif
-		} else if(!TINYCLR_SSL_STRCMP(arg, "OPENSSL_TYPE__FILE_STDIN")) {
+		} else if(!TINYCLR_SSL_STRCMP(arg, "stdin")) {
 			pwdbio = BIO_new_fp(OPENSSL_TYPE__FILE_STDIN, BIO_NOCLOSE);
 			if(!pwdbio) {
-				BIO_printf(err, "Can't open BIO for OPENSSL_TYPE__FILE_STDIN\n");
+				BIO_printf(err, "Can't open BIO for stdin\n");
 				return NULL;
 			}
 		} else {
@@ -878,10 +879,17 @@ EVP_PKEY *load_key(BIO *err, const char *file, int format, int maybe_stdin,
 	if (format == FORMAT_ENGINE)
 		{
 		if (!e)
-			BIO_printf(bio_err,"no engine specified\n");
+			BIO_printf(err,"no engine specified\n");
 		else
+			{
 			pkey = ENGINE_load_private_key(e, file,
 				ui_method, &cb_data);
+			if (!pkey) 
+				{
+				BIO_printf(err,"cannot load %s from engine\n",key_descrip);
+				ERR_print_errors(err);
+				}	
+			}
 		goto end;
 		}
 #endif
@@ -926,7 +934,7 @@ EVP_PKEY *load_key(BIO *err, const char *file, int format, int maybe_stdin,
 				&pkey, NULL, NULL))
 			goto end;
 		}
-#if !defined(OPENSSL_NO_RSA) && !defined(OPENSSL_NO_DSA)
+#if !defined(OPENSSL_NO_RSA) && !defined(OPENSSL_NO_DSA) && !defined (OPENSSL_NO_RC4)
 	else if (format == FORMAT_MSBLOB)
 		pkey = b2i_PrivateKey_bio(key);
 	else if (format == FORMAT_PVK)
@@ -940,8 +948,11 @@ EVP_PKEY *load_key(BIO *err, const char *file, int format, int maybe_stdin,
 		}
  end:
 	if (key != NULL) BIO_free(key);
-	if (pkey == NULL)
+	if (pkey == NULL) 
+		{
 		BIO_printf(err,"unable to load %s\n", key_descrip);
+		ERR_print_errors(err);
+		}	
 	return(pkey);
 	}
 
@@ -1126,7 +1137,7 @@ static int load_certs_crls(BIO *err, const char *file, int format,
 	if (bio == NULL)
 		{
 		BIO_printf(err, "Error opening %s %s\n",
-				desc, file ? file : "OPENSSL_TYPE__FILE_STDIN");
+				desc, file ? file : "stdin");
 		ERR_print_errors(err);
 		return 0;
 		}
@@ -2705,7 +2716,7 @@ static int WIN32_rename(const char *from, const char *to)
 	else	/* UNICODE path */
 		{
 		size_t i,flen=TINYCLR_SSL_STRLEN(from)+1,tlen=TINYCLR_SSL_STRLEN(to)+1;
-		tfrom = (TCHAR *)TINYCLR_SSL_MALLOC(sizeof(TCHAR)*(flen+tlen));
+		tfrom = (TCHAR *)OPENSSL_malloc(sizeof(TCHAR)*(flen+tlen));
 		if (tfrom==NULL) goto err;
 		tto=tfrom+flen;
 #if !defined(_WIN32_WCE) || _WIN32_WCE>=101
@@ -2735,7 +2746,7 @@ static int WIN32_rename(const char *from, const char *to)
 err:
 	ret=-1;
 ok:
-	if (tfrom!=NULL && tfrom!=(TCHAR *)from)	TINYCLR_SSL_FREE(tfrom);
+	if (tfrom!=NULL && tfrom!=(TCHAR *)from)	OPENSSL_free(tfrom);
 	return ret;
 	}
 #endif
@@ -2989,7 +3000,7 @@ int raw_read_stdin(void *buf,int siz)
 	}
 #else
 int raw_read_stdin(void *buf,int siz)
-	{	return read(fileno(OPENSSL_TYPE__FILE_STDIN),buf,siz);	}
+	{	return read(TINYCLR_SSL_FILENO(OPENSSL_TYPE__FILE_STDIN),buf,siz);	}
 #endif
 
 #if defined(_WIN32) && defined(STD_OUTPUT_HANDLE)
@@ -3002,5 +3013,5 @@ int raw_write_stdout(const void *buf,int siz)
 	}
 #else
 int raw_write_stdout(const void *buf,int siz)
-	{	return write(fileno(OPENSSL_TYPE__FILE_STDOUT),buf,siz);	}
+	{	return write(TINYCLR_SSL_FILENO(OPENSSL_TYPE__FILE_STDOUT),buf,siz);	}
 #endif

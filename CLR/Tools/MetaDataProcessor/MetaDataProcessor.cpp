@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "keygen.h"
 #include <TinyCLR_Endian.h>
+#include <TinyCLR_Types.h>
 
 #pragma comment(lib, "Comdlg32")
 #include <Commdlg.h>
@@ -480,7 +481,7 @@ struct Settings : CLR_RT_ParseOptions
                                 pByte += le_fd->GetCharacterSize();
 
                                 CLR_UINT32* bmData = (CLR_UINT32*)pByte;
-                                for (int count=0;count<le_bm->GetTotalSize()/sizeof(CLR_UINT32);count ++)
+                                for (CLR_UINT32 count=0;count<le_bm->GetTotalSize()/sizeof(CLR_UINT32);count ++)
                                 {
                                     *bmData = SwapEndian(*bmData);
                                     bmData++;
@@ -495,7 +496,7 @@ struct Settings : CLR_RT_ParseOptions
 
 
                                     CLR_GFX_FontCharacterRangeEx * ftCharRangeEx =  (CLR_GFX_FontCharacterRangeEx*)pByte;
-                                    for(int count=0; count <le_fd->GetRangeExSize()/sizeof(CLR_GFX_FontCharacterRangeEx); count++)  
+                                    for(CLR_UINT32 count=0; count <le_fd->GetRangeExSize()/sizeof(CLR_GFX_FontCharacterRangeEx); count++)  
                                     {
                                         ftCharRangeEx ->m_offsetAntiAlias = SwapEndian(ftCharRangeEx ->m_offsetAntiAlias );
                                         ftCharRangeEx++;
@@ -503,7 +504,7 @@ struct Settings : CLR_RT_ParseOptions
                                     pByte += le_fd->GetRangeExSize();
 
                                     CLR_GFX_FontCharacterEx* fdCharEx=  (CLR_GFX_FontCharacterEx*)pByte; 
-                                    for(int count=0; count <le_fd->GetCharacterExSize()/sizeof(CLR_GFX_FontCharacterEx); count++)   
+                                    for(CLR_UINT32 count=0; count <le_fd->GetCharacterExSize()/sizeof(CLR_GFX_FontCharacterEx); count++)   
                                     {
                                         fdCharEx->m_offsetAntiAlias = SwapEndian(fdCharEx->m_offsetAntiAlias );
                                         fdCharEx++;
@@ -706,7 +707,7 @@ struct Settings : CLR_RT_ParseOptions
                                     {
                                         sizeColor /=32;
                                         UINT32 *pConvertData32 ;
-                                        for( int count=0; count<sizeColor; count++)
+                                        for(CLR_UINT32 count=0; count<sizeColor; count++)
                                         {
                                             pConvertData32 = (UINT32 *)pByte;
                                             *pConvertData32 = (UINT32)SwapEndian((UINT32)*pConvertData32);
@@ -717,7 +718,7 @@ struct Settings : CLR_RT_ParseOptions
                                     else if(le_bm->m_bitsPerPixel ==16)
                                     {
                                         UINT16 *pConvertData16;
-                                        for( int count=0; count<sizeColor; count++)
+                                        for(CLR_UINT32 count=0; count<sizeColor; count++)
                                         {
                                             pConvertData16 = (UINT16 *)pByte;
                                             *pConvertData16 = SwapEndian(*pConvertData16);
@@ -1200,6 +1201,11 @@ TinyCLR_Cleanup:
         LPCWSTR     szFile = PARAM_EXTRACT_STRING( params, 0 );
         LPCWSTR     szName = PARAM_EXTRACT_STRING( params, 1 );
         LPCWSTR     szProj = PARAM_EXTRACT_STRING( params, 2 );
+        LPCWSTR     szLeg  = PARAM_EXTRACT_STRING( params, 3 );
+
+
+        BOOL fUseOldCodeGen =  _wcsicmp(L"TRUE", szLeg) == 0;
+        
         std::string name;
 
         TINYCLR_CHECK_HRESULT(AllocateSystem());
@@ -1211,7 +1217,14 @@ TinyCLR_Cleanup:
         m_assm = g_CLR_RT_TypeSystem.FindAssembly( name.c_str(), NULL, false );
         if(m_assm)
         {
-            m_assm->GenerateSkeleton( szFile, szProj );
+            if(fUseOldCodeGen)
+            {
+                m_assm->GenerateSkeleton_Legacy( szFile, szProj );
+            }
+            else
+            {
+                m_assm->GenerateSkeleton( szFile, szProj );
+            }
         }
 
         TINYCLR_NOCLEANUP();
@@ -1702,9 +1715,10 @@ TinyCLR_Cleanup:
         PARAM_GENERIC( L"<file>", L"Report file"                                                                          );
 
         OPTION_CALL( Cmd_GenerateSkeleton, L"-generate_skeleton", L"Generates a skeleton for the methods implemented in native code" );
-        PARAM_GENERIC( L"<file>"   , L"Prefix name for the files"                                                                    );
-        PARAM_GENERIC( L"<name>"   , L"Name of the assembly"                                                                         );
-        PARAM_GENERIC( L"<project>", L"Identifier for the library"                                                                   );
+        PARAM_GENERIC( L"<file>"      , L"Prefix name for the files"                                                                 );
+        PARAM_GENERIC( L"<name>"      , L"Name of the assembly"                                                                      );
+        PARAM_GENERIC( L"<project>"   , L"Identifier for the library"                                                                );
+        PARAM_GENERIC( L"<true|false>", L"Use legacy interop method signature"                                                       );
 
         OPTION_CALL( Cmd_RefreshAssembly, L"-refresh_assembly", L"Recomputes CRCs for an assembly" );
         PARAM_GENERIC( L"<name>"  , L"Name of the assembly"                                        );
@@ -1754,6 +1768,10 @@ TinyCLR_Cleanup:
 
 //--//
 
+extern int s_CLR_RT_fTrace_AssemblyOverhead;
+
+//--//
+
 int _tmain(int argc, _TCHAR* argv[])
 {
     TINYCLR_HEADER();
@@ -1765,8 +1783,11 @@ int _tmain(int argc, _TCHAR* argv[])
 
     ::CoInitialize( 0 );
 
-    TINYCLR_CHECK_HRESULT(HAL_Windows::Memory_Resize( 4 * 1024 * 1024 ));
+    TINYCLR_CHECK_HRESULT(HAL_Windows::Memory_Resize( 64 * 1024 * 1024 ));
     HAL_Init_Custom_Heap();
+
+    // do not display assembly load information
+    s_CLR_RT_fTrace_AssemblyOverhead = 0;
 
     CLR_RT_Memory::Reset         ();    
 

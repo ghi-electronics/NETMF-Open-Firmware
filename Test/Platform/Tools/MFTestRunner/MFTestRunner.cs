@@ -100,6 +100,7 @@ namespace Microsoft.SPOT.Platform.Test
             }
             catch
             {
+
             }
         }
 
@@ -212,15 +213,15 @@ namespace Microsoft.SPOT.Platform.Test
                                 }
                                 catch (Exception ex)
                                 {
-                                    Log.Comment("#########START STACK TRACE#########");
+                                    //Log.Comment("#########START STACK TRACE#########");
                                     Log.Comment(ex.StackTrace);
-                                    Log.Comment("#########END STACK TRACE#########");
+                                    //Log.Comment("#########END STACK TRACE#########");
                                     Log.TestResult("TEST: " + method.Name + " threw an unhandled exception", 
                                         MFTestResults.Fail);
-                                    Log.EndTestMethod();
-                                    Log.StartMethod("CleanUp");
-                                    Log.CleanUp(t.Name);
-                                    throw ex;
+                                    //Log.EndTestMethod();
+                                    //Log.StartMethod("CleanUp");
+                                    //Log.CleanUp(t.Name);
+                                    //throw ex;
                                 }
                                 Log.EndTestMethod();
                             }

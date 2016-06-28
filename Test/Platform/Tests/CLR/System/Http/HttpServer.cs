@@ -7,6 +7,7 @@ using Microsoft.SPOT.Platform.Test;
 using System.Net;
 using System.Threading;
 using Microsoft.SPOT.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Microsoft.SPOT.Platform.Tests
 {
@@ -276,8 +277,13 @@ namespace Microsoft.SPOT.Platform.Tests
             HttpListenerResponse response = context.Response;
 
             string strFilePath = GetPathFromURL(request.RawUrl == null ? "" : request.RawUrl);
+
+            if (strFilePath == null || strFilePath.Length == 0)
+            {
+                return;
+            }
             // There is one particular URL that we process differently
-            if (strFilePath == "\\PasswordProtected")
+            else if (strFilePath == "\\PasswordProtected")
             {
                 ProcessPasswordProtectedArea(request, response);
                 return;

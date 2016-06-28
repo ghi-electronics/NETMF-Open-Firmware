@@ -362,7 +362,12 @@ void CLR_Messaging::Cleanup()
 
     if(!m_fInitialized) return;
 
-    DebuggerPort_Uninitialize( m_port );
+    // Some devices cannot reset the USB controller so we need to allow them to skip uninitialization
+    // of the debug transport
+    if(!g_fDoNotUninitializeDebuggerPort)
+    {
+        DebuggerPort_Uninitialize( m_port );
+    }
     
     m_cacheSubordinate.DblLinkedList_Release();
     m_cacheMaster     .DblLinkedList_Release();
@@ -800,6 +805,39 @@ void CLR_Messaging::SwapEndian( WP_Message* msg, void* ptr, int size, bool fRepl
     case CLR_DBG_Commands::c_Debugging_Execution_Allocate             :
         SwapEndianPattern( payload, sizeof(UINT32), fReply?1:1 );
         break;
+
+    case CLR_DBG_Commands::c_Debugging_UpgradeToSsl:
+        SwapEndianPattern( payload, sizeof(UINT32), 1 );
+        break;
+
+    case CLR_DBG_Commands::c_Debugging_MFUpdate_Start:
+        if(!fReply)
+        {
+            SwapEndianPattern( payload,              1, 64 );
+            SwapEndianPattern( payload, sizeof(UINT32),  5 );
+            SwapEndianPattern( payload, sizeof(UINT16),  2 );
+        }
+        else
+        {
+            SwapEndianPattern( payload, sizeof(UINT32), 1 );
+        }
+        break;
+    case CLR_DBG_Commands::c_Debugging_MFUpdate_AuthCommand:
+        SwapEndianPattern( payload, sizeof(UINT32), fReply ? 2 : 3 );
+        break;
+    case CLR_DBG_Commands::c_Debugging_MFUpdate_Authenticate:
+        SwapEndianPattern( payload, sizeof(UINT32), fReply ? 1 : 2 );
+        break;
+    case CLR_DBG_Commands::c_Debugging_MFUpdate_AddPacket:
+        SwapEndianPattern( payload, sizeof(UINT32), fReply?4:1 );
+        break;
+    case CLR_DBG_Commands::c_Debugging_MFUpdate_GetMissingPkts:
+        SwapEndianPattern( payload, sizeof(UINT32), fReply ? 2 : 1 );
+        break;
+    case CLR_DBG_Commands::c_Debugging_MFUpdate_Install:
+        SwapEndianPattern( payload, sizeof(UINT32), fReply?2:1 );
+        break;
+        
     case CLR_DBG_Commands::c_Debugging_Execution_Breakpoints          :
         if (!fReply)
         {
@@ -840,7 +878,7 @@ void CLR_Messaging::SwapEndian( WP_Message* msg, void* ptr, int size, bool fRepl
                 if (CLR_DBG_Commands::Debugging_Execution_QueryCLRCapabilities::c_ClrInfo==cmd)                     
                 {   
                     SwapEndianPattern( payload, sizeof(UINT16), 4       ); 
-                    SwapEndianPattern( payload, 1, 64-sizeof(Version)   );
+                    SwapEndianPattern( payload, 1, 64-sizeof(MFVersion)   );
                     SwapEndianPattern( payload, sizeof(UINT16), 4       );
                 }
                 if (CLR_DBG_Commands::Debugging_Execution_QueryCLRCapabilities::c_SolutionReleaseInfo==cmd)         
@@ -855,7 +893,7 @@ void CLR_Messaging::SwapEndian( WP_Message* msg, void* ptr, int size, bool fRepl
                 if (CLR_DBG_Commands::Debugging_Execution_QueryCLRCapabilities::c_HalSystemInfo==cmd)               
                 {   
                     SwapEndianPattern( payload, sizeof(UINT16), 4       ); 
-                    SwapEndianPattern( payload, 1, 64-sizeof(Version)   );
+                    SwapEndianPattern( payload, 1, 64-sizeof(MFVersion)   );
                     SwapEndianPattern( payload, 1, 2                    );
                     SwapEndianPattern( payload, sizeof(UINT16), 1       );
                 }

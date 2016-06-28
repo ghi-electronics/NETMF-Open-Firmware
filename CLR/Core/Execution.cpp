@@ -213,6 +213,8 @@ HRESULT CLR_RT_ExecutionEngine::AllocateHeaps()
 
     CLR_UINT8* heapFirstFree = s_CLR_RT_Heap.m_location;
     CLR_UINT32 heapFree      = s_CLR_RT_Heap.m_size;
+    CLR_INT32  i             = 0;
+    CLR_UINT32 blockSize     = 1;
 
     if(heapFree <= sizeof(CLR_RT_HeapCluster))
     {
@@ -224,12 +226,30 @@ HRESULT CLR_RT_ExecutionEngine::AllocateHeaps()
         CLR_RT_HeapCluster* hc   = (CLR_RT_HeapCluster*)                                 heapFirstFree;
         CLR_UINT32          size =                      (heapFree < c_HeapClusterSize) ? heapFree : c_HeapClusterSize;
 
-        hc->HeapCluster_Initialize( size );
+        ///
+        /// Speed up heap initialization for devices with very large heaps > 1MB
+        /// Exponentially increase the size of a default heap block
+        ///
+        if(i > 100*1024*1024)
+        {
+            blockSize = CLR_RT_HeapBlock::HB_MaxSize;
+        }
+        else if( i > 10*1024*1024)
+        {
+            blockSize = 10*1024;
+        }
+        else if(i > 1024*1024)
+        {
+            blockSize = 1*1024;
+        }
+
+        hc->HeapCluster_Initialize( size, blockSize );
 
         m_heap.LinkAtBack( hc );
 
         heapFirstFree += size;
         heapFree      -= size;
+        i             += size;
     }
 
     TINYCLR_NOCLEANUP();
@@ -428,6 +448,8 @@ CLR_UINT32 CLR_RT_ExecutionEngine::PerformGarbageCollection()
 #if !defined(BUILD_RTM) || defined(PLATFORM_WINDOWS)
     if(m_fPerformHeapCompaction) CLR_EE_SET( Compaction_Pending );
 #endif
+
+    g_CLR_RT_ExecutionEngine.SpawnFinalizer();
 
     return freeMem;
 }
@@ -649,7 +671,7 @@ HRESULT CLR_RT_ExecutionEngine::Execute( LPWSTR entryPointArgs, int maxContextSw
     {
         CLR_RT_ProtectFromGC gc( ref );
 
-        TINYCLR_CHECK_HRESULT(NewThread( thMain, ref.DereferenceDelegate(), ThreadPriority::Normal ));
+        TINYCLR_CHECK_HRESULT(NewThread( thMain, ref.DereferenceDelegate(), ThreadPriority::Normal, -1 ));
     }
 
     {            
@@ -775,7 +797,7 @@ bool CLR_RT_ExecutionEngine::EnsureSystemThread( CLR_RT_Thread*& thread, int pri
 
     if(thread == NULL)
     {
-        return SUCCEEDED(NewThread( thread, NULL, priority, CLR_RT_Thread::TH_F_System ));
+        return SUCCEEDED(NewThread( thread, NULL, priority, -1, CLR_RT_Thread::TH_F_System ));
     }
     else
     {
@@ -1432,12 +1454,12 @@ void CLR_RT_ExecutionEngine::InsertThreadRoundRobin( CLR_RT_DblLinkedList& threa
 
 //--//
 
-HRESULT CLR_RT_ExecutionEngine::NewThread( CLR_RT_Thread*& thRes, CLR_RT_HeapBlock_Delegate* pDelegate, int priority, CLR_UINT32 flags )
+HRESULT CLR_RT_ExecutionEngine::NewThread( CLR_RT_Thread*& thRes, CLR_RT_HeapBlock_Delegate* pDelegate, int priority, CLR_INT32 id, CLR_UINT32 flags  )
 {
     NATIVE_PROFILE_CLR_CORE();
     TINYCLR_HEADER();
 
-    TINYCLR_CHECK_HRESULT(CLR_RT_Thread::CreateInstance( ++m_lastPid, pDelegate, priority, thRes, flags ));
+    TINYCLR_CHECK_HRESULT(CLR_RT_Thread::CreateInstance( id != -1 ? id : ++m_lastPid, pDelegate, priority, thRes, flags ));
 
     PutInProperList( thRes );
 
@@ -1455,6 +1477,11 @@ HRESULT CLR_RT_ExecutionEngine::NewThread( CLR_RT_Thread*& thRes, CLR_RT_HeapBlo
 
     TINYCLR_CLEANUP_END();
 }
+                                                              
+CLR_INT32 CLR_RT_ExecutionEngine::GetNextThreadId() 
+{
+    return ++m_lastPid; 
+}    
 
 //--//
 
@@ -2759,16 +2786,19 @@ bool CLR_RT_ExecutionEngine::IsInstanceOf( CLR_RT_TypeDescriptor& desc, CLR_RT_T
             //
             // Casting from <type>[] to System.Array or System.Object is always allowed.
             //
-            if(descTarget.m_handlerCls.m_data == g_CLR_RT_WellKnownTypes.m_Array     .m_data ||
-               descTarget.m_handlerCls.m_data == g_CLR_RT_WellKnownTypes.m_Object    .m_data ||
-               descTarget.m_handlerCls.m_data == g_CLR_RT_WellKnownTypes.m_IList     .m_data ||
-               descTarget.m_handlerCls.m_data == g_CLR_RT_WellKnownTypes.m_ICloneable.m_data  )
+            if(inst.m_data == g_CLR_RT_WellKnownTypes.m_Array     .m_data ||
+               inst.m_data == g_CLR_RT_WellKnownTypes.m_Object    .m_data ||
+               inst.m_data == g_CLR_RT_WellKnownTypes.m_IList     .m_data ||
+               inst.m_data == g_CLR_RT_WellKnownTypes.m_ICloneable.m_data  )
             {
                 return true;
             }
         }
 
-        return false;
+        if(inst.m_target->dataType != instTarget.m_target->dataType)
+        {
+            return false;
+        }
     }
 
     CLR_UINT32 semantic       = (inst      .m_target->flags & CLR_RECORD_TYPEDEF::TD_Semantics_Mask);
@@ -3174,14 +3204,14 @@ void CLR_RT_ExecutionEngine::Breakpoint_Threads_Prepare( CLR_RT_DblLinkedList& t
 
         TINYCLR_FOREACH_NODE(CLR_RT_StackFrame,call,th->m_stackFrames)
         {
+            call->m_flags &= ~CLR_RT_StackFrame::c_HasBreakpoint;
+
             if(call->m_call.DebuggingInfo().HasBreakpoint())
             {
                 call->m_flags |= CLR_RT_StackFrame::c_HasBreakpoint;
             }
             else
             {
-                call->m_flags &= ~CLR_RT_StackFrame::c_HasBreakpoint;
-
                 for(size_t pos=0; pos<m_breakpointsNum; pos++)
                 {
                     CLR_DBG_Commands::Debugging_Execution_BreakpointDef& def = m_breakpoints[ pos ];
@@ -3196,6 +3226,31 @@ void CLR_RT_ExecutionEngine::Breakpoint_Threads_Prepare( CLR_RT_DblLinkedList& t
                     }
                 }
             }
+#ifndef TINYCLR_NO_IL_INLINE
+            if(call->m_inlineFrame)
+            {
+                if(call->m_inlineFrame->m_frame.m_call.DebuggingInfo().HasBreakpoint())
+                {
+                    call->m_flags |= CLR_RT_StackFrame::c_HasBreakpoint;
+                }
+                else
+                {
+                    for(size_t pos=0; pos<m_breakpointsNum; pos++)
+                    {
+                        CLR_DBG_Commands::Debugging_Execution_BreakpointDef& def = m_breakpoints[ pos ];
+
+                        if(def.m_flags & CLR_DBG_Commands::Debugging_Execution_BreakpointDef::c_STEP)
+                        {
+                            if(def.m_pid == th->m_pid && def.m_depth == (call->m_depth-1))
+                            {
+                                call->m_flags |= CLR_RT_StackFrame::c_HasBreakpoint;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+#endif
         }
         TINYCLR_FOREACH_NODE_END();
     }

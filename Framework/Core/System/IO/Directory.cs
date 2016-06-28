@@ -67,6 +67,27 @@ namespace System.IO
             return false;
         }
 
+        public static IEnumerable EnumerateFiles(string path)
+        {
+            if (!Directory.Exists(path)) throw new IOException("", (int)IOException.IOExceptionErrorCode.DirectoryNotFound);
+
+            return new FileEnumerator(path, FileEnumFlags.Files);
+        }
+
+        public static IEnumerable EnumerateDirectories(string path)
+        {
+            if (!Directory.Exists(path)) throw new IOException("", (int)IOException.IOExceptionErrorCode.DirectoryNotFound);
+
+            return new FileEnumerator(path, FileEnumFlags.Directories);
+        }
+
+        public static IEnumerable EnumerateFileSystemEntries(string path)
+        {
+            if (!Directory.Exists(path)) throw new IOException("", (int)IOException.IOExceptionErrorCode.DirectoryNotFound);
+
+            return new FileEnumerator(path, FileEnumFlags.FilesAndDirectories);
+        }
+
         public static string[] GetFiles(string path)
         {
             return GetChildren(path, "*", false);
@@ -252,6 +273,9 @@ namespace System.IO
             // path and searchPattern validation in Path.GetFullPath() and Path.NormalizePath()
 
             path = Path.GetFullPath(path);
+
+            if (!Directory.Exists(path)) throw new IOException("", (int)IOException.IOExceptionErrorCode.DirectoryNotFound);
+
             Path.NormalizePath(searchPattern, true);
 
             ArrayList fileNames = new ArrayList();

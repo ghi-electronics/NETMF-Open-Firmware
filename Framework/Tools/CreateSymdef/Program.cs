@@ -27,22 +27,23 @@ namespace CreateSymdef
                     outFileName = args[1];
                 }
 
-                StreamReader reader = new StreamReader(inFileName);
-                StreamWriter writer = new StreamWriter(outFileName, false);
-
-                String line;
-
-                do
+                using(StreamReader reader = new StreamReader(inFileName))
+                using(StreamWriter writer = new StreamWriter(outFileName, false))
                 {
-                    line = reader.ReadLine();
+                    String line;
 
-                    if (line.StartsWith("    ") == false)
+                    do
                     {
-                        line = line.Remove(9, 1);
-                        line = line.Insert(9, "A");
-                        writer.WriteLine("0x" + line);
-                    }
-                } while (reader.EndOfStream == false);
+                        line = reader.ReadLine();
+
+                        if (line.StartsWith("    ") == false)
+                        {
+                            line = line.Remove(9, 1);
+                            line = line.Insert(9, "A");
+                            writer.WriteLine("0x" + line);
+                        }
+                    } while (reader.EndOfStream == false);
+                }
 
                 Console.WriteLine("Done !");
             }

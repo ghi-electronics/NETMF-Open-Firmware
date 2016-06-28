@@ -62,7 +62,8 @@
          SubkeyName="$(EmulatorId)"
          Name="$(EmulatorName)"
          CurrentUser="$(EmulatorCurrentUser)"
-         Path="$(OutDir)$(TargetFileName)" />
+         Path="$(OutDir)$(TargetFileName)" 
+         FrameworkVersion="v4.0"/>
   </Target>
 
 </Project>

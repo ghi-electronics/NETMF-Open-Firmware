@@ -126,11 +126,11 @@ namespace Microsoft.SPOT.Platform.Tests
                         SocketOptionLevel.Socket, SocketOptionName.Linger))
                         throw new System.Exception("SocketOptionLevel.Socket failed");
 
-                    testSockets.socketClient.SetSocketOption(SocketOptionLevel.IP,
-                        SocketOptionName.DontFragment, true);
-                    if (0 == (int)testSockets.socketClient.GetSocketOption(
-                        SocketOptionLevel.IP, SocketOptionName.DontFragment))
-                        throw new System.Exception("SocketOptionLevel.IP failed");
+                    //testSockets.socketClient.SetSocketOption(SocketOptionLevel.IP,
+                    //    SocketOptionName.DontFragment, true);
+                    //if (0 == (int)testSockets.socketClient.GetSocketOption(
+                    //    SocketOptionLevel.IP, SocketOptionName.DontFragment))
+                    //    throw new System.Exception("SocketOptionLevel.IP failed");
 
                     if ((int)testSockets.socketClient.GetSocketOption(
                         SocketOptionLevel.Socket, SocketOptionName.Linger) != 1)

@@ -10,7 +10,7 @@ namespace System.IO
     public class StreamReader : TextReader
     {
         private const int c_MaxReadLineLen = 0xFFFF;
-        private const int c_BufferSize = 0xFFF;
+        private const int c_BufferSize = 512;
 
         //--//
 
@@ -87,24 +87,32 @@ namespace System.IO
             int nextChar;
 
             // If buffer need refresh take into account max UTF8 bytes if the next character is UTF8 encoded
-            if (m_curBufPos == m_curBufLen || ((m_buffer[m_curBufPos + 1] & 0x80) != 0 && m_curBufPos + 3 > m_curBufLen))
+            if ((m_curBufPos                       == (m_curBufLen-1)) || 
+               ((m_buffer[m_curBufPos + 1] & 0x80) !=  0 && 
+                (m_curBufPos + 3                   >=  m_curBufLen)))
             {
                 // Move any bytes read for this character to front of new buffer
-                int i;
-                for (i = 0; i < m_curBufLen - m_curBufPos; ++i)
-                    m_buffer[i] = m_buffer[m_curBufPos + i];
+                int totRead;
+                for (totRead = 0; totRead < m_curBufLen - m_curBufPos - 1; ++totRead)
+                {
+                    m_buffer[totRead] = m_buffer[m_curBufPos + totRead];
+                }
 
                 // Get the new buffer
-                int noRead = 0;
                 try
                 {
                     // Retry read until response timeout expires
-                    if (m_stream.Length > 0)
+                    while (m_stream.Length > 0 && totRead < m_buffer.Length)
                     {
-                        while (i < m_buffer.Length && (noRead = m_stream.Read(m_buffer, i, (int)(m_buffer.Length - i < m_stream.Length ? m_buffer.Length - i : m_stream.Length))) == 0)
-                        {
-                            i += noRead;
-                        }
+                        int len = (int)(m_buffer.Length - totRead);
+
+                        if(len > m_stream.Length) len = (int)m_stream.Length;
+
+                        len = m_stream.Read(m_buffer, totRead, len);
+
+                        if(len <= 0) break;
+
+                        totRead += len;
                     }
                 }
                 catch (Exception e)
@@ -114,7 +122,7 @@ namespace System.IO
 
                 tempPos = 0;
                 m_curBufPos = 0;
-                m_curBufLen = noRead + i;
+                m_curBufLen = totRead;
             }
 
             // Get the next character and reset m_curBufPos
@@ -203,9 +211,9 @@ namespace System.IO
         public override string ReadLine()
         {
 
-            int bufLen = 0xFFF;
+            int bufLen = c_BufferSize;
             char[] readLineBuff = new char[bufLen];
-            int growSize = 0xFFF;
+            int growSize = c_BufferSize;
             int curPos = 0;
             int newChar;
             int startPos = m_curBufPos;
@@ -248,6 +256,8 @@ namespace System.IO
             }
 
             // Reached end of stream. Send line upto EOS
+            if(curPos == 0) return null;
+            
             return new string(readLineBuff, 0, curPos);
         }
 

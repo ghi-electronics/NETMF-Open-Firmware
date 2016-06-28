@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>SHHal_7619</AssemblyName>
@@ -39,15 +40,19 @@
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
   <PropertyGroup />
   <ItemGroup>
-
     <Compile Include="Hwsetup.cpp" />
     <Compile Include="intprg.c" />
     <Compile Include="resetprg.c" />
     <Compile Include="dbsct.c" />
     <Compile Include="sbrk.c" />
     <Compile Include="vecttbl.c" />
-
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="iodefine.h" />
+    <HFiles Include="sbrk.h" />
+    <HFiles Include="stacksct.h" />
+    <HFiles Include="typedefine.h" />
+    <HFiles Include="vect.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

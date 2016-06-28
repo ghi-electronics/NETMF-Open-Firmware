@@ -292,7 +292,7 @@ static void nist_cp_bn_0(BN_ULONG *buf, BN_ULONG *a, int top, int max)
 	BN_ULONG *_tmp1 = (buf), *_tmp2 = (a);
 
 #ifdef BN_DEBUG
-	OPENSSL_assert(top <= max);
+	TINYCLR_SSL_ASSERT(top <= max);
 #endif
 	for (i = (top); i != 0; i--)
 		*_tmp1++ = *_tmp2++;

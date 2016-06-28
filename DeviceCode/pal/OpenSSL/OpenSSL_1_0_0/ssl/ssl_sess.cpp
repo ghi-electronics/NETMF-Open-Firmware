@@ -568,7 +568,7 @@ int ssl_get_prev_session(SSL *s, unsigned char *session_id, int len,
 
 	s->session_ctx->stats.sess_hit++;
 
-	/* ret->time=time(NULL); */ /* rezero timeout? */
+	/* ret->time=TINYCLR_SSL_TIME(NULL); */ /* rezero timeout? */
 	/* again, just leave the session 
 	 * if it is the same session, we have just incremented and
 	 * then decremented the reference count :-) */

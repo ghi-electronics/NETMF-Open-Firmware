@@ -17,6 +17,7 @@ namespace System.Threading
         private object m_Thread;
         [System.Reflection.FieldNoReflection]
         private object m_AppDomain;
+        private int    m_Id;
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         extern public Thread(ThreadStart start);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
@@ -34,6 +35,12 @@ namespace System.Threading
 
             [MethodImplAttribute(MethodImplOptions.InternalCall)]
             set;
+        }
+
+        extern public int ManagedThreadId
+        {
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            get;
         }
 
         extern public bool IsAlive

@@ -40,7 +40,7 @@ BOOL LPC24XX_TIMER_Driver::Initialize( UINT32 Timer, HAL_CALLBACK_FPN ISR, void*
 
     if(ISR)
     {
-        //if(!CPU_INTC_ActivateInterrupt( LPC24XX_TIMER::getIntNo(Timer) , ISR, ISR_Param )) return FALSE;
+        if(!CPU_INTC_ActivateInterrupt( LPC24XX_TIMER::getIntNo(Timer) , ISR, ISR_Param )) return FALSE;
     }
 
     LPC24XX_TIMER& TIMER = LPC24XX::TIMER( Timer );

@@ -29,10 +29,12 @@ namespace Microsoft.SPOT.Platform.Tests
         private Thread _serverThread;
         public TestType testId = TestType.None;
         public MFTestResults testResult;
+        private bool m_linger;
 
         public SocketServer(TestType testType, AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType) : base (addressFamily, socketType, protocolType)
         {
             testId = testType;
+            m_linger = false;
         }
 
         /// <summary>
@@ -103,11 +105,28 @@ namespace Microsoft.SPOT.Platform.Tests
             }
         }
 
+        public bool LingerValue
+        {
+            set
+            {
+                m_linger = value;
+            }
+        }
+
         public void Linger(Socket sock)
         {
-            byte[] bytesReceived = new byte[2];
-            sock.Receive(bytesReceived);
-            testResult = MFTestResults.Pass;
+            try
+            {
+                byte[] bytesReceived = new byte[400];
+                sock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger, m_linger ? 3000: 0 );
+                int cnt = sock.Receive(bytesReceived);
+                sock.Send(bytesReceived, cnt, SocketFlags.None);
+                testResult = MFTestResults.Pass;
+                sock.Close();
+            }
+            catch
+            {
+            }
         }
     }
 }

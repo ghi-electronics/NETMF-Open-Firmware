@@ -22,14 +22,7 @@ namespace System.Net
         {
             get
             {
-                if(SystemInfo.IsBigEndian)
-                {
-                    return (AddressFamily)((m_Buffer[0] << 8) | m_Buffer[1]);
-                }
-                else
-                {
-                    return (AddressFamily)((m_Buffer[1] << 8) | m_Buffer[0]);
-                }
+                return (AddressFamily)(m_Buffer[0] | (m_Buffer[1] << 8));
             }
         }
 
@@ -44,16 +37,8 @@ namespace System.Net
 
             m_Buffer = new byte[size]; //(size / IntPtr.Size + 2) * IntPtr.Size];//sizeof DWORD
 
-            if(SystemInfo.IsBigEndian)
-            {
-                m_Buffer[0] = unchecked((byte)((int)family >> 8));
-                m_Buffer[1] = unchecked((byte)((int)family     ));
-            }
-            else
-            {
-                m_Buffer[0] = unchecked((byte)((int)family     ));
-                m_Buffer[1] = unchecked((byte)((int)family >> 8));
-            }
+            m_Buffer[0] = unchecked((byte)((int)family     ));
+            m_Buffer[1] = unchecked((byte)((int)family >> 8));
         }
 
         public int Size

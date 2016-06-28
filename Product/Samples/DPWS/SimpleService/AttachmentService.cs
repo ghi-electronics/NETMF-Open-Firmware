@@ -74,7 +74,7 @@ namespace schemas.example.org.AttachmentService
                     }
                     else
                     {
-                        OneWayAttachmentRequestField.Param = ConvertBase64.FromBase64String(reader.ReadString());
+                        OneWayAttachmentRequestField.Param = Convert.FromBase64String(reader.ReadString());
                         reader.ReadEndElement();
                     }
                 }
@@ -154,7 +154,7 @@ namespace schemas.example.org.AttachmentService
                     }
                     else
                     {
-                        TwoWayAttachmentRequestField.Param = ConvertBase64.FromBase64String(reader.ReadString());
+                        TwoWayAttachmentRequestField.Param = Convert.FromBase64String(reader.ReadString());
                         reader.ReadEndElement();
                     }
                 }
@@ -234,7 +234,7 @@ namespace schemas.example.org.AttachmentService
                     }
                     else
                     {
-                        TwoWayAttachmentResponseField.Param = ConvertBase64.FromBase64String(reader.ReadString());
+                        TwoWayAttachmentResponseField.Param = Convert.FromBase64String(reader.ReadString());
                         reader.ReadEndElement();
                     }
                 }

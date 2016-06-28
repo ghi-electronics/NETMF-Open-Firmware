@@ -309,9 +309,9 @@ int main(int argc, char **argv)
 	{
 #include <fcntl.h>
 	if (!(uflag && dflag))
-		setmode(fileno(DES_IN),O_BINARY);
+		setmode(TINYCLR_SSL_FILENO(DES_IN),O_BINARY);
 	if (!(uflag && eflag))
-		setmode(fileno(DES_OUT),O_BINARY);
+		setmode(TINYCLR_SSL_FILENO(DES_OUT),O_BINARY);
 	}
 #endif
 
@@ -362,7 +362,7 @@ NULL
 void doencryption(void)
 	{
 #ifdef _LIBC
-	extern unsigned long time();
+	extern unsigned long TINYCLR_SSL_TIME();
 #endif
 
 	register int i;

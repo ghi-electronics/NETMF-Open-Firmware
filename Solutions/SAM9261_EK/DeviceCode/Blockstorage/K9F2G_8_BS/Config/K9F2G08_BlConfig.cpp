@@ -15,14 +15,14 @@
 #define FLASH_BLOCK_COUNT                       2048
 #define FLASH_SECTOR_PER_BLOCK                  64
 #define FLASH_SECTOR_SIZE                       2048
-#define FLASH_BLOCK_SIZE                        FLASH_SECTOR_PER_BLOCK*FLASH_SECTOR_SIZE
+#define FLASH_BLOCK_SIZE                        (FLASH_SECTOR_PER_BLOCK*FLASH_SECTOR_SIZE)
 #define FLASH_BLOCK_ERASE_TYPICAL_TIME_USEC     1500000
 #define FLASH_SECTOR_WRITE_TYPICAL_TIME_USEC    200
 #define FLASH_BLOCK_ERASE_MAX_TIME_USEC         2000000
 #define FLASH_SECTOR_WRITE_MAX_TIME_USEC        700
 
 
-#define K9F2G_8__SIZE_IN_BYTES                  FLASH_BLOCK_SIZE*FLASH_BLOCK_COUNT
+#define K9F2G_8__SIZE_IN_BYTES                  (FLASH_BLOCK_SIZE*FLASH_BLOCK_COUNT)
 #define K9F2G_8__WP_GPIO_PIN                    GPIO_PIN_NONE
 #define K9F2G_8__WP_ACTIVE                      FALSE
 
@@ -61,12 +61,13 @@ const BlockRange g_K9F2G_8_BlockStatus[] =
 {
     { BlockRange::BLOCKTYPE_BOOTSTRAP ,  0,  1 },
     { BlockRange::BLOCKTYPE_CONFIG    ,  2,  2 },
-    { BlockRange::BLOCKTYPE_CODE      ,  3, 24 },
+    { BlockRange::BLOCKTYPE_CODE      ,  3, 22 },
 
-    { BlockRange::BLOCKTYPE_DEPLOYMENT, 25, 29 },
-    { BlockRange::BLOCKTYPE_DEPLOYMENT, 30, 34 },
-    { BlockRange::BLOCKTYPE_DEPLOYMENT, 35, 39 },
-    { BlockRange::BLOCKTYPE_DEPLOYMENT, 40, 48 },
+    { BlockRange::BLOCKTYPE_DEPLOYMENT, 23, 30 },
+    { BlockRange::BLOCKTYPE_DEPLOYMENT, 31, 39 },
+    { BlockRange::BLOCKTYPE_DEPLOYMENT, 40, 46 },
+    { BlockRange::BLOCKTYPE_SIMPLE_A  , 47, 47 },
+    { BlockRange::BLOCKTYPE_SIMPLE_B  , 48, 48 },
     { BlockRange::BLOCKTYPE_STORAGE_A , 49, 49 },
     { BlockRange::BLOCKTYPE_STORAGE_B , 50, 50 },
     
@@ -132,6 +133,7 @@ struct BS_WearLeveling_Config g_K9F2G_8_WearLeveling_Config =
 
     0,
     FLASH_BLOCK_SIZE,
+    FLASH_BASE_ADDRESS,
 
     NULL,
 };

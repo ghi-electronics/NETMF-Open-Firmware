@@ -5,7 +5,7 @@
 
 
 #include "SPOT_Net.h"
-
+/*
 BOOL CheckSignatureKeyEmpty( UINT32 Index )
 {
     BYTE *data = (BYTE *)(&g_ConfigurationSector.DeploymentKeys[ Index ].SectorKey[ 0 ]);
@@ -20,7 +20,7 @@ BOOL CheckSignatureKeyEmpty( UINT32 Index )
 UINT8* GetDeploymentKeys( UINT32 Index )
 {    
     return (UINT8 *)&(g_ConfigurationSector.DeploymentKeys[ Index ].SectorKey[ 0 ]);
-}    
+}  
 
 
 RSAKey* RetrieveWirelessEncryptionKey()
@@ -63,6 +63,7 @@ BOOL Decrypt( BYTE *Key, BYTE *pCypherText, DWORD cbCypherText, BYTE* pPlainText
 
     return Crypto_Decrypt( Key, IVPtr, IVLen, pCypherText, cbCypherText, pPlainText, cbPlainText );
 }
+*/
 
 HRESULT Library_spot_net_native_Microsoft_SPOT_Net_NetworkInformation_Wireless80211::UpdateConfiguration___STATIC__VOID__MicrosoftSPOTNetNetworkInformationWireless80211__BOOLEAN( CLR_RT_StackFrame& stack )
 {
@@ -82,7 +83,7 @@ HRESULT Library_spot_net_native_Microsoft_SPOT_Net_NetworkInformation_Wireless80
     CLR_RT_HeapBlock_String*   hbSsId          = NULL;
     CLR_UINT32                 ssidLength;
     CLR_UINT32                 passPhraseLength;
-    RSAKey*                    key             = NULL;    
+    //RSAKey*                    key             = NULL;    
 
     TINYCLR_CLEAR(config);
 
@@ -108,32 +109,35 @@ HRESULT Library_spot_net_native_Microsoft_SPOT_Net_NetworkInformation_Wireless80
 
     if (useEncryption)
     {
-        key = RetrieveWirelessEncryptionKey();
+        ASSERT(FALSE); // TODO: IMPLEMENT ENCRYPTION
+        //key = RetrieveWirelessEncryptionKey();
     }
         
     /// Only update this when we have the key (and it is symmetric??).
-    if (key != NULL)
-    {   
-        char passPhraseBuff[WIRELESS_PASSPHRASE_LENGTH];
+    /*
+        if (key != NULL)
+        {   
+            char passPhraseBuff[WIRELESS_PASSPHRASE_LENGTH];
 
-        /// Data is encrypted when stored in config sector.
-        config.wirelessFlags |= WIRELESS_FLAG_DATA__set(WIRELESS_FLAG_DATA_ENCRYPTED);
+            /// Data is encrypted when stored in config sector.
+            config.wirelessFlags |= WIRELESS_FLAG_DATA__set(WIRELESS_FLAG_DATA_ENCRYPTED);
 
-        hal_strncpy_s( passPhraseBuff, WIRELESS_PASSPHRASE_LENGTH, hbPassPhrase->StringText(), passPhraseLength );
-                        
-        Encrypt( (BYTE *)key, (BYTE *)passPhraseBuff, WIRELESS_PASSPHRASE_LENGTH - 1, (BYTE *)config.passPhrase, WIRELESS_PASSPHRASE_LENGTH - 1 );
-        config.passPhrase[ WIRELESS_PASSPHRASE_LENGTH - 1 ] = 0;
+            hal_strncpy_s( passPhraseBuff, WIRELESS_PASSPHRASE_LENGTH, hbPassPhrase->StringText(), passPhraseLength );
+                            
+            Encrypt( (BYTE *)key, (BYTE *)passPhraseBuff, WIRELESS_PASSPHRASE_LENGTH - 1, (BYTE *)config.passPhrase, WIRELESS_PASSPHRASE_LENGTH - 1 );
+            config.passPhrase[ WIRELESS_PASSPHRASE_LENGTH - 1 ] = 0;
 
-        if (pNetworkKey->m_numOfElements > 0)
-        {
-            Encrypt( (BYTE *)key, (BYTE *)pNetworkKey->GetFirstElement(), pNetworkKey->m_numOfElements, (BYTE *)&config.networkKey, pNetworkKey->m_numOfElements );
+            if (pNetworkKey->m_numOfElements > 0)
+            {
+                Encrypt( (BYTE *)key, (BYTE *)pNetworkKey->GetFirstElement(), pNetworkKey->m_numOfElements, (BYTE *)&config.networkKey, pNetworkKey->m_numOfElements );
+            }
+            if (pReKeyInternal->m_numOfElements > 0)
+            {
+                Encrypt( (BYTE *)key, (BYTE *)pReKeyInternal->GetFirstElement(), pReKeyInternal->m_numOfElements, (BYTE *)&config.reKeyInternal, pReKeyInternal->m_numOfElements );
+            }
         }
-        if (pReKeyInternal->m_numOfElements > 0)
-        {
-            Encrypt( (BYTE *)key, (BYTE *)pReKeyInternal->GetFirstElement(), pReKeyInternal->m_numOfElements, (BYTE *)&config.reKeyInternal, pReKeyInternal->m_numOfElements );
-        }
-    }
-    else
+        else
+        */
     {                
         /// Data is saved as clear text.
         config.wirelessFlags &= ~(WIRELESS_FLAG_DATA__set(WIRELESS_FLAG_DATA_ENCRYPTED));

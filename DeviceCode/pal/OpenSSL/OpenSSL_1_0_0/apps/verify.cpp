@@ -264,7 +264,7 @@ static int check(X509_STORE *ctx, char *file,
 	x = load_cert(bio_err, file, FORMAT_PEM, NULL, e, "certificate file");
 	if (x == NULL)
 		goto end;
-	TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDOUT,"%s: ",(file == NULL)?"OPENSSL_TYPE__FILE_STDIN":file);
+	TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDOUT,"%s: ",(file == NULL)?"stdin":file);
 
 	csc = X509_STORE_CTX_new();
 	if (csc == NULL)

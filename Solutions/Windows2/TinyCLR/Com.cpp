@@ -33,3 +33,19 @@ BOOL DebuggerPort_Flush( COM_HANDLE ComPortNum )
 {        
     return EmulatorNative::GetIComDriver()->Flush( ComPortNum );
 }
+
+BOOL DebuggerPort_IsSslSupported( COM_HANDLE ComPortNum )
+{
+    return FALSE;
+}
+
+BOOL DebuggerPort_UpgradeToSsl( COM_HANDLE ComPortNum, UINT32 flags ) 
+{ 
+    return FALSE; 
+}
+
+BOOL DebuggerPort_IsUsingSsl( COM_HANDLE ComPortNum )
+{
+    return FALSE;
+}
+

@@ -4,12 +4,12 @@
 
     <!-- ################################################################################ -->
     <Set Name="Heap_Begin"      Value="+0"/>
-    <Set Name="Heap_End"        Value="0x0001BFF8"/>
-    <Set Name="Stack_Bottom"    Value="0x0001C000"/>
+    <Set Name="Heap_End"        Value="0x0001CFF8"/>
+    <Set Name="Stack_Bottom"    Value="0x0001D000"/>
     <Set Name="Stack_Top"       Value="0x0001FFF8"/>
 
 
-    <LoadRegion Name="LR_%TARGETLOCATION%" Base="0x00000000" Options="ABSOLUTE" Size="0x60000">
+    <LoadRegion Name="LR_%TARGETLOCATION%" Base="0x00000000" Options="ABSOLUTE" Size="0x1a000">
 
 
         <ExecRegion Name="ER_%TARGETLOCATION%" Base="0x00000000" Options="FIXED" Size="">

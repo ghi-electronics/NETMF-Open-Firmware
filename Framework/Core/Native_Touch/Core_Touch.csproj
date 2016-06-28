@@ -4,6 +4,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Microsoft.SPOT</RootNamespace>
     <ProjectTypeGuids>{b69e3092-b931-443c-abe7-7e7b65f2a37f};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectGuid>{A6231AEF-ECAC-43DE-A597-50363900A487}</ProjectGuid>
     <NoWarn>$(NoWarn),0169</NoWarn>
     <ComponentGuid>{bda98f69-97b9-49b7-ac84-6fddadc44c8c}</ComponentGuid>
     <AssemblyBothEndian>true</AssemblyBothEndian>
@@ -19,6 +20,7 @@
     <Compile Include="TouchPanel.cs" />
     <Compile Include="Touch.cs" />
     <Compile Include="TouchCollector.cs" />
+    <Compile Include="TouchScreen.cs" />
     <Compile Include="Ink.cs" />
   </ItemGroup>
   <ItemGroup>

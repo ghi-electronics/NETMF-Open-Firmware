@@ -6,7 +6,6 @@
 
 //--//
 
-
 BOOL Network_Initialize()
 { 
     NATIVE_PROFILE_PAL_COM();
@@ -53,6 +52,19 @@ void SOCKETS_CloseConnections()
 {
     NATIVE_PROFILE_PAL_COM();
 }
+
+BOOL SOCKETS_UpgradeToSsl( INT32 ComPortNum, const UINT8* pCACert, UINT32 caCertLen, const UINT8* pDeviceCert, UINT32 deviceCertLen, LPCSTR szTargetHost )
+{
+    NATIVE_PROFILE_PAL_COM();
+    return FALSE;
+}
+
+BOOL SOCKETS_IsUsingSsl( INT32 ComPortNum )
+{
+    NATIVE_PROFILE_PAL_COM();
+    return FALSE;
+}
+
 
 BOOL SOCKETS_ProcessSocketActivity(SOCK_SOCKET signalSocket)
 {

@@ -12,6 +12,7 @@
     <SubDirectories Include="stubs_bootstrap"/>
     <SubDirectories Include="stubs_cache"/>
     <SubDirectories Include="stubs_cmu"/>
+    <SubDirectories Include="stubs_da"/>    
     <SubDirectories Include="stubs_dma"/>    
     <SubDirectories Include="stubs_ebiu"/>    
     <SubDirectories Include="stubs_gpio"/>
@@ -22,7 +23,6 @@
     <SubDirectories Include="stubs_pcu"/>
     <SubDirectories Include="stubs_perfcounter"/>    
     <SubDirectories Include="stubs_power"/>
-    <SubDirectories Include="stubs_security"/>    
     <SubDirectories Include="stubs_spi"/>
     <SubDirectories Include="stubs_time"/>    
     <SubDirectories Include="stubs_usart"/>

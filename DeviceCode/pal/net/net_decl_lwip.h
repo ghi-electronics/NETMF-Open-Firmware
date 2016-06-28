@@ -13,7 +13,7 @@
 #error Only include net_decl_lwip.h when using LWIP stack
 #endif
 
-#include <network_defines_lwip.h>
+#include "network_defines_lwip.h"
 
 #define NO_SYS 0
 #define ERRNO  1
@@ -197,13 +197,15 @@
 #define LWIP_PROVIDE_ERRNO      1
 
 /* ---------- SNMP options ---------- */
-#define LWIP_SNMP               1 /*LwIP 1.2.0*/
+#define LWIP_SNMP               0 /*LwIP 1.2.0*/
 #define LWIP_IGMP               1 /*LwIP 1.2.0*/
 
 // thread priorities are in VDK terms - 1 is highest, 30 is lowest
 #define TCPIP_THREAD_PRIO       5
 #define DEFAULT_THREAD_PRIO     10
 #define LOW_THREAD_PRIO         29
+
+#define OPENSSL_SMALL_FOOTPRINT 1
 
 
 //--// RAM size estimate macro

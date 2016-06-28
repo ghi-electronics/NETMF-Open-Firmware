@@ -37,9 +37,9 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
     {
         public MFUsbPort(string usbName)
         {
-            m_name      = usbName;
+            m_name = usbName;
             m_transport = TransportType.USB;
-            m_port      = usbName;
+            m_port = usbName;
 
             int idx = m_port.IndexOf("_");
             if (idx >= 0)

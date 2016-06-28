@@ -296,8 +296,8 @@ int main(int argc, char **argv)
 	print_it("BF_encrypt_ptr2 ",2);
 	if (max < tm[2]) { max=tm[2]; max_idx=2; }
 
-	TINYCLR_SSL_FPRINTF("options    BF ecb/s\n");
-	TINYCLR_SSL_FPRINTF("%s %12.2f 100.0%%\n",str[max_idx],tm[max_idx]);
+	TINYCLR_SSL_PRINTF("options    BF ecb/s\n");
+	TINYCLR_SSL_PRINTF("%s %12.2f 100.0%%\n",str[max_idx],tm[max_idx]);
 	d=tm[max_idx];
 	tm[max_idx]= -2.0;
 	max= -1.0;
@@ -308,7 +308,7 @@ int main(int argc, char **argv)
 			if (max < tm[i]) { max=tm[i]; j=i; }
 			}
 		if (max < 0.0) break;
-		TINYCLR_SSL_FPRINTF("%s %12.2f  %4.1f%%\n",str[j],tm[j],tm[j]/d*100.0);
+		TINYCLR_SSL_PRINTF("%s %12.2f  %4.1f%%\n",str[j],tm[j],tm[j]/d*100.0);
 		tm[j]= -2.0;
 		max= -1.0;
 		}
@@ -316,13 +316,13 @@ int main(int argc, char **argv)
 	switch (max_idx)
 		{
 	case 0:
-		TINYCLR_SSL_FPRINTF("-DBF_DEFAULT_OPTIONS\n");
+		TINYCLR_SSL_PRINTF("-DBF_DEFAULT_OPTIONS\n");
 		break;
 	case 1:
-		TINYCLR_SSL_FPRINTF("-DBF_PTR\n");
+		TINYCLR_SSL_PRINTF("-DBF_PTR\n");
 		break;
 	case 2:
-		TINYCLR_SSL_FPRINTF("-DBF_PTR2\n");
+		TINYCLR_SSL_PRINTF("-DBF_PTR2\n");
 		break;
 		}
 	TINYCLR_SSL_EXIT(0);

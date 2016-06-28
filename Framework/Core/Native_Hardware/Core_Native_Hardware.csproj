@@ -1,4 +1,4 @@
-<Project DefaultTargets="TinyCLR_Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+﻿<Project DefaultTargets="TinyCLR_Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <AssemblyName>Microsoft.SPOT.Hardware</AssemblyName>
     <OutputType>Library</OutputType>
@@ -24,6 +24,8 @@
     </MMP_STUB_Load>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnalogInput.cs" />
+    <Compile Include="AnalogOutput.cs" />
     <Compile Include="Cpu.cs" />
     <Compile Include="EventSink.cs" />
     <Compile Include="HW_Battery.cs" />
@@ -31,7 +33,7 @@
     <Compile Include="IOPorts.cs" />
     <Compile Include="Ports.cs" />
     <Compile Include="SPI.cs" />
-    <Compile Include="Buttonenum.cs" />    
+    <Compile Include="Buttonenum.cs" />
     <Compile Include="HardwareProvider.cs" />
     <Compile Include="Uptime.cs" />
     <Compile Include="LargeBuffer.cs" />

@@ -299,9 +299,9 @@ BOOL FAT_FILE::IsFileName( LPCWSTR name, UINT32 nameLen )
 
 COMPARE_SHORT_NAME:
     
-    if(nameLen <= 12) // 8.3 (with the dot)
+    if(nameLen <= 12 && nameLen == m_fileNameLength) // 8.3 (with the dot)
     {
-        FAT_Directory* dirEntry = GetDirectoryEntry();
+        FAT_Directory* dirEntry = GetDirectoryEntry( FALSE );
 
         if(!dirEntry) return FALSE;
 
@@ -348,7 +348,7 @@ HRESULT FAT_FILE::CopyFileName( LPWSTR name, UINT32 nameLen )
     }
     else // copy the short name
     {
-        FAT_Directory* dirEntry = GetDirectoryEntry();
+        FAT_Directory* dirEntry = GetDirectoryEntry( FALSE );
 
         if(!dirEntry) TINYCLR_SET_AND_LEAVE(CLR_E_FILE_IO);
 
@@ -381,7 +381,7 @@ BOOL FAT_FILE::IsFileNameValid( LPCWSTR fileName, UINT32 fileNameLen )
         return FALSE;
 
     WCHAR c;
-    int   i;
+    UINT32   i;
     int   j;
 
     for(i = 0; i < fileNameLen; i++)
@@ -429,7 +429,7 @@ BOOL FAT_FILE::IsFileLongName( LPCWSTR fileName, UINT32 fileNameLen )
     //--//
 
     WCHAR c;
-    int   i;
+    UINT32   i;
     int   j;
 
     int dotCount = 0;
@@ -484,8 +484,8 @@ BOOL FAT_FILE::GenerateBasisName( LPCWSTR fileName, UINT32 fileNameLen, LPSTR ba
         extLen = 0;
     }
 
-    int i;
-    int j = 0;
+    UINT32 i;
+    UINT32 j = 0;
     
     for(i = 0; i < baseLen && j < 8; i++)
     {
@@ -537,7 +537,7 @@ BOOL FAT_FILE::SetBasisNameChar( LPSTR basis, WCHAR c, BOOL* needsTrail )
     }
     else if(c != WHITESPACE_CHAR && c != '.')
     {            
-        *basis = c;        
+        *basis = (char)c;        
         return TRUE;
     }
 
@@ -661,7 +661,8 @@ HRESULT FAT_FILE::LongToShortName( UINT32 clusIndex, LPCWSTR longName, UINT32 lo
     // Go through all the files in the directory, and collect all the numeric tails
     while(fileInfo.Parse( m_logicDisk, &entryEnum ) == S_OK)
     {
-        dirEntry = fileInfo.GetDirectoryEntry();
+        dirEntry = fileInfo.GetDirectoryEntry( FALSE );
+        
         if(!dirEntry) return CLR_E_FILE_IO;
 
         // Skip over the volume label file
@@ -713,7 +714,8 @@ HRESULT FAT_FILE::LongToShortName( UINT32 clusIndex, LPCWSTR longName, UINT32 lo
                 
                 while(fileInfo.Parse( m_logicDisk, &entryEnum ) == S_OK)
                 {
-                    dirEntry = fileInfo.GetDirectoryEntry();
+                    dirEntry = fileInfo.GetDirectoryEntry( FALSE );
+                    
                     if(!dirEntry) return CLR_E_FILE_IO;
 
                     // Skip over the volume label file

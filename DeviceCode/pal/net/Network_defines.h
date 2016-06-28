@@ -84,15 +84,13 @@
 #define NETWORK_NAT_NUM_ENTRIES__default                  25
 #define NETWORK_NAT_NUM_ENTRIES__max                      40
 
-// NOTE: Default SOCKETS PAL only supports 64 sockets (total)
-
 #define NETWORK_TCP_NUM_PORTS__SUPPORTED__min             16
 #define NETWORK_TCP_NUM_PORTS__SUPPORTED__default         64
-#define NETWORK_TCP_NUM_PORTS__SUPPORTED__max             100
+#define NETWORK_TCP_NUM_PORTS__SUPPORTED__max             128
 
 #define NETWORK_UDP_NUM_PORTS__SUPPORTED__min             6
 #define NETWORK_UDP_NUM_PORTS__SUPPORTED__default         64
-#define NETWORK_UDP_NUM_PORTS__SUPPORTED__max             100
+#define NETWORK_UDP_NUM_PORTS__SUPPORTED__max             128
 
 
 //--//  Configurable timeout parameters

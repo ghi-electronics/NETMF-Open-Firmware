@@ -7,6 +7,7 @@
     <Project Include="FileSystem\build.dirproj" />
     <Project Include="HttpClient\build.dirproj" /> 
     <Project Include="HttpServer\build.dirproj" /> 
+    <Project Include="FtpServer\build.dirproj" /> 
     <Project Include="SimpleWPFApplication\build.dirproj" /> 
     <Project Include="SocketClient\build.dirproj" />
     <Project Include="SocketServer\build.dirproj" />

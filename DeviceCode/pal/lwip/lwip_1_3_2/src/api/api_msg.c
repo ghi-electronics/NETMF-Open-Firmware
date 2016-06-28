@@ -795,7 +795,13 @@ do_connected(void *arg, struct tcp_pcb *pcb, err_t err)
     setup_tcp(conn);
   }
   conn->state = NETCONN_NONE;
-  sys_sem_signal(conn->op_completed);
+
+  // [MS_CHANGE] - set the write enable event for asycn connect
+  if(conn->callback)
+  {
+    conn->callback(conn, NETCONN_EVT_SENDPLUS, 0);
+  }
+  
   return ERR_OK;
 }
 #endif /* LWIP_TCP */
@@ -835,11 +841,13 @@ do_connect(struct api_msg_msg *msg)
     msg->conn->err = tcp_connect(msg->conn->pcb.tcp, msg->msg.bc.ipaddr, msg->msg.bc.port,
                                  do_connected);
 
-    // [MS_CHANGE] - a signal is not sent if the connection fails
-    if(msg->conn->err != ERR_OK)
+    // [MS_CHANGE] - Make the connect be asynchronous by returning ERR_INPROGRESS
+    // and signalling operation complete.
+    if(msg->conn->err == ERR_OK)
     {
-        sys_sem_signal(msg->conn->op_completed);
+        msg->conn->err = ERR_INPROGRESS;
     }
+    sys_sem_signal(msg->conn->op_completed);
 
     /* sys_sem_signal() is called from do_connected (or err_tcp()),
      * when the connection is established! */

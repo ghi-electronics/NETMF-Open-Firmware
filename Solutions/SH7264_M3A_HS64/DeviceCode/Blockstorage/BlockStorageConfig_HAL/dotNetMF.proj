@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>BlockStorageConfig_HAL_SH7264_M3A_HS64</AssemblyName>
@@ -39,10 +40,11 @@
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
   <PropertyGroup />
   <ItemGroup>
-<!--    <Compile Include="blconfig_SH7264_M3A_HS64.cpp" /> -->
+    <!--    <Compile Include="blconfig_SH7264_M3A_HS64.cpp" /> -->
     <Compile Include="S29GL032A_16_config.cpp" />
-
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\devicecode\drivers\blockstorage\flash\am29dl_16\am29dl_16.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

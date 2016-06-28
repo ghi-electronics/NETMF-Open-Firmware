@@ -76,6 +76,8 @@ BOOL AT91_TIMER_Driver::Uninitialize( UINT32 timer )
     // Get Timer pointer
     AT91_TC &tc = AT91::TIMER(timer);
 
+    CPU_INTC_DeactivateInterrupt( AT91C_ID_TC0 + timer );
+
     // Disable the clock
     tc.TC_CCR = AT91_TC::TC_CLKDIS;
 
@@ -86,10 +88,12 @@ BOOL AT91_TIMER_Driver::Uninitialize( UINT32 timer )
     tc.TC_IDR = 0xFFFFFFFF;
 
     // First, enable the clock of the TIMER
-    // Todo clock API - PMC
-    *((volatile int*)(AT91C_BASE_PMC + 0x014)) = (1 << (AT91C_ID_TC0 + timer));
+    AT91_PMC &pmc = AT91::PMC();
+    pmc.PMC_PCDR = (1 << (AT91C_ID_TC0+timer));
 
     g_AT91_TIMER_Driver.m_descriptors[timer].configured = FALSE;
+    g_AT91_TIMER_Driver.m_descriptors[timer].isr = NULL;
+    g_AT91_TIMER_Driver.m_descriptors[timer].arg = NULL;
 
     return TRUE;
 }

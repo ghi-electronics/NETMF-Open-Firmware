@@ -58,6 +58,45 @@ namespace Microsoft.SPOT.Hardware
             GPIO_Pin15 = 15,
         }
 
+        public enum PWMChannel : int
+        {
+            PWM_NONE = -1, 
+            PWM_0    =  0,
+            PWM_1    =  1,
+            PWM_2    =  2,
+            PWM_3    =  3,
+            PWM_4    =  4,
+            PWM_5    =  5,
+            PWM_6    =  6,
+            PWM_7    =  7,
+        }
+
+        public enum AnalogChannel : int
+        {
+            ANALOG_NONE = -1,
+            ANALOG_0 = 0,
+            ANALOG_1 = 1,
+            ANALOG_2 = 2,
+            ANALOG_3 = 3,
+            ANALOG_4 = 4,
+            ANALOG_5 = 5,
+            ANALOG_6 = 6,
+            ANALOG_7 = 7,
+        }
+
+        public enum AnalogOutputChannel : int
+        {
+            ANALOG_OUTPUT_NONE = -1,
+            ANALOG_OUTPUT_0 = 0,
+            ANALOG_OUTPUT_1 = 1,
+            ANALOG_OUTPUT_2 = 2,
+            ANALOG_OUTPUT_3 = 3,
+            ANALOG_OUTPUT_4 = 4,
+            ANALOG_OUTPUT_5 = 5,
+            ANALOG_OUTPUT_6 = 6,
+            ANALOG_OUTPUT_7 = 7,
+        }
+
         //--//
 
         extern public static uint SystemClock

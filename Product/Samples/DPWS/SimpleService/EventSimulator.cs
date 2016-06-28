@@ -27,6 +27,7 @@ namespace schemas.example.org.EventingService
         DpwsHostedService m_hostedService = null;
         object m_threadLock = new object();
         bool rentryFlag = false;
+        static int s_cnt = 0;
 
         public EventSimulator(DpwsHostedService hostedService)
         {
@@ -58,6 +59,8 @@ namespace schemas.example.org.EventingService
             }
         }
 
+        static byte[] s_val = new byte[1024];
+
         // This method is called by the timer delegate.
         public void SendEvent(Object stateInfo)
         {
@@ -68,7 +71,10 @@ namespace schemas.example.org.EventingService
             // Fire SimpleEvent
             try
             {
-                ((EventingService)m_hostedService).SimpleEvent(new SimpleEventRequest());
+                SimpleEventRequest req = new SimpleEventRequest();
+                req.Param = s_val;
+
+                ((EventingService)m_hostedService).SimpleEvent(req);
                 System.Ext.Console.Write("");
                 System.Ext.Console.Write("FireEvent called SimpleEvent!");
                 System.Ext.Console.Write("");
@@ -85,10 +91,10 @@ namespace schemas.example.org.EventingService
             try
             {
                 IntegerEventRequest eventReq = new IntegerEventRequest();
-                eventReq.Param = 1005;
+                eventReq.Param = s_cnt++;
                 ((EventingService)m_hostedService).IntegerEvent(eventReq);
                 System.Ext.Console.Write("");
-                System.Ext.Console.Write("FireEvent called IntegerEvent!!!");
+                System.Ext.Console.Write("FireEvent called IntegerEvent!!! " + eventReq.Param.ToString());
                 System.Ext.Console.Write("");
             }
             catch (Exception e)

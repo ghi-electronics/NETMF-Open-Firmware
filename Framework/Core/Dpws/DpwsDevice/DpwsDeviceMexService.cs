@@ -55,7 +55,8 @@ namespace Dpws.Device.Mex
             // DPWS 1.1 spec: R0031:  A SERVICE MUST NOT generate a wsa:InvalidAddressingHeader SOAP Fault 
             // [WS-Addressing SOAP Binding] if the [address] of the [reply endpoint] of an HTTP Request 
             // Message SOAP ENVELOPE is "http://www.w3.org/2005/08/addressing/anonymous".
-            if (header.ReplyTo != null && header.ReplyTo.Address.AbsoluteUri != m_version.AnonymousRoleUri)
+            if (header.ReplyTo != null && header.ReplyTo.Address.AbsoluteUri != m_version.AnonymousUri && 
+                header.ReplyTo.Address.AbsoluteUri != m_version.AnonymousRoleUri)
             {
                 throw new WsFaultException(header, WsFaultType.WsaInvalidMessageInformationHeader, "R0031");
             }

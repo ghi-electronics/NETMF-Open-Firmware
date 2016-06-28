@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>SimpleHeap</AssemblyName>
     <Size>
@@ -25,7 +26,8 @@
     <Documentation>
     </Documentation>
     <PlatformIndependent>False</PlatformIndependent>
-    <Required>False</Required><!--Required for TinyBooter, and CLR projects using Graphics, but otherwise not required.-->
+    <Required>False</Required>
+    <!--Required for TinyBooter, and CLR projects using Graphics, but otherwise not required.-->
     <IgnoreDefaultLibPath>False</IgnoreDefaultLibPath>
     <IsStub>False</IsStub>
     <Directory>DeviceCode\pal\SimpleHeap</Directory>
@@ -35,12 +37,11 @@
   </PropertyGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
   <ItemGroup>
-    <SubDirectories Include="Stubs"/>
+    <SubDirectories Include="Stubs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="SimpleHeap.cpp" />
     <IncludePaths Include="DeviceCode\include" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

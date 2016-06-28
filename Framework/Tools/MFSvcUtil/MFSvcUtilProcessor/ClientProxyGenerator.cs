@@ -174,6 +174,37 @@ namespace Ws.SvcUtilCodeGen
                 }
             }
 
+            if(hasEvents)
+            {
+                constructor.Statements.Add(new CodeSnippetStatement(""));
+                constructor.Statements.Add(new CodeCommentStatement("Add eventing SubscriptionEnd ServiceOperations. By default Subscription End call back to this client"));
+
+                // Generated Code: ServiceOperations.Add(new WsServiceOperation("WsWellKnownUri.WseNamespaceUri", "SubscriptionEnd"));
+                constructor.Statements.Add(
+                    new CodeMethodInvokeExpression(
+                        new CodeVariableReferenceExpression("ServiceOperations"),
+                        "Add",
+                        new CodeObjectCreateExpression(
+                            "WsServiceOperation",
+                            new CodeExpression[] {
+                                new CodeFieldReferenceExpression(new CodeVariableReferenceExpression("WsWellKnownUri"), "WseNamespaceUri"),
+                                new CodePrimitiveExpression("SubscriptionEnd")
+                            }
+                        )
+                    )
+                );
+
+                constructor.Statements.Add(new CodeSnippetStatement(""));
+
+                // Generated Code: this.StartEventHandlers();
+                constructor.Statements.Add(
+                    new CodeMethodInvokeExpression(
+                        new CodeThisReferenceExpression(),
+                        "StartEventListeners"
+                    )
+                );            
+            }
+
             return constructor;
         }
 
@@ -282,6 +313,28 @@ namespace Ws.SvcUtilCodeGen
                     )
                 );
             }
+            
+            // Add request.Reader.Dispose() method call
+            codeMethod.Statements.Add( 
+                new CodeMethodInvokeExpression(
+                    new CodeFieldReferenceExpression( 
+                        new CodeVariableReferenceExpression("request"), 
+                        "Reader"
+                    ),
+                    "Dispose", new CodeExpression[] { }
+                )
+            );
+
+            // reqest.Reader = null;
+            codeMethod.Statements.Add(
+                new CodeAssignStatement(
+                    new CodeFieldReferenceExpression( 
+                        new CodeVariableReferenceExpression("request"), 
+                        "Reader"
+                    ),
+                    new CodePrimitiveExpression(null)
+                )
+            );
 
             codeMethod.Statements.Add(new CodeSnippetStatement(""));
             codeMethod.Statements.Add(new CodeCommentStatement("Call service operation to process request."));
@@ -313,8 +366,15 @@ namespace Ws.SvcUtilCodeGen
             }
 
             codeMethod.Statements.Add(new CodeSnippetStatement(""));
-            codeMethod.Statements.Add(new CodeCommentStatement("Return null response for event callback messages"));
-            codeMethod.Statements.Add(new CodeMethodReturnStatement(new CodePrimitiveExpression(null)));
+            codeMethod.Statements.Add(new CodeCommentStatement("Return OneWayResponse message for event callback messages"));
+            codeMethod.Statements.Add(
+                new CodeMethodReturnStatement(
+                    new CodeMethodInvokeExpression(
+                        new CodeVariableReferenceExpression("WsMessage"),
+                        "CreateOneWayResponse"
+                )
+                )
+            );
             return codeMethod;
         }
 
@@ -742,6 +802,29 @@ namespace Ws.SvcUtilCodeGen
                             )
                         )
                     );
+
+                    // Add response.Reader.Dispose() method call
+                    codeMethod.Statements.Add( 
+                        new CodeMethodInvokeExpression(
+                            new CodeFieldReferenceExpression( 
+                                new CodeVariableReferenceExpression("response"), 
+                                "Reader"
+                            ),
+                            "Dispose", new CodeExpression[] { }
+                        )
+                    );
+
+                    // reqest.Reader = null;
+                    codeMethod.Statements.Add(
+                        new CodeAssignStatement(
+                            new CodeFieldReferenceExpression( 
+                                new CodeVariableReferenceExpression("response"), 
+                                "Reader"
+                            ),
+                            new CodePrimitiveExpression(null)
+                        )
+                    );
+                                
                     // return resp;
                     codeMethod.Statements.Add(
                         new CodeMethodReturnStatement(

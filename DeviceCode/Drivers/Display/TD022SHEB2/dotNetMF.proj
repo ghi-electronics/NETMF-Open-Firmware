@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>TD022SHEB2</AssemblyName>
     <ProjectGuid>{eac50a10-364f-489e-a9a3-6b0a3c740c4d}</ProjectGuid>
@@ -43,6 +44,8 @@
     <Compile Include="TD022SHEB2_driver.cpp" />
     <Compile Include="TD022SHEB2_functions.cpp" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="td022sheb2.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

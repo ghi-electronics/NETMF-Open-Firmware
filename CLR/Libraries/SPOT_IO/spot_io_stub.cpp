@@ -4,7 +4,7 @@
 
 #include "spot_io.h"
 
-HRESULT Library_spot_io_native_Microsoft_SPOT_IO_NativeIO::Format___STATIC__VOID__STRING__STRING__U4( CLR_RT_StackFrame& stack )
+HRESULT Library_spot_io_native_Microsoft_SPOT_IO_NativeIO::Format___STATIC__VOID__STRING__STRING__STRING__U4( CLR_RT_StackFrame& stack )
 {
     TINYCLR_HEADER();
 

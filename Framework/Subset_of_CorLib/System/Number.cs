@@ -289,7 +289,7 @@ namespace System
 
             if (isInteger)
             {
-                return PostProcessInteger(result, formatCh, precision, info);
+                return PostProcessInteger(value, result, formatCh, precision, info);
             }
             else
             {
@@ -324,7 +324,7 @@ namespace System
             {
                 ushort digit;
 
-                if (formatLen > 3)
+                if (formatLen > 4)
                 {
                     // Invalid Format
                     throw new ArgumentException();
@@ -348,6 +348,7 @@ namespace System
             {
                 case 'G':
                     break;
+                case 'X':
                 case 'F':
                 case 'N':
                     if (formatLen == 1) precision = 2; // if no precision is specified, use the default
@@ -357,12 +358,35 @@ namespace System
             }
         }
 
-        private static String PostProcessInteger(String original, char format, int precision, NumberFormatInfo info)
+        private static String PostProcessInteger(Object value, String original, char format, int precision, NumberFormatInfo info)
         {
             String result = original;
 
             switch (format)
             {
+                case 'X':
+                    // truncate negative numbers to 
+                    if (result.Length > precision && (result[0] == 'F' || result[0] == 'f'))
+                    {
+                        int len = result.Length;
+
+                        if(value is sbyte)
+                        {
+                            if (len > 2)
+                            {
+                                result = result.Substring(len - 2, 2);
+                            }
+                        }
+                        else if (value is short)
+                        {
+                            if (len > 4)
+                            {
+                                result = result.Substring(len - 4, 4);
+                            }
+                        }
+                    }
+                    break;
+                
                 case 'N':
                     // InsertGroupSeperators, AppendTrailingZeros, ReplaceNegativeSign
                     result = InsertGroupSeperators(result, info);

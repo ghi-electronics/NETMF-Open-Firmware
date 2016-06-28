@@ -60,7 +60,12 @@
 #define HEADER_MD4_H
 
 #include <openssl/e_os2.h>
+
+#ifndef OPENSSL_SYS_WINDOWS
+#include <tinyclr/ssl_types.h>
+#else
 #include <stddef.h>
+#endif
 
 #ifdef  __cplusplus
 extern "C" {

@@ -57,7 +57,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <MiscFlags Condition="'$(PLATFORM_EMULATED_FLOATINGPOINT)'=='true'"  >$(MiscFlags) /D PLATFORM_EMULATED_FLOATINGPOINT=TRUE </MiscFlags>
+    <MiscFlags >$(MiscFlags) @(TinyCLR_Defines->'/D %(filename)',' ')</MiscFlags>
+    <MiscFlags >$(MiscFlags) @(CC_CPP_Defines->'/D %(filename)',' ')</MiscFlags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
@@ -129,7 +130,7 @@
     <IncrFlag Condition="'$(IncrFlag)'==''">false</IncrFlag>
 <!--    <LinkOptFlags Condition="'$(Configuration)'!='Debug'"> /OPT:REF /OPT:ICF</LinkOptFlags> EXCESS DEBUG OUTPUT -->
 
-    <SIGNING_KEY_FILE Condition="'$(PORT_BUILD)'=='' And '$(SIGNING_KEY_FILE)'==''">$(SPOCLIENT)\Framework\key.snk</SIGNING_KEY_FILE>
+    <SIGNING_KEY_FILE Condition="EXISTS('$(SPOCLIENT)\Framework\key.snk') And '$(SIGNING_KEY_FILE)'==''">$(SPOCLIENT)\Framework\key.snk</SIGNING_KEY_FILE>
     <DelaySign>false</DelaySign>
     <DelaySign Condition="'$(SIGNING_KEY_FILE)'!=''">true</DelaySign>
   </PropertyGroup>
@@ -148,7 +149,7 @@
     Inputs="@(CFiles);@(HFiles)"
     Outputs="@(CFiles->'$(OBJ_DIR)\%(filename).obj')"
     >
-    <VSCompileC InputFiles="@(CFiles)" OutputPath="$(OBJ_DIR)" Flags="$(CFlags) /TC" IncludePaths="@(IncludeDirs)"/>
+    <VSCompileC InputFiles="@(CFiles)" HeaderFiles="@(HFiles)" OutputPath="$(OBJ_DIR)" Flags="$(CFlags) /TC" IncludePaths="@(IncludeDirs)"/>
   </Target>
 
 
@@ -157,7 +158,7 @@
     Inputs="@(CPPFiles);@(HFiles)"
     Outputs="@(CPPFiles->'$(OBJ_DIR)\%(filename).obj')"
     >
-    <VSCompileC InputFiles="@(CPPFiles)" OutputPath="$(OBJ_DIR)" Flags="$(CFlags) /TP" IncludePaths="@(IncludeDirs)"/>
+    <VSCompileC InputFiles="@(CPPFiles)" HeaderFiles="@(HFiles)" OutputPath="$(OBJ_DIR)" Flags="$(CFlags) /TP" IncludePaths="@(IncludeDirs)"/>
   </Target>
 
 
@@ -189,12 +190,12 @@
 
   <Target Name="W32BuildLib"
     DependsOnTargets="W32CompileC;W32CompileCPP;CreateLibManifest"
-    Inputs="@(ObjFiles)"
+    Inputs="@(ObjFiles);@(DriverLibs->'$(LIB_DIR)\%(FileName)%(Extension)')"
     Outputs="$(TargetFile);@(TargetLib->'%(FullPath).manifest')"
     >
     <VSLinkLibTask
           OUT="$(TargetFile)"
-          OBJFILES="@(ObjFiles)"
+          OBJFILES="@(ObjFiles);@(DriverLibs->'$(LIB_DIR)\%(FileName)%(Extension)', ' ')"
           DEBUG="false"
           />
   </Target>

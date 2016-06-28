@@ -2,6 +2,7 @@ using System;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Net.Security;
 using Microsoft.SPOT.Platform.Test;
+using System.Security.Cryptography.X509Certificates;
 
 
 namespace Microsoft.SPOT.Platform.Tests
@@ -21,7 +22,7 @@ namespace Microsoft.SPOT.Platform.Tests
                 return InitializeResult.Skip;
             }
             
-            CertificateStore.ClearAllCertificates();
+            //CertificateStore.ClearAllCertificates();
 
             return InitializeResult.ReadyToGo; 
         }
@@ -31,7 +32,7 @@ namespace Microsoft.SPOT.Platform.Tests
         {
             Log.Comment("Cleaning up after the tests.");
 
-            CertificateStore.ClearAllCertificates();
+            //CertificateStore.ClearAllCertificates();
         }
 
         [TestMethod]

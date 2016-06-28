@@ -289,6 +289,16 @@ struct TINYCLR_SSL_TIMEVAL* dtls1_get_timeout(SSL *s, struct TINYCLR_SSL_TIMEVAL
 		timeleft->tv_usec += 1000000;
 		}
 
+	/* If remaining time is less than 15 ms, set it to 0
+	 * to prevent issues because of small devergences with
+	 * socket timeouts.
+	 */
+	if (timeleft->tv_sec == 0 && timeleft->tv_usec < 15000)
+		{
+		TINYCLR_SSL_MEMSET(timeleft, 0, sizeof(TINYCLR_SSL_TIMEVAL));
+		}
+	
+
 	return timeleft;
 	}
 

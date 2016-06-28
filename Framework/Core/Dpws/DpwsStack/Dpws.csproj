@@ -25,7 +25,7 @@
     <Compile Include="WsServicesSerialization.cs" />
     <Compile Include="WsSoapHeader.cs" />
     <Compile Include="WsSoapDispatcher.cs" />
-    <Compile Include="WsTranportUtilities.cs" />
+    <Compile Include="WsTransportUtilities.cs" />
     <Compile Include="WsUdpServer.cs" />
     <Compile Include="WsUtilities.cs" />
     <Compile Include="WsWsaEndpointRef.cs" />

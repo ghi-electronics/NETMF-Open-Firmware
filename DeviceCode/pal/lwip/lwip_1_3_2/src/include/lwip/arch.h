@@ -54,11 +54,11 @@ extern "C" {
 #endif
 
 #ifndef PACK_STRUCT_BEGIN
-#define PACK_STRUCT_BEGIN
+#define PACK_STRUCT_BEGIN _Pragma("pack(1)")
 #endif /* PACK_STRUCT_BEGIN */
 
 #ifndef PACK_STRUCT_END
-#define PACK_STRUCT_END
+#define PACK_STRUCT_END   _Pragma("pack()")
 #endif /* PACK_STRUCT_END */
 
 #ifndef PACK_STRUCT_FIELD

@@ -1,7 +1,8 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>TSC2046</AssemblyName>
-    <ProjectGuid>{44C8456D-808C-4678-9163-A37BACF0E4F8}</ProjectGuid>
+    <ProjectGuid>{BDA61DFD-FEA4-4E4C-92B0-CD22A5B686A8}</ProjectGuid>
     <Size>
     </Size>
     <Description>TSC2046 touch panel driver</Description>
@@ -44,6 +45,8 @@
     <Compile Include="tsc2046_driver.cpp" />
     <Compile Include="tsc2046_functions.cpp" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="tsc2046_driver.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

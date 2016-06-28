@@ -27,8 +27,8 @@ HRESULT Library_spot_Time_native_Microsoft_SPOT_Time_TimeService::get_Settings__
     managedSettings[ ManagedSettings::FIELD__AlternateServerIP   ].SetInteger( settings.AlternateServerIP );
     managedSettings[ ManagedSettings::FIELD__RefreshTime         ].SetInteger( settings.RefreshTime );
     managedSettings[ ManagedSettings::FIELD__Tolerance           ].SetInteger( settings.Tolerance );
-    managedSettings[ ManagedSettings::FIELD__ForceSyncAtWakeUp   ].SetBoolean( settings.Flags & TimeService_Settings_Flags_ForceSyncAtWakeUp );
-    managedSettings[ ManagedSettings::FIELD__AutoDayLightSavings ].SetBoolean( settings.Flags & TimeService_Settings_Flags_AutoDST );
+    managedSettings[ ManagedSettings::FIELD__ForceSyncAtWakeUp   ].SetBoolean( 0 != (settings.Flags & TimeService_Settings_Flags_ForceSyncAtWakeUp) );
+    managedSettings[ ManagedSettings::FIELD__AutoDayLightSavings ].SetBoolean( 0 != (settings.Flags & TimeService_Settings_Flags_AutoDST) );
 
     TINYCLR_NOCLEANUP();
 }
@@ -82,8 +82,13 @@ HRESULT Library_spot_Time_native_Microsoft_SPOT_Time_TimeService::Update___STATI
 
     TimeService_Status status;
 
-    TINYCLR_CHECK_HRESULT(TimeService_Update( serverIP, tolerance, &status ));
+    hr = TimeService_Update( serverIP, tolerance, &status );
 
+    if(hr == CLR_E_RESCHEDULE) 
+    {
+        TINYCLR_LEAVE();
+    }
+    else 
     {
         CLR_RT_HeapBlock& top = stack.PushValueAndClear();
 
@@ -108,6 +113,7 @@ HRESULT Library_spot_Time_native_Microsoft_SPOT_Time_TimeService::Update___STATI
         case CLR_E_TIMEOUT:
         case CLR_E_FAIL:
         default:
+            // swallow error
             hr = S_OK; 
             break;
     }
@@ -172,7 +178,7 @@ HRESULT Library_spot_Time_native_System_Environment::get_TickCount___STATIC__I4 
 {
     TINYCLR_HEADER(); 
 
-    stack.SetResult_I4( Time_GetTickCount() );
+    stack.SetResult_I4( (CLR_INT32)Time_GetTickCount() );
 
     TINYCLR_NOCLEANUP_NOLABEL();
 }

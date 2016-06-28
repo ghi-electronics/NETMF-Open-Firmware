@@ -64,7 +64,7 @@ const char *LP_find_file(LP_DIR_CTX **ctx, const char *directory)
   errno = 0;
   if (*ctx == NULL)
     {
-      *ctx = (LP_DIR_CTX *)malloc(sizeof(LP_DIR_CTX));
+      *ctx = (LP_DIR_CTX *)OPENSSL_malloc(sizeof(LP_DIR_CTX));
       if (*ctx == NULL)
 	{
 	  errno = ENOMEM;
@@ -78,10 +78,10 @@ const char *LP_find_file(LP_DIR_CTX **ctx, const char *directory)
 	  /* len_0 denotes string length *with* trailing 0 */ 
 	  size_t index = 0,len_0 = TINYCLR_SSL_STRLEN(directory) + 1;
 
-	  wdir = (TCHAR *)malloc(len_0 * sizeof(TCHAR));
+	  wdir = (TCHAR *)OPENSSL_malloc(len_0 * sizeof(TCHAR));
 	  if (wdir == NULL)
 	    {
-	      free(*ctx);
+	      OPENSSL_free(*ctx);
 	      *ctx = NULL;
 	      errno = ENOMEM;
 	      return 0;
@@ -95,14 +95,14 @@ const char *LP_find_file(LP_DIR_CTX **ctx, const char *directory)
 
 	  (*ctx)->handle = FindFirstFile(wdir, &(*ctx)->ctx);
 
-	  free(wdir);
+	  OPENSSL_free(wdir);
 	}
       else
 	(*ctx)->handle = FindFirstFile((TCHAR *)directory, &(*ctx)->ctx);
 
       if ((*ctx)->handle == INVALID_HANDLE_VALUE)
 	{
-	  free(*ctx);
+	  OPENSSL_free(*ctx);
 	  *ctx = NULL;
 	  errno = EINVAL;
 	  return 0;
@@ -145,7 +145,7 @@ int LP_find_file_end(LP_DIR_CTX **ctx)
   if (ctx != NULL && *ctx != NULL)
     {
       FindClose((*ctx)->handle);
-      free(*ctx);
+      OPENSSL_free(*ctx);
       *ctx = NULL;
       return 1;
     }

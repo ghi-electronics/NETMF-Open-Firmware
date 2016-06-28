@@ -89,6 +89,8 @@ namespace schemas.example.org.SimpleService
             respDcs = new TwoWayResponseDataContractSerializer("TwoWayResponse", "http://schemas.example.org/SimpleService");
             TwoWayResponse resp;
             resp = ((TwoWayResponse)(respDcs.ReadObject(response.Reader)));
+            response.Reader.Dispose();
+            response.Reader = null;
             return resp;
         }
         
@@ -119,6 +121,8 @@ namespace schemas.example.org.SimpleService
             respDcs = new TypeCheckResponseDataContractSerializer("TypeCheckResponse", "http://schemas.example.org/SimpleService");
             TypeCheckResponse resp;
             resp = ((TypeCheckResponse)(respDcs.ReadObject(response.Reader)));
+            response.Reader.Dispose();
+            response.Reader = null;
             return resp;
         }
         
@@ -149,6 +153,8 @@ namespace schemas.example.org.SimpleService
             respDcs = new AnyCheckResponseDataContractSerializer("AnyCheckResponse", "http://schemas.example.org/SimpleService");
             AnyCheckResponse resp;
             resp = ((AnyCheckResponse)(respDcs.ReadObject(response.Reader)));
+            response.Reader.Dispose();
+            response.Reader = null;
             return resp;
         }
     }

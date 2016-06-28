@@ -16,6 +16,7 @@ namespace Microsoft.SPOT.Emulator.Time
         long CurrentTime();
         void SetCompare(ulong CompareValue);
         void Sleep_MicroSeconds(uint uSec);
+        void Sleep_MicroSecondsInterruptsEnabled(uint uSec);
         long MicrosecondsToTicks(long ms);
         uint SystemClock { get; }
         uint TicksPerSecond { get; }
@@ -25,6 +26,7 @@ namespace Microsoft.SPOT.Emulator.Time
         void EnqueueContinuation( IntPtr Continuation );
         void AbortContinuation( IntPtr Continuation );
         bool DequeueAndExecuteContinuation();
+        bool IsLinked(IntPtr Continuation);
 
         bool IsExecutionPaused { set; }
     }

@@ -11,6 +11,7 @@
     <IsSolutionWizardVisible>True</IsSolutionWizardVisible>
     <ENDIANNESS>le</ENDIANNESS>
     <IntelHexFormat>true</IntelHexFormat>
+    <TCP_IP_STACK Condition="'$(TCP_IP_STACK)'==''">RTIP</TCP_IP_STACK>
   </PropertyGroup>
   <ItemGroup>
     <IncludePaths Include="Solutions\EA_LPC2478" />

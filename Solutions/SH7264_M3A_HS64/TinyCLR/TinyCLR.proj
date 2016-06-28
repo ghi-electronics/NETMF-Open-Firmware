@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>tinyclr</AssemblyName>
@@ -16,47 +17,38 @@
     <MFSettingsFile>$(SPOCLIENT)\Solutions\SH7264_M3A_HS64\SH7264_M3A_HS64.settings</MFSettingsFile>
     <IsSolutionWizardVisible>True</IsSolutionWizardVisible>
   </PropertyGroup>
-
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
   <!-- no standard sh scatterfile, our own version of scatterfile  -->
   <Import Project="Scatterfile_definition.proj" />
-
   <Import Project="$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.Build.Targets" />
   <PropertyGroup>
     <OutputType>Executable</OutputType>
-
     <ADD_LOAD_IMAGE_CRC>true</ADD_LOAD_IMAGE_CRC>
-<!--
+    <!--
     <ExtraTargets>BuildSigFiles</ExtraTargets>
 -->
-
     <ExtraEXETargets>MetaDataProcessorDat;TinyClrDat</ExtraEXETargets>
     <ImageLocation Condition="'$(MEMORY)'=='FLASH'">\ER_FLASH</ImageLocation>
-
     <!-- this is the part to make the ER_DAT included in the final images -->
     <ExtraLinkFlags> -binary=$(BIN_DIR)\tinyclr.dat(ER_DATA_ADDR:4)</ExtraLinkFlags>
-
     <MMP_DAT_SKIP>false</MMP_DAT_SKIP>
     <MMP_DAT_CreateDatabaseFile>$(BIN_DIR)\tinyclr.dat</MMP_DAT_CreateDatabaseFile>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="tinyclr.cpp" />
-    <Compile Include="tinyclr_dat.cpp"/> 
-    <ExtraCleanFiles Include="$(OBJ_DIR)\tinyclr_dat.*"/>
+    <Compile Include="tinyclr_dat.cpp" />
+    <ExtraCleanFiles Include="$(OBJ_DIR)\tinyclr_dat.*" />
     <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2a\DeviceCode\bootstrap\intprg.c" />
     <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2a\DeviceCode\bootstrap\resetprg.c" />
     <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2a\DeviceCode\bootstrap\dbsct.c" />
     <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2a\DeviceCode\bootstrap\sbrk.c" />
-    <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2a\DeviceCode\bootstrap\vecttbl.c" /> 
+    <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2a\DeviceCode\bootstrap\vecttbl.c" />
   </ItemGroup>
-
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\hardware.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\NativeEventDispatcher.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\DataStorage.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\BlockStorage.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Crypto.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Debugger.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Diagnostics.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\InterruptHandler.featureproj" />
@@ -70,8 +62,15 @@
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\TimeService.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\Stream.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\FileSystem.featureproj" />
-
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Interop.Settings" />
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\MFUpdate\stubs\dotnetMF.proj" />
+    <DriverLibs Include="MFUpdate_PAL_stub.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\ssl\stubs\dotNetMF.proj" />
+    <DriverLibs Include="ssl_pal_stubs.$(LIB_EXT)" />
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Core\dotNetMF.proj" />
     <PlatformIndependentLibs Include="Core.$(LIB_EXT)" />
@@ -111,7 +110,7 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Diagnostics\dotNetMF_stub.proj" Condition="'$(FLAVOR)'=='rtm'" />
     <PlatformIndependentLibs Include="Diagnostics_stub.$(LIB_EXT)" Condition="'$(FLAVOR)'=='rtm'" />
-  </ItemGroup>  
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Graphics\dotNetMF.proj" />
     <PlatformIndependentLibs Include="Graphics.$(LIB_EXT)" />
@@ -135,10 +134,6 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Core\IOPort\dotNetMF.proj" />
     <PlatformIndependentLibs Include="IOPort.$(LIB_EXT)" />
-  </ItemGroup>
-  <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\CLR\Libraries\SPOT\SPOT_Crypto\dotNetMF_Stub.proj" />
-    <PlatformIndependentLibs Include="SPOT_Crypto_stub.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\CLR\Messaging\dotNetMF.proj" />
@@ -241,6 +236,10 @@
     <DriverLibs Include="COM_pal.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
+    <DriverLibs Include="DebuggerPort_SSL_config_stubs.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Config\dotnetmf.proj" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\USART\dotNetMF.proj" />
     <DriverLibs Include="usart_pal.$(LIB_EXT)" />
   </ItemGroup>
@@ -251,6 +250,10 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\USB\dotNetMF.proj" />
     <DriverLibs Include="usb_pal.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_DA\dotnetmf.proj" />
+    <DriverLibs Include="cpu_DA_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Stubs\Processor\stubs_usb\dotNetMF.proj" />
@@ -296,7 +299,7 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\SH7264\DeviceCode\BlockStorage\USB\dotNetMF.proj" />
     <DriverLibs Include="USB_BL_Driver.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup >
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\SH7264_M3A_HS64\DeviceCode\Blockstorage\addDevices\dotnetmf.proj" />
     <DriverLibs Include="BlockStorage_AddDevices_SH7264_M3A_HS64.$(LIB_EXT)" />
   </ItemGroup>
@@ -319,7 +322,7 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\SimpleHeap_config\dotNetMF.proj" />
     <DriverLibs Include="SimpleHeap_config.$(LIB_EXT)" />
-  </ItemGroup>  
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\SimpleHeap\dotNetMF.proj" />
     <DriverLibs Include="SimpleHeap.$(LIB_EXT)" />
@@ -335,7 +338,7 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\SH7264_M3A_HS64\DeviceCode\HWSetup\dotNetMF.proj" />
     <DriverLibs Include="SH7264_M3A_HS64_hwsetup.$(LIB_EXT)" />
-  </ItemGroup>  
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\Time\dotNetMF.proj" />
     <DriverLibs Include="Time_pal.$(LIB_EXT)" />
@@ -381,8 +384,8 @@
     <DriverLibs Include="SH7264_Timer.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\native\sh2A\DeviceCode\ConfigSector\dotnetmf.proj"/>
-    <DriverLibs  Include="SH2A_configsector.$(LIB_EXT)"/>     
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\native\sh2A\DeviceCode\ConfigSector\dotnetmf.proj" />
+    <DriverLibs Include="SH2A_configsector.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Display\TextFonts\Font8x8\dotNetMF.proj" />
@@ -391,7 +394,7 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\SH7264\DeviceCode\VDC3\dotNetMF.proj" />
     <DriverLibs Include="SH7264_VDC3.$(LIB_EXT)" />
-  </ItemGroup>    
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\SH7264_M3A_HS64\DeviceCode\Display\SH7264VDC3\dotnetmf.proj" />
     <DriverLibs Include="SH7264VDC3_config_SH7264_M3A_HS64.$(LIB_EXT)" />
@@ -421,10 +424,6 @@
     <DriverLibs Include="cpu_ebiu_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\drivers\stubs\processor\stubs_security\dotNetMF.proj" />
-    <DriverLibs Include="cpu_security_stubs.$(LIB_EXT)" />
-  </ItemGroup>
-  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\drivers\stubs\processor\stubs_spi\dotNetMF.proj" />
     <DriverLibs Include="cpu_spi_stubs.$(LIB_EXT)" />
   </ItemGroup>
@@ -449,9 +448,23 @@
     <DriverLibs Include="piezo_pal_stubs.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\stubs\Processor\stubs_PWM\dotnetmf.proj" />
+    <DriverLibs Include="cpu_pwm_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\stubs\Processor\stubs_analog\dotnetmf.proj" />
+    <DriverLibs Include="cpu_analog_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Buttons\dotNetMF.proj" />
     <DriverLibs Include="Buttons_pal.$(LIB_EXT)" />
   </ItemGroup>
-
+  <ItemGroup>
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Double\dotNetMF.proj" />
+    <DriverLibs Include="native_double_pal.$(LIB_EXT)" />
+  </ItemGroup>  
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_application.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

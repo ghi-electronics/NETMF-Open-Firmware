@@ -109,6 +109,8 @@ static ENGINE *ENGINE_padlock (void);
 # endif
 #endif
 
+#ifdef OPENSSL_NO_DYNAMIC_ENGINE
+
 void ENGINE_load_padlock (void)
 {
 /* On non-x86 CPUs it just returns. */
@@ -120,6 +122,8 @@ void ENGINE_load_padlock (void)
 	ERR_clear_error ();
 #endif
 }
+
+#endif
 
 #ifdef COMPILE_HW_PADLOCK
 /* We do these includes here to avoid header problems on platforms that
@@ -141,17 +145,7 @@ static int padlock_available(void);
 static int padlock_init(ENGINE *e);
 
 /* RNG Stuff */
-static int padlock_rand_status(void);
-static int padlock_rand_bytes(unsigned char *output, int count);
-/* Prepare structure for registration */
-static RAND_METHOD padlock_rand = {
-	NULL,			/* seed */
-	padlock_rand_bytes,	/* bytes */
-	NULL,			/* cleanup */
-	NULL,			/* add */
-	padlock_rand_bytes,	/* pseudorand */
-	padlock_rand_status,	/* rand status */
-};
+static RAND_METHOD padlock_rand;
 
 /* Cipher Stuff */
 #ifndef OPENSSL_NO_AES
@@ -1217,9 +1211,19 @@ padlock_rand_status(void)
 }
 
 /* Prepare structure for registration */
+static RAND_METHOD padlock_rand = {
+	NULL,			/* seed */
+	padlock_rand_bytes,	/* bytes */
+	NULL,			/* cleanup */
+	NULL,			/* add */
+	padlock_rand_bytes,	/* pseudorand */
+	padlock_rand_status,	/* rand status */
+};
 
 #else  /* !COMPILE_HW_PADLOCK */
 #ifndef OPENSSL_NO_DYNAMIC_ENGINE
+OPENSSL_EXPORT
+int bind_engine(ENGINE *e, const char *id, const dynamic_fns *fns);
 OPENSSL_EXPORT
 int bind_engine(ENGINE *e, const char *id, const dynamic_fns *fns) { return 0; }
 IMPLEMENT_DYNAMIC_CHECK_FN()

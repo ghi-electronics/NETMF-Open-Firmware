@@ -4,6 +4,7 @@
 #include "openssl.h"
 #include "e_os.h"   // from openssl
 #include <tinyclr/ssl_functions.h>
+#include <objects/objects.h>
 //--//
 
 #if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
@@ -42,22 +43,28 @@ void HAL_SOCK_SignalSocketThread()
 BOOL SSL_Initialize()
 {
     NATIVE_PROFILE_PAL_COM();
-    // TODO - temporarily delay init - return ssl_initialize_internal();
-    s_init_done = FALSE;
+
+    memset(&g_SSL_Driver, 0, sizeof(g_SSL_Driver));
+    
     return TRUE;
 }
 
 BOOL SSL_Uninitialize()
 {
     NATIVE_PROFILE_PAL_COM();
+    BOOL retVal;
+
+    retVal = ssl_uninitialize_internal();
+
     s_init_done = FALSE;
-    return ssl_uninitialize_internal();
+    
+    return retVal;
 }
 
-static BOOL SSL_GenericInit( INT32 sslMode, INT32 sslVerify, const char* certificate, INT32 cert_len, INT32& sslContextHandle, BOOL isServer )
+static BOOL SSL_GenericInit( INT32 sslMode, INT32 sslVerify, const char* certificate, INT32 cert_len, const char* pwd, INT32& sslContextHandle, BOOL isServer )
 {
     if (!s_init_done) s_init_done=ssl_initialize_internal();
-    return ssl_generic_init_internal( sslMode, sslVerify, certificate, cert_len, sslContextHandle, isServer );     
+    return ssl_generic_init_internal( sslMode, sslVerify, certificate, cert_len, pwd, sslContextHandle, isServer );     
 }
 
 void SSL_GetTime(DATE_TIME_INFO* pdt)
@@ -74,13 +81,13 @@ void SSL_RegisterTimeCallback(SSL_DATE_TIME_FUNC pfn)
 BOOL SSL_ServerInit( INT32 sslMode, INT32 sslVerify, const char* certificate, INT32 cert_len, const char* szCertPwd, INT32& sslContextHandle )
 {
     NATIVE_PROFILE_PAL_COM();
-    return SSL_GenericInit( sslMode, sslVerify, certificate, cert_len, sslContextHandle, TRUE );
+    return SSL_GenericInit( sslMode, sslVerify, certificate, cert_len, szCertPwd, sslContextHandle, TRUE );
 }
 
 BOOL SSL_ClientInit( INT32 sslMode, INT32 sslVerify, const char* certificate, INT32 cert_len, const char* szCertPwd, INT32& sslContextHandle )
 { 
     NATIVE_PROFILE_PAL_COM();
-    return SSL_GenericInit( sslMode, sslVerify, certificate, cert_len, sslContextHandle, FALSE );
+    return SSL_GenericInit( sslMode, sslVerify, certificate, cert_len, szCertPwd, sslContextHandle, FALSE );
 }
 
 BOOL SSL_AddCertificateAuthority( int sslContextHandle, const char* certificate, int cert_len, const char* szCertPwd )

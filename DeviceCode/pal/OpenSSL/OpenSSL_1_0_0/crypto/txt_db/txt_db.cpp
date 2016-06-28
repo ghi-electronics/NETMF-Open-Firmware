@@ -164,7 +164,7 @@ if ((ret->qual=(int (**)(OPENSSL_STRING *))OPENSSL_malloc(sizeof(*(ret->qual))*n
 		if ((n != num) || (*f != '\0'))
 			{
 #if !defined(OPENSSL_NO_STDIO) && !defined(OPENSSL_SYS_WIN16)	/* temporary fix :-( */
-			TINYCLR_SSL_PRINTF("wrong number of fields on line %ld (looking for field %d, got %d, '%s' left)\n",ln,num,n,f);
+			TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR,"wrong number of fields on line %ld (looking for field %d, got %d, '%s' left)\n",ln,num,n,f);
 #endif
 			er=2;
 			goto err;

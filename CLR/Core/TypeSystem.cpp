@@ -5,6 +5,7 @@
 #include "Core.h"
 
 #include "corhdr_private.h"
+#include <TinyCLR_Types.h> 
 #include <TinyCLR_Endian.h>
 
 
@@ -40,7 +41,7 @@ int s_CLR_RT_fTrace_Memory                     = TINYCLR_TRACE_DEFAULT(c_CLR_RT_
 #endif
 
 #if defined(TINYCLR_TRACE_MEMORY_STATS)
-int s_CLR_RT_fTrace_MemoryStats                = TINYCLR_TRACE_DEFAULT(c_CLR_RT_Trace_None,c_CLR_RT_Trace_Info);
+int s_CLR_RT_fTrace_MemoryStats                = TINYCLR_TRACE_DEFAULT(c_CLR_RT_Trace_Info,c_CLR_RT_Trace_Info);
 #endif
 
 #if defined(TINYCLR_GC_VERBOSE)
@@ -52,7 +53,7 @@ int s_CLR_RT_fTrace_SimulateSpeed              = TINYCLR_TRACE_DEFAULT(c_CLR_RT_
 #endif
 
 #if !defined(BUILD_RTM)
-int s_CLR_RT_fTrace_AssemblyOverhead           = TINYCLR_TRACE_DEFAULT(c_CLR_RT_Trace_None,c_CLR_RT_Trace_Info);
+int s_CLR_RT_fTrace_AssemblyOverhead           = TINYCLR_TRACE_DEFAULT(c_CLR_RT_Trace_Info,c_CLR_RT_Trace_None);
 #endif
 
 #if defined(TINYCLR_JITTER)
@@ -1648,8 +1649,10 @@ HRESULT CLR_RT_Assembly::CreateInstance( const CLR_RECORD_ASSEMBLY* header, CLR_
         }
 
         assm->Assembly_Initialize( offsets );
-
+        
 #if !defined(BUILD_RTM)
+        CLR_Debug::Printf( "   Assembly: %s (%d.%d.%d.%d)  ", assm->m_szName, header->version.iMajorVersion, header->version.iMinorVersion, header->version.iBuildNumber, header->version.iRevisionNumber );
+
         if(s_CLR_RT_fTrace_AssemblyOverhead >= c_CLR_RT_Trace_Info)
         {
             size_t iMetaData = header->SizeOfTable( TBL_AssemblyRef ) +
@@ -1663,7 +1666,6 @@ HRESULT CLR_RT_Assembly::CreateInstance( const CLR_RECORD_ASSEMBLY* header, CLR_
                                header->SizeOfTable( TBL_TypeSpec    ) +
                                header->SizeOfTable( TBL_Signatures  );
 
-            CLR_Debug::Printf( "Assembly: %s (%d.%d.%d.%d)", assm->m_szName, header->version.iMajorVersion, header->version.iMinorVersion, header->version.iBuildNumber, header->version.iRevisionNumber );
             CLR_Debug::Printf( " (%d RAM - %d ROM - %d METADATA)\r\n\r\n", iTotalRamSize, header->TotalSize(), iMetaData );
 
             CLR_Debug::Printf( "   AssemblyRef    = %8d bytes (%8d elements)\r\n", offsets.iAssemblyRef   , skeleton->m_pTablesSize[ TBL_AssemblyRef ] );
@@ -2722,6 +2724,14 @@ static const TypeIndexLookup c_TypeIndexLookup[] =
     TIL( "System.Xml"              , "XmlReader_XmlAttribute"        , m_XmlReader_XmlAttribute                             ),
     TIL( "System.Xml"              , "XmlReader_NamespaceEntry"      , m_XmlReader_NamespaceEntry                           ),
 
+    TIL( "System.Security.Cryptography", "CryptoKey"                 , m_CryptoKey                                          ),
+    TIL( "Microsoft.SPOT.Cryptoki"     , "CryptokiObject"            , m_CryptokiObject                                     ),
+    TIL( "Microsoft.SPOT.Cryptoki"     , "Session"                   , m_CryptokiSession                                    ),
+    TIL( "Microsoft.SPOT.Cryptoki"     , "Slot"                      , m_CryptokiSlot                                       ),
+    TIL( "Microsoft.SPOT.Cryptoki"     , "MechanismType"             , m_CryptokiMechanismType                              ),
+    TIL( "System.Security.Cryptography", "CryptographicException"    , m_CryptoException                                    ),
+    TIL( "Microsoft.SPOT.Cryptoki"     , "CryptokiCertificate"       , m_CryptokiCertificate                                ),
+
 #undef TIL
 };
 
@@ -2740,7 +2750,8 @@ static const MethodIndexLookup c_MethodIndexLookup[] =
 {
     #define MIL(nm,type,method) { nm, &g_CLR_RT_WellKnownTypes.type, &g_CLR_RT_WellKnownMethods.method }
 
-    MIL( "GetObjectFromId", m_ResourceManager, m_ResourceManager_GetObjectFromId ),
+    MIL( "GetObjectFromId"     , m_ResourceManager, m_ResourceManager_GetObjectFromId      ),
+    MIL( "GetObjectChunkFromId", m_ResourceManager, m_ResourceManager_GetObjectChunkFromId ),
 
     #undef MIL
 };

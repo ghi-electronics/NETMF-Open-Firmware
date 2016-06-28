@@ -13,6 +13,7 @@ namespace System.Net
     using System.Threading;
     using Microsoft.SPOT;
     using Microsoft.SPOT.Net.Security;
+    using System.Security.Cryptography.X509Certificates;
 
     /// <summary>
     /// This is the class that we use to create HTTP and requests.
@@ -1009,6 +1010,15 @@ namespace System.Net
             m_responseCreated = false;
         }
 
+        public void Reset()
+        {
+            m_requestSent = false;
+            m_responseCreated = false;
+            m_contentLength = -1;
+            m_httpWriteMode = HttpWriteMode.None;
+            m_httpRequestHeaders = new WebHeaderCollection(true);
+        }
+
         /// <summary>
         /// Gets whether a response has been received from an Internet resource.
         /// </summary>
@@ -1145,15 +1155,7 @@ namespace System.Net
         /// </summary>
         private void ValidateGetRequestStream()
         {
-            // InvalidOperationException The GetRequestStream method is called more than once.
-            // -or-
             // TransferEncoding is set to a value and SendChunked is false.
-
-            if (m_requestStream != null)
-            {
-                throw new InvalidOperationException();
-            }
-
             if (TransferEncoding != null && SendChunked == false)
             {
                 throw new InvalidOperationException();
@@ -1242,7 +1244,7 @@ namespace System.Net
 
                 // Encode user info.
                 byte[] buffer = Encoding.UTF8.GetBytes(userInfo);
-                string userNameAndPassEncoded = ConvertBase64.ToBase64String(buffer);
+                string userNameAndPassEncoded = buffer != null ? Convert.ToBase64String(buffer) : "";
                 string authValue = "Basic " + userNameAndPassEncoded;
                 m_httpRequestHeaders.ChangeInternal(HttpKnownHeaderNames.Authorization, authValue);
             }
@@ -1431,7 +1433,7 @@ namespace System.Net
                     SslStream sslStream = new SslStream(retStream.m_Socket);
 
                     // Throws exception is fails.
-                    sslStream.AuthenticateAsClient(m_originalUrl.Host, null, m_caCerts, m_caCerts != null ? SslVerification.CertificateRequired : SslVerification.NoVerification, SslProtocols.Default);
+                    sslStream.AuthenticateAsClient(m_originalUrl.Host, null, m_caCerts, SslVerification.CertificateRequired, SslProtocols.Default);
 
                     // Changes the stream to SSL stream.
                     retStream.m_Stream = sslStream;
@@ -1462,23 +1464,27 @@ namespace System.Net
         {
             // We have connected socket. Create request stream
             // If proxy is set - connect to proxy server.
-            if (m_proxy == null)
-            {   // Direct connection to target server.
-                m_requestStream = EstablishConnection(m_originalUrl, m_originalUrl);
-            }
-            else // Connection through proxy. We create network stream connected to proxy
-            {
-                Uri proxyUri = m_proxy.GetProxy(m_originalUrl);
 
-                if (m_originalUrl.Scheme == "https")
-                {
-                    // For HTTPs we still need to know the target name to decide on persistent connection.
-                    m_requestStream = EstablishConnection(proxyUri, m_originalUrl);
+            if(m_requestStream == null)
+            {
+                if (m_proxy == null)
+                {   // Direct connection to target server.
+                    m_requestStream = EstablishConnection(m_originalUrl, m_originalUrl);
                 }
-                else
+                else // Connection through proxy. We create network stream connected to proxy
                 {
-                    // For normal HTTP all requests go to proxy
-                    m_requestStream = EstablishConnection(proxyUri, proxyUri);
+                    Uri proxyUri = m_proxy.GetProxy(m_originalUrl);
+
+                    if (m_originalUrl.Scheme == "https")
+                    {
+                        // For HTTPs we still need to know the target name to decide on persistent connection.
+                        m_requestStream = EstablishConnection(proxyUri, m_originalUrl);
+                    }
+                    else
+                    {
+                        // For normal HTTP all requests go to proxy
+                        m_requestStream = EstablishConnection(proxyUri, proxyUri);
+                    }
                 }
             }
 

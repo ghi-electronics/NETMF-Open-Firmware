@@ -642,7 +642,7 @@ static LHASH_OF(FUNCTION) *prog_init(void)
 	/* Purely so it looks nice when the user hits ? */
 	for(i=0,f=functions ; f->name != NULL ; ++f,++i)
 	    ;
-	qsort(functions,i,sizeof *functions,SortFnByName);
+	TINYCLR_SSL_QSORT(functions,i,sizeof *functions,SortFnByName);
 
 	if ((ret=lh_FUNCTION_new()) == NULL)
 		return(NULL);

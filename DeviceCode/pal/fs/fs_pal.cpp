@@ -206,7 +206,7 @@ void FS_UnmountVolume( BlockStorageDevice* blockStorageDevice )
 
 void FS_Initialize()
 {
-    for(int i = 0; i < g_InstalledFSCount; i++)
+    for(UINT32 i = 0; i < g_InstalledFSCount; i++)
     {
         g_AvailableFSInterfaces[i].streamDriver->Initialize();
     }
@@ -240,7 +240,14 @@ BOOL FileSystemVolumeList::InitializeVolumes()
     
     while(volume->Next())
     {
-        success = volume->InitializeVolume() && success; // even if success == FALSE, InitalizeVolume() will still get called
+        if(volume->InitializeVolume())
+        {
+            volume->m_fsDriver->GetVolumeLabel(&volume->m_volumeId, volume->m_label, ARRAYSIZE(volume->m_label));
+        }
+        else
+        {
+            success = FALSE; // even if success == FALSE, InitalizeVolume() will still get called
+        }
 
         volume = volume->Next();
     }
@@ -300,7 +307,7 @@ BOOL FileSystemVolumeList::AddVolume( FileSystemVolume* fsv, LPCSTR nameSpace, U
         current = FileSystemVolumeList::GetFirstVolume();
         while (current)
         {
-            if(0 == hal_strncmp_s( current->m_nameSpace, nextName.nextAvailableName, FS_NAME_DEFAULT_LENGTH ))
+            if(0 == hal_stricmp( current->m_nameSpace, nextName.nextAvailableName ))
             {
                 nameOK = false;
                 break;
@@ -315,8 +322,6 @@ BOOL FileSystemVolumeList::AddVolume( FileSystemVolume* fsv, LPCSTR nameSpace, U
     // initialize the members of the FileSystemVolume
     memcpy( fsv->m_nameSpace, nextName.nextAvailableName, FS_NAME_MAXLENGTH );
 
-    fsv->m_label[0] = 0;
-
     fsv->m_serialNumber                = serialNumber;
     fsv->m_deviceFlags                 = deviceFlags;
     fsv->m_streamDriver                = streamDriver;
@@ -329,6 +334,12 @@ BOOL FileSystemVolumeList::AddVolume( FileSystemVolume* fsv, LPCSTR nameSpace, U
     if(init)
     {
         success = fsv->InitializeVolume();
+
+        fsDriver->GetVolumeLabel(&fsv->m_volumeId, fsv->m_label, ARRAYSIZE(fsv->m_label));
+    }
+    else
+    {
+        fsv->m_label[0] = 0;
     }
 
     // only add the volume if initialization was successful, when requested at all
@@ -383,10 +394,14 @@ UINT32 FileSystemVolumeList::GetNumVolumes()
 FileSystemVolume* FileSystemVolumeList::FindVolume( LPCSTR nameSpace, UINT32 nameSpaceLength )
 {
     FileSystemVolume* volume = GetFirstVolume();
+    char ns[FS_NAME_MAXLENGTH];
+
+    memcpy(ns, nameSpace, nameSpaceLength);
+    ns[nameSpaceLength] = 0;
 
     while(volume)
     {
-        if(hal_strncmp_s( volume->m_nameSpace, nameSpace, nameSpaceLength ) == 0)
+        if(hal_stricmp( volume->m_nameSpace, ns ) == 0)
         {
             // Make sure we match the entire namespace string by checking for null terminator
             // In case nameSpace is a substring of m_nameSpace (i.e. nameSpace = "ROOT", m_nameSpace == "ROOT1")

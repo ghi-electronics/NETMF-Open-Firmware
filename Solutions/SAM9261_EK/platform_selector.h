@@ -25,6 +25,8 @@
 // constants, measured main clock = 18434048
 //
 
+#define PLATFORM_DEPENDENT__UPDATE_SIGNATURE_SIZE 256
+
 // system cycle clock hz = main clock (18434048) * (MULA + 1) (1085) / DIVA (100)
 #define SYSTEM_CYCLE_CLOCK_HZ           200009421  
 #define SYSTEM_PERIPHERAL_CLOCK_HZ      (SYSTEM_CYCLE_CLOCK_HZ / 2)

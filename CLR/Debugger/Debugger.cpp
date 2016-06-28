@@ -4,6 +4,7 @@
 
 #include "..\core\Core.h"
 #include <TinyCLR_Debugging.h>
+#include <MFUpdate_decl.h>
 
 #if defined(PLATFORM_WINDOWS)
 #pragma comment(lib,"crypto")
@@ -36,7 +37,9 @@ void CLR_DBG_Debugger::Debugger_Discovery()
 {
     NATIVE_PROFILE_CLR_DEBUGGER();
 
-    CLR_INT64 expire = Time_GetMachineTime() + (2 * TIME_CONVERSION__TO_SECONDS);
+    CLR_INT32 wait_sec = 5;
+
+    CLR_INT64 expire = Time_GetMachineTime() + (wait_sec * TIME_CONVERSION__TO_SECONDS);
 
     //
     // Send "presence" ping.
@@ -47,7 +50,13 @@ void CLR_DBG_Debugger::Debugger_Discovery()
 
     while(true)
     {
-        CLR_EE_DBG_EVENT_BROADCAST(CLR_DBG_Commands::c_Monitor_Ping, sizeof(cmd), &cmd, WP_Flags::c_NonCritical);
+        CLR_EE_DBG_EVENT_BROADCAST(CLR_DBG_Commands::c_Monitor_Ping, sizeof(cmd), &cmd, WP_Flags::c_NoCaching | WP_Flags::c_NonCritical);
+
+        // if we support soft reboot and the debugger is not stopped then we don't need to connect the debugger
+        if(!CLR_EE_DBG_IS(Stopped) && ::CPU_IsSoftRebootSupported())
+        {
+            break;
+        }
 
         g_CLR_RT_ExecutionEngine.DebuggerLoop();
 
@@ -117,6 +126,8 @@ HRESULT CLR_DBG_Debugger::CreateInstance()
     {
         m_deploymentStorageDevice = NULL;
     }
+
+    MFUpdate_Initialize();
 
     TINYCLR_NOCLEANUP();
 }
@@ -263,7 +274,22 @@ HRESULT CLR_DBG_Debugger::CreateListOfCalls( CLR_UINT32 pid, CLR_DBG_Commands::D
         {
             if(pass == 1)
             {
-                CLR_DBG_Commands::Debugging_Thread_Stack::Reply::Call& dst = cmdReply->m_data[ num ];
+                int tmp = num;
+                
+#ifndef TINYCLR_NO_IL_INLINE
+                if(call->m_inlineFrame)
+                {
+                    CLR_DBG_Commands::Debugging_Thread_Stack::Reply::Call& dst = cmdReply->m_data[ tmp++ ];
+                    
+                    dst.m_md =              call->m_inlineFrame->m_frame.m_call;
+                    dst.m_IP = (CLR_UINT32)(call->m_inlineFrame->m_frame.m_IP - call->m_inlineFrame->m_frame.m_IPStart);
+#if defined(TINYCLR_APPDOMAINS)
+                    dst.m_appDomainID = call->m_appDomain->m_id;
+                    dst.m_flags       = call->m_flags;
+#endif
+                }
+#endif
+                CLR_DBG_Commands::Debugging_Thread_Stack::Reply::Call& dst = cmdReply->m_data[ tmp ];
 
                 dst.m_md =              call->m_call;
                 dst.m_IP = (CLR_UINT32)(call->m_IP - call->m_IPstart);
@@ -281,6 +307,13 @@ HRESULT CLR_DBG_Debugger::CreateListOfCalls( CLR_UINT32 pid, CLR_DBG_Commands::D
                 dst.m_flags       = call->m_flags;
 #endif
             }
+
+#ifndef TINYCLR_NO_IL_INLINE
+            if(call->m_inlineFrame)
+            {
+                num++;
+            }
+#endif
 
             num++;
         }
@@ -455,6 +488,10 @@ bool CLR_DBG_Debugger::CheckPermission( ByteAddress address, int mode )
             hasPermission = true;
             break;
         case AccessMemory_Read:
+#if defined(BUILD_RTM)
+            if(!DebuggerPort_IsUsingSsl(HalSystemConfig.DebuggerPorts[ 0 ]))
+                break;
+#endif
             switch(range.RangeType)
             {
                 case BlockRange::BLOCKTYPE_CONFIG:         // fall through
@@ -463,25 +500,47 @@ bool CLR_DBG_Debugger::CheckPermission( ByteAddress address, int mode )
                 case BlockRange::BLOCKTYPE_FILESYSTEM:     // fall through
                 case BlockRange::BLOCKTYPE_STORAGE_A:      // fall through
                 case BlockRange::BLOCKTYPE_STORAGE_B:
+                case BlockRange::BLOCKTYPE_SIMPLE_A:
+                case BlockRange::BLOCKTYPE_SIMPLE_B:
+                case BlockRange::BLOCKTYPE_UPDATE:
 
                     hasPermission = true;
                     break;
             }
             break;
         case AccessMemory_Write:
+#if defined(BUILD_RTM)
+            if(!DebuggerPort_IsUsingSsl(HalSystemConfig.DebuggerPorts[ 0 ]))
+                break;
+#endif
             if(range.IsDeployment())
             {
                 hasPermission = true;
             }
+            else
+            {
+                hasPermission = DebuggerPort_IsUsingSsl(HalSystemConfig.DebuggerPorts[ 0 ]) == TRUE;
+            }
             break;
         case AccessMemory_Erase:
+#if defined(BUILD_RTM)
+            if(!DebuggerPort_IsUsingSsl(HalSystemConfig.DebuggerPorts[ 0 ]))
+                break;
+#endif
             switch(range.RangeType)
             {
                 case BlockRange::BLOCKTYPE_DEPLOYMENT:   // fall through
                 case BlockRange::BLOCKTYPE_FILESYSTEM:   // fall through
                 case BlockRange::BLOCKTYPE_STORAGE_A:    // fall through
                 case BlockRange::BLOCKTYPE_STORAGE_B:
+                case BlockRange::BLOCKTYPE_SIMPLE_A:
+                case BlockRange::BLOCKTYPE_SIMPLE_B:
+                case BlockRange::BLOCKTYPE_UPDATE:
                     hasPermission = true;
+                    break;
+
+                case BlockRange::BLOCKTYPE_CONFIG:         // fall through
+                    hasPermission = (bool)DebuggerPort_IsUsingSsl(HalSystemConfig.DebuggerPorts[ 0 ]);
                     break;
             }
             break;
@@ -750,6 +809,11 @@ bool CLR_DBG_Debugger::Monitor_Execute( WP_Message* msg, void* owner )
 
     CLR_DBG_Commands::Monitor_Execute* cmd = (CLR_DBG_Commands::Monitor_Execute*)msg->m_payload;
 
+#if defined(BUILD_RTM)
+    if(!DebuggerPort_IsUsingSsl(HalSystemConfig.DebuggerPorts[ 0 ]))
+        return false;
+#endif
+
     dbg->m_messaging->ReplyToCommand( msg, true, false );
 
     ((void (*)())(size_t)cmd->m_address)();
@@ -766,7 +830,8 @@ bool CLR_DBG_Debugger::Monitor_Reboot( WP_Message* msg, void* owner )
 #if defined(BUILD_RTM)
     if(COM_IsSock(dbg->m_messaging->m_port))
     {
-        return false;
+        if(!DebuggerPort_IsUsingSsl(HalSystemConfig.DebuggerPorts[ 0 ]))
+            return false;
     }
 #endif
 
@@ -884,21 +949,21 @@ MfReleaseInfo::Init( clrInfo.m_clrReleaseInfo, VERSION_MAJOR, VERSION_MINOR, VER
          g_CLR_RT_TypeSystem.m_assemblyMscorlib->m_header)
     {
         const CLR_RECORD_VERSION* mscorlibVer = & (g_CLR_RT_TypeSystem.m_assemblyMscorlib->m_header->version);
-        Version::Init(  clrInfo.m_TargetFrameworkVersion,
+        MFVersion::Init(  clrInfo.m_TargetFrameworkVersion,
                         mscorlibVer->iMajorVersion, mscorlibVer->iMinorVersion,
                         mscorlibVer->iBuildNumber, mscorlibVer->iRevisionNumber
                         );
     }
     else
     {
-        Version::Init( clrInfo.m_TargetFrameworkVersion, 0, 0, 0, 0 );
+        MFVersion::Init( clrInfo.m_TargetFrameworkVersion, 0, 0, 0, 0 );
     }
 }
 
 
 void MfReleaseInfo::Init(MfReleaseInfo& mfReleaseInfo, UINT16 major, UINT16 minor, UINT16 build, UINT16 revision, const char *info, size_t infoLen)
 {
-    Version::Init( mfReleaseInfo.version, major, minor, build, revision );
+    MFVersion::Init( mfReleaseInfo.version, major, minor, build, revision );
     mfReleaseInfo.infoString[ 0 ] = 0;
     if ( NULL != info && infoLen > 0 )
     {
@@ -1049,6 +1114,245 @@ bool CLR_DBG_Debugger::Debugging_Execution_Allocate( WP_Message* msg, void* owne
     dbg->m_messaging->ReplyToCommand( msg, true, false, &reply, sizeof(reply) );
 
     return true;
+}
+
+bool CLR_DBG_Debugger::Debugging_UpgradeToSsl(WP_Message* msg, void* owner )
+{
+    CLR_DBG_Debugger* dbg = (CLR_DBG_Debugger*)owner;
+    CLR_DBG_Commands::Debugging_UpgradeToSsl*       cmd = (CLR_DBG_Commands::Debugging_UpgradeToSsl*)msg->m_payload;
+    CLR_DBG_Commands::Debugging_UpgradeToSsl::Reply reply;
+
+    if(!DebuggerPort_IsSslSupported(HalSystemConfig.DebuggerPorts[0]))
+    {
+        return false;
+    }
+
+    reply.m_success = 1;
+
+    dbg->m_messaging->ReplyToCommand( msg, true, true, &reply, sizeof(reply) );
+
+    Events_WaitForEvents(0, 300);
+
+    return TRUE == DebuggerPort_UpgradeToSsl(HalSystemConfig.DebuggerPorts[0], cmd->m_flags);
+}
+
+static CLR_UINT32 s_missingPkts[64];
+
+bool CLR_DBG_Debugger::Debugging_MFUpdate_Start (WP_Message* msg, void* owner )
+{
+    NATIVE_PROFILE_CLR_DEBUGGER();
+    CLR_DBG_Debugger* dbg = (CLR_DBG_Debugger*)owner;
+    CLR_DBG_Commands::Debugging_MFUpdate_Start*       cmd = (CLR_DBG_Commands::Debugging_MFUpdate_Start*)msg->m_payload;
+    CLR_DBG_Commands::Debugging_MFUpdate_Start::Reply reply, *pReply;
+    CLR_INT32 replySize = sizeof(reply);
+    MFUpdateHeader header;
+
+    pReply = &reply;    
+
+    TINYCLR_CLEAR(header);
+
+    header.Version.usMajor = cmd->m_versionMajor;
+    header.Version.usMinor = cmd->m_versionMinor;
+    header.UpdateID        = cmd->m_updateId;
+    header.UpdateType      = cmd->m_updateType;
+    header.UpdateSubType   = cmd->m_updateSubType;
+    header.UpdateSize      = cmd->m_updateSize;
+    header.PacketSize      = cmd->m_updatePacketSize;
+
+    reply.m_updateHandle = MFUpdate_InitUpdate(cmd->m_provider, header);
+
+    dbg->m_messaging->ReplyToCommand( msg, true, false, pReply, replySize );
+    
+    return true;
+}
+
+bool CLR_DBG_Debugger::Debugging_MFUpdate_AuthCommand( WP_Message* msg, void* owner )
+{
+    NATIVE_PROFILE_CLR_DEBUGGER();
+    CLR_DBG_Debugger* dbg = (CLR_DBG_Debugger*)owner;
+    CLR_DBG_Commands::Debugging_MFUpdate_AuthCommand*       cmd = (CLR_DBG_Commands::Debugging_MFUpdate_AuthCommand*)msg->m_payload;
+    CLR_DBG_Commands::Debugging_MFUpdate_AuthCommand::Reply reply, *pReply;
+    INT32 respLen = 0;
+    INT32 replySize = sizeof(reply);
+
+    TINYCLR_CLEAR(reply);
+
+    pReply = &reply;
+
+    if(MFUpdate_AuthCommand(cmd->m_updateHandle, cmd->m_authCommand, cmd->m_authArgs, cmd->m_authArgsSize, NULL, respLen))
+    {
+        if(respLen > 0)
+        {
+            int cmdSize = respLen + offsetof(CLR_DBG_Commands::Debugging_MFUpdate_AuthCommand::Reply, m_response);
+            
+            CLR_DBG_Commands::Debugging_MFUpdate_AuthCommand::Reply* pTmp = (CLR_DBG_Commands::Debugging_MFUpdate_AuthCommand::Reply*)private_malloc(cmdSize);
+
+            if(pTmp != NULL)
+            {
+                if(MFUpdate_AuthCommand(cmd->m_updateHandle, cmd->m_authCommand, cmd->m_authArgs, cmd->m_authArgsSize, pTmp->m_response, respLen))
+                {
+                    pReply                 = pTmp;
+                    replySize              = cmdSize;
+                    pReply->m_responseSize = respLen;
+                    pReply->m_success      = 1;            
+                }
+                else
+                {
+                    private_free(pTmp);
+                }
+            }
+        }
+    }
+
+    dbg->m_messaging->ReplyToCommand( msg, true, false, pReply, replySize );
+
+    if(pReply != &reply)
+    {
+        private_free(pReply);
+    }
+
+    return true;
+}
+
+bool CLR_DBG_Debugger::Debugging_MFUpdate_Authenticate( WP_Message* msg, void* owner )
+{
+    NATIVE_PROFILE_CLR_DEBUGGER();
+    CLR_DBG_Debugger*                                        dbg = (CLR_DBG_Debugger*)owner;
+    CLR_DBG_Commands::Debugging_MFUpdate_Authenticate*       cmd = (CLR_DBG_Commands::Debugging_MFUpdate_Authenticate*)msg->m_payload;
+    CLR_DBG_Commands::Debugging_MFUpdate_Authenticate::Reply reply;
+    CLR_INT32 authType = 0;
+    CLR_INT32 respLen = sizeof(authType);
+    
+    memset(&s_missingPkts, 0xFF, sizeof(s_missingPkts));
+
+    reply.m_success = 0;
+
+    MFUpdate_AuthCommand(cmd->m_updateHandle, MFUPDATE_VALIDATION_COMMAND__GET_AUTH_TYPE, NULL, 0, (UINT8*)&authType, respLen);
+
+    if(authType == MFUPDATE_AUTHENTICATION_TYPE__SSL)
+    {
+        reply.m_success = 1;
+        
+        // reply early for SSL so that the device will try to upgrad the stream at the same time.
+        dbg->m_messaging->ReplyToCommand( msg, true, false, &reply, sizeof(reply) );
+
+        Events_WaitForEvents(0, 400);
+    }
+
+    if(MFUpdate_Authenticate(cmd->m_updateHandle, cmd->m_authenticationData, cmd->m_authenticationLen))
+    {
+        reply.m_success = MFUpdate_Open(cmd->m_updateHandle);
+
+        if(!reply.m_success)
+        {
+            reply.m_success = MFUpdate_Create(cmd->m_updateHandle);
+        }
+    }
+
+    dbg->m_messaging->ReplyToCommand( msg, true, false, &reply, sizeof(reply) );
+
+    return true;
+}
+
+bool CLR_DBG_Debugger::Debugging_MFUpdate_GetMissingPkts( WP_Message* msg, void* owner )
+{
+    NATIVE_PROFILE_CLR_DEBUGGER();
+    CLR_DBG_Debugger*                                          dbg = (CLR_DBG_Debugger*)owner;
+    CLR_DBG_Commands::Debugging_MFUpdate_GetMissingPkts*       cmd = (CLR_DBG_Commands::Debugging_MFUpdate_GetMissingPkts*)msg->m_payload;
+    CLR_DBG_Commands::Debugging_MFUpdate_GetMissingPkts::Reply reply, *pReply;
+    CLR_INT32 replySize = sizeof(reply);
+    CLR_INT32 int32Cnt = ARRAYSIZE(s_missingPkts);
+    CLR_INT32 sizeBytes = (int32Cnt << 2) + offsetof(CLR_DBG_Commands::Debugging_MFUpdate_GetMissingPkts::Reply, m_missingPkts);
+
+    memset(&s_missingPkts, 0xFF, sizeof(s_missingPkts));
+
+    TINYCLR_CLEAR(reply);
+
+    pReply = &reply;
+
+    if(MFUpdate_GetMissingPackets(cmd->m_updateHandle, &s_missingPkts[0], &int32Cnt))
+    {
+        pReply = (CLR_DBG_Commands::Debugging_MFUpdate_GetMissingPkts::Reply*)private_malloc(sizeBytes);
+
+        if(pReply != NULL)
+        {
+            pReply->m_missingPktCount = int32Cnt;
+            pReply->m_success = 1;
+            
+            memcpy(pReply->m_missingPkts, s_missingPkts, int32Cnt << 2);
+
+            replySize = sizeBytes;
+        }
+        else
+        {
+            pReply = &reply;
+        }
+    }
+    
+    dbg->m_messaging->ReplyToCommand( msg, true, false, pReply, replySize );
+
+    if(pReply != &reply)
+    {
+        private_free(pReply);
+    }
+    
+    return true;    
+}
+
+bool CLR_DBG_Debugger::Debugging_MFUpdate_AddPacket(WP_Message* msg, void* owner )
+{
+    NATIVE_PROFILE_CLR_DEBUGGER();
+    CLR_DBG_Debugger* dbg = (CLR_DBG_Debugger*)owner;
+    CLR_DBG_Commands::Debugging_MFUpdate_AddPacket*       cmd = (CLR_DBG_Commands::Debugging_MFUpdate_AddPacket*)msg->m_payload;
+    CLR_DBG_Commands::Debugging_MFUpdate_AddPacket::Reply reply;
+
+    if(cmd->m_packetIndex >> 5 < ARRAYSIZE(s_missingPkts))
+    {
+        if(0 != (s_missingPkts[cmd->m_packetIndex >> 5] & (1ul << (cmd->m_packetIndex % 32))))
+        {
+            reply.m_success = MFUpdate_AddPacket(cmd->m_updateHandle, cmd->m_packetIndex, &cmd->m_packetData[0], cmd->m_packetLength, (CLR_UINT8*)&cmd->m_packetValidation, sizeof(cmd->m_packetValidation));
+
+            if(reply.m_success)
+            {
+                s_missingPkts[cmd->m_packetIndex >> 5] &= ~(1ul << (cmd->m_packetIndex % 32));
+            }
+        }
+        else
+        {
+            reply.m_success = TRUE;
+        }
+    }
+    else
+    {
+        reply.m_success = MFUpdate_AddPacket(cmd->m_updateHandle, cmd->m_packetIndex, &cmd->m_packetData[0], cmd->m_packetLength, (CLR_UINT8*)&cmd->m_packetValidation, sizeof(cmd->m_packetValidation));
+    }
+
+    if(reply.m_success == FALSE) return false;
+
+    dbg->m_messaging->ReplyToCommand( msg, true, false, &reply, sizeof(reply) );
+
+    return true;
+}
+bool CLR_DBG_Debugger::Debugging_MFUpdate_Install(WP_Message* msg, void* owner )
+{
+    NATIVE_PROFILE_CLR_DEBUGGER();
+    CLR_DBG_Debugger* dbg = (CLR_DBG_Debugger*)owner;
+    CLR_DBG_Commands::Debugging_MFUpdate_Install*       cmd = (CLR_DBG_Commands::Debugging_MFUpdate_Install*)msg->m_payload;
+    CLR_DBG_Commands::Debugging_MFUpdate_Install::Reply reply;
+
+    reply.m_success = MFUpdate_Validate(cmd->m_updateHandle, &cmd->m_updateValidation[0], cmd->m_updateValidationSize);
+
+    // reply success before install
+    dbg->m_messaging->ReplyToCommand( msg, true, false, &reply, sizeof(reply) );
+
+    if(reply.m_success)
+    {
+        Events_WaitForEvents(0, 200);
+
+        reply.m_success = MFUpdate_Install(cmd->m_updateHandle, &cmd->m_updateValidation[0], cmd->m_updateValidationSize);
+    }
+
+    return (reply.m_success == TRUE);
 }
 
 #if defined(TINYCLR_ENABLE_SOURCELEVELDEBUGGING)
@@ -1335,15 +1639,28 @@ bool CLR_DBG_Debugger::CheckMethodDef( const CLR_RT_MethodDef_Index& md, CLR_RT_
     return false;
 }
 
-CLR_RT_StackFrame* CLR_DBG_Debugger::CheckStackFrame( CLR_UINT32 pid, CLR_UINT32 depth )
+CLR_RT_StackFrame* CLR_DBG_Debugger::CheckStackFrame( CLR_UINT32 pid, CLR_UINT32 depth, bool& isInline )
 {
     NATIVE_PROFILE_CLR_DEBUGGER();
     CLR_RT_Thread* th = GetThreadFromPid( pid );
+
+    isInline = false;
 
     if(th)
     {
         TINYCLR_FOREACH_NODE(CLR_RT_StackFrame,call,th->m_stackFrames)
         {
+#ifndef TINYCLR_NO_IL_INLINE
+            if(call->m_inlineFrame)
+            {
+                if(depth-- == 0) 
+                {
+                    isInline = true;
+                    return call;
+                }
+            }
+#endif
+
             if(depth-- == 0) return call;
         }
         TINYCLR_FOREACH_NODE_END();
@@ -1367,7 +1684,7 @@ static HRESULT Debugging_Thread_Create_Helper( CLR_RT_MethodDef_Index& md, CLR_R
 
     TINYCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Delegate::CreateInstance( ref, md, NULL ));
 
-    TINYCLR_CHECK_HRESULT(g_CLR_RT_ExecutionEngine.NewThread( th, ref.DereferenceDelegate(), ThreadPriority::Highest ));
+    TINYCLR_CHECK_HRESULT(g_CLR_RT_ExecutionEngine.NewThread( th, ref.DereferenceDelegate(), ThreadPriority::Highest, -1 ));
     
 
     if (realThread)
@@ -1666,8 +1983,9 @@ bool CLR_DBG_Debugger::Debugging_Thread_Unwind( WP_Message* msg, void* owner )
     CLR_DBG_Commands::Debugging_Thread_Unwind* cmd = (CLR_DBG_Commands::Debugging_Thread_Unwind*)msg->m_payload;
     CLR_RT_StackFrame*                         call;
     CLR_RT_Thread*                             th;
+    bool                                       isInline = false;
 
-    if((call = dbg->CheckStackFrame( cmd->m_pid, cmd->m_depth )) != NULL)
+    if((call = dbg->CheckStackFrame( cmd->m_pid, cmd->m_depth, isInline )) != NULL)
     {
         _ASSERTE((call->m_flags & CLR_RT_StackFrame::c_MethodKind_Native) == 0);
 
@@ -1696,14 +2014,28 @@ bool CLR_DBG_Debugger::Debugging_Stack_Info( WP_Message* msg, void* owner )
     CLR_DBG_Commands::Debugging_Stack_Info*       cmd = (CLR_DBG_Commands::Debugging_Stack_Info*)msg->m_payload;
     CLR_DBG_Commands::Debugging_Stack_Info::Reply cmdReply;
     CLR_RT_StackFrame*                            call;
+    bool                                          isInline = false;
 
-    if((call = dbg->CheckStackFrame( cmd->m_pid, cmd->m_depth )) != NULL)
+    if((call = dbg->CheckStackFrame( cmd->m_pid, cmd->m_depth, isInline )) != NULL)
     {
-        cmdReply.m_md               =              call->m_call;
-        cmdReply.m_IP               = (CLR_UINT32)(call->m_IP - call->m_IPstart);
-        cmdReply.m_numOfArguments   =              call->m_call.m_target->numArgs;
-        cmdReply.m_numOfLocals      =              call->m_call.m_target->numLocals;
-        cmdReply.m_depthOfEvalStack = (CLR_UINT32) call->TopValuePosition();
+#ifndef TINYCLR_NO_IL_INLINE
+        if(isInline)
+        {
+            cmdReply.m_md               =              call->m_inlineFrame->m_frame.m_call;
+            cmdReply.m_IP               = (CLR_UINT32)(call->m_inlineFrame->m_frame.m_IP - call->m_inlineFrame->m_frame.m_IPStart);
+            cmdReply.m_numOfArguments   =              call->m_inlineFrame->m_frame.m_call.m_target->numArgs;
+            cmdReply.m_numOfLocals      =              call->m_inlineFrame->m_frame.m_call.m_target->numLocals;
+            cmdReply.m_depthOfEvalStack = (CLR_UINT32)(call->m_evalStack - call->m_inlineFrame->m_frame.m_evalStack);
+        }
+        else
+#endif
+        {
+            cmdReply.m_md               =              call->m_call;
+            cmdReply.m_IP               = (CLR_UINT32)(call->m_IP - call->m_IPstart);
+            cmdReply.m_numOfArguments   =              call->m_call.m_target->numArgs;
+            cmdReply.m_numOfLocals      =              call->m_call.m_target->numLocals;
+            cmdReply.m_depthOfEvalStack = (CLR_UINT32) call->TopValuePosition();
+        }
 
         dbg->m_messaging->ReplyToCommand( msg, true, false, &cmdReply, sizeof(cmdReply) );
 
@@ -1721,12 +2053,25 @@ bool CLR_DBG_Debugger::Debugging_Stack_SetIP( WP_Message* msg, void* owner )
     CLR_DBG_Debugger* dbg = (CLR_DBG_Debugger*)owner;
     CLR_DBG_Commands::Debugging_Stack_SetIP* cmd = (CLR_DBG_Commands::Debugging_Stack_SetIP*)msg->m_payload;
     CLR_RT_StackFrame*                       call;
+    bool                                     isInline = false;
 
-    if((call = dbg->CheckStackFrame( cmd->m_pid, cmd->m_depth )) != NULL)
+    if((call = dbg->CheckStackFrame( cmd->m_pid, cmd->m_depth, isInline )) != NULL)
     {
-        call->m_IP            = call->m_IPstart   + cmd->m_IP;
-        call->m_evalStackPos  = call->m_evalStack + cmd->m_depthOfEvalStack;
-        call->m_flags        &= ~CLR_RT_StackFrame::c_InvalidIP;
+#ifndef TINYCLR_NO_IL_INLINE
+        if(isInline)
+        {
+            dbg->m_messaging->ReplyToCommand( msg, false, false );
+
+            return true;
+        }
+        else
+#endif            
+        {
+            call->m_IP            = call->m_IPstart   + cmd->m_IP;
+            call->m_evalStackPos  = call->m_evalStack + cmd->m_depthOfEvalStack;
+        }
+        
+        call->m_flags &= ~CLR_RT_StackFrame::c_InvalidIP;
 
         dbg->m_messaging->ReplyToCommand( msg, true, false );
 
@@ -1868,27 +2213,48 @@ bool CLR_DBG_Debugger::Debugging_Value_GetStack( WP_Message* msg, void* owner )
     CLR_DBG_Debugger* dbg = (CLR_DBG_Debugger*)owner;
     CLR_DBG_Commands::Debugging_Value_GetStack* cmd = (CLR_DBG_Commands::Debugging_Value_GetStack*)msg->m_payload;
     CLR_RT_StackFrame*                          call;
+    bool                                        isInline = false;
 
-    if((call = dbg->CheckStackFrame( cmd->m_pid, cmd->m_depth )) != NULL)
+    if((call = dbg->CheckStackFrame( cmd->m_pid, cmd->m_depth, isInline )) != NULL)
     {
         CLR_RT_HeapBlock* array;
         CLR_UINT32        num;
+#ifndef TINYCLR_NO_IL_INLINE
+        CLR_RT_MethodDef_Instance& md = isInline ? call->m_inlineFrame->m_frame.m_call : call->m_call;
+#else
+        CLR_RT_MethodDef_Instance& md = call->m_call;
+#endif
 
         switch(cmd->m_kind)
         {
         case CLR_DBG_Commands::Debugging_Value_GetStack::c_Argument:
+#ifndef TINYCLR_NO_IL_INLINE
+            array = isInline ? call->m_inlineFrame->m_frame.m_args : call->m_arguments;
+            num   = isInline ? md.m_target->numArgs                : md.m_target->numArgs;
+#else
             array = call->m_arguments;
             num   = call->m_call.m_target->numArgs;
+#endif
             break;
 
         case CLR_DBG_Commands::Debugging_Value_GetStack::c_Local:
+#ifndef TINYCLR_NO_IL_INLINE
+            array = isInline ? call->m_inlineFrame->m_frame.m_locals : call->m_locals;
+            num   = isInline ? md.m_target->numLocals                : md.m_target->numLocals;
+#else
             array = call->m_locals;
             num   = call->m_call.m_target->numLocals;
+#endif
             break;
 
         case CLR_DBG_Commands::Debugging_Value_GetStack::c_EvalStack:
+#ifndef TINYCLR_NO_IL_INLINE
+            array = isInline ? call->m_inlineFrame->m_frame.m_evalStack                                   : call->m_evalStack;
+            num   = isInline ? (CLR_UINT32)(call->m_evalStack - call->m_inlineFrame->m_frame.m_evalStack) : (CLR_UINT32)call->TopValuePosition();
+#else
             array =             call->m_evalStack;
             num   = (CLR_UINT32)call->TopValuePosition();
+#endif
             break;
 
         default:
@@ -1912,7 +2278,7 @@ bool CLR_DBG_Debugger::Debugging_Value_GetStack( WP_Message* msg, void* owner )
 
             if(cmd->m_kind == CLR_DBG_Commands::Debugging_Value_GetStack::c_Argument)
             {
-                parser.Initialize_MethodSignature( call->m_call.m_assm, call->m_call.m_target );
+                parser.Initialize_MethodSignature( md.m_assm, md.m_target );
 
                 iElement++; // Skip the return value, always at the head of the signature.
 
@@ -1925,7 +2291,7 @@ bool CLR_DBG_Debugger::Debugging_Value_GetStack( WP_Message* msg, void* owner )
             }
             else
             {
-                parser.Initialize_MethodLocals( call->m_call.m_assm, call->m_call.m_target );
+                parser.Initialize_MethodLocals( md.m_assm, md.m_target );
             }
 
             do

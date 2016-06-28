@@ -12,18 +12,7 @@ BOOL dm9161_lwip_mii_Init()
 {
     UINT32 pin;
 
-    CPU_GPIO_EnableOutputPin(AT91_ERX0, TRUE);
-    CPU_GPIO_EnableOutputPin(AT91_ERX1, TRUE);
-    CPU_GPIO_EnableOutputPin(AT91_ERX2, TRUE);
-    CPU_GPIO_EnableOutputPin(AT91_ERX3, TRUE);
-    CPU_GPIO_EnableOutputPin(AT91_ECRS, TRUE);
-    CPU_GPIO_EnableOutputPin(AT91_ECOL, FALSE);
-    CPU_GPIO_EnableOutputPin(AT91_ERXDV, FALSE);
-    CPU_GPIO_EnableOutputPin(AT91_ERXCK, TRUE);
-    CPU_GPIO_EnableOutputPin(AT91_ERXER, FALSE);
-
-    // Hardware Reset
-    AT91_RSTC_EXTRST();
+    g_phyAddress = INVALID_PHY_ADDR;
 
     for(pin = 0; pin < ARRAYSIZE(c_EMAC_MII); pin++)
     {

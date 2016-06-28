@@ -56,7 +56,9 @@
  * [including the GNU Public Licence.]
  */
 
+#ifndef OPENSSL_NO_MD2
 #include <openssl/md2.h>
+#endif
 #ifdef OPENSSL_SYS_WINDOWS
 #include <stdio.h>
 #include <stdlib.h>
@@ -104,7 +106,7 @@ void do_fp(TINYCLR_SSL_FILE *f)
 	int fd,i;
 	static unsigned char buf[BUFSIZE];
 
-	fd=fileno(f);
+	fd=TINYCLR_SSL_FILENO(f);
 	MD2_Init(&c);
 	for (;;)
 		{

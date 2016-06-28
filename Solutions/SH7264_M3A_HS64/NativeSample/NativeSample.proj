@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>NativeSample</AssemblyName>
@@ -16,21 +17,15 @@
     <MFSettingsFile>$(SPOCLIENT)\Solutions\SH7264_M3A_HS64\SH7264_M3A_HS64.settings</MFSettingsFile>
     <IsSolutionWizardVisible>True</IsSolutionWizardVisible>
   </PropertyGroup>
-
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
   <!-- no standard sh scatterfile, our own version of scatterfile  -->
   <Import Project="Scatterfile_definition.proj" />
-
-
   <PropertyGroup>
     <OutputType>Executable</OutputType>
     <MultipleOutputSections>false</MultipleOutputSections>
     <ADD_LOAD_IMAGE_CRC>false</ADD_LOAD_IMAGE_CRC>
   </PropertyGroup>
-
   <ItemGroup>
-    <HFiles Include="SH7264_bitmap.h" />
-    <HFiles Include="NativeSample.h" />
     <Compile Include="NativeSample.cpp" />
     <Compile Include="SH7264_bitmap.cpp" />
     <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2a\DeviceCode\bootstrap\intprg.c" />
@@ -39,7 +34,6 @@
     <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2a\DeviceCode\bootstrap\sbrk.c" />
     <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2a\DeviceCode\bootstrap\vecttbl.c" />
   </ItemGroup>
-  
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Test\native\src\dotnetmf.proj" />
     <DriverLibs Include="Native.$(LIB_EXT)" />
@@ -47,6 +41,10 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\dotNetMF.proj" />
     <DriverLibs Include="COM_pal.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <DriverLibs Include="DebuggerPort_SSL_config_stubs.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Config\dotnetmf.proj" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\USART\dotNetMF.proj" />
@@ -79,11 +77,11 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\SH7264_M3A_HS64\DeviceCode\Blockstorage\USB\dotNetMF.proj" />
     <DriverLibs Include="USB_blconfig_SH7264_M3A_HS64.$(LIB_EXT)" />
-  </ItemGroup>  
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\SH7264_M3A_HS64\DeviceCode\HWSetup\dotNetMF.proj" />
     <DriverLibs Include="SH7264_M3A_HS64_hwsetup.$(LIB_EXT)" />
-  </ItemGroup>  
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Support\CRC\dotNetMF.proj" />
     <PlatformIndependentLibs Include="CRC.$(LIB_EXT)" />
@@ -129,8 +127,8 @@
     <DriverLibs Include="SH7264_Timer.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\native\sh2A\DeviceCode\ConfigSector\dotnetmf.proj"/>
-    <DriverLibs  Include="SH2A_configsector.$(LIB_EXT)"/>     
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\native\sh2A\DeviceCode\ConfigSector\dotnetmf.proj" />
+    <DriverLibs Include="SH2A_configsector.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Support\WireProtocol\dotNetMF.proj" />
@@ -148,7 +146,7 @@
     <RequiredProjects Include="$(SPOCLIENT)\Crypto\stubs\dotNetMF.proj" />
     <DriverLibs Include="Crypto_stub.$(LIB_EXT)" />
   </ItemGroup>
-   <ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\Events\dotNetMF.proj" />
     <DriverLibs Include="events_pal.$(LIB_EXT)" />
   </ItemGroup>
@@ -180,7 +178,7 @@
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\SH7264_M3A_HS64\DeviceCode\Blockstorage\BlockstorageConfig_hal\dotnetmf.proj" />
     <DriverLibs Include="BlockStorageConfig_HAL_SH7264_M3A_HS64.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup >
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\SH7264_M3A_HS64\DeviceCode\Blockstorage\addDevices\dotnetmf.proj" />
     <DriverLibs Include="BlockStorage_AddDevices_SH7264_M3A_HS64.$(LIB_EXT)" />
   </ItemGroup>
@@ -208,14 +206,14 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\palevent\stubs\dotNetMF.proj" />
     <DriverLibs Include="palevent_pal_stubs.$(LIB_EXT)" />
   </ItemGroup>
-    <ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\SH7264_M3A_HS64\DeviceCode\USB\dotnetmf.proj" />
     <DriverLibs Include="usb_pal_config_SH7264_M3A_HS64.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\IO\dotNetMF.proj" />
     <DriverLibs Include="io_pal.$(LIB_EXT)" />
-  </ItemGroup> 
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\SimpleHeap\dotNetMF.proj" />
     <DriverLibs Include="SimpleHeap.$(LIB_EXT)" />
@@ -231,7 +229,7 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\SH7264\DeviceCode\VDC3\dotNetMF.proj" />
     <DriverLibs Include="SH7264_VDC3.$(LIB_EXT)" />
-  </ItemGroup>  
+  </ItemGroup>
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Targets\Native\SH7264\DeviceCode\Display\SH7264VDC3\dotNetMF.proj" />
     <DriverLibs Include="SH7264VDC3.$(LIB_EXT)" />
@@ -252,11 +250,11 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\stubs\processor\stubs_cache\dotNetMF.proj" />
     <DriverLibs Include="cpu_cache_stubs.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup >
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\stubs\dotNetMF.proj" />
     <DriverLibs Include="sockets_pal_stubs.$(LIB_EXT)" />
   </ItemGroup>
-  <ItemGroup >
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\ssl\stubs\dotNetMF.proj" />
     <DriverLibs Include="ssl_pal_stubs.$(LIB_EXT)" />
   </ItemGroup>
@@ -283,6 +281,24 @@
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\TimeService\stubs\dotNetMF.proj" />
     <DriverLibs Include="TimeService_pal_stubs.$(LIB_EXT)" />
+  </ItemGroup>
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\devicecode\drivers\fs\fat\fat_fs.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\include\tests.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\targets\native\sh7264\devicecode\gpio\sh7264_gpio.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\targets\native\sh7264\devicecode\include\sh7264_vdc3_decl.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\targets\native\sh7264\devicecode\keypad\sh7264_keypad.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\targets\native\sh7264\devicecode\vdc3\sh7264_vdc3.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\gpio\gpio.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\log\log.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\ramtest\ramtest.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\spi\eeprom_stm95x.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\spi\spi.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\timedevents\timedevents.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\timers\timers.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\uart\uart.h" />
+    <HFiles Include="nativesample.h" />
+    <HFiles Include="sh7264_bitmap.h" />
   </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

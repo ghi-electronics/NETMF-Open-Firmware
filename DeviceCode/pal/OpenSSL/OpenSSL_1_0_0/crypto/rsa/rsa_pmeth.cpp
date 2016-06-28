@@ -251,6 +251,8 @@ static int pkey_rsa_verifyrecover(EVP_PKEY_CTX *ctx,
 			ret = int_rsa_verify(EVP_MD_type(rctx->md),
 						NULL, 0, rout, &sltmp,
 					sig, siglen, ctx->pkey->pkey.rsa);
+			if (ret <= 0)
+				return 0;
 			ret = sltmp;
 			}
 		else
@@ -550,7 +552,7 @@ static int pkey_rsa_keygen(EVP_PKEY_CTX *ctx, EVP_PKEY *pkey)
 	return ret;
 	}
 
-extern "C" EVP_PKEY_METHOD rsa_pkey_meth = 
+EVP_PKEY_METHOD rsa_pkey_meth = 
 	{
 	EVP_PKEY_RSA,
 	EVP_PKEY_FLAG_AUTOARGLEN,
@@ -588,7 +590,8 @@ extern "C" EVP_PKEY_METHOD rsa_pkey_meth =
 
 
 	};
+
 #ifdef	__cplusplus
-}
+    }
 #endif
 

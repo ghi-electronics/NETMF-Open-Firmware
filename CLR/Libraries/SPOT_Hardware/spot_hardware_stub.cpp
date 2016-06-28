@@ -8,6 +8,46 @@ void PostManagedEvent(UINT8 category, UINT8 subCategory, UINT16 data1, UINT32 da
 {
 }
 
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogInput::ReadRaw___I4( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+
+    TINYCLR_SET_AND_LEAVE(stack.NotImplementedStub());
+
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogInput::Initialize___STATIC__VOID__MicrosoftSPOTHardwareCpuAnalogChannel__I4( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+
+    TINYCLR_SET_AND_LEAVE(stack.NotImplementedStub());
+
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogOutput::WriteRaw___VOID__I4( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+
+    TINYCLR_SET_AND_LEAVE(stack.NotImplementedStub());
+
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogOutput::Initialize___STATIC__VOID__MicrosoftSPOTHardwareCpuAnalogOutputChannel__I4( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+
+    TINYCLR_SET_AND_LEAVE(stack.NotImplementedStub());
+
+    TINYCLR_NOCLEANUP();
+}
+
 HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_Cpu::get_SystemClock___STATIC__U4( CLR_RT_StackFrame& stack )
 {
     NATIVE_PROFILE_CLR_HARDWARE();
@@ -655,7 +695,7 @@ HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::N
     TINYCLR_NOCLEANUP();
 }
 
-
+// LCD
 HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::NativeGetLCDMetrics___VOID__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4( CLR_RT_StackFrame& stack )
 {
     NATIVE_PROFILE_CLR_HARDWARE();
@@ -666,9 +706,59 @@ HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::N
     TINYCLR_NOCLEANUP();
 }
 
+// PWM
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::NativeGetPWMChannelsCount___I4( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+
+    TINYCLR_SET_AND_LEAVE(stack.NotImplementedStub());
+
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::NativeGetPWMPinForChannel___MicrosoftSPOTHardwareCpuPin__MicrosoftSPOTHardwareCpuPWMChannel( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+
+    TINYCLR_SET_AND_LEAVE(stack.NotImplementedStub());
+
+    TINYCLR_NOCLEANUP();
+}
+
+// A/D
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::NativeGetAnalogChannelsCount___I4( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+
+    TINYCLR_SET_AND_LEAVE(stack.NotImplementedStub());
+
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::NativeGetAnalogPinForChannel___MicrosoftSPOTHardwareCpuPin__MicrosoftSPOTHardwareCpuAnalogChannel( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+
+    TINYCLR_SET_AND_LEAVE(stack.NotImplementedStub());
+
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider::NativeGetAvailablePrecisionInBitsForChannel___SZARRAY_I4__MicrosoftSPOTHardwareCpuAnalogChannel( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+
+    TINYCLR_SET_AND_LEAVE(stack.NotImplementedStub());
+
+    TINYCLR_NOCLEANUP();
+}
 
 // POWER
-
 HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_PowerState::Reboot___STATIC__VOID__BOOLEAN( CLR_RT_StackFrame& stack )
 {
     NATIVE_PROFILE_CLR_HARDWARE();

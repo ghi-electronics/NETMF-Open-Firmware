@@ -1,8 +1,8 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
 
   <PropertyGroup>
-    <ComponentGuid>{36ba05ee-2294-4b96-9c97-13ab77896e8b}</ComponentGuid>
-    <DirectoryRef>MSBuildExtensionsPathVersion</DirectoryRef>
+    <ComponentGuid>{71DE170F-B663-4384-BA3F-5A1AD3576492}</ComponentGuid>
+    <DirectoryRef>MSBuildExtensionsPath_MFv4_1</DirectoryRef>
     <_curdir>$(SPOCLIENT)\Framework\IDE\Targets\v4.1</_curdir>
   </PropertyGroup>
 

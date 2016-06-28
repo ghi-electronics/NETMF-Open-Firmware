@@ -4,12 +4,12 @@
     <TinyCLR_Platform>Server</TinyCLR_Platform>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(PORT_BUILD)'==''">
+  <ItemGroup Condition="EXISTS('$(SPOCLIENT)\Framework\Tools\BuildTasksInternal\InternalBuildTasks.csproj')">
     <Project Include="WiXLib\WixLibSpotBuild.csproj"/>
     <Project Include="BuildTasksInternal\BuildSigner\BuildSignerSpotBuild.csproj"/>
-    <Project Include="BuildTasksInternal\InternalBuildTasks.csproj"/>
   </ItemGroup>
   <ItemGroup>
+    <Project Include="BuildTasksInternal\InternalBuildTasks.csproj" Condition="EXISTS('$(SPOCLIENT)\Framework\Tools\BuildTasksInternal\InternalBuildTasks.csproj')"/>
     <Project Include="BuildTasks\BuildTasks.csproj"/>
     <Project Include="BuildTasksNativeBuild\NativeBuildTasks.csproj"/>
     <Project Include="CreateSymdef\CreateSymdef.csproj" Condition="'$(COMPILER_TOOL)'=='GCC'"/>

@@ -40,6 +40,7 @@ struct SSL_Driver
     struct SSL_Context
     {
         void* SslContext;
+        INT32 CryptokiSession;
 
         RTCertificate m_certificates[c_MaxCertificatesPerContext];
         INT32         m_certificateCount;

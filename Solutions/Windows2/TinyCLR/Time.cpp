@@ -6,6 +6,16 @@
 
 using namespace Microsoft::SPOT::Emulator;
 
+void HAL_Time_Sleep_MicroSeconds( UINT32 uSec )
+{
+    return EmulatorNative::GetITimeDriver()->Sleep_MicroSeconds( uSec );    
+}
+
+void HAL_Time_Sleep_MicroSeconds_InterruptEnabled( UINT32 uSec )
+{
+    return EmulatorNative::GetITimeDriver()->Sleep_MicroSecondsInterruptsEnabled( uSec );    
+}
+
 UINT64 HAL_Time_CurrentTicks()
 {
     return EmulatorNative::GetITimeDriver()->CurrentTicks();
@@ -74,6 +84,11 @@ void HAL_COMPLETION::Execute()
 }
 
 //Continuations
+
+bool HAL_CONTINUATION::IsLinked()
+{
+    return EmulatorNative::GetITimeDriver()->IsLinked( (IntPtr)this );
+}
 
 BOOL HAL_CONTINUATION::Dequeue_And_Execute()
 {

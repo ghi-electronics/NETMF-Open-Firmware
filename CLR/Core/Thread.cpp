@@ -705,6 +705,12 @@ HRESULT CLR_RT_Thread::ProcessException_Phase1()
     // If we were executing a filter that returned false, there's not much point checking the stack frames above the point of the filter.
     // Try to resume from the frame of the last filter executed.
     CLR_RT_StackFrame*  stack     = us.m_handlerStack;
+    
+#ifndef TINYCLR_NO_IL_INLINE
+    CLR_RT_InlineFrame tmpInline;
+    tmpInline.m_IP = NULL;
+#endif
+    
     // If this is the first pass through _Phase1 then start at the top.
     if(!stack) { stack = CurrentFrame(); }
 
@@ -765,6 +771,13 @@ HRESULT CLR_RT_Thread::ProcessException_Phase1()
                     us.m_handlerBlockStart = eh.m_handlerStart;
                     us.m_handlerBlockEnd   = eh.m_handlerEnd;
                     us.m_handlerStack      = stack;
+
+#ifndef TINYCLR_NO_IL_INLINE
+                    if(tmpInline.m_IP)
+                    {
+                        us.m_flags |= UnwindStack::c_MagicCatchForInline;
+                    }
+#endif
 
                     if (eh.IsFilter())
                     {
@@ -876,7 +889,25 @@ HRESULT CLR_RT_Thread::ProcessException_Phase1()
             TINYCLR_SET_AND_LEAVE(CLR_E_PROCESS_EXCEPTION);
         }
 
-        stack = stack->Caller();
+#ifndef TINYCLR_NO_IL_INLINE
+        if(stack->m_inlineFrame != NULL && tmpInline.m_IP == NULL)
+        {
+            stack->SaveStack(tmpInline);
+            stack->RestoreFromInlineStack();
+        }
+        else
+        {
+            if(tmpInline.m_IP)  
+            {
+                stack->RestoreStack(tmpInline);
+                tmpInline.m_IP = NULL;
+            }
+#else
+        {
+#endif
+            
+            stack = stack->Caller();
+        }
     }
 
     us.m_handlerStack = NULL;
@@ -904,7 +935,16 @@ ContinueAndExit:
     us.m_flags         |= UnwindStack::c_ContinueExceptionHandler;
     TINYCLR_SET_AND_LEAVE(S_OK);
 
-    TINYCLR_NOCLEANUP();
+    TINYCLR_CLEANUP();
+
+#ifndef TINYCLR_NO_IL_INLINE
+    if(tmpInline.m_IP)
+    {
+        stack->RestoreStack(tmpInline);
+    }    
+#endif
+
+    TINYCLR_CLEANUP_END();
 }
 
 HRESULT CLR_RT_Thread::ProcessException_Phase2()
@@ -970,7 +1010,12 @@ HRESULT CLR_RT_Thread::ProcessException_Phase2()
                     iterStack->m_flags &=  ~CLR_RT_StackFrame::c_InvalidIP;
 
 #if defined(TINYCLR_ENABLE_SOURCELEVELDEBUGGING)
-                    g_CLR_RT_ExecutionEngine.Breakpoint_StackFrame_Pop( iterStack, true );
+#ifndef TINYCLR_NO_IL_INLINE
+                    if(iterStack->m_inlineFrame == NULL)
+#endif
+                    {
+                        g_CLR_RT_ExecutionEngine.Breakpoint_StackFrame_Pop( iterStack, true );
+                    }
 #endif //#if defined(TINYCLR_ENABLE_SOURCELEVELDEBUGGING)
 
                     TINYCLR_SET_AND_LEAVE(S_OK);
@@ -978,31 +1023,41 @@ HRESULT CLR_RT_Thread::ProcessException_Phase2()
 
                 if (iterStack == us.m_handlerStack)
                 {
-                    //We've popped off all stack frames above the target.
-                    //Now we should run the exception handler.
+#ifndef TINYCLR_NO_IL_INLINE
+                    if(iterStack->m_inlineFrame == NULL || 0 == (us.m_flags & UnwindStack::c_MagicCatchForInline))
+#endif
+                    {
+                        //We've popped off all stack frames above the target.
+                        //Now we should run the exception handler.
 
-                    //Store the range of the block and the stack frame we're executing for PopEH
-                    us.m_currentBlockStart = us.m_handlerBlockStart;
-                    us.m_currentBlockEnd   = us.m_handlerBlockEnd;
-                    us.m_stack             = us.m_handlerStack;
-                    us.SetPhase( UnwindStack::p_3_RunningHandler );
+                        //Store the range of the block and the stack frame we're executing for PopEH
+                        us.m_currentBlockStart = us.m_handlerBlockStart;
+                        us.m_currentBlockEnd   = us.m_handlerBlockEnd;
+                        us.m_stack             = us.m_handlerStack;
+                        us.SetPhase( UnwindStack::p_3_RunningHandler );
 
-                    //Set the IP and push the exception object on the stack.
-                    iterStack->m_IP        = us.m_handlerBlockStart;
-                    iterStack->m_flags    &= ~CLR_RT_StackFrame::c_InvalidIP;
+                        //Set the IP and push the exception object on the stack.
+                        iterStack->m_IP        = us.m_handlerBlockStart;
+                        iterStack->m_flags    &= ~CLR_RT_StackFrame::c_InvalidIP;
 
-                    iterStack->ResetStack();
-                    iterStack->PushValue().SetObjectReference( us.m_exception );
+                        iterStack->ResetStack();
+                        iterStack->PushValue().SetObjectReference( us.m_exception );
 
-                    //We are willing to execute IL again so clear the m_currentException flag.
-                    m_currentException.SetObjectReference( NULL );
+                        //We are willing to execute IL again so clear the m_currentException flag.
+                        m_currentException.SetObjectReference( NULL );
 
 #if defined(TINYCLR_ENABLE_SOURCELEVELDEBUGGING)
-                    g_CLR_RT_ExecutionEngine.Breakpoint_StackFrame_Pop( iterStack, true );
+#ifndef TINYCLR_NO_IL_INLINE
+                        if(iterStack->m_inlineFrame == NULL)
+#endif
+                        {
+                            g_CLR_RT_ExecutionEngine.Breakpoint_StackFrame_Pop( iterStack, true );
+                        }
 #endif //#if defined(TINYCLR_ENABLE_SOURCELEVELDEBUGGING)
 
-                    //Return a success value to break out of ProcessException and to signal that execution of IL can continue.
-                    TINYCLR_SET_AND_LEAVE(S_OK);
+                        //Return a success value to break out of ProcessException and to signal that execution of IL can continue.
+                        TINYCLR_SET_AND_LEAVE(S_OK);
+                    }
                 }
             }
         }
@@ -1067,7 +1122,16 @@ HRESULT CLR_RT_Thread::ProcessException_Phase2()
             CLR_EE_DBG_SET(BreakpointsDisabled);
 #endif //#if defined(TINYCLR_ENABLE_SOURCELEVELDEBUGGING)            
 
-            iterStack->Pop();   //No finally's for the current ip in this method, pop to the next.
+#ifndef TINYCLR_NO_IL_INLINE
+            if(iterStack->m_inlineFrame)
+            {
+                iterStack->PopInline();
+            }
+            else
+#endif                
+            {
+                iterStack->Pop();   //No finally's for the current ip in this method, pop to the next.
+            }
 
 #if defined(TINYCLR_ENABLE_SOURCELEVELDEBUGGING)
             if(!fBreakpointsDisabledSav)
@@ -1091,7 +1155,17 @@ HRESULT CLR_RT_Thread::ProcessException_Phase2()
         CLR_EE_DBG_SET(BreakpointsDisabled);
 #endif //#if defined(TINYCLR_ENABLE_SOURCELEVELDEBUGGING)        
 
-        iterStack->Pop();   //No finally's for the current ip in this method, pop to the next.
+
+#ifndef TINYCLR_NO_IL_INLINE
+        if(iterStack->m_inlineFrame)
+        {
+            iterStack->PopInline();
+        }
+        else
+#endif            
+        {
+            iterStack->Pop();   //No finally's for the current ip in this method, pop to the next.
+        }
         iterStack = CurrentFrame();
 
 #if defined(TINYCLR_ENABLE_SOURCELEVELDEBUGGING)

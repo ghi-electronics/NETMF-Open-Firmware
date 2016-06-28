@@ -7,6 +7,7 @@ namespace System.Net
     using System.Net.Sockets;
     using System.Globalization;
     using System.Text;
+    using Microsoft.SPOT.Net.NetworkInformation;
     /// <devdoc>
     ///    <para>Provides an internet protocol (IP) address.</para>
     /// </devdoc>
@@ -161,6 +162,58 @@ namespace System.Net
 
         // this method ToInt32 is part of teh Convert class which we will bring over later
         ////////////////////////////////////////////////////////////////////////////////////////
+
+
+        public static IPAddress GetDefaultLocalAddress()
+        {
+            // Special conditions are implemented here because of a ptoblem with GetHostEntry
+            // on the digi device and NetworkInterface from the emulator.
+            // In the emulator we must use GetHostEntry.
+            // On the device and Windows NetworkInterface works and is preferred.
+            try
+            {
+                NetworkInterface[] interfaces = NetworkInterface.GetAllNetworkInterfaces();
+
+                int cnt = interfaces.Length;
+                for (int i = 0; i < cnt; i++)
+                {
+                    NetworkInterface ni = interfaces[i];
+
+                    if (ni.IPAddress != "0.0.0.0" && ni.SubnetMask != "0.0.0.0")
+                    {
+                        return IPAddress.Parse(ni.IPAddress);
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                IPAddress localAddress = null;
+                IPHostEntry hostEntry = Dns.GetHostEntry("");
+
+                int cnt = hostEntry.AddressList.Length;
+                for (int i = 0; i < cnt; ++i)
+                {
+                    if ((localAddress = hostEntry.AddressList[i]) != null)
+                    {
+                        if(localAddress.m_Address != 0)
+                        {
+                            return localAddress;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return IPAddress.Any;
+        }
+        
+        
     } // class IPAddress
 } // namespace System.Net
 

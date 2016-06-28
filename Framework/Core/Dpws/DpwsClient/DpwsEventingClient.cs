@@ -234,7 +234,7 @@ namespace Dpws.Client.Eventing
                     m_version.EventingNamespace + "/Subscribe",     // Action
                     null,                                           // RelatesTo
                     serviceUri.AbsoluteUri,                         // To
-                    m_version.AnonymousRoleUri,                     // ReplyTo
+                    m_version.AnonymousUri,                         // ReplyTo
                     null, null);                                    // From, Any
 
                 WsXmlNamespaces additionalPrefixes = new WsXmlNamespaces();

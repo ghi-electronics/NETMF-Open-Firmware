@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{524E06D4-E942-4d4d-ABD2-4728F85E0B82}</ProjectGuid>
     <AssemblyName>AT91_USBHS</AssemblyName>
@@ -42,11 +43,17 @@
     <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <HFiles Include="AT91_USBHS.h" />
     <Compile Include="AT91_USBHS.cpp" />
     <Compile Include="AT91_usbhs_config.cpp" />
     <Compile Include="AT91_usbhs_functions.cpp" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\arm_util.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\cpu.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\cpu_definitions.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\cores\arm\include\smartptr_fiq_arm.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\com\usb\usb.h" />
+    <HFiles Include="at91_usbhs.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

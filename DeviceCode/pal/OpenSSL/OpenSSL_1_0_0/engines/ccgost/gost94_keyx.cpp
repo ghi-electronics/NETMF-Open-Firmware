@@ -177,7 +177,7 @@ int pkey_GOST94cp_encrypt(EVP_PKEY_CTX *ctx, unsigned char *out, size_t *outlen,
 	ASN1_OBJECT_free(gkt->key_agreement_info->cipher);
 	gkt->key_agreement_info->cipher = OBJ_nid2obj(param->nid);
 	*outlen = i2d_GOST_KEY_TRANSPORT(gkt,out?&out:NULL);
-	if (*outlen == 0)
+	if (*outlen <= 0)
 		{
 		GOSTerr(GOST_F_PKEY_GOST94CP_ENCRYPT,GOST_R_ERROR_PACKING_KEY_TRANSPORT_INFO);
 		goto err;
@@ -262,11 +262,11 @@ int pkey_GOST94cp_decrypt(EVP_PKEY_CTX *ctx, unsigned char *key, size_t *key_len
 
 	param = get_encryption_params(gkt->key_agreement_info->cipher);
 	gost_init(&cctx,param->sblock);	
-	OPENSSL_assert(gkt->key_agreement_info->eph_iv->length==8);
+	TINYCLR_SSL_ASSERT(gkt->key_agreement_info->eph_iv->length==8);
 	TINYCLR_SSL_MEMCPY(wrappedKey,gkt->key_agreement_info->eph_iv->data,8);
-	OPENSSL_assert(gkt->key_info->encrypted_key->length==32);
+	TINYCLR_SSL_ASSERT(gkt->key_info->encrypted_key->length==32);
 	TINYCLR_SSL_MEMCPY(wrappedKey+8,gkt->key_info->encrypted_key->data,32);
-	OPENSSL_assert(gkt->key_info->imit->length==4);
+	TINYCLR_SSL_ASSERT(gkt->key_info->imit->length==4);
 	TINYCLR_SSL_MEMCPY(wrappedKey+40,gkt->key_info->imit->data,4);	
 	make_cp_exchange_key(gost_get0_priv_key(priv),peerkey,sharedKey);
 	if (!keyUnwrapCryptoPro(&cctx,sharedKey,wrappedKey,key))

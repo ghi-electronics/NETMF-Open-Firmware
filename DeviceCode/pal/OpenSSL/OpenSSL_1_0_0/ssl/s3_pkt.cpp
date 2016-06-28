@@ -432,7 +432,7 @@ TINYCLR_SSL_PRINTF("\n");
 		{
 		/* !clear => s->read_hash != NULL => mac_size != -1 */
 		mac_size=EVP_MD_CTX_size(s->read_hash);
-		OPENSSL_assert(mac_size >= 0);
+		TINYCLR_SSL_ASSERT(mac_size >= 0);
 
 		if (rr->length > SSL3_RT_MAX_COMPRESSED_LENGTH+extra+mac_size)
 			{

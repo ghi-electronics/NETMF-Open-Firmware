@@ -22,7 +22,6 @@ namespace Microsoft.SPOT.Platform.Tests
 
             //wait until UI Window is created
             autoEvent.WaitOne();
-            Thread.Sleep(3000);
             string[] args = { "UIElementTests" };
             MFTestRunner runner = new MFTestRunner(args);
 
@@ -88,7 +87,7 @@ namespace Microsoft.SPOT.Platform.Tests
         protected static MyWindow mainWindow = null;     
         protected static Font _font = Resources.GetFont(Resources.FontResources.small);
 
-        protected const int wait = 100;
+        protected const int wait = 20;
         protected static AutoResetEvent autoEvent = new AutoResetEvent(false);
         protected static int _width = SystemMetrics.ScreenWidth;
         protected static int _height = SystemMetrics.ScreenHeight;

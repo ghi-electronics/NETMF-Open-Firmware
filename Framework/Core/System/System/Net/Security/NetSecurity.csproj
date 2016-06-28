@@ -13,7 +13,6 @@
   </PropertyGroup>
   <Import Project="$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.CSharp.Targets" />
   <ItemGroup>
-    <Compile Include="CertificateStore.cs" />
     <Compile Include="SslStream.cs" />
   </ItemGroup>
   <ItemGroup>

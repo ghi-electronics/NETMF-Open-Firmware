@@ -15,7 +15,7 @@ HRESULT Library_spot_hardware_serial_native_System_IO_Ports_SerialPort::Read___I
     TINYCLR_NOCLEANUP();
 }
 
-HRESULT Library_spot_hardware_serial_native_System_IO_Ports_SerialPort::Write___I4__SZARRAY_U1__I4__I4( CLR_RT_StackFrame& stack )
+HRESULT Library_spot_hardware_serial_native_System_IO_Ports_SerialPort::Write___VOID__SZARRAY_U1__I4__I4( CLR_RT_StackFrame& stack )
 {
     NATIVE_PROFILE_CLR_HARDWARE();
     TINYCLR_HEADER();

@@ -29,32 +29,6 @@ FAT_FileHandle* FAT_FileHandle::Open( FAT_LogicDisk* logicDisk, FAT_FILE* fileIn
 
 HRESULT FAT_FileHandle::Close()
 {
-    FAT_Directory* dirEntry = m_file.GetDirectoryEntry();
-
-    if (dirEntry && m_readWriteState != ReadWriteState__NONE)
-    {
-        UINT16 date, time;
-        BOOL markedForWrite = FALSE;
-
-        FAT_Utility::GetCurrentFATTime( &date, &time, NULL );
-        
-        if(dirEntry->Get_DIR_LstAccDate() != date)
-        {            
-            m_file.MarkDirectoryEntryForWrite();
-            markedForWrite = TRUE;
-            
-            dirEntry->Set_DIR_LstAccDate( date );
-        }
-        
-        if((m_readWriteState & ReadWriteState__WRITE) == ReadWriteState__WRITE)
-        {
-            if(!markedForWrite) m_file.MarkDirectoryEntryForWrite();
-            
-            dirEntry->Set_DIR_WrtDate ( date );
-            dirEntry->Set_DIR_WrtTime ( time );
-        } 
-    }
-    
     Flush();
 
     FAT_MemoryManager::FreeHandle( this );
@@ -84,9 +58,13 @@ HRESULT FAT_FileHandle::ReadWriteSeekHelper( int type, BYTE* buffer, int size, i
         size_t count = sectorSize - m_dataIndex;
 
         // Adjust if we only need a portion of it
-        if(size < count) count = size;
+        if(size < (INT32)count) count = size;
 
-        if(type != Helper_Seek)
+        if(type == Helper_Flush)
+        {
+            m_logicDisk->SectorCache.FlushSector( m_sectIndex );
+        }
+        else if(type != Helper_Seek)
         {
             sector = m_logicDisk->SectorCache.GetSector( m_sectIndex, (type == Helper_Write) ? TRUE : FALSE );
 
@@ -138,7 +116,7 @@ HRESULT FAT_FileHandle::Read( BYTE* buffer, int size, int* bytesRead )
         TINYCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
     }
 
-    dirEntry = m_file.GetDirectoryEntry();
+    dirEntry = m_file.GetDirectoryEntry( FALSE );
 
     if(!dirEntry) TINYCLR_SET_AND_LEAVE(CLR_E_FILE_IO);
 
@@ -150,7 +128,7 @@ HRESULT FAT_FileHandle::Read( BYTE* buffer, int size, int* bytesRead )
         m_position = dirFileSize ;
     }
 
-    limit = dirFileSize  - m_position;
+    limit = (int)(dirFileSize - m_position);
 
     if(limit == 0)
     {
@@ -178,13 +156,16 @@ HRESULT FAT_FileHandle::Read( BYTE* buffer, int size, int* bytesRead )
 
     m_readWriteState |= ReadWriteState__READ;
 
+#ifndef FAT_FS__DO_NOT_UPDATE_FILE_ACCESS_TIME
     UINT16 date,time;
     UINT8 timeTenth;
 
     FAT_Utility::GetCurrentFATTime( &date, &time, &timeTenth );
 
+    dirEntry = m_file.GetDirectoryEntry(TRUE);
     dirEntry->Set_DIR_LstAccDate(date);
-    
+#endif    
+
     TINYCLR_NOCLEANUP();
 }
 
@@ -196,7 +177,7 @@ HRESULT FAT_FileHandle::Write( BYTE* buffer, int size, int* bytesWritten )
     
     if(size < 0) TINYCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
 
-    dirEntry = m_file.GetDirectoryEntry();
+    dirEntry = m_file.GetDirectoryEntry( FALSE );
 
     if(!dirEntry) TINYCLR_SET_AND_LEAVE(CLR_E_FILE_IO);
 
@@ -208,6 +189,7 @@ HRESULT FAT_FileHandle::Write( BYTE* buffer, int size, int* bytesWritten )
         if(nextFreeClus == CLUST_ERROR) TINYCLR_SET_AND_LEAVE(CLR_E_FILE_IO);
         
         // GetNextFreeClus() might invalidate dirEntry
+
         dirEntry = m_file.GetDirectoryEntry( TRUE );
 
         if(!dirEntry) TINYCLR_SET_AND_LEAVE(CLR_E_FILE_IO);
@@ -233,47 +215,111 @@ HRESULT FAT_FileHandle::Write( BYTE* buffer, int size, int* bytesWritten )
     TINYCLR_CHECK_HRESULT(ReadWriteSeekHelper( Helper_Write, buffer, size, bytesWritten ));
 
     // Need to refresh directory entry, as the sector may be paged out by ReadWriteSeekHelper()
-    dirEntry = m_file.GetDirectoryEntry();
+    dirEntry = m_file.GetDirectoryEntry( FALSE );
 
     if(!dirEntry) TINYCLR_SET_AND_LEAVE(CLR_E_FILE_IO);
 
     //if file is resized
     if(dirEntry->Get_DIR_FileSize() < m_position)
     {
-        m_file.MarkDirectoryEntryForWrite();
+        dirEntry = m_file.GetDirectoryEntry( TRUE );
+
+        if(!dirEntry) TINYCLR_SET_AND_LEAVE(CLR_E_FILE_IO);
+
         dirEntry->Set_DIR_FileSize((UINT32)m_position);
+
+        // update the access time since we are already updating the size
+#ifdef FAT_FS__DO_NOT_UPDATE_FILE_ACCESS_TIME
+        UINT16 date,time;
+
+        FAT_Utility::GetCurrentFATTime( &date, &time, NULL );
+
+        dirEntry->Set_DIR_WrtDate ( date );
+        dirEntry->Set_DIR_WrtTime ( time );
+        dirEntry->Set_DIR_LstAccDate(date);
+#endif
     }
 
     //set file write flag
     m_readWriteState |= ReadWriteState__WRITE;
 
+#ifndef FAT_FS__DO_NOT_UPDATE_FILE_ACCESS_TIME
     UINT16 date,time;
-    UINT8 timeTenth;
 
-    FAT_Utility::GetCurrentFATTime( &date, &time, &timeTenth );
+    FAT_Utility::GetCurrentFATTime( &date, &time, NULL );
 
+    dirEntry = m_file.GetDirectoryEntry( TRUE );
+
+    if(!dirEntry) TINYCLR_SET_AND_LEAVE(CLR_E_FILE_IO);
+    
     dirEntry->Set_DIR_WrtDate ( date );
     dirEntry->Set_DIR_WrtTime ( time );
     dirEntry->Set_DIR_LstAccDate(date);
+#endif
     
     TINYCLR_NOCLEANUP();
 }
 
 HRESULT FAT_FileHandle::Flush()
 {
-    m_logicDisk->SectorCache.FlushAll();
+    TINYCLR_HEADER();
 
-    return S_OK;
+    if (0 != (m_readWriteState & ReadWriteState__WRITE))
+    {
+        UINT16         date, time;
+        FAT_Directory* dirEntry;
+
+#ifndef FAT_FS__DO_NOT_UPDATE_FILE_ACCESS_TIME
+        dirEntry = m_file.GetDirectoryEntry( TRUE );
+
+        if(!dirEntry) TINYCLR_SET_AND_LEAVE(CLR_E_FILE_IO);
+
+        FAT_Utility::GetCurrentFATTime( &date, &time, NULL );
+        
+        if(dirEntry->Get_DIR_LstAccDate() != date)
+        {            
+            dirEntry->Set_DIR_LstAccDate( date );
+        }
+        
+        if((m_readWriteState & ReadWriteState__WRITE) == ReadWriteState__WRITE)
+        {
+            dirEntry->Set_DIR_WrtDate ( date );
+            dirEntry->Set_DIR_WrtTime ( time );
+        } 
+#else 
+        dirEntry = m_file.GetDirectoryEntry( FALSE );
+
+        if(!dirEntry) TINYCLR_SET_AND_LEAVE(CLR_E_FILE_IO);
+
+#endif //FAT_FS__DO_NOT_UPDATE_FILE_ACCESS_TIME
+
+        {
+            INT64 pos = m_position;
+        
+            m_clusIndex = dirEntry->GetFstClus();
+            m_sectIndex = m_logicDisk->ClusToSect( m_clusIndex );
+            m_dataIndex = 0;
+            m_position  = 0;
+
+            TINYCLR_CHECK_HRESULT(ReadWriteSeekHelper( Helper_Flush, NULL, dirEntry->Get_DIR_FileSize(), NULL ));    
+
+            Seek( pos, SEEKORIGIN_BEGIN, NULL );
+        }
+    }
+
+    TINYCLR_NOCLEANUP();
 }
 
 HRESULT FAT_FileHandle::Seek( INT64 offset, UINT32 origin, INT64* position )
 {
     TINYCLR_HEADER();
     
-    FAT_Directory* dirEntry = m_file.GetDirectoryEntry();
-
-    UINT32 dirFileSize  = dirEntry->Get_DIR_FileSize();
+    UINT32         dirFileSize;
+    FAT_Directory* dirEntry = m_file.GetDirectoryEntry( FALSE );
+    
     if(!dirEntry) TINYCLR_SET_AND_LEAVE(CLR_E_FILE_IO);
+
+    dirFileSize = dirEntry->Get_DIR_FileSize();
 
     // If there's another handle that's modifying the filesize, make sure m_position is valid
     if(m_position > dirFileSize)
@@ -322,6 +368,11 @@ HRESULT FAT_FileHandle::Seek( INT64 offset, UINT32 origin, INT64* position )
             
             TINYCLR_SET_AND_LEAVE(S_OK);
         }
+
+        // Reload dirEntry after SetLength
+        dirEntry = m_file.GetDirectoryEntry( FALSE );
+
+        if(!dirEntry) TINYCLR_SET_AND_LEAVE(CLR_E_FILE_IO);
         
         m_clusIndex = dirEntry->GetFstClus();
         m_sectIndex = m_logicDisk->ClusToSect( m_clusIndex );
@@ -331,7 +382,7 @@ HRESULT FAT_FileHandle::Seek( INT64 offset, UINT32 origin, INT64* position )
         offset = newPosition;
     }
 
-    TINYCLR_CHECK_HRESULT(ReadWriteSeekHelper( Helper_Seek, NULL, offset, NULL ));
+    TINYCLR_CHECK_HRESULT(ReadWriteSeekHelper( Helper_Seek, NULL, (int)offset, NULL ));
     
     if(position) *position = m_position;
 
@@ -345,7 +396,7 @@ HRESULT FAT_FileHandle::GetLength( INT64* length )
         return CLR_E_INVALID_PARAMETER;
     }
     
-    FAT_Directory* dirEntry = m_file.GetDirectoryEntry();
+    FAT_Directory* dirEntry = m_file.GetDirectoryEntry( FALSE );
 
     if(!dirEntry) return CLR_E_FILE_IO;
     
@@ -368,7 +419,7 @@ HRESULT FAT_FileHandle::SetLength( INT64 length )
         TINYCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
     }
 
-    dirEntry = m_file.GetDirectoryEntry();
+    dirEntry = m_file.GetDirectoryEntry( FALSE );
 
     if(!dirEntry) TINYCLR_SET_AND_LEAVE(CLR_E_FILE_IO);
     
@@ -443,7 +494,7 @@ HRESULT FAT_FileHandle::SetLength( INT64 length )
 
         TINYCLR_CHECK_HRESULT(Seek( 0, SEEKORIGIN_END, &endPosition ));
 
-        TINYCLR_CHECK_HRESULT(Write( NULL, length - endPosition, NULL ));
+        TINYCLR_CHECK_HRESULT(Write( NULL, (int)(length - endPosition), NULL ));
 
         TINYCLR_CHECK_HRESULT(Seek( oldPosition, SEEKORIGIN_BEGIN, NULL ));
     }

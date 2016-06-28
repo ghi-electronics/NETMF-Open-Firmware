@@ -100,11 +100,14 @@ namespace Microsoft.SPOT.Platform.Tests
             }
             // Make a buffer size of the bytes in read buffer
             string readString = "";
+            Thread.Sleep(100);
             while (this.BytesToRead > 0)
             {
                 byte[] readbuff = new byte[this.BytesToRead];
                 this.Read(readbuff, 0, readbuff.Length);
                 readString += new string(Encoding.UTF8.GetChars(readbuff));
+
+                Thread.Sleep(100);
             }
             this.Close();
             if (data != readString)

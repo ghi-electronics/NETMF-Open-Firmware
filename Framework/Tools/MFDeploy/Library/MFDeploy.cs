@@ -41,6 +41,8 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
         public int       DiscoveryMulticastTimeout     { get { return m_DiscoveryMulticastTimeout;     } set { m_DiscoveryMulticastTimeout     = value; } }
         public int       DiscoveryTTL                  { get { return m_DiscoveryTTL;                  } set { m_DiscoveryTTL                  = value; } }
 
+
+
         /// <summary>
         /// Enumerates the available ports for .Net Micro Framework devices.
         /// Also, USART or COM ports will be listed even if there is no device attached.
@@ -52,7 +54,7 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
             {
                 types = new TransportType[] { TransportType.Serial, TransportType.TCPIP, TransportType.USB };
             }
-            
+
             m_deviceList.Clear();
 
             foreach (TransportType type in types)
@@ -61,11 +63,21 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
 
                 if (type == TransportType.TCPIP)
                 {
-                    list = new  ArrayList(_DBG.PortDefinition_Tcp.EnumeratePorts(m_DiscoveryMulticastAddress, m_DiscoveryMulticastAddressRecv, m_DiscoveryMulticastPort, m_DiscoveryMulticastToken, m_DiscoveryMulticastTimeout, m_DiscoveryTTL));
+                    list = new ArrayList(_DBG.PortDefinition_Tcp.EnumeratePorts(m_DiscoveryMulticastAddress, m_DiscoveryMulticastAddressRecv, m_DiscoveryMulticastPort, m_DiscoveryMulticastToken, m_DiscoveryMulticastTimeout, m_DiscoveryTTL));
                 }
                 else
                 {
-                    list = _DBG.PortDefinition.Enumerate(type == TransportType.USB ? _DBG.PortFilter.Usb : _DBG.PortFilter.Serial);
+                    switch (type)
+                    {
+                        case TransportType.USB:
+                            list = _DBG.PortDefinition.Enumerate(_DBG.PortFilter.Usb);
+                            break;
+                        case TransportType.Serial:
+                            list = _DBG.PortDefinition.Enumerate(_DBG.PortFilter.Serial);
+                            break;
+                        default:
+                            throw new ArgumentException();
+                    }
                 }
 
                 foreach (_DBG.PortDefinition pd in list)

@@ -32,6 +32,7 @@ BOOL EEPROM_STM95x::Initialize( GPIO_PIN ChipSelect, UINT32 SPI_Module )
     s_spi_device.m_SPI_Config.MD_16bits      = FALSE;
     s_spi_device.m_SPI_Config.MSK_SampleEdge = TRUE;
     s_spi_device.m_SPI_Config.SPI_mod        = SPI_Module; 
+    s_spi_device.m_SPI_Config.BusyPin.Pin    = GPIO_PIN_NONE;
 
     for(UINT32 i=0; i<SUBORDINATE_DATA_LENGTH; i++)
     {

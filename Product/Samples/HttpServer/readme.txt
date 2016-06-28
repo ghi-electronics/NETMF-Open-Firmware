@@ -4,14 +4,30 @@ This sample demonstrates the following:
 -  Using the Http and Https classes to create an HTTP or HTTPS file server.  
 -  Setting up certificates.
 -  Mapping the host name to the IP address of your PC or device.
--  Validating DMS.
+-  Validating DNS.
+-  Simple HTTP(s) Remote Update for supported platforms
 
 This sample runs on the following devices:
 -  The .NET Micro Framework SDK 4.0 Emulator.
 -  Any physical device that implements Sockets API and the Block Storage API. 
 -  Any emulator that implements the Microsoft.SPOT.Emulator.Sockets interface 
    and the Microsoft.SPOT.Emulator.BlockStorage interface.
+-  MFUpdate support is currently only implemented on the iMXS_net_open platform.
 
+MFUpdate procedure
+-  When you build your solution the images are compressed and concatenated 
+   automatically in the last step of the build process.  This generates a 
+   series of .nmf files (one for each target binary file ER_DAT.nmf, ER_FLASH.nmf, 
+   ER_CONFIG.nmf and TinyCLR.nmf).  The TinyCLR.nmf file contains all of the 
+   normal firmware images (ER_FLASH, ER_DAT and ER_CONFIG).  When using this
+   HTTP(s) server sample you can test firmware uploads by selecting one of these
+   .nmf files in the "Install Firmware Update" file upload.  Currently only the
+   iMXS_net_open solution supports this sample.  If when you upload the firmware
+   image file, the browser will generate a new tab which will be busy until the 
+   download is complete (please be patient).  The output window should display
+   the current packet progress during the install.  After the download is complete,
+   the device will reset and decompress the image.  During this time the device will
+   appear unresponsive for around 30 seconds while the image is installed.
 
 To build and run this sample:
 
@@ -80,6 +96,8 @@ Continue to the next steps.
 
 
 C. Mapping the host name to the IP address of your PC or device
+   (This step is only required if you do not want to see a warning about the 
+   certificate's CN name not matching the URL.)
 
 1. Obtain the IP address of your PC (if using an emulator) or device.  To get 
    the IP address of your PC: open a command prompt, and issue the ipconfig 
@@ -103,8 +121,8 @@ C. Mapping the host name to the IP address of your PC or device
 Continue to the next steps.
 
 
-D. Validating DMS
-o  Validate that DMS is properly set up.  To do this, open a command prompt.
+D. Validating DNS
+   Validate that DNS is properly set up.  To do this, open a command prompt.
    - For an emulator, issue the command:
      ping zachl-sba1.redmond.corp.microsoft.com
    - For a device, issue the command:

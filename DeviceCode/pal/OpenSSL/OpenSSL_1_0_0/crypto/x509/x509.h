@@ -178,8 +178,8 @@ typedef struct X509_name_entry_st
 	int size; 	/* temp variable */
 	} X509_NAME_ENTRY;
 
-DECLARE_STACK_OF(X509_NAME_ENTRY)
-DECLARE_ASN1_SET_OF(X509_NAME_ENTRY)
+//DECLARE_STACK_OF(X509_NAME_ENTRY)
+//DECLARE_ASN1_SET_OF(X509_NAME_ENTRY)
 
 /* we always keep X509_NAMEs in 2 forms. */
 struct X509_name_st
@@ -258,6 +258,7 @@ typedef struct x509_cinf_st
 	ASN1_BIT_STRING *issuerUID;		/* [ 1 ] optional in v2 */
 	ASN1_BIT_STRING *subjectUID;		/* [ 2 ] optional in v2 */
 	STACK_OF(X509_EXTENSION) *extensions;	/* [ 3 ] optional in v3 */
+	ASN1_ENCODING enc;
 	} X509_CINF;
 
 /* This stuff is certificate "auxiliary info"

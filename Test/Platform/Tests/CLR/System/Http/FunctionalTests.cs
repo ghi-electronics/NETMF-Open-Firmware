@@ -45,7 +45,7 @@ namespace Microsoft.SPOT.Platform.Tests
             {
                 Log.Comment("Small web page - redirect");
                 // Print for now, Parse later
-                Log.Comment(new string(Encoding.UTF8.GetChars(GetRequested("http://www.microsoft.com", "IIS"))));
+                string data = new string(Encoding.UTF8.GetChars(GetRequested("http://www.microsoft.com", "IIS")));
             }
             catch (Exception ex)
             {
@@ -62,7 +62,7 @@ namespace Microsoft.SPOT.Platform.Tests
             {
                 Log.Comment("SUN web page");
                 // Print for now, Parse later
-                Log.Comment(new string(Encoding.UTF8.GetChars(GetRequested("http://www.nytimes.com", "SUN"))));
+                string data = new string(Encoding.UTF8.GetChars(GetRequested("http://www.nytimes.com", "SUN")));
             }
             catch (Exception ex)
             {
@@ -79,7 +79,7 @@ namespace Microsoft.SPOT.Platform.Tests
             {
                 Log.Comment("Apache Web server");
                 // Print for now, Parse later
-                Log.Comment(new string(Encoding.UTF8.GetChars(GetRequested("http://www.apache.org", "Apache"))));
+                string data = new string(Encoding.UTF8.GetChars(GetRequested("http://www.apache.org", "Apache")));
             }
             catch (Exception ex)
             {
@@ -96,7 +96,7 @@ namespace Microsoft.SPOT.Platform.Tests
             {
                 Log.Comment("Google Web server");
                 // Print for now, Parse later
-                Log.Comment(new string(Encoding.UTF8.GetChars(GetRequested("http://www.google.com", "GWS"))));
+                string data = new string(Encoding.UTF8.GetChars(GetRequested("http://www.google.com", "GWS")));
             }
             catch (ArgumentException) { /* Don't care if google doesn't return wrong header, happens at major 'holidays' like april 1 */ }
             catch (Exception ex)
@@ -114,7 +114,7 @@ namespace Microsoft.SPOT.Platform.Tests
             {
                 Log.Comment("Lighttpd Web server");
                 // Print for now, Parse later
-                Log.Comment(new string(Encoding.UTF8.GetChars(GetRequested("http://redmine.lighttpd.net", "Lighttpd"))));
+                string data = new string(Encoding.UTF8.GetChars(GetRequested("http://redmine.lighttpd.net", "Lighttpd")));
             }
             catch (Exception ex)
             {
@@ -131,10 +131,10 @@ namespace Microsoft.SPOT.Platform.Tests
             try
             {
                 Log.Comment("Get RSS feed");
-                byte[] page = GetRequested("http://www.microsoft.com/feeds/msdn/en-us/rss.xml", "IIS");
+                byte[] page = GetRequested("http://msdn.microsoft.com/en-us/magazine/rss/default.aspx?z=z&iss=1", "IIS");
                 Log.Comment("Create xml document from feed");
                 Log.Comment("Raw Page");
-                Log.Comment(new string(Encoding.UTF8.GetChars(page)));
+                string data = new string(Encoding.UTF8.GetChars(page));
                 using (MemoryStream stream = new MemoryStream(page))
                 {
                     XmlReader reader = XmlReader.Create(stream);

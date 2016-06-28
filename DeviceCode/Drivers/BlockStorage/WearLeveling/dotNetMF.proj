@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectPath>$(SPOCLIENT)\DeviceCode\Drivers\BlockStorage\WearLeveling\dotnetmf.proj</ProjectPath>
     <ProjectGuid>{5A76F74A-4E78-4855-BFD1-86D1A637AFCA}</ProjectGuid>
@@ -12,7 +13,7 @@
     <Groups>BlockStorage</Groups>
     <Documentation>
     </Documentation>
-    <PlatformIndependent>False</PlatformIndependent>    
+    <PlatformIndependent>False</PlatformIndependent>
     <CustomFilter>
     </CustomFilter>
     <Required>False</Required>
@@ -40,9 +41,10 @@
   <Import Project="$(SPOCLIENT)\Framework\features\BlockStorage_HAL.libcatproj" />
   <PropertyGroup />
   <ItemGroup>
-    <HFiles Include="BS_WearLeveling.h" />
     <Compile Include="BS_WearLeveling_driver.cpp" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="bs_wearleveling.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

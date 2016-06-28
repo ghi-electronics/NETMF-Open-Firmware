@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 /// This program demonstrates how to use the .NET Micro Framework HTTP classes 
 /// to create a simple HTTP client that retrieves pages from several different 
@@ -21,6 +22,18 @@ namespace HttpClientSample
         /// </summary>
         public static void Main()
         {
+            Microsoft.SPOT.Hardware.Utility.SetLocalTime(new DateTime(2012, 7, 24));
+
+            // Wait for DHCP (on LWIP devices)
+            while (true)
+            {
+                IPAddress ip = IPAddress.GetDefaultLocalAddress();
+
+                if (ip != IPAddress.Any) break;
+
+                Thread.Sleep(1000);
+            }
+
             // Root CA Certificate needed to validate HTTPS servers.
             byte[] ca = Resource1.GetBytes(
                 Resource1.BinaryResources.VerisignCA);
@@ -31,7 +44,7 @@ namespace HttpClientSample
             // Initialize the default webproxy to be used by all 
             // HttpWebRequests.
             // Change the proxy address to fit your environment.
-            HttpWebRequest.DefaultWebProxy = 
+            HttpWebRequest.DefaultWebProxy =
                 new WebProxy("itgproxy.dns.microsoft.com", true);
 
             // Print the HTTP data from each of the following pages.

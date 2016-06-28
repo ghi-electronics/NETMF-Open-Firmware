@@ -16,7 +16,7 @@ void ssl_rand_seed(const void *seed, int length)
 BOOL SSL_Initialize()
 {
     NATIVE_PROFILE_PAL_COM();
-    return TRUE;
+    return FALSE;
 }
 
 BOOL SSL_Uninitialize()

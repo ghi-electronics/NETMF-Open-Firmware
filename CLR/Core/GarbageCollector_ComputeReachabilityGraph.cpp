@@ -202,14 +202,6 @@ bool CLR_RT_GarbageCollector::ComputeReachabilityGraphForMultipleBlocks( CLR_RT_
 
     //--//
 
-#if !defined(TINYCLR_NO_ASSEMBLY_STRINGS)
-                case DATATYPE_STRING:
-                    {
-                        CLR_RT_Assembly* assm = ptr->StringAssembly();                            
-                    }
-                    break;
-#endif
-
                 case DATATYPE_ARRAY_BYREF:
                     sub = (CLR_RT_HeapBlock*)ptr->Array();
                     break;

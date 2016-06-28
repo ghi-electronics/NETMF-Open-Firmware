@@ -109,7 +109,7 @@ void __section(SectionForBootstrapOperations) BootstrapCode_Clocks()
     LPC24XX::SYSCON().PLLFEED = 0x55;
     
     // Enable UART2
-        LPC24XX::SYSCON().PCONP |= (1<<24);
+    LPC24XX::SYSCON().PCONP |= (1<<24);
 }
 
 //should be unused in the LPC24XX, I'm leaving it here as a possible reference
@@ -135,22 +135,23 @@ void __section(SectionForBootstrapOperations) BootstrapCode_Ext_SRAM()
 void __section(SectionForBootstrapOperations) BootstrapCode_Ext_Flash()
 {
     // NOR Flash
-    LPC24XX::EMC().SWAITWEN0 = 0x0; // 0x2
-    LPC24XX::EMC().SWAITOEN0 = 0x0; // 0x2
-    LPC24XX::EMC().SWAITRD0 = 0x7;  // 0x1f
-    LPC24XX::EMC().SWAITPAGE0 = 0x1f;
-    LPC24XX::EMC().SWAITWR0 = 0x4; //0x1f
-    LPC24XX::EMC().SWAITTURN0 = 0x0;//0xf
-    LPC24XX::EMC().SCONFIG0 = 0x00000081;
+    LPC24XX_EMC& emc = LPC24XX::EMC();
+    emc.SWAITWEN0 = 0x0; // 0x2
+    emc.SWAITOEN0 = 0x0; // 0x2
+    emc.SWAITRD0 = 0x4;  // 0x1f
+    emc.SWAITPAGE0 = 0x1f;
+    emc.SWAITWR0 = 0x4; //0x1f
+    emc.SWAITTURN0 = 0x0;//0xf
+    emc.SCONFIG0 = 0x00000081;
 
     // NAND Flash
-    LPC24XX::EMC().SWAITWEN1 = 0x2;
-    LPC24XX::EMC().SWAITOEN1 = 0x2;
-    LPC24XX::EMC().SWAITRD1 = 0x8;
-    LPC24XX::EMC().SWAITPAGE1 = 0x1f;
-    LPC24XX::EMC().SWAITWR1 = 0x8;
-    LPC24XX::EMC().SWAITTURN1 = 0xf;
-    LPC24XX::EMC().SCONFIG1 = 0x00000080;
+    emc.SWAITWEN1 = 0x2;
+    emc.SWAITOEN1 = 0x2;
+    emc.SWAITRD1 = 0x8;
+    emc.SWAITPAGE1 = 0x1f;
+    emc.SWAITWR1 = 0x8;
+    emc.SWAITTURN1 = 0xf;
+    emc.SCONFIG1 = 0x00000080;
 }
 
 void __section(SectionForBootstrapOperations) BootstrapCode_Pins()
@@ -220,10 +221,9 @@ void __section(SectionForBootstrapOperations) BootstrapCode_Ext_SDRAM()
     LPC24XX::EMC().DCONTROL = 0x00000103;
     LPC24XX::EMC().DREFRESH = 0x00000002;
     
-    //wait for precharge
-    for(i = 0; i < 0x40; i++)	// wait 128 AHB clock cycles
-    {
-    }
+    // wait for precharge
+    // wait 128 AHB clock cycles
+    Bootstrap_Delay(0x40);
     
     //Set refresh period
     LPC24XX::EMC().DREFRESH = 28;

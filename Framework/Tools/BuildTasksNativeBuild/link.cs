@@ -329,6 +329,7 @@ namespace Microsoft.SPOT.Tasks.NativeBuild
             if (debug)
             {
                 builder.AppendSwitch("/DEBUG");
+                builder.AppendSwitch("/ASSEMBLYDEBUG");
             }
 
             if (null != DEFLIBS)

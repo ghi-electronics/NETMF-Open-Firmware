@@ -66,7 +66,6 @@
 #include <openssl/opensslconf.h>
 
 #ifndef OPENSSL_NO_KRB5
-
 #ifdef OPENSSL_SYS_WINDOWS
 #include <stdio.h>
 #include <ctype.h>

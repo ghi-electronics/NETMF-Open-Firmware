@@ -16,3 +16,4 @@
 #include "spot_native_Microsoft_SPOT_SerializationHintsAttribute.cpp"
 #include "spot_native_Microsoft_SPOT_UnknownTypeException.cpp"
 #include "spot_native_Microsoft_SPOT_WeakDelegate.cpp"
+#include "spot_native_System_Security_Cryptography_X509Certificates_X509Certificate.cpp"

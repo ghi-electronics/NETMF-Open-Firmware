@@ -250,6 +250,8 @@ dhcp_select(struct netif *netif)
   struct dhcp *dhcp = netif->dhcp;
   err_t result;
   u16_t msecs;
+  //[MS_CHANGE] - this option is set by the NetMF network configuration
+  u8_t dynamicDns = 0 != (netif->flags & NETIF_FLAG_DYNAMIC_DNS);
 #if LWIP_NETIF_HOSTNAME
   const char *p;
 #endif /* LWIP_NETIF_HOSTNAME */
@@ -273,11 +275,16 @@ dhcp_select(struct netif *netif)
     dhcp_option(dhcp, DHCP_OPTION_SERVER_ID, 4);
     dhcp_option_long(dhcp, ntohl(dhcp->server_ip_addr.addr));
 
-    dhcp_option(dhcp, DHCP_OPTION_PARAMETER_REQUEST_LIST, 4/*num options*/);
+    dhcp_option(dhcp, DHCP_OPTION_PARAMETER_REQUEST_LIST, dynamicDns ? 4 : 3/*num options*/);
     dhcp_option_byte(dhcp, DHCP_OPTION_SUBNET_MASK);
     dhcp_option_byte(dhcp, DHCP_OPTION_ROUTER);
     dhcp_option_byte(dhcp, DHCP_OPTION_BROADCAST);
-    dhcp_option_byte(dhcp, DHCP_OPTION_DNS_SERVER);
+
+    //[MS_CHANGE] - this option is set by the NetMF network configuration
+    if(dynamicDns)
+    {
+        dhcp_option_byte(dhcp, DHCP_OPTION_DNS_SERVER);
+    }
 
 #if LWIP_NETIF_HOSTNAME
     p = (const char*)netif->hostname;
@@ -827,6 +834,9 @@ dhcp_discover(struct netif *netif)
   err_t result = ERR_OK;
   u16_t msecs;
   int i;
+  // [MS_CHANGE] - this option is set by the NetMF network configuration
+  u8_t dynamicDns = 0 != (netif->flags & NETIF_FLAG_DYNAMIC_DNS);
+
   LWIP_DEBUGF(DHCP_DEBUG | LWIP_DBG_TRACE, ("dhcp_discover()\n"));
   ip_addr_set(&dhcp->offered_ip_addr, IP_ADDR_ANY);
   dhcp_set_state(dhcp, DHCP_SELECTING);
@@ -840,13 +850,18 @@ dhcp_discover(struct netif *netif)
     dhcp_option(dhcp, DHCP_OPTION_MAX_MSG_SIZE, DHCP_OPTION_MAX_MSG_SIZE_LEN);
     dhcp_option_short(dhcp, DHCP_MAX_MSG_LEN(netif));
 
-    dhcp_option(dhcp, DHCP_OPTION_PARAMETER_REQUEST_LIST, 4/*num options*/);
+    dhcp_option(dhcp, DHCP_OPTION_PARAMETER_REQUEST_LIST, dynamicDns ? 4 : 3 /*num options*/);
     dhcp_option_byte(dhcp, DHCP_OPTION_SUBNET_MASK);
     dhcp_option_byte(dhcp, DHCP_OPTION_ROUTER);
     dhcp_option_byte(dhcp, DHCP_OPTION_BROADCAST);
-    dhcp_option_byte(dhcp, DHCP_OPTION_DNS_SERVER);
 
-    // [MS_CHANGE - Add ClientId option required for MS DHCP network]
+    // [MS_CHANGE] - this option is set by the NetMF network configuration
+    if(dynamicDns)
+    {
+        dhcp_option_byte(dhcp, DHCP_OPTION_DNS_SERVER);
+    }
+
+    // [MS_CHANGE] - Add ClientId option required for MS DHCP network
     dhcp_option(dhcp, DHCP_OPTION_CLIENT_ID, 1 + netif->hwaddr_len);
     dhcp_option_byte(dhcp, 1                    ); //type - HardwareAddress
     for(i=0; i<netif->hwaddr_len; i++)

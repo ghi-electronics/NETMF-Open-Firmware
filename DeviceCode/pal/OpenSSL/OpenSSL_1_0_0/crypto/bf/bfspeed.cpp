@@ -188,12 +188,12 @@ int main(int argc, char **argv)
 #endif
 
 #ifndef TIMES
-	TINYCLR_SSL_FPRINTF("To get the most accurate results, try to run this\n");
-	TINYCLR_SSL_FPRINTF("program when this computer is idle.\n");
+	TINYCLR_SSL_PRINTF("To get the most accurate results, try to run this\n");
+	TINYCLR_SSL_PRINTF("program when this computer is idle.\n");
 #endif
 
 #ifndef SIGALRM
-	TINYCLR_SSL_FPRINTF("First we calculate the approximate speed ...\n");
+	TINYCLR_SSL_PRINTF("First we calculate the approximate speed ...\n");
 	BF_set_key(&sch,16,key);
 	count=10;
 	do	{
@@ -209,14 +209,14 @@ int main(int argc, char **argv)
 	ca=count/512;
 	cb=count;
 	cc=count*8/BUFSIZE+1;
-	TINYCLR_SSL_FPRINTF("Doing BF_set_key %ld times\n",ca);
+	TINYCLR_SSL_PRINTF("Doing BF_set_key %ld times\n",ca);
 #define COND(d)	(count != (d))
 #define COUNT(d) (d)
 #else
 #define COND(c)	(run)
 #define COUNT(d) (count)
 	signal(SIGALRM,sig_done);
-	TINYCLR_SSL_FPRINTF("Doing BF_set_key for 10 seconds\n");
+	TINYCLR_SSL_PRINTF("Doing BF_set_key for 10 seconds\n");
 	alarm(10);
 #endif
 
@@ -229,14 +229,14 @@ int main(int argc, char **argv)
 		BF_set_key(&sch,16,key);
 		}
 	d=Time_F(STOP);
-	TINYCLR_SSL_FPRINTF("%ld BF_set_key's in %.2f seconds\n",count,d);
+	TINYCLR_SSL_PRINTF("%ld BF_set_key's in %.2f seconds\n",count,d);
 	a=((double)COUNT(ca))/d;
 
 #ifdef SIGALRM
-	TINYCLR_SSL_FPRINTF("Doing BF_encrypt's for 10 seconds\n");
+	TINYCLR_SSL_PRINTF("Doing BF_encrypt's for 10 seconds\n");
 	alarm(10);
 #else
-	TINYCLR_SSL_FPRINTF("Doing BF_encrypt %ld times\n",cb);
+	TINYCLR_SSL_PRINTF("Doing BF_encrypt %ld times\n",cb);
 #endif
 	Time_F(START);
 	for (count=0,run=1; COND(cb); count+=4)
@@ -249,15 +249,15 @@ int main(int argc, char **argv)
 		BF_encrypt(data,&sch);
 		}
 	d=Time_F(STOP);
-	TINYCLR_SSL_FPRINTF("%ld BF_encrypt's in %.2f second\n",count,d);
+	TINYCLR_SSL_PRINTF("%ld BF_encrypt's in %.2f second\n",count,d);
 	b=((double)COUNT(cb)*8)/d;
 
 #ifdef SIGALRM
-	TINYCLR_SSL_FPRINTF("Doing BF_cbc_encrypt on %ld byte blocks for 10 seconds\n",
+	TINYCLR_SSL_PRINTF("Doing BF_cbc_encrypt on %ld byte blocks for 10 seconds\n",
 		BUFSIZE);
 	alarm(10);
 #else
-	TINYCLR_SSL_FPRINTF("Doing BF_cbc_encrypt %ld times on %ld byte blocks\n",cc,
+	TINYCLR_SSL_PRINTF("Doing BF_cbc_encrypt %ld times on %ld byte blocks\n",cc,
 		BUFSIZE);
 #endif
 	Time_F(START);
@@ -265,13 +265,13 @@ int main(int argc, char **argv)
 		BF_cbc_encrypt(buf,buf,BUFSIZE,&sch,
 			&(key[0]),BF_ENCRYPT);
 	d=Time_F(STOP);
-	TINYCLR_SSL_FPRINTF("%ld BF_cbc_encrypt's of %ld byte blocks in %.2f second\n",
+	TINYCLR_SSL_PRINTF("%ld BF_cbc_encrypt's of %ld byte blocks in %.2f second\n",
 		count,BUFSIZE,d);
 	c=((double)COUNT(cc)*BUFSIZE)/d;
 
-	TINYCLR_SSL_FPRINTF("Blowfish set_key       per sec = %12.3f (%9.3fuS)\n",a,1.0e6/a);
-	TINYCLR_SSL_FPRINTF("Blowfish raw ecb bytes per sec = %12.3f (%9.3fuS)\n",b,8.0e6/b);
-	TINYCLR_SSL_FPRINTF("Blowfish cbc     bytes per sec = %12.3f (%9.3fuS)\n",c,8.0e6/c);
+	TINYCLR_SSL_PRINTF("Blowfish set_key       per sec = %12.3f (%9.3fuS)\n",a,1.0e6/a);
+	TINYCLR_SSL_PRINTF("Blowfish raw ecb bytes per sec = %12.3f (%9.3fuS)\n",b,8.0e6/b);
+	TINYCLR_SSL_PRINTF("Blowfish cbc     bytes per sec = %12.3f (%9.3fuS)\n",c,8.0e6/c);
 	TINYCLR_SSL_EXIT(0);
 #if defined(LINT) || defined(OPENSSL_SYS_MSDOS)
 	return(0);

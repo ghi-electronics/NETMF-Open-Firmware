@@ -72,6 +72,14 @@
     #define AT91C_RTSC__PERRST      0x04         // Peripheral reset bit
     #define AT91C_RTSC__EXTRST      0x08         // asserts NRST pin
     #define AT91C_RSTC__RESET_KEY   0xA5000000   // reset key
+#define AT91C_BASE_RSTC_SR      0xFFFFFD04 
+    #define AT91C_RTSC_SR__SRCMP    (1ul < 17)   // Software Reset Command in progress
+    #define AT91C_RTSC_SR__NRSTL    (1ul < 16)   // Registers the NRST Pin Level at Master Clock (MCK)
+    #define AT91C_RTSC_SR__RSTTYP   (7ul <  8)   // Reset Type mask
+    #define AT91C_RTSC_SR__BODSTS   (1ul <  1)   // Brownout Detection Status
+    #define AT91C_RTSC_SR__URSTS    (1ul <  0)   // User Reset Status
+#define AT91C_BASE_RSTC_MR      0xFFFFFD08 
+  
 // (RTTC) Base Address
 #define AT91C_BASE_RTTC         0xFFFFFD20 
 // (PITC) Base Address
@@ -194,12 +202,12 @@
 
 #define AT91_TXD0   AT91_GPIO_Driver::PA0
 #define AT91_RXD0   AT91_GPIO_Driver::PA1
-#define AT91_RST0   AT91_GPIO_Driver::PA3
+#define AT91_RTS0   AT91_GPIO_Driver::PA3
 #define AT91_CTS0   AT91_GPIO_Driver::PA4
 
 #define AT91_TXD1   AT91_GPIO_Driver::PA5
 #define AT91_RXD1   AT91_GPIO_Driver::PA6
-#define AT91_RST1   AT91_GPIO_Driver::PA8
+#define AT91_RTS1   AT91_GPIO_Driver::PA8
 #define AT91_CTS1   AT91_GPIO_Driver::PA9
 
 // Define the multiplexing pins - EMAC-MII

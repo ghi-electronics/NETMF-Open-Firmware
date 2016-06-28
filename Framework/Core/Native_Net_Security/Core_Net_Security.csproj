@@ -15,6 +15,7 @@
     <MMP_STUB_SKIP>false</MMP_STUB_SKIP>
     <MMP_STUB_GenerateSkeletonFile>$(BUILD_TREE_STUBS)\spot_net_security_native</MMP_STUB_GenerateSkeletonFile>
     <MMP_STUB_GenerateSkeletonProject>SPOT_Net_Security</MMP_STUB_GenerateSkeletonProject>
+    <MMP_STUB_LegacySkeletonInterop>true</MMP_STUB_LegacySkeletonInterop>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="NetworkSecurity.cs" />

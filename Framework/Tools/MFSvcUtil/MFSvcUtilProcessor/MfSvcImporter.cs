@@ -92,6 +92,11 @@ namespace Ws.SvcImporter
                 {
                     reader = XmlReader.Create(fileName, settings);
                     ServiceDescription sd = ServiceDescription.Read(reader, true);
+
+                    for(int i=0; i<sd.Bindings.Count;i++)
+                    {
+                        m_svcDesc.Bindings.Add(sd.Bindings[i]);
+                    }
                     reader.Close();
 
                     importFiles.Add(fileName);

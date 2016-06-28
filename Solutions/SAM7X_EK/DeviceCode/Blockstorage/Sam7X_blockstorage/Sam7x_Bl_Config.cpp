@@ -77,12 +77,10 @@ const BlockRange g_SAM7X_BS_BlockRange[] =
 {
     //
     { BlockRange::BLOCKTYPE_BOOTSTRAP       ,  0,  5 },
-    { MEMORY_BLOCKTYPE_GCC_SPECIAL_BOOTSTRAP,  6, 14 },
-    { BlockRange::BLOCKTYPE_CODE            , 15, 54 },
-    { MEMORY_BLOCKTYPE_GCC_SPECIAL_CODE     , 55, 56 },
-    { BlockRange::BLOCKTYPE_DEPLOYMENT      , 57, 60 },
-    { BlockRange::BLOCKTYPE_STORAGE_A       , 61, 61 },
-    { BlockRange::BLOCKTYPE_STORAGE_B       , 62, 62 },
+    { MEMORY_BLOCKTYPE_GCC_SPECIAL_BOOTSTRAP,  6,  7 },
+    { BlockRange::BLOCKTYPE_CODE            ,  8, 54 },
+    { MEMORY_BLOCKTYPE_GCC_SPECIAL_CODE     , 55, 57 },
+    { BlockRange::BLOCKTYPE_DEPLOYMENT      , 58, 62 },
     { BlockRange::BLOCKTYPE_CONFIG          , 63, 63 }
 };
 

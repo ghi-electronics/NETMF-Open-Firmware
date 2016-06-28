@@ -76,7 +76,7 @@ namespace Microsoft.SPOT.IO
         internal const int FSNameMaxLength = 7 + 1;   // From FS_decl.h
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        internal static extern void Format(String nameSpace, String fileSystem, uint parameter);
+        internal static extern void Format(String nameSpace, String fileSystem, String volumeLabel, uint parameter);
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         internal static extern void Delete(string path);

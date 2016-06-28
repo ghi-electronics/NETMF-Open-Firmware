@@ -124,7 +124,7 @@ int MAIN(int argc, char **argv)
 			else
 				badopt = 1;
 			}
-		else if (TINYCLR_SSL_STRCMP(argv[i], "-OPENSSL_TYPE__FILE_STDIN") == 0)
+		else if (TINYCLR_SSL_STRCMP(argv[i], "-stdin") == 0)
 			{
 			if (!pw_source_defined)
 				{
@@ -181,7 +181,7 @@ int MAIN(int argc, char **argv)
 #endif
 		BIO_printf(bio_err, "-salt string       use provided salt\n");
 		BIO_printf(bio_err, "-in file           read passwords from file\n");
-		BIO_printf(bio_err, "-OPENSSL_TYPE__FILE_STDIN             read passwords from OPENSSL_TYPE__FILE_STDIN\n");
+		BIO_printf(bio_err, "-stdin             read passwords from stdin\n");
 		BIO_printf(bio_err, "-noverify          never verify when reading password from terminal\n");
 		BIO_printf(bio_err, "-quiet             no warnings\n");
 		BIO_printf(bio_err, "-table             format output as table\n");

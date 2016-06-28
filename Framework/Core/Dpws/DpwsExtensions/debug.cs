@@ -16,7 +16,11 @@ namespace System.Ext
             {
                 try
                 {
-                    Debug.Print(new string(System.Text.Encoding.UTF8.GetChars(message), index, count));
+                    byte[] data = new byte[count];
+
+                    Array.Copy(message, index, data, 0, count);
+
+                    Debug.Print(new string(System.Text.Encoding.UTF8.GetChars(data)));
                 }
                 catch
                 {
@@ -27,13 +31,16 @@ namespace System.Ext
         [Conditional("DEBUG")]
         public static void Write(byte[] message)
         {
-            Write(message, 0, message.Length);
+            if (Verbose && message != null)
+            {
+                Write(message, 0, message.Length);
+            }
         }
 
         [Conditional("DEBUG")]
         public static void Write(string message)
         {
-            if (Verbose)
+            if (Verbose && message != null)
             {
                 Debug.Print(message);
             }

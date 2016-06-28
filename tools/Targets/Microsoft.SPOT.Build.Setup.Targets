@@ -91,7 +91,7 @@
         <TargetFrameworkDirectory>$(BUILD_TREE_DLL)</TargetFrameworkDirectory>
         <FrameworkRegistryBase>Software\Microsoft\.NETMicroFramework</FrameworkRegistryBase>
         <TargetFrameworkIdentifier>.NETMicroFramework</TargetFrameworkIdentifier>
-        <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)'== ''">v4.1</TargetFrameworkVersion>
+        <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)'== ''">v4.2</TargetFrameworkVersion>
         <AssemblyFoldersSuffix  Condition="'$(AssemblyFoldersSuffix)' == ''">AssemblyFoldersEx</AssemblyFoldersSuffix>
       </PropertyGroup>
 

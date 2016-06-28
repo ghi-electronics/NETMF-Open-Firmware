@@ -13,6 +13,8 @@
 #define ENC28J60_CS_SETUP_USEC         0
 #define ENC28J60_CS_HOLD_USEC          0
 #define ENC28J60_MODULE                GPIO_PIN_NONE
+#define ENC28J60_BUSYPIN               GPIO_PIN_NONE
+#define ENC28J60_BUSYPIN_ACTIVESTATE   FALSE
 
 //--//
 
@@ -35,6 +37,10 @@ ENC28J60_DEVICE_CONFIG g_ENC28J60_Config =
                 ENC28J60_CS_SETUP_USEC,
                 ENC28J60_CS_HOLD_USEC,
                 ENC28J60_MODULE,
+                {
+                    ENC28J60_BUSYPIN,
+                    ENC28J60_BUSYPIN_ACTIVESTATE,
+                },
             },
             
             ENC28J60_INT,                    // Interrupt Pin

@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>PXA271_bootstrap</AssemblyName>
     <Size>
@@ -51,11 +52,11 @@
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
   <PropertyGroup />
   <ItemGroup>
-    <HFiles Include="..\PXA271.h" />
     <Compile Include="PXA271_bootstrap.cpp" />
-
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Cores\arm\Processors\ARM9\Bootstrap\dotnetmf.proj" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\devicecode\drivers\blockstorage\flash\i28f_16\i28f_16.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

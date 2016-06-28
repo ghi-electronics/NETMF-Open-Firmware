@@ -50,7 +50,7 @@
     <CryptoStub Condition="'$(PLATFORM_FAMILY)'=='WCE'"     >true</CryptoStub>
     <CryptoStub Condition="'$(PLATFORM_FAMILY)'=='BLACKFIN'">true</CryptoStub>
     <CryptoStub Condition="'$(PLATFORM_FAMILY)'=='SHC'"     >true</CryptoStub>
-    <CryptoStub Condition="'$(COMPILER_TOOL_VERSION)'=='GCCOP4.2'">true</CryptoStub>
+    <CryptoStub Condition="'$(COMPILER_TOOL)'  =='GCCOP'"   >true</CryptoStub>
 
     <CustomTargets Condition="'$(CryptoStub)'=='false'">CryptoLib</CustomTargets>
     <CustomTargets Condition="'$(INSTRUCTION_SET)'=='x86'">CryptoLibX86</CustomTargets>
@@ -58,9 +58,11 @@
 
 
   <PropertyGroup Condition="'$(INSTRUCTION_SET)'!='x86'">
-    <LibSrc                                                 >lib\$(INSTRUCTION_SET)\$(DOTNETMF_COMPILER)\crypto.$(LIB_EXT)</LibSrc>
-    <LibSrc Condition="'$(COMPILER_TOOL_VERSION)'=='GCC4.2'">lib\$(INSTRUCTION_SET)\RVDS3.1\crypto.$(LIB_EXT)</LibSrc>
-    <LibSrc Condition="!EXISTS('$(LibSrc)')"                >$(LIB_DIR)\crypto_stub.$(LIB_EXT)</LibSrc>
+    <LibSrc                                                                >lib\$(INSTRUCTION_SET)\$(DOTNETMF_COMPILER)\crypto.$(LIB_EXT)</LibSrc>
+    <LibSrc Condition="'$(COMPILER_TOOL)'=='ARM' AND !EXISTS('$(LibSrc)')" >lib\$(INSTRUCTION_SET)\RVDS4.0\crypto.$(LIB_EXT)</LibSrc>
+    <LibSrc Condition="'$(COMPILER_TOOL)'=='GCC'"                          >lib\$(INSTRUCTION_SET)\RVDS3.1\crypto.$(LIB_EXT)</LibSrc>
+    <LibSrc Condition="'$(COMPILER_TOOL)'=='ARC'"                          >lib\$(INSTRUCTION_SET)\MTWR8.0\crypto.$(LIB_EXT)</LibSrc>
+    <LibSrc Condition="!EXISTS('$(LibSrc)')"                               >$(LIB_DIR)\crypto_stub.$(LIB_EXT)</LibSrc>
     <LibTo>crypto.$(LIB_EXT)</LibTo>
   </PropertyGroup>
 

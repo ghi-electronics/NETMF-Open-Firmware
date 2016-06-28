@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>ENC28J60_config_iMXS_thumb</AssemblyName>
     <Size>
@@ -59,6 +60,37 @@
     <IncludePaths Include="DeviceCode\Pal\RTIP\RTPCore" />
     <IncludePaths Include="DeviceCode\Pal\RTIP\TinyCLR" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\devicecode\drivers\ethernet\enc28j60\enc28j60_driver.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\bget.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\dhcpcapi.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\dhcpconf.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtipapi.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtipconf.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtp.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpchar.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpdate.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpdb.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpdbapi.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpenv.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpirq.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpkern.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpmem.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpmemdb.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpmtxdb.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpscnv.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpsemdb.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpsignl.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpstr.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpterm.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpthrd.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtptime.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtptypes.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtputil.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\sock.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\socket.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\tinyclr\rtpport.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\xnconf.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

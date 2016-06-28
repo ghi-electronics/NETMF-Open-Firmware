@@ -3,6 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "SPOT_Net.h"
+#include <TinyCLR_endian.h>
      
 HRESULT Library_spot_net_native_Microsoft_SPOT_Net_SocketNative::socket___STATIC__I4__I4__I4__I4( CLR_RT_StackFrame& stack )
 {
@@ -490,6 +491,8 @@ HRESULT Library_spot_net_native_Microsoft_SPOT_Net_SocketNative::MarshalSockAddr
 
     CLR_RT_HeapBlock blkArr; blkArr.SetObjectReference( NULL );
     CLR_RT_ProtectFromGC gc( blkArr );
+    SOCK_sockaddr_in* dst;
+    SOCK_sockaddr_in* src = (SOCK_sockaddr_in*)addrSrc;
         
     TINYCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Array::CreateInstance( blkArr, addrLenSrc, g_CLR_RT_WellKnownTypes.m_UInt8 ));
     
@@ -497,7 +500,13 @@ HRESULT Library_spot_net_native_Microsoft_SPOT_Net_SocketNative::MarshalSockAddr
 
     _ASSERTE(arr);
 
-    memcpy( arr->GetFirstElement(), addrSrc, addrLenSrc );
+    dst = (SOCK_sockaddr_in*)arr->GetFirstElement();
+
+    dst->sin_family           = SwapEndianIfBEc16(src->sin_family);
+    dst->sin_port             = src->sin_port;
+    dst->sin_addr.S_un.S_addr = src->sin_addr.S_un.S_addr;
+
+    memcpy(dst->sin_zero, src->sin_zero, sizeof(dst->sin_zero));
 
     _ASSERTE(blkDst.DataType() == DATATYPE_BYREF || blkDst.DataType() == DATATYPE_ARRAY_BYREF);
 
@@ -512,17 +521,23 @@ HRESULT Library_spot_net_native_Microsoft_SPOT_Net_SocketNative::MarshalSockAddr
     TINYCLR_HEADER();
 
     CLR_RT_HeapBlock_Array* ptrSockAddress;
+    SOCK_sockaddr_in* dst = (SOCK_sockaddr_in*)addrDst;
+    SOCK_sockaddr_in* src;    
 
     ptrSockAddress = blkSockAddress.DereferenceArray();                    
     FAULT_ON_NULL(ptrSockAddress);
 
     if(ptrSockAddress->m_numOfElements > addrLen) TINYCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
 
-    memcpy( addrDst, ptrSockAddress->GetFirstElement(), ptrSockAddress->m_numOfElements );
+    src = (SOCK_sockaddr_in*)ptrSockAddress->GetFirstElement();
+
+    dst->sin_family           = SwapEndianIfBEc16(src->sin_family);
+    dst->sin_port             = src->sin_port;
+    dst->sin_addr.S_un.S_addr = src->sin_addr.S_un.S_addr; //already in network byte order
+
+    memcpy(dst->sin_zero, src->sin_zero, sizeof(dst->sin_zero));
 
     addrLen = ptrSockAddress->m_numOfElements;
-
-    _ASSERTE(addrDst->sa_family == SOCK_AF_INET);
 
     TINYCLR_NOCLEANUP();
 }
@@ -538,7 +553,7 @@ HRESULT Library_spot_net_native_Microsoft_SPOT_Net_SocketNative::SendRecvHelper(
     CLR_UINT32              offset    = stack.Arg2().NumericByRef().u4;
     CLR_UINT32              count     = stack.Arg3().NumericByRef().u4;
     CLR_INT32               flags     = stack.Arg4().NumericByRef().s4;
-    CLR_INT32               timeout_ms = stack.ArgN(5).NumericByRef().s4;
+    CLR_INT32               timeout_ms = stack.Arg5().NumericByRef().s4;
     CLR_RT_HeapBlock        hbTimeout;
 
     CLR_INT64* timeout;
@@ -616,12 +631,12 @@ HRESULT Library_spot_net_native_Microsoft_SPOT_Net_SocketNative::SendRecvHelper(
         {
             struct SOCK_sockaddr addr;
             CLR_UINT32 addrLen = sizeof(addr);
-            CLR_RT_HeapBlock& blkAddr = stack.ArgN( 6 );
+            CLR_RT_HeapBlock& blkAddr = stack.Arg6();
 
             if(fSend)
             {
                 TINYCLR_CHECK_HRESULT(MarshalSockAddress( &addr, addrLen, blkAddr ));
-                
+
                 bytes = SOCK_sendto( handle, (const char*)buf, count, flags, &addr, addrLen );
             }
             else

@@ -11,6 +11,7 @@
 #include "net_decl_lwip.h"
 #include "lwip\tcp.h"
 #include "lwip\tcpip.h"
+#include <com_decl.h>
 
 //--//
 
@@ -81,6 +82,8 @@ struct Sockets_LWIP_Driver
     static INT32 Write( INT32 ComPortNum, const char* Data, size_t size );
     static INT32 Read ( INT32 ComPortNum, char*       Data, size_t size );
     static void  CloseConnections(BOOL fCloseDbg);
+    static BOOL  UpgradeToSsl( INT32 ComPortNum, const UINT8* pCACert, UINT32 caCertLen, const UINT8* pDeviceCert, UINT32 deviceCertLen, LPCSTR szTargetHost );
+    static BOOL  IsUsingSsl( INT32 ComPortNum );
 
     static void SaveConfig(INT32 index, SOCK_NetworkConfiguration *cfg);
 
@@ -135,6 +138,7 @@ struct Sockets_LWIP_Driver
 
 
     static void ClearStatusBitsForSocket(SOCK_SOCKET sock, BOOL fWrite);
+    static BOOL InitializeMulticastDiscovery();
 
 private:
 
@@ -159,8 +163,9 @@ private:
         DbgSock_Listening     = 1,
         DbgSock_Connected     = 2,
     } m_stateDebugSocket;
+
+    BOOL m_usingSSL;
     
-    static BOOL InitializeMulticastDiscovery();
     static void MulticastDiscoveryRespond(void* arg);
 
     static void CloseDebuggerSocket();
@@ -188,6 +193,7 @@ private:
     static BOOL           s_initialized;
     static const INT32    c_WellKnownDebugPort = DEBUG_SOCKET_PORT;
     static BOOL           s_wirelessInitialized;
+    static BOOL           s_discoveryInitialized;
 };
 
 extern Sockets_LWIP_Driver g_Sockets_LWIP_Driver;

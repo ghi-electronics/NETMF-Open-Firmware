@@ -53,6 +53,8 @@ HRESULT AT91_USB_Driver::Initialize( int Controller )
     AT91_UDP &udp = AT91::UDP();
     AT91_PMC &pmc = AT91::PMC();
 
+    if(State.Initialized) return S_OK;
+
     g_AT91_USB_Driver.pUsbControllerState = NULL;
 
     GLOBAL_LOCK(irq);

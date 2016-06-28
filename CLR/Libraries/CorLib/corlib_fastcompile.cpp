@@ -12,6 +12,7 @@
 #include "corlib_native_System_DateTime.cpp"
 #include "corlib_native_System_Delegate.cpp"
 #include "corlib_native_System_Diagnostics_Debugger.cpp"
+#include "corlib_native_System_Double.cpp"
 #include "corlib_native_System_Enum.cpp"
 #include "corlib_native_System_Exception.cpp"
 #include "corlib_native_System_GC.cpp"

@@ -29,7 +29,7 @@ HRESULT Library_corlib_native_System_Random::Next___I4__I4( CLR_RT_StackFrame& s
 
     maxValue = stack.Arg1().NumericByRef().s4;
 
-    if(maxValue < 0) TINYCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
+    if(maxValue <= 0) TINYCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
 
     stack.SetResult_I4( rand->Next() % maxValue );
     

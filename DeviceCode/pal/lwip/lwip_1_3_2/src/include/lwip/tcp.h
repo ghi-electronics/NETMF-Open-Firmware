@@ -256,6 +256,16 @@ enum tcp_state {
   TIME_WAIT   = 10
 };
 
+// [MS_CHANGE] - Added support for linger socket option
+/*
+ * Structure used for manipulating linger option.
+ */
+struct tcp_linger {
+       int l_onoff;                /* option on/off */
+       int l_linger;               /* linger time */
+};
+
+
 /** Flags used on input processing, not on pcb->flags
 */
 #define TF_RESET     (u8_t)0x08U   /* Connection was reset. */
@@ -356,7 +366,7 @@ struct tcp_pcb {
   u16_t snd_queuelen; /* Available buffer space for sending (in tcp_segs). */
 
   // [MS_CHANGE] - Added support for linger socket option
-  u16_t linger;
+  struct tcp_linger linger;
   
   /* These are ordered by sequence number: */
   struct tcp_seg *unsent;   /* Unsent (queued) segments. */

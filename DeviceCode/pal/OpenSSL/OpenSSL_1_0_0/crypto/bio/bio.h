@@ -61,8 +61,10 @@
 
 #include <openssl/e_os2.h>
 
+#ifdef OPENSSL_SYS_WINDOWS
 #ifndef OPENSSL_NO_FP_API
 # include <stdio.h>
+#endif
 #endif
 #include <stdarg.h>
 

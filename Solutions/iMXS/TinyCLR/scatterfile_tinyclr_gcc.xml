@@ -25,12 +25,12 @@
         <Set Name="Config_BaseAddress"  Value="0x107E0000"/>    
         <Set Name="Config_Size"         Value="0x00020000"/>
         <Set Name="Code_BaseAddress"    Value="0x10040000"/>    
-        <Set Name="Deploy_BaseAddress"  Value="0x10220000"/>
+        <Set Name="Deploy_BaseAddress"  Value="0x10280000"/>
         <Set Name="Code_Size"           Value="%Deploy_BaseAddress - Code_BaseAddress%"/>
         <Set Name="Valid"               Value="true"/>
 
         <If Name="TARGETTYPE" In="RELEASE DEBUG">
-            <Set Name="Data_BaseAddress"    Value="0x10160000"/>
+            <Set Name="Data_BaseAddress"    Value="0x10240000"/>
             <Set Name="Code_Size"           Value="%Data_BaseAddress - Code_BaseAddress%"/>
             <Set Name="Data_Size"           Value="%Deploy_BaseAddress - Data_BaseAddress%"/>
         </If>

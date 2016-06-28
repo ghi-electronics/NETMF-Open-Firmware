@@ -109,7 +109,8 @@ namespace Ws.Services.Encoding
 
             reader.ReadStartElement("Envelope", WsWellKnownUri.SoapNamespaceUri);
 
-            if(ctx.Version.IncludeSoapHeaders)
+            reader.MoveToContent();
+            if(ctx.Version.IncludeSoapHeaders || reader.LocalName == "Header")
             {
                 hdr.ParseHeader(reader, ctx.Version);
             }

@@ -33,6 +33,12 @@ HRESULT CLR_HW_Hardware::SpawnDispatcher()
     CLR_RT_HeapBlock_NativeEventDispatcher* ioPort;
     CLR_RT_HeapBlock_NativeEventDispatcher ::InterruptPortInterrupt *interruptData;
 
+    // if reboot is in progress, just bail out
+    if(CLR_EE_DBG_IS( RebootPending )) 
+    {
+        return S_OK;
+    }
+
     interrupt = (CLR_RT_ApplicationInterrupt*)m_interruptData.m_applicationQueue.FirstValidNode();
 
     if((interrupt == NULL) || !g_CLR_RT_ExecutionEngine.EnsureSystemThread( g_CLR_RT_ExecutionEngine.m_interruptThread, ThreadPriority::System_Highest ))

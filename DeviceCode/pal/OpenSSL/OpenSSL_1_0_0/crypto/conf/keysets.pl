@@ -169,7 +169,7 @@ print "static unsigned short CONF_type_default[256]={";
 for ($i=0; $i<256; $i++)
 	{
 	print "\n\t" if ($i % 8) == 0;
-	TINYCLR_SSL_PRINTF "0x%04X,",$V_def[$i];
+	printf "0x%04X,",$V_def[$i];
 	}
 
 print "\n\t};\n\n";
@@ -179,7 +179,7 @@ print "static unsigned short CONF_type_win32[256]={";
 for ($i=0; $i<256; $i++)
 	{
 	print "\n\t" if ($i % 8) == 0;
-	TINYCLR_SSL_PRINTF "0x%04X,",$V_w32[$i];
+	printf "0x%04X,",$V_w32[$i];
 	}
 
 print "\n\t};\n\n";

@@ -27,6 +27,9 @@ namespace Dpws.Device.Discovery
     {
         DpwsDeviceDiscovery m_discovery;
 
+        // defined by http://www.iana.org/assignments/port-numbers as Web Services for Devices
+        public const int DiscoveryLocalPort = 5357;
+
         //--//
         
         public DpwsDeviceDiscoService(ProtocolVersion v) : base(v)
@@ -126,6 +129,7 @@ namespace Dpws.Device.Discovery
                         if (namespaceUri == m_version.WsdpNamespaceUri && typeName == "Device")
                         {
                             match = true;
+                            break;
                         }
 
                         // If there is a host check it
@@ -134,6 +138,7 @@ namespace Dpws.Device.Discovery
                             if (Device.Host.ServiceNamespace.NamespaceURI == namespaceUri && Device.Host.ServiceTypeName == typeName)
                             {
                                 match = true;
+                                break;
                             }
                         }
 

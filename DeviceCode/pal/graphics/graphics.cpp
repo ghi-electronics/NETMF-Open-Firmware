@@ -1237,7 +1237,8 @@ BOOL Graphics_Driver::ClipToVisible( const PAL_GFX_Bitmap& target, int& x, int& 
 
 UINT32 Graphics_Driver::NativeColorInterpolate( UINT32 colorTo, UINT32 colorFrom, UINT16 scalar )
 {
-    ASSERT( scalar <= PAL_GFX_Bitmap::c_OpacityOpaque );
+    // truncate to maximum acceptable value to implement a tolerant behaviour
+    if(scalar > PAL_GFX_Bitmap::c_OpacityOpaque) scalar = PAL_GFX_Bitmap::c_OpacityOpaque;
 
     if (scalar == PAL_GFX_Bitmap::c_OpacityOpaque     ) return colorTo;
     if (scalar == PAL_GFX_Bitmap::c_OpacityTransparent) return colorFrom;

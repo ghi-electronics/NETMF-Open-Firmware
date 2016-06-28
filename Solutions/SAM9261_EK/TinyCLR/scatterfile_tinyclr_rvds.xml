@@ -27,7 +27,7 @@
     <!-- in order to optimized for flash operations while erasing flash that it is still able to implement code from other flash partition -->
 
     <Set Name="Code_BaseAddress"     Value="0x20040000"/>
-    <Set Name="Code_Size"            Value="0x000c0000"/>
+    <Set Name="Code_Size"            Value="0x00200000"/>
 
     <!-- Config_BaseAddress it the NAND address -->
     <Set Name="Config_BaseAddress"   Value="0x00040000"/>    
@@ -35,8 +35,8 @@
     <Set Name="ERConfig_BaseAddress" Value="0x00020000"/>    
     <Set Name="Config_Size"          Value="0x00020000"/>
 
-    <Set Name="Data_BaseAddress"     Value="0x001C0000"/>
-    <Set Name="Deploy_BaseAddress"   Value="0x00200000"/>
+    <Set Name="Data_BaseAddress"     Value="0x002A0000"/>
+    <Set Name="Deploy_BaseAddress"   Value="0x002E0000"/>
     <Set Name="Valid"                Value="true"/>
     <Set Name="Data_Size"            Value="%Deploy_BaseAddress - Data_BaseAddress%"/>
   </If>
@@ -79,7 +79,7 @@
 
     </ExecRegion>
 
-    <ExecRegion Name="ER_RAM_RW" Base="+0" Options="ABSOLUTE" Size="0xD000">
+    <ExecRegion Name="ER_RAM_RW" Base="+0" Options="ABSOLUTE" Size="0x1A000">
 
       <FileMapping Name="*" Options="(+RW-DATA, +ZI)" />
 

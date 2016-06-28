@@ -38,6 +38,24 @@ BOOL DebuggerPort_Flush( COM_HANDLE ComPortNum )
     return true;
 }
 
+BOOL DebuggerPort_IsSslSupported( COM_HANDLE ComPortNum )
+{
+    NATIVE_PROFILE_PAL_COM();
+    return FALSE;
+}
+
+BOOL DebuggerPort_UpgradeToSsl( COM_HANDLE ComPortNum, UINT32 flags ) 
+{ 
+    NATIVE_PROFILE_PAL_COM();
+    return FALSE; 
+}
+
+BOOL DebuggerPort_IsUsingSsl( COM_HANDLE ComPortNum )
+{
+    NATIVE_PROFILE_PAL_COM();
+    return FALSE;
+}
+
 //////////////////////////////////////////////////////////////////////////////////
 
 void CPU_InitializeCommunication()

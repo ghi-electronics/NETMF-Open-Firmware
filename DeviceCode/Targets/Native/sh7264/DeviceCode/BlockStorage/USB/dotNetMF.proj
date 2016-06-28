@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>USB_BL_Driver</AssemblyName>
@@ -39,11 +40,12 @@
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
   <PropertyGroup />
   <ItemGroup>
-  	<HFiles Include="USB_BL.h" />
-  	<HFiles Include="USB_Host.h" />
-  	<Compile Include="USB_Host.cpp" />
+    <Compile Include="USB_Host.cpp" />
     <Compile Include="USB_BL_Driver.cpp" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="usb_bl.h" />
+    <HFiles Include="usb_host.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

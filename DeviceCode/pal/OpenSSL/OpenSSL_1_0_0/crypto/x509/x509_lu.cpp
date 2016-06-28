@@ -88,8 +88,8 @@ void X509_LOOKUP_free(X509_LOOKUP *ctx)
 	{
 	if (ctx == NULL) return;
 	if (	(ctx->method != NULL) &&
-		(ctx->method->TINYCLR_SSL_FREE != NULL))
-		ctx->method->TINYCLR_SSL_FREE(ctx);
+		(ctx->method->free != NULL))
+		ctx->method->free(ctx);
 	OPENSSL_free(ctx);
 	}
 
@@ -171,7 +171,7 @@ static int x509_object_cmp(const X509_OBJECT * const *a, const X509_OBJECT * con
  		ret=X509_CRL_cmp((*a)->data.crl,(*b)->data.crl);
  		break;
 	default:
-		/* abort(); */
+		/* TINYCLR_SSL_ABORT(); */
 		return 0;
 		}
 	return ret;
@@ -225,7 +225,7 @@ static void cleanup(X509_OBJECT *a)
 		}
 	else
 		{
-		/* abort(); */
+		/* TINYCLR_SSL_ABORT(); */
 		}
 
 	OPENSSL_free(a);
@@ -449,7 +449,7 @@ static int x509_object_idx_cnt(STACK_OF(X509_OBJECT) *h, int type,
 		crl_info_s.issuer=name;
 		break;
 	default:
-		/* abort(); */
+		/* TINYCLR_SSL_ABORT(); */
 		return -1;
 		}
 

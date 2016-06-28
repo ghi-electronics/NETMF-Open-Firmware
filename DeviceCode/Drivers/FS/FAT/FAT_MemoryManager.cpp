@@ -19,11 +19,13 @@ void FAT_MemoryManager::Initialize()
     for(i = 0; i < MAX_VOLUMES; i++)
     {
         s_logicDisks[i].inUse = FALSE;
+        memset(&s_logicDisks[i].logicDisk, 0, sizeof(s_logicDisks[i].logicDisk));
     }
 
     for(i = 0 ; i < MAX_OPEN_HANDLES; i++)
     {
         s_handles[i].inUse = FALSE;
+        memset(&s_handles[i].handle, 0, sizeof(s_handles[i].handle));
     }
 }
 
@@ -78,6 +80,7 @@ void FAT_MemoryManager::FreeLogicDisk( FAT_LogicDisk* logicDisk )
         if(&(s_logicDisks[i].logicDisk) == logicDisk)
         {
             s_logicDisks[i].inUse = FALSE;
+            memset(&s_logicDisks[i].logicDisk, 0, sizeof(s_logicDisks[i].logicDisk));
             return;
         }
     }
@@ -104,6 +107,7 @@ void FAT_MemoryManager::FreeHandle( void* handle )
         if(&(s_handles[i].handle) == handle)
         {
             s_handles[i].inUse = FALSE;
+            memset(&s_handles[i].handle, 0, sizeof(s_handles[i].handle));
             return;
         }
     }

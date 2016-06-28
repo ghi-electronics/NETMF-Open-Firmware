@@ -49,6 +49,8 @@
 #define AD7466_SPI_CS_SETUP_TIME                    5
 #define AD7466_SPI_CS_HOLD_TIME                     0
 #define AD7466_SPI_MODULE                           GPIO_PIN_NONE
+#define AD7466_SPI_BUSYPIN                          GPIO_PIN_NONE
+#define AD7466_SPI_BUSYPIN_ACTIVESTATE              FALSE
 #define AD7466_ADC_BATTERY_ADC_VMAX                 1800
 #define AD7466_ADC_BATTERY_OFFSET_MV                0
 #define AD7466_ADC_MUX_BASE_RESISTOR                3240
@@ -104,6 +106,10 @@ AD7466_CONFIG g_AD7466_Config =
         AD7466_SPI_CS_SETUP_TIME,       // UINT32         CS_Setup_uSecs;
         AD7466_SPI_CS_HOLD_TIME,        // UINT32         CS_Hold_uSecs;
         AD7466_SPI_MODULE,              // UINT16         SPI_mod;
+        {
+            AD7466_SPI_BUSYPIN,             // SPI busy pin
+            AD7466_SPI_BUSYPIN_ACTIVESTATE, // SPI busy pin active state
+        }
     },
 
     AD7466_ADC_THERMISTOR_RB,                   // UINT32                      Thermistor_Rb;

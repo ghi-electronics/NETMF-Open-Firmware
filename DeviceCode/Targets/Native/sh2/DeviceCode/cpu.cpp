@@ -40,6 +40,8 @@ void HAL_UnReserveAllGpios()
     }
 }
 
+bool g_fDoNotUninitializeDebuggerPort = false;
+
 void HAL_Initialize()
 {
     HAL_CONTINUATION::InitializeList();

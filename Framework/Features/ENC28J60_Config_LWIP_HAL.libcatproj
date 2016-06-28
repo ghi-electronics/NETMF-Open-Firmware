@@ -50,7 +50,7 @@
     </VersionDependency>
     <ComponentType>Feature</ComponentType>
   </FeatureAssociations>
-  <IsTranport xmlns="http://schemas.microsoft.com/netmf/InventoryFormat.xsd">false</IsTranport>
+  <IsTransport xmlns="http://schemas.microsoft.com/netmf/InventoryFormat.xsd">false</IsTransport>
 </LibraryCategory></PKUI_LibraryCategory>
   </PropertyGroup>
 </Project>

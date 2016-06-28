@@ -7,14 +7,14 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
-#include <Tinyhal_types.h>
-#include <Crypto.h>
+#include "Tinyhal_types.h"
+#include "Crypto.h"
 
 
-#include <TinyCLR_Runtime.h>
-#include <Commands.h>
-#include <CryptoInterface.h>
-#include <Keys.h>
+#include "TinyCLR_Runtime.h"
+#include "Commands.h"
+#include "CryptoInterface.h"
+#include "Keys.h"
 
 
 /////////////////////////////////////////////////////////////////////////////

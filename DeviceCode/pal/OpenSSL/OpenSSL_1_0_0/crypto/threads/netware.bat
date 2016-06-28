@@ -6,7 +6,7 @@ rem      debug => build using debug settings
 
 rem
 rem After building, copy mttest.nlm to the server and run it, you'll probably
-rem want to redirect OPENSSL_TYPE__FILE_STDOUT and OPENSSL_TYPE__FILE_STDERR.  An example command line would be
+rem want to redirect stdout and stderr.  An example command line would be
 rem "mttest.nlm -thread 20 -loops 10 -CAfile \openssl\apps\server.pem >mttest.out 2>mttest.err"
 rem 
 

@@ -88,19 +88,23 @@ namespace System.Collections
             int whichBucket = Hash(key, _numberOfBuckets);
             Entry match = EntryForKey(key, buckets[whichBucket]);
 
-            if (match != null && overwrite){ //i.e. already exists in table
+            if (match != null && overwrite)
+            { //i.e. already exists in table
                 match.value = value;
-            } else if ((match != null && !overwrite)) {
+                return;
+            }
+            else if ((match != null && !overwrite))
+            {
                 throw new ArgumentException("key exists");
-            } else {            // insert at front
+            }
+            else
+            {            // insert at front
                 Entry newOne = new Entry(key, value, ref buckets[whichBucket]);
                 buckets[whichBucket] = newOne;
+                _count++;
             }
 
-            _count++;
-            //double temp = ((double)_count / (double)_numberOfBuckets) + 0.5;
             _loadFactor = _count / _numberOfBuckets;
-            //_loadFactor = (int)temp;
         }
 
         // Hash function.
@@ -128,8 +132,10 @@ namespace System.Collections
             Entry[] newTable = new Entry[newSize];
             _numberOfBuckets = newSize;
             _count = 0;
-            for (int i = 0; i < _buckets.Length; i++ ){
-                if (_buckets[i] != null){
+            for (int i = 0; i < _buckets.Length; i++)
+            {
+                if (_buckets[i] != null)
+                {
                     for (Entry cur = _buckets[i]; cur != null; cur = cur.next)
                         Add(ref newTable, cur.key, cur.value, false);
                 }

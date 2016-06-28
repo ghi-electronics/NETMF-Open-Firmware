@@ -13,11 +13,12 @@ namespace Microsoft.SPOT.UnitTest.SerialPortUnitTest
     {
         static void Main(string[] args)
         {   
-            SerialPort ser = new SerialPort( "COM1", (int)BaudRate.Baud115200 );
-            bool b = true;
+            SerialPort ser = new SerialPort( "COM1", (int)BaudRate.Baudrate115200 );
             byte[] buf = new byte[26];
+            byte[] ret = new byte[26];
 
             ser.Handshake = Handshake.XOnXOff;
+            ser.DataReceived += new SerialDataReceivedEventHandler(ser_DataReceived);
 
             ser.Open();
 
@@ -27,31 +28,38 @@ namespace Microsoft.SPOT.UnitTest.SerialPortUnitTest
             {
                 buf[i] = (byte)('a' + i);
             }
-            while (b)
-            {
-                int len = ser.Write(buf, 0, buf.Length);
-                if (len > 26)
-                {
-                    Debug.Print("ERROR: LENGTH RETURNED TOO LONG");
-                }
-                else if (len < 0)
-                {
-                    Debug.Print("ERROR: Write returned error");
-                }
-                else if (len < 26)
-                {
-                    while (len < 26)
-                    {
-                        int tlen = ser.Write(buf, len, buf.Length - len);
-                        if( tlen > 0 )
-                        {
-                            len += tlen;
-                        }
-                    }
-                }
-                Thread.Sleep(10);
-            }
-             
+
+            ser.Write(buf, 0, buf.Length);
+            ser.Flush();
+
+            Thread.Sleep(1000);
+
+            ser.DataReceived -= new SerialDataReceivedEventHandler(ser_DataReceived);
+
+            ser.Write(buf, 0, buf.Length);
+
+            Thread.Sleep(1000);
+
+            ser.DataReceived += new SerialDataReceivedEventHandler(ser_DataReceived);
+            ser.ErrorReceived += new SerialErrorReceivedEventHandler(ser_ErrorReceived);
+
+            ser.Write(buf, 0, buf.Length);
+
+            Thread.Sleep(3000);
+
+            ser.Read(ret, 0, ret.Length);
+
+            Thread.Sleep(10000);             
+        }
+
+        static void ser_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
+        {
+            Debug.Print("Error Received");
+        }
+
+        static void ser_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            Debug.Print("Data Received");
         }
     }
 }

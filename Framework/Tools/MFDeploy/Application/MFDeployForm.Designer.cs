@@ -30,6 +30,12 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.groupBoxDevice = new System.Windows.Forms.GroupBox();
+            this.buttonBrowseCert = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.textBoxCertPwd = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.textBoxCert = new System.Windows.Forms.TextBox();
+            this.checkBoxUseSSL = new System.Windows.Forms.CheckBox();
             this.comboBoxTransport = new System.Windows.Forms.ComboBox();
             this.buttonErase = new System.Windows.Forms.Button();
             this.buttonPing = new System.Windows.Forms.Button();
@@ -48,6 +54,7 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
             this.publicKeyConfigurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.createKeyPairToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updateDeviceKeysToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateSSLKeyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.configurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uSBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.uSBConfigurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -67,12 +74,11 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
             this.helpTopicsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutMFDeployToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.listViewFiles = new System.Windows.Forms.ListView();
-            this.columnHeaderName = new System.Windows.Forms.ColumnHeader();
-            this.columnHeaderFile = new System.Windows.Forms.ColumnHeader();
-            this.columnHeaderBaseAddress = new System.Windows.Forms.ColumnHeader();
-            this.columnHeaderSize = new System.Windows.Forms.ColumnHeader();
-            this.columnHeaderTimeStamp = new System.Windows.Forms.ColumnHeader();
-            this.updateSSLKeyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.columnHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeaderFile = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeaderBaseAddress = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeaderSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeaderTimeStamp = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.groupBoxDevice.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -82,16 +88,79 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
             // 
             this.groupBoxDevice.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxDevice.Controls.Add(this.buttonBrowseCert);
+            this.groupBoxDevice.Controls.Add(this.label2);
+            this.groupBoxDevice.Controls.Add(this.textBoxCertPwd);
+            this.groupBoxDevice.Controls.Add(this.label1);
+            this.groupBoxDevice.Controls.Add(this.textBoxCert);
+            this.groupBoxDevice.Controls.Add(this.checkBoxUseSSL);
             this.groupBoxDevice.Controls.Add(this.comboBoxTransport);
             this.groupBoxDevice.Controls.Add(this.buttonErase);
             this.groupBoxDevice.Controls.Add(this.buttonPing);
             this.groupBoxDevice.Controls.Add(this.comboBoxDevice);
             this.groupBoxDevice.Location = new System.Drawing.Point(12, 34);
             this.groupBoxDevice.Name = "groupBoxDevice";
-            this.groupBoxDevice.Size = new System.Drawing.Size(673, 53);
+            this.groupBoxDevice.Size = new System.Drawing.Size(673, 110);
             this.groupBoxDevice.TabIndex = 0;
             this.groupBoxDevice.TabStop = false;
             this.groupBoxDevice.Text = "De&vice";
+            // 
+            // buttonBrowseCert
+            // 
+            this.buttonBrowseCert.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonBrowseCert.Location = new System.Drawing.Point(511, 56);
+            this.buttonBrowseCert.Name = "buttonBrowseCert";
+            this.buttonBrowseCert.Size = new System.Drawing.Size(75, 23);
+            this.buttonBrowseCert.TabIndex = 9;
+            this.buttonBrowseCert.Text = global::Microsoft.NetMicroFramework.Tools.MFDeployTool.Properties.Resources.ButtonBrowse;
+            this.buttonBrowseCert.UseVisualStyleBackColor = true;
+            this.buttonBrowseCert.Click += new System.EventHandler(this.buttonBrowseCert_Click);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(99, 86);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(56, 13);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "Password:";
+            // 
+            // textBoxCertPwd
+            // 
+            this.textBoxCertPwd.Location = new System.Drawing.Point(161, 83);
+            this.textBoxCertPwd.Name = "textBoxCertPwd";
+            this.textBoxCertPwd.PasswordChar = '*';
+            this.textBoxCertPwd.Size = new System.Drawing.Size(344, 20);
+            this.textBoxCertPwd.TabIndex = 7;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(99, 60);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(57, 13);
+            this.label1.TabIndex = 6;
+            this.label1.Text = "Certificate:";
+            // 
+            // textBoxCert
+            // 
+            this.textBoxCert.Location = new System.Drawing.Point(161, 57);
+            this.textBoxCert.Name = "textBoxCert";
+            this.textBoxCert.Size = new System.Drawing.Size(344, 20);
+            this.textBoxCert.TabIndex = 5;
+            // 
+            // checkBoxUseSSL
+            // 
+            this.checkBoxUseSSL.AutoSize = true;
+            this.checkBoxUseSSL.Enabled = false;
+            this.checkBoxUseSSL.Location = new System.Drawing.Point(6, 59);
+            this.checkBoxUseSSL.Name = "checkBoxUseSSL";
+            this.checkBoxUseSSL.Size = new System.Drawing.Size(68, 17);
+            this.checkBoxUseSSL.TabIndex = 4;
+            this.checkBoxUseSSL.Text = "Use SSL";
+            this.checkBoxUseSSL.UseVisualStyleBackColor = true;
+            this.checkBoxUseSSL.CheckedChanged += new System.EventHandler(this.checkBoxUseSSL_CheckedChanged);
+            this.checkBoxUseSSL.EnabledChanged += new System.EventHandler(this.checkBoxUseSSL_EnabledChanged);
             // 
             // comboBoxTransport
             // 
@@ -100,7 +169,7 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
             this.comboBoxTransport.Items.AddRange(new object[] {
             global::Microsoft.NetMicroFramework.Tools.MFDeployTool.Properties.Resources.TransportSerial,
             global::Microsoft.NetMicroFramework.Tools.MFDeployTool.Properties.Resources.TransportUsb,
-            global::Microsoft.NetMicroFramework.Tools.MFDeployTool.Properties.Resources.TransportTcpIp});
+            global::Microsoft.NetMicroFramework.Tools.MFDeployTool.Properties.Resources.TransportTcpIp,});
             this.comboBoxTransport.Location = new System.Drawing.Point(6, 19);
             this.comboBoxTransport.Name = "comboBoxTransport";
             this.comboBoxTransport.Size = new System.Drawing.Size(87, 21);
@@ -146,9 +215,9 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
             this.groupBox1.Controls.Add(this.buttonDeploy);
             this.groupBox1.Controls.Add(this.buttonBrowse);
             this.groupBox1.Controls.Add(this.comboBoxImageFile);
-            this.groupBox1.Location = new System.Drawing.Point(12, 93);
+            this.groupBox1.Location = new System.Drawing.Point(12, 150);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(673, 53);
+            this.groupBox1.Size = new System.Drawing.Size(673, 50);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "&Image File";
@@ -186,9 +255,9 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
             this.comboBoxImageFile.Name = "comboBoxImageFile";
             this.comboBoxImageFile.Size = new System.Drawing.Size(499, 21);
             this.comboBoxImageFile.TabIndex = 0;
+            this.comboBoxImageFile.DropDown += new System.EventHandler(this.comboBoxImageFile_DropDown);
             this.comboBoxImageFile.SelectedIndexChanged += new System.EventHandler(this.comboBoxImageFile_SelectedIndexChanged);
             this.comboBoxImageFile.KeyDown += new System.Windows.Forms.KeyEventHandler(this.comboBoxImageFile_KeyDown);
-            this.comboBoxImageFile.DropDown += new System.EventHandler(this.comboBoxImageFile_DropDown);
             // 
             // richTextBoxOutput
             // 
@@ -196,17 +265,17 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.richTextBoxOutput.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.richTextBoxOutput.Location = new System.Drawing.Point(18, 159);
+            this.richTextBoxOutput.Location = new System.Drawing.Point(18, 324);
             this.richTextBoxOutput.Name = "richTextBoxOutput";
             this.richTextBoxOutput.ReadOnly = true;
-            this.richTextBoxOutput.Size = new System.Drawing.Size(661, 212);
+            this.richTextBoxOutput.Size = new System.Drawing.Size(661, 295);
             this.richTextBoxOutput.TabIndex = 2;
             this.richTextBoxOutput.Text = "";
             // 
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button1.Location = new System.Drawing.Point(18, 377);
+            this.button1.Location = new System.Drawing.Point(18, 625);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 3;
@@ -288,6 +357,13 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
             this.updateDeviceKeysToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
             this.updateDeviceKeysToolStripMenuItem.Text = "Update Device Keys";
             this.updateDeviceKeysToolStripMenuItem.Click += new System.EventHandler(this.OnMenuItem_Click);
+            // 
+            // updateSSLKeyToolStripMenuItem
+            // 
+            this.updateSSLKeyToolStripMenuItem.Name = "updateSSLKeyToolStripMenuItem";
+            this.updateSSLKeyToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+            this.updateSSLKeyToolStripMenuItem.Text = "Update SSL Seed";
+            this.updateSSLKeyToolStripMenuItem.Click += new System.EventHandler(this.updateSSLKeyToolStripMenuItem_Click);
             // 
             // configurationToolStripMenuItem
             // 
@@ -441,13 +517,12 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
             this.listViewFiles.FullRowSelect = true;
             this.listViewFiles.GridLines = true;
             this.listViewFiles.HideSelection = false;
-            this.listViewFiles.Location = new System.Drawing.Point(18, 159);
+            this.listViewFiles.Location = new System.Drawing.Point(18, 206);
             this.listViewFiles.Name = "listViewFiles";
-            this.listViewFiles.Size = new System.Drawing.Size(661, 100);
+            this.listViewFiles.Size = new System.Drawing.Size(661, 112);
             this.listViewFiles.TabIndex = 9;
             this.listViewFiles.UseCompatibleStateImageBehavior = false;
             this.listViewFiles.View = System.Windows.Forms.View.Details;
-            this.listViewFiles.Visible = false;
             // 
             // columnHeaderName
             // 
@@ -476,33 +551,27 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
             this.columnHeaderTimeStamp.Text = global::Microsoft.NetMicroFramework.Tools.MFDeployTool.Properties.Resources.ColumnHeaderTimeStamp;
             this.columnHeaderTimeStamp.Width = 135;
             // 
-            // updateSSLKeyToolStripMenuItem
-            // 
-            this.updateSSLKeyToolStripMenuItem.Name = "updateSSLKeyToolStripMenuItem";
-            this.updateSSLKeyToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
-            this.updateSSLKeyToolStripMenuItem.Text = "Update SSL Seed";
-            this.updateSSLKeyToolStripMenuItem.Click += new System.EventHandler(this.updateSSLKeyToolStripMenuItem_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(697, 409);
+            this.ClientSize = new System.Drawing.Size(697, 657);
             this.Controls.Add(this.listViewFiles);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.richTextBoxOutput);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBoxDevice);
             this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.richTextBoxOutput);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.MinimumSize = new System.Drawing.Size(300, 250);
             this.Name = "Form1";
             this.Text = ".NET Micro Framework Deployment Tool";
-            this.Load += new System.EventHandler(this.Form1_Load);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBoxDevice.ResumeLayout(false);
+            this.groupBoxDevice.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -557,6 +626,12 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
         private System.Windows.Forms.ToolStripMenuItem deviceCapabilitiesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem uSBConfigurationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem updateSSLKeyToolStripMenuItem;
+        private System.Windows.Forms.Button buttonBrowseCert;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox textBoxCertPwd;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox textBoxCert;
+        private System.Windows.Forms.CheckBox checkBoxUseSSL;
     }
 }
 

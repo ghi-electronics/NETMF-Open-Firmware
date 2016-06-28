@@ -2705,7 +2705,7 @@ char *make_revocation_str(int rev_type, char *rev_arg)
 	case REV_CRL_REASON:
 		for (i = 0; i < 8; i++)
 			{
-			if (!strcasecmp(rev_arg, crl_reasons[i]))
+			if (!TINYCLR_SSL_STRCASECMP(rev_arg, crl_reasons[i]))
 				{
 				reason = crl_reasons[i];
 				break;
@@ -2921,7 +2921,7 @@ int unpack_revinfo(ASN1_TIME **prevtm, int *preason, ASN1_OBJECT **phold, ASN1_G
 		{
 		for (i = 0; i < NUM_REASONS; i++)
 			{
-			if(!strcasecmp(reason_str, crl_reasons[i]))
+			if(!TINYCLR_SSL_STRCASECMP(reason_str, crl_reasons[i]))
 				{
 				reason_code = i;
 				break;

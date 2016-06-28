@@ -83,7 +83,8 @@ extern "C" void ERR_print_errors_cb(int (*cb)(const char *str, size_t len, void 
 		ERR_error_string_n(l, buf, sizeof buf);
 		BIO_snprintf(buf2, sizeof(buf2), "%lu:%s:%s:%d:%s\n", es, buf,
 			file, line, (flags & ERR_TXT_STRING) ? data : "");
-		cb(buf2, TINYCLR_SSL_STRLEN(buf2), u);
+		if (cb(buf2, TINYCLR_SSL_STRLEN(buf2), u) <= 0)
+			break; /* abort outputting the error report */
 		}
 	}
 

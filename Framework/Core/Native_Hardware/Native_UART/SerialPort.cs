@@ -6,7 +6,7 @@ using Microsoft.SPOT.Hardware;
 
 namespace System.IO.Ports
 {
-    public class SerialPort : IDisposable
+    public class SerialPort : Stream
     {
         internal class Configuration
         {
@@ -160,9 +160,9 @@ namespace System.IO.Ports
         }
 
         [MethodImplAttribute(MethodImplOptions.Synchronized)]
-        public void Close()
+        public override void Close()
         {
-            if (!m_fOpened) throw new InvalidOperationException();
+            if (!m_fOpened) return;
 
             try
             {
@@ -176,19 +176,23 @@ namespace System.IO.Ports
             }
         }
 
-        ~SerialPort()
+        public override long Seek(long offset, SeekOrigin origin)
         {
-            Dispose(false);
+            throw new NotSupportedException();
         }
 
-        [MethodImplAttribute(MethodImplOptions.Synchronized)]
-        private void Dispose(bool fDisposing)
+        public override void SetLength(long value)
+        {
+            throw new NotSupportedException();
+        }
+        
+        protected override void Dispose(bool disposing)
         {
             if (!m_fDisposed)
             {
                 try
                 {
-                    if (fDisposing)
+                    if (disposing)
                     {
                         if (m_callbacksErrorEvent != null)
                         {
@@ -216,13 +220,8 @@ namespace System.IO.Ports
                     m_fOpened = false;
                 }
             }
-        }
 
-        public void Dispose()
-        {
-            Dispose(true);
-
-            GC.SuppressFinalize(this);
+            base.Dispose(disposing);
         }
 
         public void DiscardInBuffer()
@@ -246,8 +245,44 @@ namespace System.IO.Ports
         public Handshake Handshake { get { return m_config.Handshake; } set { if (m_fOpened) throw new InvalidOperationException(); m_config.Handshake = value; } }
         public Parity Parity { get { return m_config.Parity; } set { if (m_fOpened) throw new InvalidOperationException(); m_config.Parity = value; } }
         public StopBits StopBits { get { return m_config.StopBits; } set { if (m_fOpened) throw new InvalidOperationException(); m_config.StopBits = value; } }
-        public int ReadTimeout { get { return m_config.ReadTimeout; } set { if (m_fOpened) throw new InvalidOperationException(); m_config.ReadTimeout = value; } }
-        public int WriteTimeout { get { return m_config.WriteTimeout; } set { if (m_fOpened) throw new InvalidOperationException(); m_config.WriteTimeout = value; } }
+        public override int ReadTimeout { get { return m_config.ReadTimeout; } set { if (m_fOpened) throw new InvalidOperationException(); m_config.ReadTimeout = value; } }
+        public override int WriteTimeout { get { return m_config.WriteTimeout; } set { if (m_fOpened) throw new InvalidOperationException(); m_config.WriteTimeout = value; } }
+
+        public Stream BaseStream { get { return (Stream)this; } }
+
+
+        public override bool CanRead
+        {
+            get { return true; }
+        }
+
+        // If CanSeek is false, Position, Seek, Length, and SetLength should throw.
+        public override bool CanSeek
+        {
+            get { return false; }
+        }
+
+        public override bool CanTimeout
+        {
+            get { return true; }
+        }
+
+        public override bool CanWrite
+        {
+            get { return true; }
+        }
+
+        public override long Length
+        {
+            get { throw new NotSupportedException(); }
+        }
+
+        public override long Position
+        {
+            get { throw new NotSupportedException(); }
+            set { throw new NotSupportedException(); }
+        }
+
 
         //--// Events
 
@@ -394,16 +429,16 @@ namespace System.IO.Ports
         extern private void InternalClose();
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern public int Read(byte[] buffer, int offset, int count);
+        extern public override int Read(byte[] buffer, int offset, int count);
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern public int Write(byte[] buffer, int offset, int count);
+        extern public override void Write(byte[] buffer, int offset, int count);
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         extern private void InternalDispose();
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern public void Flush();
+        extern public override void Flush();
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         extern private int BytesInBuffer(bool fInput);

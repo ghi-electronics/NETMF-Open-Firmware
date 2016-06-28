@@ -60,9 +60,7 @@
 #define HEADER_MD2_H
 
 #include <openssl/opensslconf.h> /* OPENSSL_NO_MD2, MD2_INT */
-#ifdef OPENSSL_NO_MD2
-#error MD2 is disabled.
-#endif
+#ifndef OPENSSL_NO_MD2
 #include <stddef.h>
 
 #define MD2_DIGEST_LENGTH	16
@@ -88,5 +86,7 @@ unsigned char *MD2(const unsigned char *d, size_t n,unsigned char *md);
 #ifdef  __cplusplus
 }
 #endif
+
+#endif // OPENSSL_NO_MD2
 
 #endif

@@ -105,7 +105,7 @@ const char *LP_find_file(LP_DIR_CTX **ctx, const char *directory)
 	  return 0;
 	}
 
-      *ctx = (LP_DIR_CTX *)malloc(sizeof(LP_DIR_CTX));
+      *ctx = (LP_DIR_CTX *)OPENSSL_malloc(sizeof(LP_DIR_CTX));
       if (*ctx == NULL)
 	{
 	  errno = ENOMEM;
@@ -183,7 +183,7 @@ int LP_find_file_end(LP_DIR_CTX **ctx)
     {
       int status = lib$find_file_end(&(*ctx)->VMS_context);
 
-      free(*ctx);
+      OPENSSL_free(*ctx);
 
       if(!$VMS_STATUS_SUCCESS(status))
 	{

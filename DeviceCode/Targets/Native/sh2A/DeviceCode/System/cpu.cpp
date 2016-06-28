@@ -40,6 +40,8 @@ void HAL_UnReserveAllGpios()
     }
 }
 
+bool g_fDoNotUninitializeDebuggerPort = false;
+
 void HAL_Initialize()
 {
     HAL_CONTINUATION::InitializeList();
@@ -91,17 +93,44 @@ void HAL_Initialize()
 */
 }
 
+static ON_SOFT_REBOOT_HANDLER s_rebootHandlers[5] = {NULL, NULL, NULL, NULL, NULL};
+
+void HAL_AddSoftRebootHandler(ON_SOFT_REBOOT_HANDLER handler)
+{
+    for(int i=0; i<ARRAYSIZE(s_rebootHandlers); i++)
+    {
+        if(s_rebootHandlers[i] == NULL)
+        {
+            s_rebootHandlers[i] = handler;
+            return;
+        }
+        else if(s_rebootHandlers[i] == handler)
+        {
+            return;
+        }
+    }
+}
+
 
 void HAL_Uninitialize()
 {
 /* 
     other driver uninit
 */
+    int i;
+
+    for(i=0; i<ARRAYSIZE(s_rebootHandlers); i++)
+    {
+        if(s_rebootHandlers[i] != NULL)
+        {
+            s_rebootHandlers[i]();
+            return;
+        }
+    }    
 
     LCD_Uninitialize();
     
     I2C_Uninitialize();
-
 
     TimeService_UnInitialize();
 

@@ -2,10 +2,10 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include <tinyhal.h>
 #include <cores\arm\include\cpu.h>
 
 //--//
-
 
 void HAL_AssertEx()
 {
@@ -24,6 +24,29 @@ void HAL_AssertEx()
 
 BOOL CPU_Initialize()
 {
+#if defined(AT91EMAC_SOCKETS_ENABLED)
+    CPU_GPIO_EnableOutputPin(AT91_ERX0 , TRUE );
+    CPU_GPIO_EnableOutputPin(AT91_ERX1 , TRUE );
+    CPU_GPIO_EnableOutputPin(AT91_ERX2 , TRUE );
+    CPU_GPIO_EnableOutputPin(AT91_ERX3 , TRUE );
+    CPU_GPIO_EnableOutputPin(AT91_ECRS , TRUE );
+    CPU_GPIO_EnableOutputPin(AT91_ECOL , FALSE);
+    CPU_GPIO_EnableOutputPin(AT91_ERXDV, FALSE);
+    CPU_GPIO_EnableOutputPin(AT91_ERXCK, TRUE );
+    CPU_GPIO_EnableOutputPin(AT91_ERXER, FALSE);
+
+    AT91_RSTC_EXTRST();
+#endif
+
+    // The SAM7 devices cannot reset the USB controller so we need to skip uninitialization
+    // of the debug transport
+#if defined(PLATFORM_ARM_SAM7_ANY)
+    if(COM_IsUsb(HalSystemConfig.DebuggerPorts[ 0 ]))
+    {
+        g_fDoNotUninitializeDebuggerPort = true;
+    }
+#endif
+
     return AT91_SAM_Driver::Initialize();
 }
 

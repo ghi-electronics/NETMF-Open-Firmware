@@ -3,6 +3,7 @@ using System.Collections;
 using System.Text;
 using Dpws.Device.Services;
 using Ws.Services.WsaAddressing;
+using Ws.Services.Binding;
 
 namespace Dpws.Device.Services
 {
@@ -169,19 +170,21 @@ namespace Dpws.Device.Services
 
     internal class DpwsWseEventSink
     {
-        private string m_guid;
+        private string           m_guid;
         private WsWsaEndpointRef m_endTo;
         private WsWsaEndpointRef m_notifyTo;
-        private long m_expires;
-        private long m_startTime;
-        private string[] m_filter;
+        private long             m_expires;
+        private long             m_startTime;
+        private string[]         m_filter;
+        private IRequestChannel  m_reqChannel;
 
-        public string ID { get { return m_guid; } set { m_guid = value; } }
-        public WsWsaEndpointRef EndTo { get { return m_endTo; } set { m_endTo = value; } }
-        public WsWsaEndpointRef NotifyTo { get { return m_notifyTo; } set { m_notifyTo = value; } }
-        public long Expires { get { return m_expires; } set { m_expires = value; } }
-        public string[] Filters { get { return m_filter; } set { m_filter = value; } }
-        public long StartTime { get { return m_startTime; } set { m_startTime = value; } }
+        public string           ID              { get { return m_guid;       } set { m_guid       = value; } }
+        public WsWsaEndpointRef EndTo           { get { return m_endTo;      } set { m_endTo      = value; } }
+        public WsWsaEndpointRef NotifyTo        { get { return m_notifyTo;   } set { m_notifyTo   = value; } }
+        public long             Expires         { get { return m_expires;    } set { m_expires    = value; } }
+        public string[]         Filters         { get { return m_filter;     } set { m_filter     = value; } }
+        public long             StartTime       { get { return m_startTime;  } set { m_startTime  = value; } }
+        public IRequestChannel  RequestChannel  { get { return m_reqChannel; } set { m_reqChannel = value; } }
     }
 
     internal class DpwsWseEventSinks

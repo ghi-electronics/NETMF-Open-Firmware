@@ -11,7 +11,7 @@ using _WP  = Microsoft.SPOT.Debugger.WireProtocol;
 
 namespace Microsoft.SPOT.Tools
 {
-    class SerialDump
+    class SerialDump : IDisposable
     {
         _DBG.Engine m_eng;
         FileStream  m_output;
@@ -115,17 +115,24 @@ namespace Microsoft.SPOT.Tools
         void Run()
         {
             m_eng.Silent = true;
-
             m_eng.Start();
 
-            m_eng.OnNoise   += new _DBG.NoiseEventHandler  ( OnNoise   );
-            m_eng.OnMessage += new _DBG.MessageEventHandler( OnMessage );
+            try
+            {
+                m_eng.OnNoise += new _DBG.NoiseEventHandler(OnNoise);
+                m_eng.OnMessage += new _DBG.MessageEventHandler(OnMessage);
 
-            Console.WriteLine( "####### PRESS RETURN TO EXIT #######" );
-            Console.ReadLine();
+                Console.WriteLine("####### PRESS RETURN TO EXIT #######");
+                Console.ReadLine();
+            }
+            finally
+            {
+                m_eng.OnNoise -= new _DBG.NoiseEventHandler(OnNoise);
+                m_eng.OnMessage -= new _DBG.MessageEventHandler(OnMessage);
 
-            m_eng.Stop();
-            m_eng = null;
+                m_eng.Stop();
+                m_eng = null;
+            }
         }
 
         void OnNoise( byte[] buf, int offset, int count )
@@ -173,17 +180,49 @@ namespace Microsoft.SPOT.Tools
         {
             try
             {
-                SerialDump o = new SerialDump( args );
+                if (String.Compare(args[0], "-?", true) == 0 || String.Compare(args[0], "/?", true) == 0)
+                {
+                    Console.WriteLine("Usage: SerialDump.exe [-dump <dump_file>] [-timestamp] [-usb] [port] [baudrate]");
+                    return;
+                }
 
-                o.Run();
+                using (SerialDump o = new SerialDump(args))
+                {
+                    o.Run();
+                }
             }
-            catch(ApplicationException)
+            catch (ApplicationException)
             {
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                Console.WriteLine( "{0}", e.ToString() );
+                Console.WriteLine("{0}", e.ToString());
             }
         }
+
+        ~SerialDump()
+        {
+            Dispose(false);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (m_output != null)
+            {
+                m_output.Close();
+                m_output.Dispose();
+                m_output = null;
+            }
+        }
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
     }
 }

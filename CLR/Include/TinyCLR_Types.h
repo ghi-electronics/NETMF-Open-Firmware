@@ -1145,6 +1145,8 @@ struct CLR_RECORD_EH
     CLR_UINT32 GetToken() const;
 };
 
+CT_ASSERT_UNIQUE_NAME( sizeof(CLR_RECORD_EH) == 12, CLR_RECORD_EH )
+
 struct CLR_RECORD_RESOURCE_FILE
 {
     static const CLR_UINT32 CURRENT_VERSION = 2;

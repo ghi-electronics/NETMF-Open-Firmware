@@ -135,9 +135,6 @@
  * OTHERWISE.
  */
 
-#define USE_SOCKETS
-#include "apps.h"
-
 #ifdef OPENSSL_SYS_WINDOWS
 #include <assert.h>
 #include <ctype.h>
@@ -158,6 +155,8 @@
 typedef unsigned int u_int;
 #endif
 
+#define USE_SOCKETS
+#include "apps.h"
 #include <openssl/x509.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
@@ -1273,8 +1272,8 @@ SSL_set_tlsext_status_ids(con, ids);
 #if !defined(OPENSSL_SYS_WINDOWS) && !defined(OPENSSL_SYS_MSDOS) && !defined(OPENSSL_SYS_NETWARE) && !defined (OPENSSL_SYS_BEOS_R5)
 			if (tty_on)
 				{
-				if (read_tty)  openssl_fdset(fileno(OPENSSL_TYPE__FILE_STDIN),&readfds);
-				if (write_tty) openssl_fdset(fileno(OPENSSL_TYPE__FILE_STDOUT),&writefds);
+				if (read_tty)  openssl_fdset(TINYCLR_SSL_FILENO(OPENSSL_TYPE__FILE_STDIN),&readfds);
+				if (write_tty) openssl_fdset(TINYCLR_SSL_FILENO(OPENSSL_TYPE__FILE_STDOUT),&writefds);
 				}
 			if (read_ssl)
 				openssl_fdset(SSL_get_fd(con),&readfds);
@@ -1334,21 +1333,21 @@ SSL_set_tlsext_status_ids(con, ids);
 			/* Under BeOS-R5 the situation is similar to DOS */
 			i=0;
 			stdin_set = 0;
-			(void)fcntl(fileno(OPENSSL_TYPE__FILE_STDIN), F_SETFL, O_NONBLOCK);
+			(void)fcntl(TINYCLR_SSL_FILENO(OPENSSL_TYPE__FILE_STDIN), F_SETFL, O_NONBLOCK);
 			if(!write_tty) {
 				if(read_tty) {
 					tv.tv_sec = 1;
 					tv.tv_usec = 0;
 					i=TINYCLR_SSL_SELECT(width,(void *)&readfds,(void *)&writefds,
 						 NULL,&tv);
-					if (read(fileno(OPENSSL_TYPE__FILE_STDIN), sbuf, 0) >= 0)
+					if (read(TINYCLR_SSL_FILENO(OPENSSL_TYPE__FILE_STDIN), sbuf, 0) >= 0)
 						stdin_set = 1;
 					if (!i && (stdin_set != 1 || !read_tty))
 						continue;
 				} else 	i=TINYCLR_SSL_SELECT(width,(void *)&readfds,(void *)&writefds,
 					 NULL,timeoutp);
 			}
-			(void)fcntl(fileno(OPENSSL_TYPE__FILE_STDIN), F_SETFL, 0);
+			(void)fcntl(TINYCLR_SSL_FILENO(OPENSSL_TYPE__FILE_STDIN), F_SETFL, 0);
 #else
 			i=TINYCLR_SSL_SELECT(width,(void *)&readfds,(void *)&writefds,
 				 NULL,timeoutp);
@@ -1439,7 +1438,7 @@ SSL_set_tlsext_status_ids(con, ids);
 		/* Assume Windows/DOS/BeOS can always write */
 		else if (!ssl_pending && write_tty)
 #else
-		else if (!ssl_pending && FD_ISSET(fileno(OPENSSL_TYPE__FILE_STDOUT),&writefds))
+		else if (!ssl_pending && FD_ISSET(TINYCLR_SSL_FILENO(OPENSSL_TYPE__FILE_STDOUT),&writefds))
 #endif
 			{
 #ifdef CHARSET_EBCDIC
@@ -1530,7 +1529,7 @@ TINYCLR_SSL_PRINTF("read=%d pending=%d peek=%d\n",k,SSL_pending(con),SSL_peek(co
 #elif defined(OPENSSL_SYS_BEOS_R5)
 		else if (stdin_set)
 #else
-		else if (FD_ISSET(fileno(OPENSSL_TYPE__FILE_STDIN),&readfds))
+		else if (FD_ISSET(TINYCLR_SSL_FILENO(OPENSSL_TYPE__FILE_STDIN),&readfds))
 #endif
 			{
 			if (crlf)

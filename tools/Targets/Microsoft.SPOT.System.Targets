@@ -370,6 +370,16 @@
 
   </Target>
 
+  <Target Name="CompressImage" Inputs="@(CompressImageFlash);@(CompressImageDat);@(CompressImageCfg);@(CompressImageSymdef)" Outputs="$(BIN_DIR)\TinyCLR.nmf')" Condition="'$(MEMORY)'!='RAM'" >
+    <Message Text="Compressing @(CompressImages)"/>
+    <Exec Command="$(TOOLS_DIR)\buildhelper -symdef @(CompressImageSymdef->'%(RootDir)%(Directory)%(FileName).symdefs') $(CompressImageFlashSym) -compress @(CompressImageFlash) @(CompressImageFlash->'%(RootDir)%(Directory)%(FileName).nmf')"/>
+    <Exec Command="$(TOOLS_DIR)\buildhelper -symdef @(CompressImageSymdef->'%(RootDir)%(Directory)%(FileName).symdefs') $(CompressImageDatSym) -compress @(CompressImageDat) @(CompressImageDat->'%(RootDir)%(Directory)%(FileName).nmf')" Condition="EXISTS('@(CompressImageDat)')"/>
+    <Exec Command="$(TOOLS_DIR)\buildhelper -symdef @(CompressImageSymdef->'%(RootDir)%(Directory)%(FileName).symdefs') $(CompressImageCfgSym) -compress @(CompressImageCfg) @(CompressImageCfg->'%(RootDir)%(Directory)%(FileName).nmf')"/>
+
+    <Exec Command="Copy /b @(CompressImageFlash->'%(RootDir)%(Directory)%(FileName).nmf') + @(CompressImageDat->'%(RootDir)%(Directory)%(FileName).nmf') + @(CompressImageCfg->'%(RootDir)%(Directory)%(FileName).nmf') $(BIN_DIR)\TinyCLR.nmf" Condition="EXISTS('@(CompressImageDat)')"/>
+    <Exec Command="Copy /b @(CompressImageFlash->'%(RootDir)%(Directory)%(FileName).nmf') + @(CompressImageCfg->'%(RootDir)%(Directory)%(FileName).nmf') $(BIN_DIR)\TinyCLR.nmf" Condition="!EXISTS('@(CompressImageDat)')"/>
+  </Target>
+
   <PropertyGroup>
     <ImportToSDK>false</ImportToSDK>
   </PropertyGroup>

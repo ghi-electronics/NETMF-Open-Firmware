@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MFDeployEngine", "Library\M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MFDeployCom", "MFDeployCom\MFDeployCom.csproj", "{322AE920-4781-4D09-834D-71E744C78303}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Debugger", "..\..\Debugger\Debugger.csproj", "{D9DCA6FB-680F-4355-ABEF-128DB02721E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinUsb", "..\..\Debugger\WinUsb\WinUsb.csproj", "{DAEB83A4-5868-4725-A15D-85F75DB87EAC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{322AE920-4781-4D09-834D-71E744C78303}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{322AE920-4781-4D09-834D-71E744C78303}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{322AE920-4781-4D09-834D-71E744C78303}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9DCA6FB-680F-4355-ABEF-128DB02721E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9DCA6FB-680F-4355-ABEF-128DB02721E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9DCA6FB-680F-4355-ABEF-128DB02721E6}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9DCA6FB-680F-4355-ABEF-128DB02721E6}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{DAEB83A4-5868-4725-A15D-85F75DB87EAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAEB83A4-5868-4725-A15D-85F75DB87EAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAEB83A4-5868-4725-A15D-85F75DB87EAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAEB83A4-5868-4725-A15D-85F75DB87EAC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

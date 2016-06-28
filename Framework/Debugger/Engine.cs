@@ -22,6 +22,11 @@ using System.Runtime.Remoting.Proxies;
 
 using System.Management;
 using Microsoft.Win32;
+using Microsoft.SPOT.Debugger.WireProtocol;
+using System.Security.Cryptography.X509Certificates;
+using System.Collections.Generic;
+
+using WinUsb;
 
 namespace Microsoft.SPOT.Debugger
 {
@@ -91,6 +96,11 @@ namespace Microsoft.SPOT.Debugger
         static public PortDefinition CreateInstanceForUsb(string displayName, string port)
         {
             return new PortDefinition_Usb(displayName, port, new ListDictionary());
+        }
+
+        static public PortDefinition CreateInstanceForWinUsb(string displayName, string port)
+        {
+            return new PortDefinition_WinUsb(displayName, port, new ListDictionary());
         }
 
         static public PortDefinition CreateInstanceForEmulator(string displayName, string port, int pid)
@@ -167,17 +177,22 @@ namespace Microsoft.SPOT.Debugger
                 {
                     case PortFilter.Emulator: res = Emulator.EnumeratePipes(); break;
                     case PortFilter.Serial: res = AsyncSerialStream.EnumeratePorts(); break;
-                    case PortFilter.Usb: res = AsyncUsbStream.EnumeratePorts(); break;
+                    case PortFilter.Usb: 
+                        {
+                            res = WinUsb_AsyncUsbStream.EnumeratePorts();
+
+                            lst.AddRange(res);
+
+                            res = AsyncUsbStream.EnumeratePorts(); 
+                        }
+                        break;
                     case PortFilter.TcpIp: res = PortDefinition_Tcp.EnumeratePorts(); break;
                     default: res = null; break;
                 }
 
                 if (res != null)
                 {
-                    foreach (PortDefinition pd in res)
-                    {
-                        lst.Add(pd);
-                    }
+                    lst.AddRange(res);
                 }
             }
 
@@ -568,6 +583,7 @@ namespace Microsoft.SPOT.Debugger
             Starting,
             Started,
             Stopping,
+            Resume,
             Stopped,
             Disposing,
             Disposed
@@ -596,7 +612,12 @@ namespace Microsoft.SPOT.Debugger
         {
             lock (m_syncObject)
             {
-                if (m_value < value)
+                if (m_value == Value.Stopping && value == Value.Resume)
+                {
+                    m_value = Value.Started;
+                    return true;
+                }
+                else if (m_value < value)
                 {
                     m_value = value;
                     return true;
@@ -1435,11 +1456,6 @@ namespace Microsoft.SPOT.Debugger
 
         Stream WireProtocol.IControllerHostLocal.OpenConnection()
         {
-            //
-            // Shutting down?
-            //
-            if (m_notificationThread == null) return null;
-
             return m_portDefinition.Open();
         }
 
@@ -2273,9 +2289,16 @@ namespace Microsoft.SPOT.Debugger
                 
                 SyncMessage(WireProtocol.Commands.c_Monitor_Reboot, 0, cmd);
 
-                if(option != RebootOption.NoReconnect)
+                if (this.Capabilities.SoftReboot && !(m_portDefinition is PortDefinition_Tcp))
                 {
-                    m_evtPing.WaitOne(5000, false);
+                    if (option != RebootOption.NoReconnect)
+                    {
+                        m_evtPing.WaitOne(5000, false);
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(200);
                 }
             }
             finally
@@ -2474,6 +2497,263 @@ namespace Microsoft.SPOT.Debugger
             address = 0;
             return false;
         }
+
+        public IAsyncResult UpgradeConnectionToSsl_Begin(X509Certificate2 cert, bool fRequireClientCert)
+        {
+            AsyncNetworkStream ans = ((IControllerLocal)m_ctrl).OpenPort() as AsyncNetworkStream;
+
+            if(ans == null) return null;
+
+            m_ctrl.StopProcessing();
+
+            IAsyncResult iar = ans.BeginUpgradeToSSL(cert, fRequireClientCert);
+
+            return iar;
+        }
+        
+        public bool UpgradeConnectionToSSL_End(IAsyncResult iar)
+        {
+            AsyncNetworkStream ans = ((IControllerLocal)m_ctrl).OpenPort() as AsyncNetworkStream;
+
+            if(ans == null) return false;
+
+            bool result = ans.EndUpgradeToSSL(iar);
+
+            m_ctrl.ResumeProcessing();
+
+            return result;
+        }
+
+        public bool IsUsingSsl
+        {
+            get
+            {
+                if (!IsConnected) return false;
+
+                AsyncNetworkStream ans = ((IControllerLocal)m_ctrl).OpenPort() as AsyncNetworkStream;
+
+                if (ans == null) return false;
+
+                return ans.IsUsingSsl;
+            }
+        }
+
+        public bool CanUpgradeToSsl()
+        {
+            WireProtocol.Commands.Debugging_UpgradeToSsl cmd = new WireProtocol.Commands.Debugging_UpgradeToSsl();
+
+            cmd.m_flags = 0;
+
+            WireProtocol.IncomingMessage reply = SyncMessage(WireProtocol.Commands.c_Debugging_UpgradeToSsl, WireProtocol.Flags.c_NoCaching, cmd, 2, 5000);
+
+            if (reply != null)
+            {
+                WireProtocol.Commands.Debugging_UpgradeToSsl.Reply cmdReply = reply.Payload as WireProtocol.Commands.Debugging_UpgradeToSsl.Reply;
+
+                if (cmdReply != null)
+                {
+                    return cmdReply.m_success != 0;
+                }
+            }
+
+            return false;
+
+        }
+
+        Dictionary<int, uint[]> m_updateMissingPktTbl = new Dictionary<int, uint[]>();
+
+        public bool StartUpdate(
+            string provider, 
+            ushort versionMajor, 
+            ushort versionMinor, 
+            uint updateId, 
+            uint updateType, 
+            uint updateSubType, 
+            uint updateSize, 
+            uint packetSize, 
+            uint installAddress, 
+            ref int updateHandle )
+        {
+            WireProtocol.Commands.Debugging_MFUpdate_Start cmd = new WireProtocol.Commands.Debugging_MFUpdate_Start();
+
+            byte[] name = UTF8Encoding.UTF8.GetBytes(provider);
+
+            Array.Copy(name, cmd.m_updateProvider, Math.Min(name.Length, cmd.m_updateProvider.Length));
+            cmd.m_updateId         = updateId;
+            cmd.m_updateVerMajor   = versionMajor;
+            cmd.m_updateVerMinor   = versionMinor;
+            cmd.m_updateType       = updateType;
+            cmd.m_updateSubType    = updateSubType;
+            cmd.m_updateSize       = updateSize;
+            cmd.m_updatePacketSize = packetSize;
+
+            WireProtocol.IncomingMessage reply = SyncMessage(WireProtocol.Commands.c_Debugging_MFUpdate_Start, WireProtocol.Flags.c_NoCaching, cmd, 2, 5000);
+            
+            if (reply != null)
+            {
+                WireProtocol.Commands.Debugging_MFUpdate_Start.Reply cmdReply = reply.Payload as WireProtocol.Commands.Debugging_MFUpdate_Start.Reply;
+
+                if (cmdReply != null)
+                {
+                    updateHandle = cmdReply.m_updateHandle;
+                    return (-1 != updateHandle);
+                }
+            }
+
+            updateHandle = -1;
+            return false;
+        }
+
+        public bool UpdateAuthCommand(int updateHandle, uint authCommand, byte[] commandArgs, ref byte[] response)
+        {
+            WireProtocol.Commands.Debugging_MFUpdate_AuthCommand cmd = new WireProtocol.Commands.Debugging_MFUpdate_AuthCommand();
+
+            if (commandArgs == null) commandArgs = new byte[0];
+
+            cmd.m_updateHandle = updateHandle;
+            cmd.m_authCommand  = authCommand;
+            cmd.m_authArgs     = commandArgs;
+            cmd.m_authArgsSize = (uint)commandArgs.Length;
+
+            WireProtocol.IncomingMessage reply = SyncMessage(WireProtocol.Commands.c_Debugging_MFUpdate_AuthCmd, WireProtocol.Flags.c_NoCaching, cmd);
+            
+            if (reply != null)
+            {
+                WireProtocol.Commands.Debugging_MFUpdate_AuthCommand.Reply cmdReply = reply.Payload as WireProtocol.Commands.Debugging_MFUpdate_AuthCommand.Reply;
+            
+                if (cmdReply != null && cmdReply.m_success != 0)
+                {
+                    if(cmdReply.m_responseSize > 0)
+                    {
+                        Array.Copy(cmdReply.m_response, response, Math.Min(response.Length, cmdReply.m_responseSize));
+                    }
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        public bool UpdateAuthenticate(int updateHandle, byte[] authenticationData)
+        {
+            WireProtocol.Commands.Debugging_MFUpdate_Authenticate cmd = new WireProtocol.Commands.Debugging_MFUpdate_Authenticate();
+
+            cmd.m_updateHandle = updateHandle;
+            cmd.PrepareForSend(authenticationData);
+
+            WireProtocol.IncomingMessage reply = SyncMessage(WireProtocol.Commands.c_Debugging_MFUpdate_Authenticate, WireProtocol.Flags.c_NoCaching, cmd);
+            
+            if (reply != null)
+            {
+                WireProtocol.Commands.Debugging_MFUpdate_Authenticate.Reply cmdReply = reply.Payload as WireProtocol.Commands.Debugging_MFUpdate_Authenticate.Reply;
+            
+                if (cmdReply != null && cmdReply.m_success != 0)
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        private bool UpdateGetMissingPackets(int updateHandle)
+        {
+            WireProtocol.Commands.Debugging_MFUpdate_GetMissingPkts cmd = new WireProtocol.Commands.Debugging_MFUpdate_GetMissingPkts();
+
+            cmd.m_updateHandle = updateHandle;
+
+            WireProtocol.IncomingMessage reply = SyncMessage(WireProtocol.Commands.c_Debugging_MFUpdate_GetMissingPkts, WireProtocol.Flags.c_NoCaching, cmd);
+
+            if (reply != null)
+            {
+                WireProtocol.Commands.Debugging_MFUpdate_GetMissingPkts.Reply cmdReply = reply.Payload as WireProtocol.Commands.Debugging_MFUpdate_GetMissingPkts.Reply;
+
+                if (cmdReply != null && cmdReply.m_success != 0)
+                {
+                    if (cmdReply.m_missingPktCount > 0)
+                    {
+                        m_updateMissingPktTbl[updateHandle] = cmdReply.m_missingPkts;
+                    }
+                    else
+                    {
+                        m_updateMissingPktTbl[updateHandle] = new uint[0];
+                    }
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool AddPacket(int updateHandle, uint packetIndex, byte[] packetData, uint packetValidation )
+        {
+            if (!m_updateMissingPktTbl.ContainsKey(updateHandle))
+            {
+                UpdateGetMissingPackets(updateHandle);
+            }
+
+            if(m_updateMissingPktTbl.ContainsKey(updateHandle) && m_updateMissingPktTbl[updateHandle].Length > 0)
+            {
+                uint[] pktBits = m_updateMissingPktTbl[updateHandle];
+                uint div = packetIndex >> 5;
+
+                if (pktBits.Length > div)
+                {
+                    if (0 == (pktBits[div] & (1u << (int)(packetIndex % 32))))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            WireProtocol.Commands.Debugging_MFUpdate_AddPacket cmd = new WireProtocol.Commands.Debugging_MFUpdate_AddPacket();
+
+            cmd.m_updateHandle = updateHandle;
+            cmd.m_packetIndex = packetIndex;
+            cmd.m_packetValidation = packetValidation;
+            cmd.PrepareForSend(packetData);
+
+            WireProtocol.IncomingMessage reply = SyncMessage(WireProtocol.Commands.c_Debugging_MFUpdate_AddPacket, WireProtocol.Flags.c_NoCaching, cmd);
+            if (reply != null)
+            {
+                WireProtocol.Commands.Debugging_MFUpdate_AddPacket.Reply cmdReply = reply.Payload as WireProtocol.Commands.Debugging_MFUpdate_AddPacket.Reply;
+
+                if (cmdReply != null)
+                {
+                    return cmdReply.m_success != 0;
+                }
+            }
+
+            return false;
+        }
+
+        public bool InstallUpdate(int updateHandle, byte[] validationData )
+        {
+            if (m_updateMissingPktTbl.ContainsKey(updateHandle))
+            {
+                m_updateMissingPktTbl.Remove(updateHandle);
+            }
+
+            WireProtocol.Commands.Debugging_MFUpdate_Install cmd = new WireProtocol.Commands.Debugging_MFUpdate_Install();
+
+            cmd.m_updateHandle = updateHandle;
+
+            cmd.PrepareForSend(validationData);
+
+            WireProtocol.IncomingMessage reply = SyncMessage(WireProtocol.Commands.c_Debugging_MFUpdate_Install, WireProtocol.Flags.c_NoCaching, cmd);
+            if (reply != null)
+            {
+                WireProtocol.Commands.Debugging_MFUpdate_Install.Reply cmdReply = reply.Payload as WireProtocol.Commands.Debugging_MFUpdate_Install.Reply;
+
+                if (cmdReply != null)
+                {
+                    return cmdReply.m_success != 0;
+                }
+            }
+
+            return false;
+        }
+            
 
         public uint CreateThread(uint methodIndex, int scratchPadLocation)
         {
@@ -3890,16 +4170,16 @@ namespace Microsoft.SPOT.Debugger
 
             try
             {
-                DirectoryInfo di = new DirectoryInfo(@"\\.\pipe");
+                String[] pipeNames = Directory.GetFiles(@"\\.\pipe");
 
-                foreach (FileInfo fi in di.GetFiles())
+                foreach (string pipe in pipeNames)
                 {
                     try
                     {
-                        if (re.IsMatch(fi.Name))
+                        if (re.IsMatch(Path.GetFileName(pipe)))
                         {
-                            int pid = Int32.Parse(re.Match(fi.Name).Groups[1].Value);
-                            PortDefinition pd = PortDefinition.CreateInstanceForEmulator("Emulator - pid " + pid, fi.FullName, pid);
+                            int pid = Int32.Parse(re.Match(Path.GetFileName(pipe)).Groups[1].Value);
+                            PortDefinition pd = PortDefinition.CreateInstanceForEmulator("Emulator - pid " + pid, pipe, pid);
 
                             lst.Add(pd.DisplayName, pd);
                         }

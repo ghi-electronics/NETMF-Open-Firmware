@@ -19,6 +19,10 @@ HRESULT Library_corlib_native_System_Threading_Thread::_ctor___VOID__SystemThrea
     
     // Thread is always constructed with normal priority.
     pThis[ FIELD__m_Priority ].NumericByRef().s4 = ThreadPriority::Normal;
+    
+    // Book a Thread ID
+    pThis[ FIELD__m_Id       ].NumericByRef().s4 = g_CLR_RT_ExecutionEngine.GetNextThreadId();
+    
            
 #if defined(TINYCLR_APPDOMAINS)
     TINYCLR_CHECK_HRESULT(CLR_RT_ObjectToEvent_Source::CreateInstance( g_CLR_RT_ExecutionEngine.GetCurrentAppDomain(), *pThis, pThis[ FIELD__m_AppDomain ] ));
@@ -56,7 +60,7 @@ HRESULT Library_corlib_native_System_Threading_Thread::Start___VOID( CLR_RT_Stac
 
     pThis->ResetFlags( CLR_RT_HeapBlock::HB_Signaled );
 
-    TINYCLR_CHECK_HRESULT(g_CLR_RT_ExecutionEngine.NewThread( th, dlg, pri ));
+    TINYCLR_CHECK_HRESULT(g_CLR_RT_ExecutionEngine.NewThread( th, dlg, pri, pThis[ FIELD__m_Id ].NumericByRef().s4 ));
 
     TINYCLR_SET_AND_LEAVE(SetThread( stack, th ));
 
@@ -222,7 +226,27 @@ HRESULT Library_corlib_native_System_Threading_Thread::set_Priority___VOID__Syst
     }
 
     TINYCLR_NOCLEANUP();
+
 }
+
+HRESULT Library_corlib_native_System_Threading_Thread::get_ManagedThreadId___I4( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_CORE();
+    TINYCLR_HEADER();
+
+    int id;
+
+    // Get C# thread object
+    CLR_RT_HeapBlock* pThis = stack.This(); FAULT_ON_NULL(pThis);
+    
+    // Reads priority stored in C# object. 
+    id = pThis[ FIELD__m_Id ].NumericByRef().s4;
+
+    // Return value back to C# code.
+    stack.SetResult_I4( id );
+    TINYCLR_NOCLEANUP();
+}
+
 
 HRESULT Library_corlib_native_System_Threading_Thread::get_IsAlive___BOOLEAN( CLR_RT_StackFrame& stack )
 {

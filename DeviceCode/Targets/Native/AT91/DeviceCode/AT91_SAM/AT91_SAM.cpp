@@ -1,32 +1,19 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) Microsoft Corporation.  All rights reserved.
-//
-// Portions Copyright (c) GHI Electronics, LLC.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <tinyhal.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
-//#define CPU_SPIN_NOT_SLEEP 1
-
-
-#pragma arm section code = "SectionForFlashOperations"
-
-AT91_SAM_Driver g_AT91SAM_Driver;
-
-#if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
-#pragma arm section zidata
+#if defined(DEBUG)
+#define CPU_SPIN_NOT_SLEEP 1
 #endif
 
 //--//
 
 void __section(SectionForFlashOperations) AT91_SAM_Driver::Sleep(void)
 {
-
-
-/*
 #if defined(PLATFORM_ARM_SAM9261_ANY) || defined(PLATFORM_ARM_SAM9RL64_ANY)
     UINT32 reg = 0;
 
@@ -54,10 +41,6 @@ void __section(SectionForFlashOperations) AT91_SAM_Driver::Sleep(void)
 #endif
 
 #endif
-
-*/
-
-
 }
 
 BOOL AT91_SAM_Driver::Initialize()
@@ -75,9 +58,11 @@ void AT91_SAM_Driver::Reset(void)
 {
 #if defined(PLATFORM_ARM_SAM9261_ANY) || defined(PLATFORM_ARM_SAM7X_ANY) || defined(PLATFORM_ARM_SAM9RL64_ANY) || defined(PLATFORM_ARM_SAM7S_ANY)
 
-    volatile UINT32 *pReset = (volatile UINT32*)AT91C_BASE_RSTC;
+    volatile UINT32 *pReset     = (volatile UINT32*)AT91C_BASE_RSTC;
+    volatile UINT32 *pResetMode = (volatile UINT32*)AT91C_BASE_RSTC_MR;
 
-    *pReset = (AT91C_RSTC__RESET_KEY | AT91C_RTSC__PROCRST | AT91C_RTSC__PERRST | AT91C_RTSC__EXTRST);
+    *pResetMode = (AT91C_RSTC__RESET_KEY | 4ul << 8);
+    *pReset     = (AT91C_RSTC__RESET_KEY | AT91C_RTSC__PROCRST | AT91C_RTSC__PERRST | AT91C_RTSC__EXTRST);
 
     while(true);
 #endif

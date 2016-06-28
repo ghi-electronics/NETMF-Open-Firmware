@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Microsoft.SPOT.Platform.Tests
 {

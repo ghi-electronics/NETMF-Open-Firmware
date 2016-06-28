@@ -129,24 +129,8 @@ HRESULT CLR_RT_HeapBlock::Convert_Internal( CLR_DataType et )
         scaleIn = 0;
         break;
 
-#if !defined(TINYCLR_EMULATED_FLOATINGPOINT)
-
     case DATATYPE_R4: scaleIn = 1; break;
     case DATATYPE_R8: scaleIn = 2; break;
-
-#else
-
-    case DATATYPE_R4:
-        NumericByRef().r8 = (CLR_INT64)((CLR_INT32)NumericByRef().r4);
-        scaleIn = CLR_RT_HeapBlock::HB_FloatShift;
-        break;
-
-    case DATATYPE_R8:
-        scaleIn = CLR_RT_HeapBlock::HB_DoubleShift;
-        break;
-
-#endif
-
 
     default:
         TINYCLR_SET_AND_LEAVE(CLR_E_WRONG_TYPE);
@@ -156,15 +140,8 @@ HRESULT CLR_RT_HeapBlock::Convert_Internal( CLR_DataType et )
 
     switch(et)
     {
-#if !defined(TINYCLR_EMULATED_FLOATINGPOINT)
-
-    case DATATYPE_R4:  scaleOut = 1; break;
-    case DATATYPE_R8:  scaleOut = 2; break;
-#else
-    case DATATYPE_R4:  scaleOut = CLR_RT_HeapBlock::HB_FloatShift ; break;
-    case DATATYPE_R8:  scaleOut = CLR_RT_HeapBlock::HB_DoubleShift; break;
-#endif
-
+    case DATATYPE_R4: scaleOut = 1; break;
+    case DATATYPE_R8: scaleOut = 2; break;
     default         : scaleOut = 0; break;
     }
 
@@ -198,23 +175,83 @@ HRESULT CLR_RT_HeapBlock::Convert_Internal( CLR_DataType et )
         case  2: NumericByRef().r8 =             val; break;
         }
 #else
+        CLR_INT64 val = 0;
+        CLR_INT64 orig = 0;
 
-        int scaleDiff = scaleOut - scaleIn;
+        if((dtlSrc.m_flags & CLR_RT_DataTypeLookup::c_Signed) == 0) scaleIn  = -1;
+        if((dtlDst.m_flags & CLR_RT_DataTypeLookup::c_Signed) == 0) scaleOut = -1;
 
-        if(scaleDiff > 0)
+        switch(scaleIn)
         {
-            NumericByRef().u8 <<= scaleDiff;
-        }
-        else
-        {
-            scaleDiff = -scaleDiff;
-
-            // should be the integer value to the right closest to the zero 
-            if ( NumericByRef().s8   <0)
-                NumericByRef().s8  = (CLR_INT64)NumericByRef().s8 + (CLR_INT64)((1 << scaleDiff)-1);
-            NumericByRef().s8 >>=       scaleDiff;
+        case -1: orig = ((CLR_INT64)((CLR_UINT64_TEMP_CAST)NumericByRef().u8)); val = orig <<  CLR_RT_HeapBlock::HB_DoubleShift;                                    break;
+        case  0: orig = ((CLR_INT64)((CLR_INT64_TEMP_CAST) NumericByRef().s8)); val = orig <<  CLR_RT_HeapBlock::HB_DoubleShift;                                    break;
+        case  1: orig = ((CLR_INT64)((CLR_INT32)           NumericByRef().r4)); val = orig << (CLR_RT_HeapBlock::HB_DoubleShift - CLR_RT_HeapBlock::HB_FloatShift); break;
+        case  2: orig = ((CLR_INT64)                       NumericByRef().r8 ); val = orig;                                                                         break;
         }
 
+        switch(scaleOut)
+        {
+        // Direct casting of negative double to CLR_UINT64 is returns zero for RVDS 3.1 compiler. 
+        // Double cast looks as most portable way. 
+        case -1: NumericByRef().u8 = (CLR_UINT64)(CLR_INT64 )(val >>  CLR_RT_HeapBlock::HB_DoubleShift);                                    break;
+        case  0: NumericByRef().s8 = (CLR_INT64 )            (val >>  CLR_RT_HeapBlock::HB_DoubleShift);                                    break;
+        case  1: NumericByRef().r4 = (CLR_INT64 )            (val >> (CLR_RT_HeapBlock::HB_DoubleShift - CLR_RT_HeapBlock::HB_FloatShift)); break;
+        case  2: NumericByRef().r8 =                          val;                                                                          break;
+        }
+
+        if(scaleIn < 1 && scaleOut > 0)
+        {
+            switch(scaleOut)
+            {
+                case 1:
+                    {
+                        CLR_INT32 r4 = (CLR_INT32)NumericByRef().r4;
+                        
+                        if((orig != (((CLR_INT64)r4) >> CLR_RT_HeapBlock::HB_FloatShift)) ||
+                            (orig > 0 && r4 < 0))
+                        {
+                            NumericByRef().r4 = orig < 0 ? 0x80000000 : 0x7FFFFFFF;
+                            
+                            //
+                            // Uncomment to produce an overflow exception for emulated floating points
+                            //
+                            // TINYCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
+                        }
+                    }
+                    break;
+                case 2:
+                    {
+                        CLR_INT64 r8 = (CLR_INT64)NumericByRef().r8;
+                            
+                        if((orig != (r8 >> CLR_RT_HeapBlock::HB_DoubleShift)) ||
+                            (orig > 0 && r8 < 0))
+                        {
+                            NumericByRef().r8 = orig < 0 ? ULONGLONGCONSTANT(0x8000000000000000) : ULONGLONGCONSTANT(0x7FFFFFFFFFFFFFFF);
+                            
+                            //
+                            // Uncomment to produce an overflow exception for emulated floating points
+                            //
+                            // TINYCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
+                        }
+                    }
+                    break;
+            }
+        }
+        else if(scaleIn == 2 && scaleOut == 1)
+        {
+            CLR_INT32 r4 = (CLR_INT64)NumericByRef().r4;
+            
+            if((orig != (((CLR_UINT64)r4) << (CLR_RT_HeapBlock::HB_DoubleShift - CLR_RT_HeapBlock::HB_FloatShift))) ||
+                (orig > 0 && r4 < 0))
+            {
+                NumericByRef().r4 = orig < 0 ? 0x80000000 : 0x7FFFFFFF;
+                
+                //
+                // Uncomment to produce an overflow exception for emulated floating points
+                //
+                //TINYCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
+            }
+        }
 #endif
         
     }
@@ -276,6 +313,10 @@ void CLR_RT_Thread::PopEH_Inner( CLR_RT_StackFrame* stack, CLR_PMETADATA ip )
             // The new target is within the previous handler, don't pop.
             //
             if(ip && (us.m_currentBlockStart <= ip && ip < us.m_currentBlockEnd)) break;
+
+#ifndef TINYCLR_NO_IL_INLINE
+            if(stack->m_inlineFrame) break;
+#endif
 
             m_nestedExceptionsPos--;
         }
@@ -663,6 +704,13 @@ HRESULT CLR_RT_Thread::Execute_Inner()
                 break;
             }
 
+            // perform systematic GC and compaction under memory pressure
+            // (g_CLR_RT_GarbageCollector.m_freeBytes refers to last time GC was run)
+            if(g_CLR_RT_GarbageCollector.m_freeBytes < g_CLR_RT_GarbageCollector.c_memoryThreshold2)
+            {
+                stack->m_flags |= CLR_RT_StackFrame::c_CompactAndRestartOnOutOfMemory;
+            }
+            
             while(true)
             {
 #if defined(TINYCLR_JITTER_ARMEMULATION)
@@ -688,7 +736,7 @@ HRESULT CLR_RT_Thread::Execute_Inner()
                         Native_Profiler_Stop();
                     }
                     #endif
-                   
+                    
                     hr = stack->m_nativeMethod( *stack );
                 }
 
@@ -1216,7 +1264,7 @@ Execute_RestartDecoding:
 #if !defined(TINYCLR_EMULATED_FLOATINGPOINT)
                 evalPos[ 0 ].SetFloatFromBits( arg );
 #else
-                evalPos[ 0 ].SetFloatIEEE754( arg );
+                TINYCLR_CHECK_HRESULT(evalPos[ 0 ].SetFloatIEEE754( arg ));
 #endif
                 break;
             }
@@ -1232,7 +1280,7 @@ Execute_RestartDecoding:
 #if !defined(TINYCLR_EMULATED_FLOATINGPOINT)
                 evalPos[ 0 ].SetDoubleFromBits( arg );
 #else
-                evalPos[ 0 ].SetDoubleIEEE754( arg );
+                TINYCLR_CHECK_HRESULT(evalPos[ 0 ].SetDoubleIEEE754( arg ));
 #endif
                 break;
             }
@@ -1877,18 +1925,27 @@ Execute_RestartDecoding:
                         }
                     }
                 }
-                                
-                WRITEBACK(stack,evalPos,ip,fDirty);
-                
+                               
 #if defined(TINYCLR_APPDOMAINS)
                 if(fAppDomainTransition)
                 {
+                    WRITEBACK(stack,evalPos,ip,fDirty);
+
                     _ASSERTE(FIMPLIES(pThis->DataType() == DATATYPE_OBJECT, pThis->Dereference() != NULL));
                     TINYCLR_CHECK_HRESULT(CLR_RT_StackFrame::PushAppDomainTransition( th, calleeInst, &pThis[ 0 ], &pThis[ 1 ]));
                 }
                 else
 #endif //TINYCLR_APPDOMAINS
                 {
+#ifndef TINYCLR_NO_IL_INLINE
+                    if(stack->PushInline(ip, assm, evalPos, calleeInst, pThis))
+                    {
+                        fDirty = true;
+                        break;
+                    }
+#endif
+
+                    WRITEBACK(stack,evalPos,ip,fDirty);
                     TINYCLR_CHECK_HRESULT(CLR_RT_StackFrame::Push( th, calleeInst, -1 ));
                 }
                                 
@@ -1898,6 +1955,22 @@ Execute_RestartDecoding:
 
             OPDEF(CEE_RET,                        "ret",              VarPop,             Push0,       InlineNone,         IPrimitive,  1,  0xFF,    0x2A,    RETURN)
             {
+#ifndef TINYCLR_NO_IL_INLINE
+                if(stack->m_inlineFrame)
+                {
+                    stack->m_evalStackPos = evalPos;
+                    
+                    stack->PopInline();
+                    
+                    ip      = stack->m_IP;
+                    assm    = stack->m_call.m_assm;
+                    evalPos = stack->m_evalStackPos-1;
+                    fDirty  = true;
+                    
+                    break;
+                }
+#endif
+
                 WRITEBACK(stack,evalPos,ip,fDirty);
 
                 //
@@ -1998,8 +2071,6 @@ Execute_RestartDecoding:
                 CLR_RT_TypeDef_Instance   cls;
                 CLR_RT_HeapBlock*         top;
                 CLR_INT32                 changes;
-
-
 
                 cls.InitializeFromMethod( calleeInst ); // This is the class to create!
 
@@ -2108,8 +2179,17 @@ Execute_RestartDecoding:
                             stack->m_flags &= ~CLR_RT_StackFrame::c_ExecutingConstructor;
                         }
                     }
+                    
+                    if(FAILED(hr = CLR_RT_StackFrame::Push( th, calleeInst, -1 )))
+                    {   
+                        if(hr == CLR_E_NOT_SUPPORTED)
+                        {
+                            // no matter what, we are no longer executing a ctor
+                            stack->m_flags &= ~CLR_RT_StackFrame::c_ExecutingConstructor;  
+                        }
 
-                    TINYCLR_CHECK_HRESULT(CLR_RT_StackFrame::Push( th, calleeInst, -1 ));
+                        TINYCLR_LEAVE();
+                    }
 
                     goto Execute_Restart;
                 }
@@ -2388,11 +2468,14 @@ Execute_RestartDecoding:
 
             OPDEF(CEE_NEWARR,                     "newarr",           PopI,               PushRef,     InlineType,         IObjModel,   1,  0xFF,    0x8D,    NEXT)
             {
+                
                 FETCH_ARG_COMPRESSED_TYPETOKEN(arg,ip);
 
                 CLR_UINT32 size = evalPos[ 0 ].NumericByRef().u4;
 
                 UPDATESTACK(stack,evalPos);
+
+                stack->m_flags &= ~CLR_RT_StackFrame::c_CompactAndRestartOnOutOfMemory; // we do not need this in this case
 
                 for(int pass=0; pass<2; pass++)
                 {

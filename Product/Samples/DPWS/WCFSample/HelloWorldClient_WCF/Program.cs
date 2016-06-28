@@ -20,6 +20,10 @@ namespace WCF_SampleClient
                 DiscoveryClient discoveryClient =
                     new DiscoveryClient(new UdpDiscoveryEndpoint(DiscoveryVersion.WSDiscovery11));
 
+                // Uncomment to support WSDiscoveryApril2005 discovery (and change app.config for binding change)
+                //DiscoveryClient discoveryClient =
+                //    new DiscoveryClient(new UdpDiscoveryEndpoint(DiscoveryVersion.WSDiscoveryApril2005)); 
+
                 Collection<EndpointDiscoveryMetadata> services = discoveryClient.Find(new FindCriteria(typeof(IServiceHelloWCF))).Endpoints;
 
                 discoveryClient.Close();

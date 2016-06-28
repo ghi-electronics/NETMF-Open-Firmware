@@ -20,6 +20,8 @@ HAL_COMPLETION Sockets_LWIP_Driver::s_DebuggerTimeoutCompletion;
 
 HAL_CONTINUATION MulticastResponseContinuation;
 
+INT32 g_DebuggerPort_SslCtx_Handle = -1;
+
 //--//
 
 void SOCKETS_CreateTcpIpProcessor(HAL_CALLBACK_FPN callback, void* arg)
@@ -146,22 +148,25 @@ BOOL Network_Initialize()
 BOOL Network_Uninitialize()
 {
     NATIVE_PROFILE_PAL_COM();
-    BOOL ret;
 
-    BOOL wasDisabled = SmartPtr_IRQ::ForceEnabled();
-    
-    ret = Sockets_LWIP_Driver::Uninitialize( );
-
-    if(wasDisabled) SmartPtr_IRQ::ForceDisabled();
-
-    return ret;
+    return Sockets_LWIP_Driver::Uninitialize( );
 }
 
 void Sockets_LWIP_Driver::CloseDebuggerSocket()
 {
     if(g_Sockets_LWIP_Driver.m_SocketDebugStream != SOCK_SOCKET_ERROR)
     {
-        SOCK_close( g_Sockets_LWIP_Driver.m_SocketDebugStream );
+        if(g_Sockets_LWIP_Driver.m_usingSSL)
+        {
+            SSL_CloseSocket( g_Sockets_LWIP_Driver.m_SocketDebugStream );
+        }
+        else
+        {
+            SOCK_close( g_Sockets_LWIP_Driver.m_SocketDebugStream );
+        }
+        UnregisterSocket( g_Sockets_LWIP_Driver.m_SocketDebugStream );
+
+        g_Sockets_LWIP_Driver.m_usingSSL = FALSE;
         
         g_Sockets_LWIP_Driver.m_SocketDebugStream = SOCK_SOCKET_ERROR;
 
@@ -183,7 +188,19 @@ BOOL  SOCKETS_Initialize( int ComPortNum )
 {
     NATIVE_PROFILE_PAL_COM();
 
-    return Sockets_LWIP_Driver::InitializeDbgListener( ComPortNum );
+    BOOL ret = FALSE;
+
+    for(int i=0; i<50; i++)
+    {
+        ret = Sockets_LWIP_Driver::InitializeDbgListener( ComPortNum );
+
+        if(ret) break;
+
+        Events_WaitForEvents(SLEEP_LEVEL__SLEEP, SYSTEM_EVENT_FLAG_SOCKET, 100);
+        Watchdog_ResetCounter();
+    }
+
+    return ret;
 }
 BOOL  SOCKETS_Uninitialize( int ComPortNum )
 {
@@ -214,6 +231,19 @@ void SOCKETS_CloseConnections()
     NATIVE_PROFILE_PAL_COM();
     Sockets_LWIP_Driver::CloseConnections(FALSE);
 }
+
+BOOL SOCKETS_UpgradeToSsl( INT32 ComPortNum, const UINT8* pCACert, UINT32 caCertLen, const UINT8* pDeviceCert, UINT32 deviceCertLen, LPCSTR szTargetHost )
+{
+    NATIVE_PROFILE_PAL_COM();
+    return Sockets_LWIP_Driver::UpgradeToSsl( ComPortNum, pCACert, caCertLen, pDeviceCert, deviceCertLen, szTargetHost );
+}
+
+BOOL SOCKETS_IsUsingSsl( INT32 ComPortNum )
+{
+    NATIVE_PROFILE_PAL_COM();
+    return Sockets_LWIP_Driver::IsUsingSsl( ComPortNum );
+}
+
 
 UINT32 SOCK_CONFIGURATION_GetAdapterCount()
 {
@@ -345,22 +375,35 @@ void Sockets_LWIP_Driver::CloseConnections(BOOL fCloseDbg)
 {
     NATIVE_PROFILE_PAL_COM();
 
-    g_Sockets_LWIP_Driver.m_cntSockets = 0;
+    INT32 cnt = g_Sockets_LWIP_Driver.m_cntSockets;
 
-    for( INT32 i=0; i<g_Sockets_LWIP_Driver.m_cntSockets; i++ )
+    for( INT32 i=0; i<cnt; i++ )
     {
-        if(g_Sockets_LWIP_Driver.m_socketHandles[i].m_sslData != NULL)
-        {
-            SSL_CloseSocket(g_Sockets_LWIP_Driver.m_socketHandles[i].m_socket);
-        }
-        else
-        {
-            Sockets_LWIP_Driver::Close(g_Sockets_LWIP_Driver.m_socketHandles[i].m_socket);
-        }
+        SOCK_SOCKET sock = g_Sockets_LWIP_Driver.m_socketHandles[i].m_socket;
         
-        g_Sockets_LWIP_Driver.m_socketHandles[i].m_socket  = SOCK_SOCKET_ERROR;
-        g_Sockets_LWIP_Driver.m_socketHandles[i].m_flags   = 0;
-        g_Sockets_LWIP_Driver.m_socketHandles[i].m_sslData = NULL;
+        if((sock != SOCK_SOCKET_ERROR) && (fCloseDbg || !ISSET_SOCKET_FLAG(g_Sockets_LWIP_Driver.m_socketHandles[i], SocketRegisterMap::c_DebugSocket)))
+        {
+            if(g_Sockets_LWIP_Driver.m_socketHandles[i].m_sslData != NULL)
+            {
+                SSL_CloseSocket(sock);
+            }
+            else
+            {
+                // use the HAL method so we don't unregister the socket since we handle that here
+                HAL_SOCK_close(sock);
+            }
+            
+            g_Sockets_LWIP_Driver.m_socketHandles[i].m_socket  = SOCK_SOCKET_ERROR;
+            g_Sockets_LWIP_Driver.m_socketHandles[i].m_flags   = 0;
+            g_Sockets_LWIP_Driver.m_socketHandles[i].m_sslData = NULL;
+            g_Sockets_LWIP_Driver.m_cntSockets--;
+        }
+        else if(i > 0)
+        {
+            memcpy( &g_Sockets_LWIP_Driver.m_socketHandles[i], 
+                    &g_Sockets_LWIP_Driver.m_socketHandles[0], 
+                    sizeof(g_Sockets_LWIP_Driver.m_socketHandles[i]) );
+        }
     }
 }
 
@@ -593,6 +636,8 @@ BOOL Sockets_LWIP_Driver::InitializeDbgListener( int ComPortNum )
 
     g_Sockets_LWIP_Driver.m_stateDebugSocket = DbgSock_Listening;
 
+    InitializeMulticastDiscovery();
+
     SOCKET_CLEANUP();
 
     if(g_Sockets_LWIP_Driver.m_SocketDebugListener != SOCK_SOCKET_ERROR)
@@ -601,11 +646,6 @@ BOOL Sockets_LWIP_Driver::InitializeDbgListener( int ComPortNum )
         g_Sockets_LWIP_Driver.m_SocketDebugListener = SOCK_SOCKET_ERROR;
 
         debug_printf("DBGLISTENER SOCKET_ERROR: %d\r\n", HAL_SOCK_getlasterror() );
-    }
-
-    if(!InitializeMulticastDiscovery())
-    {
-        debug_printf("MULTICAST discovery failed\r\n");
     }
 
     SOCKET_CHECK_EXIT_BOOL_CLEANUP();
@@ -699,6 +739,8 @@ BOOL Sockets_LWIP_Driver::InitializeMulticastDiscovery()
     SOCK_sockaddr_in sockAddr;
     INT32 nonblocking = 1;
 
+    if(g_Sockets_LWIP_Driver.s_discoveryInitialized) return TRUE;
+
     MulticastResponseContinuation.InitializeCallback(MulticastDiscoveryRespond, NULL);
 
     // set up discovery socket to list to defined discovery port for any ip address
@@ -708,7 +750,7 @@ BOOL Sockets_LWIP_Driver::InitializeMulticastDiscovery()
     sockAddr.sin_addr.S_un.S_addr = SOCK_htonl(SOCK_INADDR_ANY);
 
     // UDP socket is easier in our scenario because it isn't session based
-    g_Sockets_LWIP_Driver.m_multicastSocket = Socket( SOCK_AF_INET, SOCK_SOCK_DGRAM, SOCK_IPPROTO_UDP, TRUE );
+    g_Sockets_LWIP_Driver.m_multicastSocket = Socket( SOCK_AF_INET, SOCK_SOCK_DGRAM, SOCK_IPPROTO_UDP, FALSE );
     SOCKET_CHECK_RESULT( g_Sockets_LWIP_Driver.m_multicastSocket );
 
     // set sock option for multicast
@@ -721,6 +763,9 @@ BOOL Sockets_LWIP_Driver::InitializeMulticastDiscovery()
     SOCKET_CHECK_RESULT( SOCK_setsockopt( g_Sockets_LWIP_Driver.m_multicastSocket, SOCK_IPPROTO_IP, SOCK_IPO_ADD_MEMBERSHIP, (const char*)&multicast, sizeof(multicast) ) );
 
     SOCKET_CHECK_RESULT( SOCK_bind( g_Sockets_LWIP_Driver.m_multicastSocket, (SOCK_sockaddr*)&sockAddr, sizeof(sockAddr) ) );
+
+    g_Sockets_LWIP_Driver.s_discoveryInitialized = TRUE;
+
 
     SOCKET_CLEANUP()
 
@@ -771,7 +816,7 @@ void Sockets_LWIP_Driver::CreateTcpIpProcessor(HAL_CALLBACK_FPN callback, void* 
     g_Sockets_LWIP_Driver.m_TCP_IP_state_machine_callback = callback;
     // now initizlie our callback
     g_Sockets_LWIP_Driver.m_TCP_IP_state_machine.InitializeForUserMode(&Sockets_LWIP_Driver::TCP_IP_Thread_ContinuationRoutine, arg);
-    g_Sockets_LWIP_Driver.m_TCP_IP_state_machine.EnqueueDelta(1000);
+    g_Sockets_LWIP_Driver.m_TCP_IP_state_machine.EnqueueDelta(500 * 1000);
 }
 
 void Sockets_LWIP_Driver::RestartTcpIpProcessor(UINT32 timeFromNow_us)
@@ -779,7 +824,7 @@ void Sockets_LWIP_Driver::RestartTcpIpProcessor(UINT32 timeFromNow_us)
     GLOBAL_LOCK(irq);
 
     BOOL isLinked = g_Sockets_LWIP_Driver.m_TCP_IP_state_machine.IsLinked();
-    
+
     if(timeFromNow_us == 0)
     {
         if(isLinked) 
@@ -820,6 +865,8 @@ BOOL Sockets_LWIP_Driver::Initialize()
         }
 
 
+        g_Sockets_LWIP_Driver.m_usingSSL = FALSE;
+
         g_Sockets_LWIP_Driver.m_stateDebugSocket = DbgSock_Uninitialized;
 
         ApplyConfig();        
@@ -827,12 +874,7 @@ BOOL Sockets_LWIP_Driver::Initialize()
         
         SOCKET_CHECK_BOOL( HAL_SOCK_Initialize() );
 
-        //HAL_SOCK_EventsSet(SOCKET_EVENT_FLAG_SOCKETS_READY);
-
-        if(!SSL_Initialize())
-        {
-            debug_printf("SSL initialize failed!\r\n");
-        }
+        SSL_Initialize();
 
         s_initialized = TRUE;
     }
@@ -848,7 +890,10 @@ BOOL Sockets_LWIP_Driver::Uninitialize( )
    
     if(s_initialized)
     {
-        BOOL fWasEnabled = SmartPtr_IRQ::ForceEnabled(NULL);
+        if(MulticastResponseContinuation.IsLinked())
+        {
+            MulticastResponseContinuation.Abort();
+        }
 
         g_Sockets_LWIP_Driver.m_TCP_IP_timer.Abort();
         g_Sockets_LWIP_Driver.m_TCP_IP_state_machine.Abort();
@@ -866,9 +911,9 @@ BOOL Sockets_LWIP_Driver::Uninitialize( )
 
         ret = HAL_SOCK_Uninitialize();
 
-        if(!fWasEnabled) SmartPtr_IRQ::ForceDisabled(NULL);
-
-        s_initialized = FALSE;
+        s_initialized          = FALSE;
+        s_wirelessInitialized  = FALSE;
+        s_discoveryInitialized = FALSE;
     }
    
     
@@ -896,7 +941,14 @@ INT32 Sockets_LWIP_Driver::Write( int ComPortNum, const char* Data, size_t size 
         return SOCK_SOCKET_ERROR;
     }
 
-    ret = SOCK_send( g_Sockets_LWIP_Driver.m_SocketDebugStream, Data, size, 0 );
+    if(g_Sockets_LWIP_Driver.m_usingSSL)
+    {
+        ret = SSL_Write(g_Sockets_LWIP_Driver.m_SocketDebugStream, Data, size);
+    }
+    else
+    {
+        ret = SOCK_send( g_Sockets_LWIP_Driver.m_SocketDebugStream, Data, size, 0 );
+    }
 
     if(ret < 0) 
     {
@@ -936,15 +988,32 @@ INT32 Sockets_LWIP_Driver::Read( int ComPortNum, char* Data, size_t size )
     SOCK_sockaddr_in addr;
     INT32 len = sizeof(addr);
     INT32 ret = 0;
+    SOCK_timeval timeout;
+    SOCK_fd_set  readSet;
 
     if(ComPortNum != ConvertCOM_SockPort(COM_SOCKET_DBG)) return 0;
 
     if(g_Sockets_LWIP_Driver.m_stateDebugSocket == DbgSock_Uninitialized) return 0;
 
+    memset(&addr, 0, sizeof(addr));
+
+    timeout.tv_sec  = 0;
+    timeout.tv_usec = 0;
+
+    readSet.fd_array[0] = g_Sockets_LWIP_Driver.m_SocketDebugListener;
+    readSet.fd_count = 1;
+
     // if we are connected, then read from the debug stream
     if(g_Sockets_LWIP_Driver.m_stateDebugSocket == DbgSock_Connected)
     {
-        ret = SOCK_recv(g_Sockets_LWIP_Driver.m_SocketDebugStream, Data, size, 0);
+        if(g_Sockets_LWIP_Driver.m_usingSSL)
+        {
+            ret = SSL_Read(g_Sockets_LWIP_Driver.m_SocketDebugStream, Data, size);
+        }
+        else
+        {
+            ret = SOCK_recv(g_Sockets_LWIP_Driver.m_SocketDebugStream, Data, size, 0);
+        }
 
         // return value of zero indicates a shutdown of the socket.  Also we shutdown for any error except
         // ewouldblock.  If either of these happens, then we go back to the listening state
@@ -959,55 +1028,57 @@ INT32 Sockets_LWIP_Driver::Read( int ComPortNum, char* Data, size_t size )
         }
     }
 
-    // we always perform an accept so that we handle pending connections
-    // if we alread are connected and the debug stream socket is still active, then we immediately close
-    // the pending connection
-    sock = Accept( g_Sockets_LWIP_Driver.m_SocketDebugListener, (SOCK_sockaddr*)&addr, &len, TRUE );
-
-    if(SOCK_SOCKET_ERROR != sock)
+    if(SOCK_SOCKET_ERROR != HAL_SOCK_select( SOCK_FD_SETSIZE, &readSet, NULL, NULL, &timeout))
     {
-        INT32 nonblocking = 1;
-        BOOL  optval      = 1;
-        INT32 optLinger   = 0;
+        // we always perform an accept so that we handle pending connections
+        // if we alread are connected and the debug stream socket is still active, then we immediately close
+        // the pending connection
+        sock = Accept( g_Sockets_LWIP_Driver.m_SocketDebugListener, (SOCK_sockaddr*)&addr, &len, TRUE );
 
-        // if we are already in the connected state, then verify that the debugger stream socket is still active
-        if(DbgSock_Connected == g_Sockets_LWIP_Driver.m_stateDebugSocket)
+        if(SOCK_SOCKET_ERROR != sock)
         {
-            // the debugger stream is still active, so shutdown the pending connection
-            HAL_SOCK_setsockopt( sock, SOCK_SOL_SOCKET, SOCK_SOCKO_LINGER, (const char*)&optLinger, sizeof(INT32) );
-            SOCK_close(sock);
+            INT32 nonblocking = 1;
+            BOOL  optval      = 1;
+            INT32 optLinger   = 0;
 
-            // set timeout since another connection is trying to use us.
-            if(!s_DebuggerTimeoutCompletion.IsLinked())
+            // if we are already in the connected state, then verify that the debugger stream socket is still active
+            if(DbgSock_Connected == g_Sockets_LWIP_Driver.m_stateDebugSocket)
             {
-                s_DebuggerTimeoutCompletion.EnqueueDelta(5000000); // 5 seconds
+                // the debugger stream is still active, so shutdown the pending connection
+                HAL_SOCK_setsockopt( sock, SOCK_SOL_SOCKET, SOCK_SOCKO_LINGER, (const char*)&optLinger, sizeof(INT32) );
+                SOCK_close(sock);
+
+                // set timeout since another connection is trying to use us.
+                if(!s_DebuggerTimeoutCompletion.IsLinked())
+                {
+                    s_DebuggerTimeoutCompletion.EnqueueDelta(5000000); // 5 seconds
+                }
             }
-        }
-        else // we are in the listening state, so accept the pending connection and update the state
-        {
-            g_Sockets_LWIP_Driver.m_SocketDebugStream = sock;
-            SOCKET_CHECK_RESULT( SOCK_ioctl(g_Sockets_LWIP_Driver.m_SocketDebugStream, SOCK_FIONBIO, &nonblocking) );
-            SOCKET_CHECK_RESULT( HAL_SOCK_setsockopt( g_Sockets_LWIP_Driver.m_SocketDebugStream, SOCK_IPPROTO_TCP, SOCK_TCP_NODELAY, (char*)&optval, sizeof(optval) ) );
-            SOCKET_CHECK_RESULT( HAL_SOCK_setsockopt( g_Sockets_LWIP_Driver.m_SocketDebugStream, SOCK_SOL_SOCKET, SOCK_SOCKO_LINGER, (const char*)&optLinger, sizeof(INT32) ) );
-
-            g_Sockets_LWIP_Driver.m_stateDebugSocket = DbgSock_Connected;
-
-            SOCKET_CLEANUP()
-
-            if(g_Sockets_LWIP_Driver.m_SocketDebugStream != SOCK_SOCKET_ERROR)
+            else // we are in the listening state, so accept the pending connection and update the state
             {
-                SOCK_close(g_Sockets_LWIP_Driver.m_SocketDebugStream);
-                g_Sockets_LWIP_Driver.m_SocketDebugStream = SOCK_SOCKET_ERROR;
+                g_Sockets_LWIP_Driver.m_SocketDebugStream = sock;
+                SOCKET_CHECK_RESULT( SOCK_ioctl(g_Sockets_LWIP_Driver.m_SocketDebugStream, SOCK_FIONBIO, &nonblocking) );
+                SOCKET_CHECK_RESULT( HAL_SOCK_setsockopt( g_Sockets_LWIP_Driver.m_SocketDebugStream, SOCK_IPPROTO_TCP, SOCK_TCP_NODELAY, (char*)&optval, sizeof(optval) ) );
+                SOCKET_CHECK_RESULT( HAL_SOCK_setsockopt( g_Sockets_LWIP_Driver.m_SocketDebugStream, SOCK_SOL_SOCKET, SOCK_SOCKO_LINGER, (const char*)&optLinger, sizeof(INT32) ) );
 
-                debug_printf("DBGSTREAM SOCKET_ERROR: %d\r\n", HAL_SOCK_getlasterror() );
+                g_Sockets_LWIP_Driver.m_stateDebugSocket = DbgSock_Connected;
+
+                SOCKET_CLEANUP()
+
+                if(g_Sockets_LWIP_Driver.m_SocketDebugStream != SOCK_SOCKET_ERROR)
+                {
+                    SOCK_close(g_Sockets_LWIP_Driver.m_SocketDebugStream);
+                    g_Sockets_LWIP_Driver.m_SocketDebugStream = SOCK_SOCKET_ERROR;
+
+                    debug_printf("DBGSTREAM SOCKET_ERROR: %d\r\n", HAL_SOCK_getlasterror() );
+                }
+
+                SOCKET_CHECK_EXIT_NORETURN();
             }
-
-            SOCKET_CHECK_EXIT_NORETURN();
+            
+            HAL_SOCK_EventsSet( SOCKET_EVENT_FLAG_SOCKET );
         }
-        
-        HAL_SOCK_EventsSet( SOCKET_EVENT_FLAG_SOCKET );
     }
-
 
     if(ret < 0)
     {  
@@ -1015,6 +1086,60 @@ INT32 Sockets_LWIP_Driver::Read( int ComPortNum, char* Data, size_t size )
     }
 
     return ret;
+}
+
+BOOL Sockets_LWIP_Driver::IsUsingSsl( int ComPortNum )
+{
+    if(ComPortNum != ConvertCOM_SockPort(COM_SOCKET_DBG)) return FALSE;
+    if(g_Sockets_LWIP_Driver.m_stateDebugSocket == DbgSock_Uninitialized) return FALSE;
+
+    if(g_Sockets_LWIP_Driver.m_stateDebugSocket == DbgSock_Connected)
+    {
+        return g_Sockets_LWIP_Driver.m_usingSSL;
+    }
+
+    return FALSE;
+}
+
+
+BOOL Sockets_LWIP_Driver::UpgradeToSsl( int ComPortNum, const UINT8* pCACert, UINT32 caCertLen, const UINT8* pDeviceCert, UINT32 deviceCertLen, LPCSTR szTargetHost  )
+{
+    if(ComPortNum != ConvertCOM_SockPort(COM_SOCKET_DBG)) return 0;
+    if(g_Sockets_LWIP_Driver.m_stateDebugSocket == DbgSock_Uninitialized) return 0;
+    
+    if(g_Sockets_LWIP_Driver.m_stateDebugSocket == DbgSock_Connected)
+    {
+        if(g_Sockets_LWIP_Driver.m_usingSSL) return TRUE;
+
+        // TLS only and Verify=Required --> only verify the server
+        if(SSL_ClientInit( 0x10, 0x04, (const char*)pDeviceCert, deviceCertLen, NULL, g_DebuggerPort_SslCtx_Handle ))
+        {
+            INT32 ret;
+    
+            SSL_AddCertificateAuthority( g_DebuggerPort_SslCtx_Handle, (const char*)pCACert, caCertLen, NULL);
+    
+            do
+            {
+                ret = SSL_Connect( g_Sockets_LWIP_Driver.m_SocketDebugStream, szTargetHost, g_DebuggerPort_SslCtx_Handle );
+            }
+            while(ret == SOCK_EWOULDBLOCK || ret == SOCK_TRY_AGAIN);
+    
+    
+            if(ret != 0)
+            {
+                SSL_CloseSocket(g_Sockets_LWIP_Driver.m_SocketDebugStream);
+                SSL_ExitContext(g_DebuggerPort_SslCtx_Handle);
+            }
+            else
+            {
+                g_Sockets_LWIP_Driver.m_usingSSL = TRUE;
+            }
+    
+            return ret == 0;
+        }
+    }
+
+    return FALSE;
 }
 
 
@@ -1043,6 +1168,8 @@ void Sockets_LWIP_Driver::RegisterSocket( SOCK_SOCKET sock, BOOL selectable, BOO
     g_Sockets_LWIP_Driver.m_socketHandles[g_Sockets_LWIP_Driver.m_cntSockets].m_socket  = sock;
     g_Sockets_LWIP_Driver.m_socketHandles[g_Sockets_LWIP_Driver.m_cntSockets].m_flags   = 0;
     g_Sockets_LWIP_Driver.m_socketHandles[g_Sockets_LWIP_Driver.m_cntSockets].m_sslData = NULL;
+
+    if(fDebug) SET_SOCKET_FLAG(g_Sockets_LWIP_Driver.m_socketHandles[g_Sockets_LWIP_Driver.m_cntSockets], SocketRegisterMap::c_DebugSocket);
 
     g_Sockets_LWIP_Driver.m_cntSockets++;
 }
@@ -1084,6 +1211,7 @@ void Sockets_LWIP_Driver::UnregisterSocket( SOCK_SOCKET sock )
 
 BOOL Sockets_LWIP_Driver::s_initialized=FALSE;
 BOOL Sockets_LWIP_Driver::s_wirelessInitialized=FALSE;
+BOOL Sockets_LWIP_Driver::s_discoveryInitialized=FALSE;
 
 #if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
 #pragma arm section zidata

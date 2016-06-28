@@ -5,6 +5,7 @@
 #ifndef _TINYCLR_PLATFORMDEF_H_
 #define _TINYCLR_PLATFORMDEF_H_
 
+#include "CLR_Defines.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // PLATFORMS GENERAL DEFINITIONS
@@ -28,14 +29,11 @@
 #endif
 
 #if !defined(PLATFORM_WINDOWS) && !defined(PLATFORM_WINCE)
-#if defined(LITTLE_ENDIAN)
-#define TINYCLR_LITTLE_ENDIAN 1
-#elif defined(BIG_ENDIAN)
-#define TINYCLR_BIG_ENDIAN    1
-#else
-!ERROR
+#if !defined(LITTLE_ENDIAN) && !defined(BIG_ENDIAN)
+!ERROR ENDIANNESS NOT DEFINED
 #endif
 #endif
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // DEFINITIONS
 #define TINYCLR_VALIDATE_HEAP_0_None                0 // No Trace
@@ -54,7 +52,7 @@
 #define TINYCLR_EMULATED_FLOATINGPOINT    // use the fixed point floating point notation in the clr ocdes 
 #endif
 
-#if !defined(TINYCLR_NO_APPDOAMINS)
+#if !defined(TINYCLR_NO_APPDOMAINS)
 #define TINYCLR_APPDOMAINS           // enables application doman support
 #endif
 #define TINYCLR_TRACE_EXCEPTIONS     // enables exception dump support
@@ -72,19 +70,19 @@
 
 //--//
 // Setting the threshold value to start Garbagge collector 
-// PLATFORM_DEPENDENT_HEAP_SIZE_THRESHOLD should set in the file platform.settings file, eg sam7x_ek.settings
-// as that file can be view in the CLR codes.
+// PLATFORM_DEPENDENT_HEAP_SIZE_THRESHOLD should set in the file platform.settings file, eg sam7x_ek.settings. 
+// defaults are 32Kb and 48 kb for lower and upper threshold respectively
 
 #ifdef PLATFORM_DEPENDENT_HEAP_SIZE_THRESHOLD
 #define HEAP_SIZE_THRESHOLD   PLATFORM_DEPENDENT_HEAP_SIZE_THRESHOLD
 #else
-#define HEAP_SIZE_THRESHOLD   50 * 1024
+#define HEAP_SIZE_THRESHOLD   48 * 1024
 #endif
 
 #ifdef PLATFORM_DEPENDENT_HEAP_SIZE_THRESHOLD_UPPER
 #define HEAP_SIZE_THRESHOLD_UPPER   PLATFORM_DEPENDENT_HEAP_SIZE_THRESHOLD_UPPER
 #else
-#define HEAP_SIZE_THRESHOLD_UPPER   HEAP_SIZE_THRESHOLD + 30 * 1024
+#define HEAP_SIZE_THRESHOLD_UPPER   HEAP_SIZE_THRESHOLD + 16 * 1024
 #endif
 
 //--//
@@ -99,10 +97,12 @@
 #define TINYCLR_PROFILE_NEW_ALLOCATIONS
 #if defined(DEBUG) || defined(_DEBUG)
 #define TINYCLR_VALIDATE_HEAP                   TINYCLR_VALIDATE_HEAP_2_DblLinkedList
+//#define TINYCLR_TRACE_MALLOC
 #define TINYCLR_FILL_MEMORY_WITH_DIRTY_PATTERN
 #define TINYCLR_TRACE_EARLYCOLLECTION
 #define TINYCLR_DELEGATE_PRESERVE_STACK
 #define TINYCLR_VALIDATE_APPDOMAIN_ISOLATION
+#define TINYCLR_TRACE_HRESULT        // enable tracing of HRESULTS from interop libraries 
 #else //RELEASE
 #define TINYCLR_VALIDATE_HEAP TINYCLR_VALIDATE_HEAP_0_None
 #endif
@@ -133,7 +133,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // GENERAL RTM RULES
-#if defined(BUILD_RTM)
+#if defined(BUILD_RTM) || defined(PLATFORM_NO_CLR_TRACE)
 #undef TINYCLR_TRACE_MEMORY_STATS
 #undef TINYCLR_TRACE_EXCEPTIONS 
 #undef TINYCLR_TRACE_ERRORS

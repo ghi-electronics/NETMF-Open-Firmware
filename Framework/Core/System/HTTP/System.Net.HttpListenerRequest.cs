@@ -104,6 +104,12 @@ namespace System.Net
             m_contentLength = -1;
         }
 
+        public void Reset()
+        {
+            m_httpRequestHeaders = new WebHeaderCollection(true);
+            m_contentLength = -1;
+        }
+
         /// <summary>
         /// Parses request from client.
         /// Fills
@@ -190,7 +196,7 @@ namespace System.Net
                     {
                         string authInfo = headerValue.Substring(sepSpace + 1);
                         // authInfo is base64 encoded username and password.
-                        byte[] authInfoDecoded = ConvertBase64.FromBase64String(authInfo);
+                        byte[] authInfoDecoded = Convert.FromBase64String(authInfo);
                         char[] authInfoDecChar = System.Text.Encoding.UTF8.GetChars(authInfoDecoded);
                         string strAuthInfo = new string(authInfoDecChar);
                         // The strAuthInfo comes in format username:password. Parse it.

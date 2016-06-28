@@ -69,7 +69,6 @@
 #include <stdio.h>
 #endif
 #endif
-
 #ifndef OPENSSL_NO_BIO
 #include <openssl/bio.h>
 #endif
@@ -102,38 +101,42 @@ typedef void (*LHASH_DOALL_ARG_FN_TYPE)(void *, void *);
 /* First: "hash" functions */
 #define DECLARE_LHASH_HASH_FN(name, o_type) \
 	unsigned long name##_LHASH_HASH(const void *);
+//MS: cast to o_type*
 #define IMPLEMENT_LHASH_HASH_FN(name, o_type) \
 	unsigned long name##_LHASH_HASH(const void *arg) { \
-		const o_type *a = arg; \
+		const o_type *a = (o_type*)arg; \
 		return name##_hash(a); }
 #define LHASH_HASH_FN(name) name##_LHASH_HASH
 
 /* Second: "compare" functions */
 #define DECLARE_LHASH_COMP_FN(name, o_type) \
 	int name##_LHASH_COMP(const void *, const void *);
+//MS: Cast to o_type*
 #define IMPLEMENT_LHASH_COMP_FN(name, o_type) \
 	int name##_LHASH_COMP(const void *arg1, const void *arg2) { \
-		const o_type *a = arg1;		    \
-		const o_type *b = arg2; \
+		const o_type *a = (o_type*)arg1;		    \
+		const o_type *b = (o_type*)arg2; \
 		return name##_cmp(a,b); }
 #define LHASH_COMP_FN(name) name##_LHASH_COMP
 
 /* Third: "doall" functions */
 #define DECLARE_LHASH_DOALL_FN(name, o_type) \
 	void name##_LHASH_DOALL(void *);
+//MS: cast to o_type*
 #define IMPLEMENT_LHASH_DOALL_FN(name, o_type) \
 	void name##_LHASH_DOALL(void *arg) { \
-		o_type *a = arg; \
+		o_type *a = (o_type*)arg; \
 		name##_doall(a); }
 #define LHASH_DOALL_FN(name) name##_LHASH_DOALL
 
 /* Fourth: "doall_arg" functions */
 #define DECLARE_LHASH_DOALL_ARG_FN(name, o_type, a_type) \
 	void name##_LHASH_DOALL_ARG(void *, void *);
+//MS: cast to atch signatures
 #define IMPLEMENT_LHASH_DOALL_ARG_FN(name, o_type, a_type) \
 	void name##_LHASH_DOALL_ARG(void *arg1, void *arg2) { \
-		o_type *a = arg1; \
-		a_type *b = arg2; \
+		o_type *a = (o_type*)arg1; \
+		a_type *b = (a_type*)arg2; \
 		name##_doall_arg(a, b); }
 #define LHASH_DOALL_ARG_FN(name) name##_LHASH_DOALL_ARG
 

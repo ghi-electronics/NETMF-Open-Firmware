@@ -248,6 +248,26 @@ const ConfigurationSector g_ConfigurationSector =
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+static ON_SOFT_REBOOT_HANDLER s_rebootHandlers[5] = {NULL, NULL, NULL, NULL, NULL};
+
+void __cdecl HAL_AddSoftRebootHandler(ON_SOFT_REBOOT_HANDLER handler)
+{
+    for(int i=0; i<ARRAYSIZE(s_rebootHandlers); i++)
+    {
+        if(s_rebootHandlers[i] == NULL)
+        {
+            s_rebootHandlers[i] = handler;
+            return;
+        }
+        else if(s_rebootHandlers[i] == handler)
+        {
+            return;
+        }
+    }
+}
+
+bool g_fDoNotUninitializeDebuggerPort = false;
+
 void __cdecl HAL_Initialize(void)
 {
     // In the case of the Extensible Emulator, the work typically done here is
@@ -257,7 +277,18 @@ void __cdecl HAL_Initialize(void)
 
 void __cdecl HAL_Uninitialize(void)
 {
-   CPU_GPIO_Uninitialize();
+    int i;
+
+    CPU_GPIO_Uninitialize();
+
+    for(i=0; i<ARRAYSIZE(s_rebootHandlers); i++)
+    {
+        if(s_rebootHandlers[i] != NULL)
+        {
+            s_rebootHandlers[i]();
+            return;
+        }
+    }       
 }
 
 void HAL_EnterBooterMode()
@@ -538,6 +569,12 @@ SmartPtr_IRQ::~SmartPtr_IRQ()
 {
     Restore();
 }
+
+void SmartPtr_IRQ::Release()
+{
+    HAL_Windows_ReleaseGlobalLock();
+}
+
 void SmartPtr_IRQ::Disable()
 {
     HAL_Windows_AcquireGlobalLock();

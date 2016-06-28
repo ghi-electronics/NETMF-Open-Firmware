@@ -106,7 +106,7 @@ namespace Ws.Services
         public override string EventingNamespace         { get { return WsWellKnownUri.WseNamespaceUri; } }
         public override string DiscoveryNamespace        { get { return m_wsdDiscoveryUri; } }
         public override string DiscoveryWellKnownAddress { get { return m_wsdDiscoveryUrn; } }
-        public override string AnonymousUri              { get { return m_wsaAnonymousUri; } }
+        public override string AnonymousUri              { get { return m_wsaAnonymousRoleUri; } } // DPWS 1.0 requires AnonymousRole for To: in Resolve/Probe matches
         public override string AnonymousRoleUri          { get { return m_wsaAnonymousRoleUri; } }
         public override string WsdpNamespaceUri          { get { return m_wsdpNamespaceUri; } }
         public override bool   IncludeSoapHeaders        { get { return true; } }
@@ -122,7 +122,7 @@ namespace Ws.Services
         const String m_wsaAnonymousRoleUri = m_wsaNamespaceUri + "/role/anonymous";
         const String m_wsdDiscoveryUrn     = "urn:docs-oasis-open-org:ws-dd:ns:discovery:2009:01";
         const String m_wsdDiscoveryUri     = "http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01";
-        const String m_wsdpNamespaceUri    = "http://schemas.xmlsoap.org/ws/2006/02/devprof";
+        const String m_wsdpNamespaceUri    = "http://docs.oasis-open.org/ws-dd/ns/dpws/2009/01";
         static Version m_wsVersion         = new Version(1,1,0,0);
 
         /// <summary>

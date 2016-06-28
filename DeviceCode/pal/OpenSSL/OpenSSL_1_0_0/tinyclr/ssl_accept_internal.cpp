@@ -7,6 +7,7 @@ int ssl_accept_internal( int sd, int sslContextHandle )
 {
     int err = SOCK_SOCKET_ERROR;
     SSL *ssl = NULL;
+    int nonblock = 0;
     
     if((sslContextHandle >= ARRAYSIZE(g_SSL_Driver.m_sslContextArray)) || (sslContextHandle < 0))
     {
@@ -24,7 +25,12 @@ int ssl_accept_internal( int sd, int sslContextHandle )
         goto error;
     }
 
+    SOCK_ioctl(sd, SOCK_FIONBIO, &nonblock);
+
     err = SSL_accept (ssl);
+
+    nonblock = 1;
+    SOCK_ioctl(sd, SOCK_FIONBIO, &nonblock);
 
     err = SSL_get_error(ssl,err);
     

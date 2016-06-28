@@ -66,7 +66,7 @@ void main(int argc,char *argv[])
 			RC4(&ctx,num,buffer,buffer);
 			}
 
-		printf("RC4 (%d bytes) %d %d (%d) - 8 bytes\n",num,
+		TINYCLR_SSL_PRINTF("RC4 (%d bytes) %d %d (%d) - 8 bytes\n",num,
 			e1-s1,e2-s2,(e1-s1)-(e2-s2));
 		}
 	}

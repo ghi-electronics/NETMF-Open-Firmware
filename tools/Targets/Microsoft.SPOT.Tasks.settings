@@ -5,7 +5,7 @@
   <PropertyGroup>
     <SPOTTasksAssembly>$(BUILD_ROOT)\$(Configuration)\Server\dll\Microsoft.SPOT.Tasks.dll</SPOTTasksAssembly>
     <NativeBuildTasksAssembly>$(BUILD_ROOT)\$(Configuration)\Server\dll\Microsoft.SPOT.Tasks.NativeBuild.dll</NativeBuildTasksAssembly>
-    <InternalBuildTasksAssembly>Microsoft.SPOT.Tasks.Internal.dll</InternalBuildTasksAssembly>
+    <InternalBuildTasksAssembly>$(SPOCLIENT)\tools\build\Microsoft.SPOT.Tasks.Internal.dll</InternalBuildTasksAssembly>
   </PropertyGroup>
 
   <UsingTask TaskName="Microsoft.SPOT.Tasks.GetDeviceFrameworkPaths"    AssemblyFile="$(SPOTTasksAssembly)"/>
@@ -50,6 +50,6 @@
   <UsingTask TaskName="Microsoft.SPOT.Tasks.Internal.TransmorgifyProject"       AssemblyName="$(InternalBuildTasksAssembly)"/>
   <UsingTask TaskName="Microsoft.SPOT.Tasks.Internal.TransmorgifyTemplateFiles" AssemblyName="$(InternalBuildTasksAssembly)"/>
   <UsingTask TaskName="Microsoft.SPOT.Tasks.Internal.GenerateFrameworkList"     AssemblyFile="$(InternalBuildTasksAssembly)"/>
-
+  <UsingTask TaskName="Microsoft.SPOT.Tasks.Internal.GenerateCLRDefines"        AssemblyFile="$(InternalBuildTasksAssembly)"/>
 
 </Project>

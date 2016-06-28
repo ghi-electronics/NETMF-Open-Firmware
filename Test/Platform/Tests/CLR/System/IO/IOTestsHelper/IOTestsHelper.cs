@@ -137,8 +137,10 @@ namespace Microsoft.SPOT.Platform.Tests
         public static void IntializeVolume()
         {
             Log.Comment("Formatting " + Volume.Name + " in " + Volume.FileSystem + " [" + _volumes[_currentVolume].Comment + "]");
-            Volume.Format(_volumes[_currentVolume].Parameter, true);
+            Volume.Format(Volume.FileSystem, _volumes[_currentVolume].Parameter, "TEST_VOL", true);
             Directory.SetCurrentDirectory(Volume.RootDirectory);
+
+            Log.Comment("TestVolumeLabel: " + Volume.VolumeLabel);
         }
     }
 }

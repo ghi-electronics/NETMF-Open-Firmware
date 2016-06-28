@@ -131,7 +131,7 @@ while($line=<>) {
     {
 	$line =~ s|(^[\.\w]+)\:\s*||;
 	my $label = $1;
-	TINYCLR_SSL_PRINTF "%s:",($GLOBALS{$label} or $label) if ($label);
+	printf "%s:",($GLOBALS{$label} or $label) if ($label);
     }
 
     {

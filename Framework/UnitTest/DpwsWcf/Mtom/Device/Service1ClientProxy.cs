@@ -71,6 +71,9 @@ namespace tempuri.org
             respDcs.BodyParts = response.BodyParts;
             GetDataResponse resp;
             resp = ((GetDataResponse)(respDcs.ReadObject(response.Reader)));
+            response.Reader.Dispose();
+            response.Reader = null;
+
             return resp;
         }
         
@@ -105,6 +108,9 @@ namespace tempuri.org
             respDcs.BodyParts = response.BodyParts;
             SetDataResponse resp;
             resp = ((SetDataResponse)(respDcs.ReadObject(response.Reader)));
+            response.Reader.Dispose();
+            response.Reader = null;
+
             return resp;
         }
         
@@ -139,6 +145,9 @@ namespace tempuri.org
             respDcs.BodyParts = response.BodyParts;
             SetFileInfoResponse resp;
             resp = ((SetFileInfoResponse)(respDcs.ReadObject(response.Reader)));
+            response.Reader.Dispose();
+            response.Reader = null;
+
             return resp;
         }
         
@@ -173,6 +182,9 @@ namespace tempuri.org
             respDcs.BodyParts = response.BodyParts;
             GetNestedDataResponse resp;
             resp = ((GetNestedDataResponse)(respDcs.ReadObject(response.Reader)));
+            response.Reader.Dispose();
+            response.Reader = null;
+
             return resp;
         }
         
@@ -207,6 +219,9 @@ namespace tempuri.org
             respDcs.BodyParts = response.BodyParts;
             SetNestedDataResponse resp;
             resp = ((SetNestedDataResponse)(respDcs.ReadObject(response.Reader)));
+            response.Reader.Dispose();
+            response.Reader = null;
+
             return resp;
         }
     }

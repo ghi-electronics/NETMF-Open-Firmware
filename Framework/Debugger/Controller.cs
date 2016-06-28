@@ -37,6 +37,8 @@ namespace Microsoft.SPOT.Debugger.WireProtocol
         void ClosePort();
 
         void Start();
+        void StopProcessing();
+        void ResumeProcessing();
         void Stop ();
 
         uint GetUniqueEndpointId();
@@ -551,28 +553,48 @@ namespace Microsoft.SPOT.Debugger.WireProtocol
             m_state.SetValue( State.Value.Started, false );
         }
 
+        void IController.StopProcessing()
+        {
+            m_state.SetValue(State.Value.Stopping, false);
+
+            m_evtShutdown.Set();
+
+            if (m_inboundDataThread != null)
+            {
+                m_inboundDataThread.Join();
+                m_inboundDataThread = null;
+            }
+            if (m_stateMachineThread != null)
+            {
+                m_stateMachineThread.Join();
+                m_stateMachineThread = null;
+            }
+        }
+
+        void IController.ResumeProcessing()
+        {
+            m_evtShutdown.Reset();
+            m_state.SetValue(State.Value.Resume, false);
+            if (m_inboundDataThread == null)
+            {
+                m_inboundDataThread = CreateThread(new ThreadStart(this.ReceiveInput));
+            }
+            if (m_stateMachineThread == null)
+            {
+                m_stateMachineThread = CreateThread(new ThreadStart(this.Process));
+            }
+        }
+
         void IController.Stop()
         {
-            if(m_state.SetValue( State.Value.Stopping, false ))
+            if (m_evtShutdown != null)
             {
-                if (m_evtShutdown != null)
-                {
-                    m_evtShutdown.Set();
-                }
+                m_evtShutdown.Set();
+            }
 
-                if (m_stateMachineThread != null)
-                {
-                    m_stateMachineThread.Abort();
-                    m_stateMachineThread.Join();
-                    m_stateMachineThread = null;
-                }
-
-                if (m_inboundDataThread != null)
-                {
-                    m_inboundDataThread.Abort();
-                    m_inboundDataThread.Join();
-                    m_inboundDataThread = null;
-                }
+            if (m_state.SetValue(State.Value.Stopping, false))
+            {
+                ((IController)this).StopProcessing();
 
                 ((IController)this).ClosePort();
 
@@ -891,7 +913,7 @@ namespace Microsoft.SPOT.Debugger.WireProtocol
         static public bool ReplyBadPacket( IController ctrl, uint flags )
         {
             //What is this for? Nack + Ping?  What can the TinyCLR possibly do with this information?
-            OutgoingMessage msg = new OutgoingMessage( ctrl, null, Commands.c_Monitor_Ping, Flags.c_NonCritical | Flags.c_NACK | flags, null );
+            OutgoingMessage msg = new OutgoingMessage( ctrl, new WireProtocol.Converter(), Commands.c_Monitor_Ping, Flags.c_NonCritical | Flags.c_NACK | flags, null );
 
             return msg.Send();
         }

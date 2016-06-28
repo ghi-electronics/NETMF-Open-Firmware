@@ -352,8 +352,8 @@ end:
 			TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR,"-----\n");
 			lh_stats(SSL_CTX_sessions(s_ctx),OPENSSL_TYPE__FILE_STDERR);
 			TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR,"-----\n");
-		/*	lh_node_stats(SSL_CTX_sessions(s_ctx),stderr);
-			TINYCLR_SSL_FPRINTF(stderr,"-----\n"); */
+		/*	lh_node_stats(SSL_CTX_sessions(s_ctx),OPENSSL_TYPE__FILE_STDERR);
+			TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR,"-----\n"); */
 			lh_node_usage_stats(SSL_CTX_sessions(s_ctx),OPENSSL_TYPE__FILE_STDERR);
 			TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR,"-----\n");
 			}
@@ -392,7 +392,7 @@ int ndoit(SSL_CTX *ssl_ctx[2])
 	TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDOUT,"started thread %lu\n",CRYPTO_thread_id());
 	for (i=0; i<number_of_loops; i++)
 		{
-/*		TINYCLR_SSL_FPRINTF(stderr,"%4d %2d ctx->ref (%3d,%3d)\n",
+/*		TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR,"%4d %2d ctx->ref (%3d,%3d)\n",
 			CRYPTO_thread_id(),i,
 			ssl_ctx[0]->references,
 			ssl_ctx[1]->references); */
@@ -869,7 +869,7 @@ void solaris_locking_callback(int mode, int type, char *file, int line)
 
 	/*
 	if (CRYPTO_LOCK_SSL_CERT == type)
-	TINYCLR_SSL_FPRINTF(stderr,"(t,m,f,l) %ld %d %s %d\n",
+	TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR,"(t,m,f,l) %ld %d %s %d\n",
 		CRYPTO_thread_id(),
 		mode,file,line);
 	*/
@@ -1073,7 +1073,7 @@ void pthreads_locking_callback(int mode, int type, char *file,
 #endif
 /*
 	if (CRYPTO_LOCK_SSL_CERT == type)
-		TINYCLR_SSL_FPRINTF(stderr,"(t,m,f,l) %ld %d %s %d\n",
+		TINYCLR_SSL_FPRINTF(OPENSSL_TYPE__FILE_STDERR,"(t,m,f,l) %ld %d %s %d\n",
 		CRYPTO_thread_id(),
 		mode,file,line);
 */

@@ -142,7 +142,7 @@ SetBlob
 
  /* Now we have to sort the blobs. I am using a simple algo.
     *Sort ptrs *Copy to temp-mem *Copy from temp-mem to user-mem*/
-        qsort( rgSetBlob, sk_OPENSSL_BLOCK_num(a), sizeof(MYBLOB), SetBlobCmp);
+        TINYCLR_SSL_QSORT( rgSetBlob, sk_OPENSSL_BLOCK_num(a), sizeof(MYBLOB), SetBlobCmp);
 		if (!(pTempMem = (unsigned char*)OPENSSL_malloc(totSize)))//MS: cast to unsigned char*
 			{
 			ASN1err(ASN1_F_I2D_ASN1_SET,ERR_R_MALLOC_FAILURE);

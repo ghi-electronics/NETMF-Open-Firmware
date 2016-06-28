@@ -164,6 +164,8 @@ int SH7264_SMSC_LWIP_Driver::Open(int index)
     ipaddr.addr = iface->ipaddr;
     gateway.addr = iface->gateway;
     subnetmask.addr = iface->subnetmask;
+ 
+    g_SH7264_SMSC_NetIF.flags |= NETIF_FLAG_IGMP;
 
     pNetIF = netif_add( &g_SH7264_SMSC_NetIF, &ipaddr, &subnetmask, &gateway, NULL, SH7264_SMSC_ethhw_init, ethernet_input );
     

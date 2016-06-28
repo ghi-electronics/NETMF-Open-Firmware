@@ -82,13 +82,13 @@ namespace Microsoft.SPOT.Tasks
                 ProjectPropertyGroupElement bpg = proj.Xml.AddPropertyGroup(); 
                 bpg.AddProperty("FeatureName", m_name);
                 bpg.AddProperty("Guid", System.Guid.NewGuid().ToString("B"));
-                bpg.AddProperty("Description", "");
+                bpg.AddProperty("Description", "<Add Feature Description Here>");
                 bpg.AddProperty("Groups", "");
 
                 ProjectItemGroupElement big = proj.Xml.AddItemGroup();
                 big.AddItem("InteropFeature", Path.GetFileNameWithoutExtension(m_assemblyName).Replace('.', '_'));
                 big.AddItem("DriverLibs", Path.GetFileNameWithoutExtension(m_assemblyName).Replace('.', '_') + ".$(LIB_EXT)");
-                big.AddItem("MMP_DAT_CreateDatabase", "$(BUILD_TREE_CLIENT)\\pe\\" + m_assemblyName);
+                big.AddItem("MMP_DAT_CreateDatabase", "$(BUILD_TREE_CLIENT)\\pe\\$(ENDIANNESS)\\" + m_assemblyName);
                 big.AddItem("RequiredProjects", Path.Combine(m_stubsPath, m_nativeProjectFile));
 
             

@@ -60,6 +60,8 @@ namespace localhost.ServiceHelloWCF
             reqDcs = new HelloWCFDataContractSerializer("HelloWCF", "http://localhost/ServiceHelloWCF");
             HelloWCF req;
             req = ((HelloWCF)(reqDcs.ReadObject(request.Reader)));
+            request.Reader.Dispose();
+            request.Reader = null;
 
             // Create response object
             // Call service operation to process request and return response.

@@ -36,6 +36,11 @@ BOOL HAL_CONTINUATION::Dequeue_And_Execute()
     return TRUE;
 }
 
+bool HAL_CONTINUATION::IsLinked()
+{
+    NATIVE_PROFILE_PAL_ASYNC_PROC_CALL();
+    return false;
+}
 
 //-//
 // completion list

@@ -600,7 +600,7 @@ void CRYPTO_lock(int mode, int type, const char *file, int line)
 			struct CRYPTO_dynlock_value *pointer
 				= CRYPTO_get_dynlock_value(type);
 
-			OPENSSL_assert(pointer != NULL);
+			TINYCLR_SSL_ASSERT(pointer != NULL);
 
 			dynlock_lock_callback(mode, pointer, file, line);
 
@@ -755,12 +755,34 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason,
 #if defined(_WIN32) && !defined(__CYGWIN__)
 #include <tchar.h>
 #include <signal.h>
+#ifdef __WATCOMC__
+#if defined(_UNICODE) || defined(__UNICODE__)
+#define _vsntprintf _vsnwprintf
+#else
+#define _vsntprintf _vsnprintf
+#endif
+#endif
+#ifdef _MSC_VER
+#define alloca _alloca
+#endif
 
 #if defined(_WIN32_WINNT) && _WIN32_WINNT>=0x0333
 int OPENSSL_isservice(void)
 { HWINSTA h;
   DWORD len;
   WCHAR *name;
+  static union { void *p; int (*f)(void); } _OPENSSL_isservice = { NULL };
+
+    if (_OPENSSL_isservice.p == NULL) {
+	HMODULE h = GetModuleHandle(NULL);
+	if (h != NULL)
+	    _OPENSSL_isservice.p = GetProcAddress(h,"_OPENSSL_isservice");
+	if (_OPENSSL_isservice.p == NULL)
+	    _OPENSSL_isservice.p = (void *)-1;
+    }
+
+    if (_OPENSSL_isservice.p != (void *)-1)
+	return (*_OPENSSL_isservice.f)();
 
     (void)GetDesktopWindow(); /* return value is ignored */
 
@@ -773,11 +795,7 @@ int OPENSSL_isservice(void)
 
     if (len>512) return -1;		/* paranoia */
     len++,len&=~1;			/* paranoia */
-#ifdef _MSC_VER
-    name=(WCHAR *)_alloca(len+sizeof(WCHAR));
-#else
     name=(WCHAR *)alloca(len+sizeof(WCHAR));
-#endif
     if (!GetUserObjectInformationW (h,UOI_NAME,name,len,&len))
 	return -1;
 
@@ -826,11 +844,7 @@ void OPENSSL_showfatal (const char *fmta,...)
       size_t len_0=TINYCLR_SSL_STRLEN(fmta)+1,i;
       WCHAR *fmtw;
 
-#ifdef _MSC_VER
-	fmtw = (WCHAR *)_alloca (len_0*sizeof(WCHAR));
-#else
-	fmtw = (WCHAR *)alloca (len_0*sizeof(WCHAR));
-#endif
+	fmtw = (WCHAR *)alloca(len_0*sizeof(WCHAR));
 	if (fmtw == NULL) { fmt=(const TCHAR *)L"no stack?"; break; }
 
 #ifndef OPENSSL_NO_MULTIBYTE
@@ -896,7 +910,7 @@ void OpenSSLDie(const char *file,int line,const char *assertion)
 #if !defined(_WIN32) || defined(__CYGWIN__)
 	TINYCLR_SSL_ABORT();
 #else
-	/* Win32 abort() customarily shows a dialog, but we just did that... */
+	/* Win32 TINYCLR_SSL_ABORT() customarily shows a dialog, but we just did that... */
 	raise(SIGABRT);
 	TINYCLR_SSL_EXIT(3);
 #endif

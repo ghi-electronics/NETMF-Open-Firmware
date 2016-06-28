@@ -54,7 +54,7 @@ BOOL AT91_I2C_Driver::Initialize()
         pmc.EnablePeriphClock(AT91C_ID_TWI);
 
         // set Clock to 400KHz?
-        UINT16 clkDiv;
+//        UINT16 clkDiv;
 //        clkDiv = SYSTEM_PERIPHERAL_CLOCK_HZ/(400000*2) -3;
 //        I2C.TWI_CWGR = clkDiv | (clkDiv <<AT91_I2C::TWI_CWGR_CHDIV_SHIFT ) | (1 <<AT91_I2C::TWI_CWGR_CKDIV_SHIFT )  ;
 
@@ -117,7 +117,7 @@ void AT91_I2C_Driver::MasterXAction_Start( I2C_HAL_XACTION* xAction, bool repeat
 #if defined(PLATFORM_ARM_SAM7_ANY)
 // for SAM7x and SAM7S
     I2C.TWI_CR = AT91_I2C::TWI_CR_MSEN;
-#else if defined(PLATFORM_ARM_SAM9261_ANY)
+#elif defined(PLATFORM_ARM_SAM9261_ANY)
     I2C.TWI_CR = AT91_I2C::TWI_CR_MSEN | AT91_I2C::TWI_CR_SVDIS;
 #endif
 
@@ -176,7 +176,7 @@ void AT91_I2C_Driver::GetClockRate( UINT32 rateKhz, UINT8& clockRate, UINT8& clo
 
 #if defined(PLATFORM_ARM_SAM7_ANY)
 #define CLOCK_RATE_CONSTANT     3 
-#else if defined(PLATFORM_ARM_SAM9261_ANY)
+#elif defined(PLATFORM_ARM_SAM9261_ANY)
 #define CLOCK_RATE_CONSTANT     4
 #endif
 

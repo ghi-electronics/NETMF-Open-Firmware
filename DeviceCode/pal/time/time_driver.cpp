@@ -23,7 +23,7 @@ const int CummulativeDaysForMonth[13] = {0, 31, 59, 90, 120, 151, 181, 212, 243,
 
 /// In absense of any time sync, or built in clock, this will be the UTC time of the system.
 /// We can set it to our RTM date. For now I am setting it to 1/1/2009:00:00:00.000
-#define INITIAL_TIME                128752416000000000ll
+#define INITIAL_TIME               ((UINT64)(YEARS_TO_DAYS(2011) + MONTH_TO_DAYS(2011, 6)) * HOURS_TO_DAY * MINUTES_TO_HOUR * TIMEUNIT_TO_MINUTES)
 
 TimeDriver g_TimeDriver;
 BOOL TimeDriver::m_initialized = FALSE;
@@ -132,7 +132,10 @@ INT64 TimeDriver::GetMachineTime()
 {
     INT64 time = HAL_Time_CurrentTime();
 
-    time = (time * m_Ticks_b + m_Ticks_c) / m_Ticks_a;
+    if(m_Ticks_a != 0)
+    {
+        time = (time * m_Ticks_b + m_Ticks_c) / m_Ticks_a;
+    }
 
     return time;
 }
@@ -274,7 +277,7 @@ BOOL TimeDriver::SafeSprintfV( LPSTR& szBuffer, size_t& iBuffer, LPCSTR format, 
     int  chars = hal_vsnprintf( szBuffer, iBuffer, format, arg );
     BOOL fRes  = (chars >= 0);
 
-    if(fRes == FALSE) chars = (int)iBuffer;
+    if(fRes == FALSE) chars = 0;
 
     szBuffer += chars; szBuffer[0] = 0;
     iBuffer  -= chars;

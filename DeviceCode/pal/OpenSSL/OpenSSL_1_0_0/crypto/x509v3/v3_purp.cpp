@@ -720,8 +720,13 @@ int X509_check_issued(X509 *issuer, X509 *subject)
 		if(ku_reject(issuer, KU_DIGITAL_SIGNATURE))
 			return X509_V_ERR_KEYUSAGE_NO_DIGITAL_SIGNATURE;
 		}
-	else if(ku_reject(issuer, KU_KEY_CERT_SIGN))
+	else if(ku_reject(issuer, KU_KEY_CERT_SIGN) &&
+            // [MS_CHANGE] Enable Windows self signed certs to pass validation
+            (0 != X509_NAME_cmp(X509_get_subject_name(subject),
+                                 X509_get_issuer_name(subject))))
+		{
 		return X509_V_ERR_KEYUSAGE_NO_CERTSIGN;
+		}
 	return X509_V_OK;
 }
 

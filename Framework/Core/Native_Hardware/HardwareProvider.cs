@@ -139,7 +139,53 @@ namespace Microsoft.SPOT.Hardware
             NativeGetI2CPins(out scl, out sda);
         }
 
+
+        public virtual int GetPWMChannelsCount()
+        {
+            return NativeGetPWMChannelsCount();
+        }
+
+        public virtual Cpu.Pin GetPwmPinForChannel(Cpu.PWMChannel channel)
+        {
+            return NativeGetPWMPinForChannel(channel);
+        }
+
         //--//
+
+        public virtual int GetAnalogChannelsCount()
+        {
+            return NativeGetAnalogChannelsCount();
+        }
+
+        public virtual Cpu.Pin GetAnalogPinForChannel(Cpu.AnalogChannel channel)
+        {
+            return NativeGetAnalogPinForChannel(channel);
+        }
+
+        public virtual int[] GetAvailablePrecisionInBitsForChannel(Cpu.AnalogChannel channel)
+        {
+            return NativeGetAvailablePrecisionInBitsForChannel(channel);
+        }
+
+        //--//
+
+        public virtual int GetAnalogOutputChannelsCount()
+        {
+            return NativeGetAnalogOutputChannelsCount();
+        }
+
+        public virtual Cpu.Pin GetAnalogOutputPinForChannel(Cpu.AnalogOutputChannel channel)
+        {
+            return NativeGetAnalogOutputPinForChannel(channel);
+        }
+
+        public virtual int[] GetAvailableAnalogOutputPrecisionInBitsForChannel(Cpu.AnalogOutputChannel channel)
+        {
+            return NativeGetAvailableAnalogOutputPrecisionInBitsForChannel(channel);
+        }
+
+        //--//
+        
         public virtual int GetPinsCount()
         {
             return NativeGetPinsCount();
@@ -187,218 +233,72 @@ namespace Microsoft.SPOT.Hardware
 
         //---// native calls
 
-#if !TINYCLR_DIRECTBAND_SERVER
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern
-#endif
- private void NativeGetSerialPins(int com, ref Cpu.Pin rxPin, ref Cpu.Pin txPin, ref Cpu.Pin ctsPin, ref Cpu.Pin rtsPin)
-#if TINYCLR_DIRECTBAND_SERVER
-        {
-            throw new NotImplementedException();
-        }
-
-#else
-;
-#endif
-
-#if !TINYCLR_DIRECTBAND_SERVER
+        extern private void NativeGetSerialPins(int com, ref Cpu.Pin rxPin, ref Cpu.Pin txPin, ref Cpu.Pin ctsPin, ref Cpu.Pin rtsPin);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern
-#endif
- private int NativeGetSerialPortsCount()
-#if TINYCLR_DIRECTBAND_SERVER
-        {
-            throw new NotImplementedException();
-        }
-
-#else
-;
-#endif
-
-#if !TINYCLR_DIRECTBAND_SERVER
+        extern private int NativeGetSerialPortsCount();
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern
-#endif
- private bool NativeSupportsNonStandardBaudRate(int com)
-#if TINYCLR_DIRECTBAND_SERVER
-        {
-            throw new NotImplementedException();
-        }
+        extern private bool NativeSupportsNonStandardBaudRate(int com);
 
-#else
-;
-#endif
-
-#if !TINYCLR_DIRECTBAND_SERVER
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern
-#endif
- private void NativeGetBaudRateBoundary(int com, out uint MaxBaudRate, out uint MinBaudRate)
+        extern private void NativeGetBaudRateBoundary(int com, out uint MaxBaudRate, out uint MinBaudRate);
 
-#if TINYCLR_DIRECTBAND_SERVER
-        {
-            throw new NotImplementedException();
-        }
-
-#else
-;
-#endif
-
-#if !TINYCLR_DIRECTBAND_SERVER
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern
-#endif
- private bool NativeIsSupportedBaudRate(int com, ref uint baudrateHz)
+        extern private bool NativeIsSupportedBaudRate(int com, ref uint baudrateHz);
 
-#if TINYCLR_DIRECTBAND_SERVER
-        {
-            throw new NotImplementedException();
-        }
-
-#else
-;
-#endif
-
-#if !TINYCLR_DIRECTBAND_SERVER
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern
-#endif
- private void NativeGetSpiPins(SPI.SPI_module spi_mod, out Cpu.Pin msk, out Cpu.Pin miso, out Cpu.Pin mosi)
-#if TINYCLR_DIRECTBAND_SERVER
-        {
-            throw new NotImplementedException();
-        }
+        extern private void NativeGetSpiPins(SPI.SPI_module spi_mod, out Cpu.Pin msk, out Cpu.Pin miso, out Cpu.Pin mosi);
 
-#else
-;
-#endif
-
-#if !TINYCLR_DIRECTBAND_SERVER
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern
-#endif
- private int NativeGetSpiPortsCount()
-#if TINYCLR_DIRECTBAND_SERVER
-        {
-            throw new NotImplementedException();
-        }
+        extern private int NativeGetSpiPortsCount();
 
-#else
-;
-#endif
-
-#if !TINYCLR_DIRECTBAND_SERVER
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern
-#endif
- private void NativeGetI2CPins(out Cpu.Pin scl, out Cpu.Pin sda)
-#if TINYCLR_DIRECTBAND_SERVER
-        {
-            throw new NotImplementedException();
-        }
+        extern private void NativeGetI2CPins(out Cpu.Pin scl, out Cpu.Pin sda);
 
-#else
-;
-#endif
-
-#if !TINYCLR_DIRECTBAND_SERVER
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern
-#endif
- private int NativeGetPinsCount()
-#if TINYCLR_DIRECTBAND_SERVER
-        {
-            throw new NotImplementedException();
-        }
+        extern private int NativeGetPinsCount();
 
-#else
-;
-#endif
-
-#if !TINYCLR_DIRECTBAND_SERVER
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern
-#endif
- private void NativeGetPinsMap(Cpu.PinUsage[] pins)
-#if TINYCLR_DIRECTBAND_SERVER
-        {
-            throw new NotImplementedException();
-        }
+        extern private void NativeGetPinsMap(Cpu.PinUsage[] pins);
 
-#else
-;
-#endif
-
-#if !TINYCLR_DIRECTBAND_SERVER
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern
-#endif
- private Cpu.PinUsage NativeGetPinUsage(Cpu.Pin pin)
-#if TINYCLR_DIRECTBAND_SERVER
-        {
-            throw new NotImplementedException();
-        }
+        extern private Cpu.PinUsage NativeGetPinUsage(Cpu.Pin pin);
 
-#else
-;
-#endif
-
-#if !TINYCLR_DIRECTBAND_SERVER
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern
-#endif
- private Cpu.PinValidResistorMode NativeGetSupportedResistorModes(Cpu.Pin pin)
-#if TINYCLR_DIRECTBAND_SERVER
-        {
-            throw new NotImplementedException();
-        }
+        extern private Cpu.PinValidResistorMode NativeGetSupportedResistorModes(Cpu.Pin pin);
 
-#else
-;
-#endif
-
-#if !TINYCLR_DIRECTBAND_SERVER
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern
-#endif
- private Cpu.PinValidInterruptMode NativeGetSupportedInterruptModes(Cpu.Pin pin)
-#if TINYCLR_DIRECTBAND_SERVER
-        {
-            throw new NotImplementedException();
-        }
+        extern private Cpu.PinValidInterruptMode NativeGetSupportedInterruptModes(Cpu.Pin pin);
 
-#else
-;
-#endif
-
-#if !TINYCLR_DIRECTBAND_SERVER
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern
-#endif
- private Cpu.Pin NativeGetButtonPins(Button iButton)
-#if TINYCLR_DIRECTBAND_SERVER
-        {
-            throw new NotImplementedException();
-        }
+        extern private Cpu.Pin NativeGetButtonPins(Button iButton);
 
-#else
-;
-#endif
-
-#if !TINYCLR_DIRECTBAND_SERVER
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        extern
-#endif
- private void NativeGetLCDMetrics(out int height, out int width, out int bitPerPixel, out int orientationDeg)
-#if TINYCLR_DIRECTBAND_SERVER
-        {
-            throw new NotImplementedException();
-        }
+        extern private void NativeGetLCDMetrics(out int height, out int width, out int bitPerPixel, out int orientationDeg);
 
-#else
-;
-#endif
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        extern private int NativeGetPWMChannelsCount();
 
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        extern private Cpu.Pin NativeGetPWMPinForChannel(Cpu.PWMChannel channel);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        extern private int NativeGetAnalogChannelsCount();
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        extern private Cpu.Pin NativeGetAnalogPinForChannel(Cpu.AnalogChannel channel);
+        
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        extern private int[] NativeGetAvailablePrecisionInBitsForChannel(Cpu.AnalogChannel channel);
+        
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        extern private int NativeGetAnalogOutputChannelsCount();
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        extern private Cpu.Pin NativeGetAnalogOutputPinForChannel(Cpu.AnalogOutputChannel channel);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        extern private int[] NativeGetAvailableAnalogOutputPrecisionInBitsForChannel(Cpu.AnalogOutputChannel channel);
     }
 }
 

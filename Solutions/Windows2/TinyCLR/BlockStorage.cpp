@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include <tinyhal.h>
+#include "..\..\..\DeviceCode\Drivers\BlockStorage\WearLeveling\BS_WearLeveling.h"
 
 namespace EmulatorBlockStorage = Microsoft::SPOT::Emulator::BlockStorage;
 
@@ -169,6 +170,25 @@ struct IBlockStorageDevice Emulator_BS_DeviceTable =
     &Emulator_BS_Driver::MaxBlockErase_uSec,    
 };
 
+struct IBlockStorageDevice Emulator_WearLeveling_DeviceTable = 
+{
+    &BS_WearLeveling_Driver::InitializeDevice, 
+    &BS_WearLeveling_Driver::UninitializeDevice, 
+    &BS_WearLeveling_Driver::GetDeviceInfo, 
+    &BS_WearLeveling_Driver::Read, 
+    &BS_WearLeveling_Driver::Write,
+    &BS_WearLeveling_Driver::Memset,
+    &BS_WearLeveling_Driver::GetSectorMetadata,
+    &BS_WearLeveling_Driver::SetSectorMetadata,
+    &BS_WearLeveling_Driver::IsBlockErased, 
+    &BS_WearLeveling_Driver::EraseBlock, 
+    &BS_WearLeveling_Driver::SetPowerState, 
+    &BS_WearLeveling_Driver::MaxSectorWrite_uSec, 
+    &BS_WearLeveling_Driver::MaxBlockErase_uSec, 
+};
+
+BS_WearLeveling_Config Emulator_WearLeveling_Config[10];
+
 //--//
 
 void BlockStorage_AddDevices()
@@ -193,6 +213,7 @@ void BlockStorage_AddDevices()
 
     for(int i = 0; i < numDevices; i++)
     {
+        int size = 0;
         deviceInfo = &(g_Emulator_BS_DevicesInfo[i]);
 
         deviceInfo->Attribute.Removable      = devices[i].Removable;
@@ -222,6 +243,8 @@ void BlockStorage_AddDevices()
                 regionInfo->NumBlockRanges = numRanges;
                 regionInfo->BytesPerBlock  = regions[j].BytesPerBlock;
                 regionInfo->BlockRanges    = new BlockRange[numRanges];
+                
+                size += regions[j].NumBlocks * regions[j].BytesPerBlock;
 
                 ranges = regions[j].BlockRanges;
 
@@ -234,10 +257,28 @@ void BlockStorage_AddDevices()
                     pRange->EndBlock   = ranges[k].EndBlock;
                 }
             }
+            
+            deviceInfo->Size = size;
 
             // The index into the g_Emulator_BS_Devices will be used as context so the emulator
             // block storage driver can differentiate between different devices
-            BlockStorageList::AddDevice( &(g_Emulator_BS_Devices[i]), &Emulator_BS_DeviceTable, (void*)i, FALSE );
+            if(!deviceInfo->Attribute.SupportsXIP)
+            {
+                BS_WearLeveling_Config& cfg = Emulator_WearLeveling_Config[i];
+
+                cfg.BlockConfig    = (BLOCK_CONFIG*)i;
+                cfg.BadBlockList   = NULL;
+                cfg.BlockIndexMask = 0;
+                cfg.Device         = &Emulator_BS_DeviceTable;
+                cfg.BytesPerBlock  = regions[0].BytesPerBlock;
+                cfg.BaseAddress    = regions[0].Start;
+                
+                BlockStorageList::AddDevice( &(g_Emulator_BS_Devices[i]), &Emulator_WearLeveling_DeviceTable, &cfg, FALSE );
+            }
+            else
+            {
+                BlockStorageList::AddDevice( &(g_Emulator_BS_Devices[i]), &Emulator_BS_DeviceTable, (void*)i, FALSE );
+            }
         }
         else
         {

@@ -128,13 +128,14 @@ void MC9328MXL_Driver::Hibernate()
 void HAL_AssertEx()
 {
     NATIVE_PROFILE_HAL_PROCESSOR_POWER();
-#if defined(JTAG_DEBUGGING)
     lcd_printf("\f!! ASSERT !!\n");
-    while(1);
-#endif
-    
+#if defined(JTAG_DEBUGGING)
+    volatile BOOL fContinue=FALSE;
+    while(!fContinue);
+#else    
     // cause an abort and let the abort handler take over
     *((char*)0xFFFFFFFF) = 'a';
+#endif
 }
 
 

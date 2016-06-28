@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Security.Cryptography.X509Certificates;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("System.Net.Security")]
 
@@ -29,66 +30,6 @@ namespace Microsoft.SPOT.Net.Security
         VerifyPeer = 2,
         CertificateRequired = 4,
         VerifyClientOnce = 8,
-    }
-
-    [Serializable()]
-    public class X509Certificate
-    {
-        private byte[] m_certificate;
-        private string m_password;
-
-        // The following members are extracted from the raw certificate data, so no need to serialize them.
-        [NonSerialized()]
-        private string m_issuer;
-        [NonSerialized()]
-        private string m_subject;
-        [NonSerialized()]
-        private DateTime m_effectiveDate;
-        [NonSerialized()]
-        private DateTime m_expirationDate;
-
-        public X509Certificate(byte[] certificate)
-            : this(certificate, "")
-        {
-        }
-
-        public X509Certificate(byte[] certificate, string password)
-        {
-            m_certificate = certificate;
-            m_password = password;
-
-            Initialize();
-        }
-
-        public void Initialize()
-        {
-            SslNative.ParseCertificate(m_certificate, m_password, ref m_issuer, ref m_subject, ref m_effectiveDate, ref m_expirationDate);
-        }
-
-        public string Issuer
-        {
-            get { return m_issuer; }
-        }
-
-        public string Subject
-        {
-            get { return m_subject; }
-        }
-
-        public DateTime GetEffectiveDate()
-        {
-            return m_effectiveDate;
-        }
-
-        public DateTime GetExpirationDate()
-        {
-            return m_expirationDate;
-        }
-
-        public byte[] GetRawCertData()
-        {
-            return m_certificate;
-        }
     }
 
     internal static class SslNative
@@ -119,9 +60,6 @@ namespace Microsoft.SPOT.Net.Security
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         internal static extern int ExitSecureContext(int contextHandle);
-
-        [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        internal static extern void ParseCertificate(byte[] cert, string password, ref string issuer, ref string subject, ref DateTime effectiveDate, ref DateTime expirationDate);
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         internal static extern int DataAvailable(object socket);

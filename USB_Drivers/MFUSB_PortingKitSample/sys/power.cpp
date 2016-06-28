@@ -97,6 +97,9 @@ static char* devstate[] = {
 
 GENERICAPI NTSTATUS  GenericDispatchPower(PGENERIC_EXTENSION pdx, PIRP Irp)
 {                            // DispatchPower
+
+    static LONG dispatchCount = 0;
+    
     NTSTATUS status = STATUS_SUCCESS;
     if(pdx->RemoveLock)
     {
@@ -115,33 +118,47 @@ GENERICAPI NTSTATUS  GenericDispatchPower(PGENERIC_EXTENSION pdx, PIRP Irp)
 
     if(fcn == IRP_MN_SET_POWER || fcn == IRP_MN_QUERY_POWER)
     {                        // handle set/query
+        // increase count
+        LONG outstanding = InterlockedIncrement(&dispatchCount);
 
-#if DBG
-        if(stack->Parameters.Power.Type == SystemPowerState)
-            KdPrint(("%s - POWER Request (%s), S-state = %s\n", pdx->DebugName, fcnname[fcn], sysstate[stack->Parameters.Power.State.SystemState]));
-        else
-            KdPrint(("%s - POWER Request (%s), D-state = %s\n", pdx->DebugName, fcnname[fcn], devstate[stack->Parameters.Power.State.DeviceState]));
-#endif // DBG
-
-        // Create a context structure and launch the finite state machine that will process
-        // this IRP asynchronously. The initial call to HandlePowerEvent should return
-        // STATUS_PENDING. The FSM will eventually complete the IRP.
-
-        PPOWCONTEXT ctx = (PPOWCONTEXT) ExAllocatePoolWithTag(NonPagedPool, sizeof(POWCONTEXT), SPOT_TAG);
-        if(!ctx)
+        if(outstanding > 1)
         {
-            KdPrint(("%s - Can't allocate power context structure\n", pdx->DebugName));
+            // do not process two power events concurrently 
             PoStartNextPowerIrp(Irp);
             status = CompleteRequest(Irp, STATUS_INSUFFICIENT_RESOURCES);
         }
         else
-        {                // process this IRP
-            RtlZeroMemory(ctx, sizeof(POWCONTEXT));
-            ctx->pdx = pdx;
-            ctx->irp = Irp;
-            ctx->id = InterlockedIncrement(&ctxcount);
-            status = HandlePowerEvent(ctx, NewIrp);
-        }                // process this IRP
+        {
+#if DBG
+            if(stack->Parameters.Power.Type == SystemPowerState)
+                KdPrint(("%s - POWER Request (%s), S-state = %s\n", pdx->DebugName, fcnname[fcn], sysstate[stack->Parameters.Power.State.SystemState]));
+            else
+                KdPrint(("%s - POWER Request (%s), D-state = %s\n", pdx->DebugName, fcnname[fcn], devstate[stack->Parameters.Power.State.DeviceState]));
+#endif // DBG
+
+            // Create a context structure and launch the finite state machine that will process
+            // this IRP asynchronously. The initial call to HandlePowerEvent should return
+            // STATUS_PENDING. The FSM will eventually complete the IRP.
+
+            PPOWCONTEXT ctx = (PPOWCONTEXT) ExAllocatePoolWithTag(NonPagedPool, sizeof(POWCONTEXT), SPOT_TAG);
+            if(!ctx)
+            {
+                KdPrint(("%s - Can't allocate power context structure\n", pdx->DebugName));
+                PoStartNextPowerIrp(Irp);
+                status = CompleteRequest(Irp, STATUS_INSUFFICIENT_RESOURCES);
+            }
+            else
+            {                // process this IRP
+                RtlZeroMemory(ctx, sizeof(POWCONTEXT));
+                ctx->pdx = pdx;
+                ctx->irp = Irp;
+                ctx->id = InterlockedIncrement(&ctxcount);
+                status = HandlePowerEvent(ctx, NewIrp);
+            }                // process this IRP
+        }
+
+        // release count
+        InterlockedDecrement(&dispatchCount);
     }                        // handle set/query
 
     else

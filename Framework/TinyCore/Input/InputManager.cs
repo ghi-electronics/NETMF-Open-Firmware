@@ -62,6 +62,7 @@ namespace Microsoft.SPOT.Input
         {
             _stagingArea = new Queue();
             _currentStagingStack = new Stack();
+            _frameStagingArea = new ArrayList();
             InputDeviceEvents = new DeviceEvents[(int)InputDeviceType.Last];
 
             for (int i = 0; i < (int)InputDeviceType.Last; i++)
@@ -198,16 +199,20 @@ namespace Microsoft.SPOT.Input
             // Post a work item to continue processing the staging area
             // in case someone pushes a dispatcher frame in the middle
             // of input processing.
-            if (!_continueProcessingStagingArea)
+            DispatcherFrame frame = Dispatcher.CurrentFrame;
+            if (frame != null)
             {
-                _continueProcessingStagingArea = true;
-                Dispatcher.BeginInvoke(_continueProcessingStagingAreaCallback, true);
+                if (!_frameStagingArea.Contains(frame))
+                {
+                    _frameStagingArea.Add(frame);
+                    Dispatcher.BeginInvoke(_continueProcessingStagingAreaCallback, frame);
+                }
             }
 
             return true;
         }
 
-        private object ProcessStagingArea(object postContinue)
+        private object ProcessStagingArea(object frame)
         {
             bool handled = false;
 
@@ -220,8 +225,6 @@ namespace Microsoft.SPOT.Input
             // staging area - that could throw an exception if the queue
             // changes underneath us.  Instead, just loop until we find a
             // frame marker or until the staging area is empty.
-
-            _continueProcessingStagingArea = true;
 
             try
             {
@@ -309,31 +312,30 @@ namespace Microsoft.SPOT.Input
                                 handled = true;
                             }
                         }
-                    }while(_currentStagingStack.Count > 0);
+                    } while (_currentStagingStack.Count > 0);
                 }
             }
             finally
             {
-                _continueProcessingStagingArea = false;
-
                 // It is possible that we can be re-entered by a nested
                 // dispatcher frame.  Continue processing the staging
                 // area if we need to. 
                 if (_stagingArea.Count > 0)
                 {
-                    _continueProcessingStagingArea = true;
                     // Before we actually start to drain the staging area, we need
                     // to post a work item to process more input.  This enables us
                     // to process more input if we enter a nested pump.
-                    Dispatcher.BeginInvoke(_continueProcessingStagingAreaCallback, true);
+                    Dispatcher.BeginInvoke(_continueProcessingStagingAreaCallback, Dispatcher.CurrentFrame);
                 }
+
+                _frameStagingArea.Remove(frame);
             }
 
             return handled;
         }
 
         private DispatcherOperationCallback _continueProcessingStagingAreaCallback;
-        private bool _continueProcessingStagingArea;
+        private ArrayList _frameStagingArea;
 
         public enum InputDeviceType : int
         {

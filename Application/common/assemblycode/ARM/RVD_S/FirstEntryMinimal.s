@@ -16,6 +16,7 @@
     IMPORT  ABORTP_SubHandler
     IMPORT  ABORTD_SubHandler
 
+
     PRESERVE8
 
     IMPORT  IRQ_Handler        ; stubbed version with assert
@@ -41,17 +42,18 @@ STACK_MODE_UNDEF    EQU     16
 STACK_MODE_IRQ      EQU     2048
     
     ;*************************************************************************
-    AREA SectionForStackBottom, DATA
+    
+	AREA SectionForStackBottom, DATA, NOINIT
 StackBottom DCD 0
-    AREA SectionForStackTop,    DATA
+    AREA SectionForStackTop,    DATA, NOINIT
 StackTop    DCD 0
-    AREA SectionForHeapBegin,   DATA
+    AREA SectionForHeapBegin,   DATA, NOINIT
 HeapBegin   DCD 0
-    AREA SectionForHeapEnd,     DATA
+    AREA SectionForHeapEnd,     DATA, NOINIT
 HeapEnd     DCD 0
-    AREA SectionForCustomHeapBegin,   DATA
+    AREA SectionForCustomHeapBegin,   DATA, NOINIT
 CustomHeapBegin   DCD 0
-    AREA SectionForCustomHeapEnd,     DATA
+    AREA SectionForCustomHeapEnd,     DATA, NOINIT
 CustomHeapEnd     DCD 0
 
     EXPORT StackBottom

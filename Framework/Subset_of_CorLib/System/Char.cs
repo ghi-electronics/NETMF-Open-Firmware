@@ -32,6 +32,25 @@ namespace System
             return new String(m_value, 1);
         }
 
+        public char ToLower()
+        {
+            if('A' <= m_value && m_value <= 'Z')
+            {
+                return (char)(m_value - ('A' - 'a'));
+            }
+
+            return m_value;
+        }
+
+        public char ToUpper()
+        {
+            if('a' <= m_value && m_value <= 'z')
+            {
+                return (char)(m_value + ('A' - 'a'));
+            }
+
+            return m_value;
+        }
     }
 }
 

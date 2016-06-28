@@ -1,9 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>SerialFlash_Config</AssemblyName>
     <Size>
     </Size>
-    <ProjectGuid>{A44D290A-CEEA-452a-BEDB-CE50B904CC52}</ProjectGuid>
+    <ProjectGuid>{68E1A3A8-1A52-4DDB-B718-FFAAE757CA61}</ProjectGuid>
     <Description>Block storage SH7264 RSK config</Description>
     <Level>HAL</Level>
     <LibraryFile>SerialFlash_Config.$(LIB_EXT)</LibraryFile>
@@ -41,6 +42,8 @@
   <ItemGroup>
     <Compile Include="Serial_Flash_config.cpp" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\devicecode\targets\native\sh7264\devicecode\blockstorage\serialflash\serial_flash_bl.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

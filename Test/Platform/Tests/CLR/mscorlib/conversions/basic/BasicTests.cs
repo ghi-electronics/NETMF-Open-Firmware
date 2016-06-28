@@ -2241,6 +2241,7 @@ namespace Microsoft.SPOT.Platform.Tests
             }
             return MFTestResults.Fail;
         }
+        
         /*
         [TestMethod]
         public MFTestResults Basic_ulong_float_I_0_Test()
@@ -2693,7 +2694,7 @@ namespace Microsoft.SPOT.Platform.Tests
             }
             return MFTestResults.Fail;
         }
-        */
+        */        
         //Compiled Test Cases 
         public class BasicTestClass_byte_byte_I_0
         {
@@ -7351,7 +7352,8 @@ namespace Microsoft.SPOT.Platform.Tests
                 return (Main_old() == 0);
             }
         }
-        /*
+
+        /*        
         public class BasicTestClass_ulong_float_I_0
         {
             public static int Main_old()
@@ -8303,7 +8305,6 @@ namespace Microsoft.SPOT.Platform.Tests
                 return (Main_old() == 0);
             }
         }
-        
     */
     }
 }

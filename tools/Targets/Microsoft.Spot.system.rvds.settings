@@ -29,6 +29,11 @@
     <SWTC>--</SWTC>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(COMPILER_TOOL_VERSION)'=='RVDS4.1'">
+    <ADS_TOOLS Condition="'$(ADS_TOOLS)'==''">$(SPO_SDK)\tools\ads_v4_1</ADS_TOOLS>
+    <SWTC>--</SWTC>
+  </PropertyGroup>
+  
   <!-- set up the base DST_DIR path base on different INSTRUCTION_SET -->  
   <PropertyGroup>
     <OBJ_EXT>obj</OBJ_EXT>

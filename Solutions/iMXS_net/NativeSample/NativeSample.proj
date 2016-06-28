@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>NativeSample</AssemblyName>
     <ProjectGuid>{04fa5f07-ee94-413b-aebe-17a592df86e7}</ProjectGuid>
@@ -26,16 +27,13 @@
   </PropertyGroup>
   <PropertyGroup>
     <CC_CPP_COMMON_FLAGS Condition="'$(TEST_OPEN_SOURCE_NETWORKSTACK)'=='true'">$(CC_CPP_COMMON_FLAGS) -DTEST_OPEN_SOURCE_NETWORKSTACK</CC_CPP_COMMON_FLAGS>
-
   </PropertyGroup>
-  <ItemGroup />
   <ItemGroup>
     <Compile Include="NativeSample.cpp" />
-
     <IncludePaths Include="DeviceCode\pal\lwip\lwip_1_3_2\src\include" />
     <IncludePaths Include="DeviceCode\pal\lwip\lwip_1_3_2\src\include\ipv4" />
-    <IncludePaths Include="DeviceCode\pal\lwip\lwip_1_3_2\contrib\ports\arm\proj\lwIPv4lib" /> 
-    <IncludePaths Include="DeviceCode\pal\lwip\lwip_1_3_2\contrib\ports\arm\include" /> 
+    <IncludePaths Include="DeviceCode\pal\lwip\lwip_1_3_2\contrib\ports\arm\proj\lwIPv4lib" />
+    <IncludePaths Include="DeviceCode\pal\lwip\lwip_1_3_2\contrib\ports\arm\include" />
     <IncludePaths Include="DeviceCode\pal\lwip\SocketsDriver" />
     <IncludePaths Include="DeviceCode\pal\lwip\TinyCLR" />
     <IncludePaths Include="DeviceCode\PAL\rtip" />
@@ -43,7 +41,7 @@
     <IncludePaths Include="DeviceCode\PAL\rtip\tinyclr" />
     <IncludePaths Include="DeviceCode\pal\net\" />
     <IncludePaths Include="DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\" />
-    <IncludePaths Include="DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\inc32" />
+    <IncludePaths Include="DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\include\" />
     <IncludePaths Include="DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto" />
     <IncludePaths Include="DeviceCode\pal\COM\sockets\openssl" />
     <IncludePaths Include="DeviceCode\Drivers\Ethernet\loopback_lwip" />
@@ -136,6 +134,10 @@
     <DriverLibs Include="COM_pal.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup>
+    <DriverLibs Include="DebuggerPort_SSL_config_stubs.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Config\dotnetmf.proj" />
+  </ItemGroup>
+  <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Pal\Watchdog\stubs\dotNetMF.proj" />
     <DriverLibs Include="Watchdog_pal_stubs.$(LIB_EXT)" />
   </ItemGroup>
@@ -143,18 +145,12 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\I2C\stubs\dotNetMF.proj" />
     <DriverLibs Include="i2c_pal_stubs.$(LIB_EXT)" />
   </ItemGroup>
-
-
-
   <ItemGroup Condition="'$(TCP_IP_STACK)'!='LWIP' and '$(OPENSSLLIBRARIES)'!='true'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\stubs\dotNetMF.proj" />
     <DriverLibs Include="sockets_pal_stubs.$(LIB_EXT)" />
   </ItemGroup>
-
-
-
   <!-- lwIP STACK LIBRARIES -->
-  <ItemGroup  Condition="'$(TCP_IP_STACK)'=='LWIP'">
+  <ItemGroup Condition="'$(TCP_IP_STACK)'=='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets_lwip\dotNetMF.proj" />
     <DriverLibs Include="sockets_pal_lwip.$(LIB_EXT)" />
   </ItemGroup>
@@ -186,7 +182,6 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\Sockets\ssl\stubs\dotNetMF.proj" />
     <DriverLibs Include="ssl_pal_stubs.$(LIB_EXT)" />
   </ItemGroup>
-
   <!-- lwIP STACK LIBRARIES for Ethernet adapters -->
   <ItemGroup Condition="'$(TCP_IP_STACK)'=='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\iMXS_net\DeviceCode\Network\dotnetmf.proj" />
@@ -204,7 +199,6 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Ethernet\Loopback_lwip\dotNetMF.proj" />
     <DriverLibs Include="ETHERNET_loopback_lwip.$(LIB_EXT)" />
   </ItemGroup>
-
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\COM\USART\stubs\dotNetMF.proj" />
     <DriverLibs Include="usart_pal_stubs.$(LIB_EXT)" />
@@ -349,175 +343,118 @@
     <RequiredProjects Include="$(SPOCLIENT)\Test\native\src\dotnetmf.proj" />
     <DriverLibs Include="Native.$(LIB_EXT)" />
   </ItemGroup>
-
-
   <!-- OPEN SSL TESTS -->
-  <ItemGroup  Condition="'$(OPENSSLLIBRARIES)'=='true'">  
-
+  <ItemGroup Condition="'$(OPENSSLLIBRARIES)'=='true'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\COM\sockets\openssl\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="openssl_pal.$(LIB_EXT)" />
-
+    <DriverLibs Include="openssl_pal.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\COM\sockets\dotnetmf.proj" />
     <DriverLibs Include="sockets_pal.$(LIB_EXT)" />
-
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="crypto_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="crypto_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\ssl\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="libssl_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="libssl_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\aes\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="aes_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="aes_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\asn1\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="asn1_openssl.$(LIB_EXT)" />
-    <PlatformIndependentLibs Include="asn1pt2_openssl.$(LIB_EXT)" />
-
-     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\bf\dotNETMF.proj" />
-    <PlatformIndependentLibs Include="bf_openssl.$(LIB_EXT)" />
- 
+    <DriverLibs Include="asn1_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="asn1pt2_openssl.$(LIB_EXT)" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\bf\dotNETMF.proj" />
+    <DriverLibs Include="bf_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\bio\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="bio_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="bio_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\buffer\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="buffer_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="buffer_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\bn\dotNETMF.proj" />
-    <PlatformIndependentLibs Include="bn_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="bn_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\cast\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="cast_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="cast_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\comp\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="comp_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="comp_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\conf\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="conf_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="conf_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\des\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="des_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="des_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\des\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="des_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="des_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\dh\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="dh_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="dh_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\dsa\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="dsa_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="dsa_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\dso\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="dso_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="dso_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\ecdh\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ecdh_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="ecdh_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\ec\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ec_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="ec_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\des\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ecdsa_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="ecdsa_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\engine\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="engine_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="engine_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\err\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="err_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="err_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\evp\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="evp_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="evp_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\hmac\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="hmac_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="hmac_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\lhash\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="lhash_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="lhash_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\md2\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="md2_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="md2_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\md4\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="md4_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="md4_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\md5\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="md5_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="md5_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\modes\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="modes_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="modes_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\ocsp\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ocsp_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="ocsp_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\objects\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="objects_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="objects_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\pem\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="pem_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="pem_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\pkcs7\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="pkcs7_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="pkcs7_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\pkcs12\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="pkcs12_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="pkcs12_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\pqueue\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="pqueue_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="pqueue_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\rand\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="rand_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="rand_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\rc2\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="rc2_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="rc2_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\rc4\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="rc4_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="rc4_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\ripemd\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ripemd_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="ripemd_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\rsa\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="rsa_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="rsa_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\seed\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="seed_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="seed_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\sha\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="sha_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="sha_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\stack\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="stack_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="stack_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\ts\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ts_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="ts_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\txt_db\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="txt_db_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="txt_db_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\ui\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ui_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="ui_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\whrlpool\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="whrlpool_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="whrlpool_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\x509\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="x509_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="x509_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\crypto\x509v3\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="x509v3_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="x509v3_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\tinyclr\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ssl_types.$(LIB_EXT)" />
-
+    <DriverLibs Include="ssl_types.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\tinyclr\test\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ssl_tests.$(LIB_EXT)" />
-
+    <DriverLibs Include="ssl_tests.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\engines\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="engines_openssl.$(LIB_EXT)" />
-
+    <DriverLibs Include="engines_openssl.$(LIB_EXT)" />
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\engines\ccgost\dotnetmf.proj" />
-    <PlatformIndependentLibs Include="ccgost_openssl.$(LIB_EXT)" />
+    <DriverLibs Include="ccgost_openssl.$(LIB_EXT)" />
   </ItemGroup>
-
   <!-- General Network Stack Libraries -->
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\iMXS_net\DeviceCode\Network\dotnetmf.proj" />
@@ -527,8 +464,6 @@
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\iMXS_net\DeviceCode\Network\ENC28J60\dotnetmf.proj" />
     <DriverLibs Include="ENC28J60_config_iMXS_net.$(LIB_EXT)" />
   </ItemGroup>
-
-
   <!-- RTIP Stack Libraries -->
   <ItemGroup Condition="'$(TCP_IP_STACK)'=='' or '$(TCP_IP_STACK)'=='RTIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\rtip\lib\dotNetMF_sockets.proj" />
@@ -559,8 +494,6 @@
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\rtip\lib\dotNetMF_tcp.proj" />
     <DriverLibs Include="sockets_hal_tcp.$(LIB_EXT)" />
   </ItemGroup>
-
-
   <!-- RTIPStack Libraries for Ethernet adapters -->
   <ItemGroup Condition="'$(TCP_IP_STACK)'=='' or '$(TCP_IP_STACK)'!='LWIP'">
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\Drivers\Ethernet\enc28J60\dotNetMF.proj" />
@@ -574,7 +507,124 @@
     <RequiredProjects Include="$(SPOCLIENT)\devicecode\drivers\timeservice\rtip\dotNetMF.proj" />
     <DriverLibs Include="timeservice_hal_rtip.$(LIB_EXT)" />
   </ItemGroup>
-
-
+  <ItemGroup>
+    <HFiles Include="$(SPOCLIENT)\devicecode\drivers\ethernet\loopback_lwip\loopback_lwip_driver.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\include\tests.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\contrib\ports\arm\include\arch\cc.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\contrib\ports\arm\include\arch\sys_arch.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\ipv4\lwip\autoip.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\ipv4\lwip\icmp.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\ipv4\lwip\igmp.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\ipv4\lwip\inet.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\ipv4\lwip\ip.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\ipv4\lwip\ip_addr.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\api.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\api_msg.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\arch.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\debug.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\def.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\dhcp.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\err.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\init.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\mem.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\netbuf.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\netif.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\netifapi.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\opt.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\pbuf.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\sockets.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\sys.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\tcp.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\tcpip.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\lwip\udp.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\netif\etharp.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\lwip\lwip_1_3_2\src\include\netif\loopif.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\net\network_defines_lwip.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\net\net_decl_lwip.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\crypto\ossl_typ.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\crypto\o_str.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\e_os.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\asn1.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\bio.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\bn.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\buffer.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\comp.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\crypto.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\dh.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\dsa.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\dtls1.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\ebcdic.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\ec.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\ecdh.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\ecdsa.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\err.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\evp.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\e_os2.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\hmac.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\kssl.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\lhash.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\objects.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\obj_mac.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\opensslconf.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\opensslv.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\ossl_typ.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\pem.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\pem2.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\pkcs7.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\pqueue.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\rsa.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\safestack.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\sha.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\ssl.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\ssl2.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\ssl23.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\ssl3.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\stack.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\symhacks.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\tls1.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\x509.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\include\openssl\x509_vfy.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\tinyclr\ssl_functions.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\tinyclr\ssl_types.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\openssl\openssl_1_0_0\tinyclr\test\ssl_tests.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\bget.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\dhcpcapi.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\dhcpconf.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtipapi.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtipconf.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtp.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpchar.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpdate.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpdb.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpdbapi.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpenv.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpirq.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpkern.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpmem.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpmemdb.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpmtxdb.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpscnv.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpsemdb.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpsignl.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpstr.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpterm.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtpthrd.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtptime.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtptypes.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\rtpcore\rtputil.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\sock.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\socket.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\tinyclr\rtpport.h" />
+    <HFiles Include="$(SPOCLIENT)\devicecode\pal\rtip\xnconf.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\gpio\gpio.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\log\log.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\ramtest\ramtest.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\spi\eeprom_stm95x.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\spi\spi.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\timedevents\timedevents.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\timers\timers.h" />
+    <HFiles Include="$(SPOCLIENT)\test\native\src\uart\uart.h" />
+    <HFiles Include="nativesample.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

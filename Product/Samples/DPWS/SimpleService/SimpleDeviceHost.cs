@@ -16,10 +16,5 @@ namespace Interop.SimpleService
             ServiceID = "urn:uuid:3cb0d1ba-cc3a-46ce-b416-212ac2419b51";
             ServiceTypeName = "SimpleDeviceType";
         }
-
-        public SimpleDeviceHost() 
-            : this(new ProtocolVersion10())
-        {
-        }
     }
 }

@@ -63,7 +63,7 @@ namespace Microsoft.SPOT.Platform.Tests
                 {
                     // create full path
                     Directory.CreateDirectory(path);
-                    while (!validDirs.Contains(path) && path != null)
+                    while (!validDirs.Contains(path) && path != "\\" && path != null)
                     {
                         validDirs.Add(path);
                         path = Path.GetFullPath(path + @"\..");
@@ -84,6 +84,32 @@ namespace Microsoft.SPOT.Platform.Tests
                 result += item + ", ";
             }
             return result.TrimEnd(',', ' ');
+        }
+
+        private bool TestGetDirectoryEnum(int expected, params string[] nodes)
+        {
+            return VerifyEnum(expected, GetPath(nodes), Directory.EnumerateDirectories(GetPath(nodes)));
+        }
+
+        private bool VerifyEnum(int expected, string path, IEnumerable result)
+        {
+            bool success = true;
+            int cnt = 0;
+            foreach (string dir in result)
+            {
+                if (!validDirs.Contains(dir))
+                {
+                    Log.Exception("Unexpected directory found: " + dir);
+                    success = false;
+                }
+                cnt++;
+            }
+            if (cnt != expected)
+            {
+                Log.Exception("Expected " + expected + " directories, got " + cnt);
+                success = false;
+            }
+            return success;
         }
 
         private bool TestGetDirectories(int expected, params string[] nodes)
@@ -296,6 +322,74 @@ namespace Microsoft.SPOT.Platform.Tests
         }
 
         [TestMethod]
+        public MFTestResults DirectoryEnumTest()
+        {
+            MFTestResults result = MFTestResults.Pass;
+            try
+            {
+                // relative
+                Directory.SetCurrentDirectory(IOTests.Volume.RootDirectory);
+                if (!TestGetDirectoryEnum(0, TestDir, Mid1, Tail2))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetDirectoryEnum(0, TestDir, Mid2, Tail1))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetDirectoryEnum(2, TestDir, Mid1))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetDirectoryEnum(1, TestDir, Mid2))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetDirectoryEnum(2, TestDir))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetDirectoryEnum(1, "."))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetDirectoryEnum(0, TestDir, Mid1, ".", Tail1, "..", Tail1, "..", "..", Mid2, Tail1))
+                    result = MFTestResults.Fail;
+
+                // Move up tree where there is more directories
+                Directory.SetCurrentDirectory(TestDir);
+                if (!TestGetDirectoryEnum(2, "."))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetDirectoryEnum(1, ".."))
+                    result = MFTestResults.Fail;
+
+                // absolute
+                if (!TestGetDirectoryEnum(0, IOTests.Volume.RootDirectory, TestDir, Mid1, Tail1))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetDirectoryEnum(0, IOTests.Volume.RootDirectory, TestDir, Mid2, Tail1))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetDirectoryEnum(1, IOTests.Volume.RootDirectory, TestDir, Mid2))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetDirectoryEnum(2, IOTests.Volume.RootDirectory, TestDir, Mid1))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetDirectoryEnum(2, IOTests.Volume.RootDirectory, TestDir))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetDirectoryEnum(1, IOTests.Volume.RootDirectory))
+                    result = MFTestResults.Fail;
+
+                if (!TestGetDirectoryEnum(0, IOTests.Volume.RootDirectory, TestDir, Mid1, ".", Tail1, "..", Tail1, "..", "..", Mid2, Tail1, "."))
+                    result = MFTestResults.Fail;
+            }
+            catch (Exception ex)
+            {
+                Log.Exception("Unexpected exception: " + ex.Message);
+                result = MFTestResults.Fail;
+            }
+
+            return result;
+        }
+
+        [TestMethod]
         public MFTestResults SpecialDirNames()
         {
             MFTestResults result = MFTestResults.Pass;
@@ -351,6 +445,91 @@ namespace Microsoft.SPOT.Platform.Tests
                 Log.Exception("Unexpected exception: " + ex.Message);
                 result = MFTestResults.Fail;
             }
+            return result;
+        }
+
+        [TestMethod]
+        public MFTestResults GetDirectoriesBadPath()
+        {
+            MFTestResults result = MFTestResults.Pass;
+
+            try
+            {
+                Directory.GetDirectories(IOTests.Volume.RootDirectory + "\\_DIR_NOT_EXIST");
+                result = MFTestResults.Fail;
+            }
+            catch (IOException e1)
+            {
+                if (e1.ErrorCode != IOException.IOExceptionErrorCode.DirectoryNotFound)
+                    result = MFTestResults.Fail;
+            }
+
+            // make sure the directory was not created
+            try
+            {
+                Directory.GetDirectories(IOTests.Volume.RootDirectory + "\\_DIR_NOT_EXIST");
+                result = MFTestResults.Fail;
+            }
+            catch (IOException e1)
+            {
+                if (e1.ErrorCode != IOException.IOExceptionErrorCode.DirectoryNotFound)
+                    result = MFTestResults.Fail;
+            }
+
+
+            try
+            {
+                Directory.GetFiles(IOTests.Volume.RootDirectory + "\\_DIR_NOT_EXIST");
+                result = MFTestResults.Fail;
+            }
+            catch (IOException e1)
+            {
+                if (e1.ErrorCode != IOException.IOExceptionErrorCode.DirectoryNotFound)
+                    result = MFTestResults.Fail;
+            }
+
+            // make sure the path was not created
+            try
+            {
+                Directory.GetFiles(IOTests.Volume.RootDirectory + "\\_DIR_NOT_EXIST");
+                result = MFTestResults.Fail;
+            }
+            catch (IOException e1)
+            {
+                if (e1.ErrorCode != IOException.IOExceptionErrorCode.DirectoryNotFound)
+                    result = MFTestResults.Fail;
+            }
+
+            try
+            {
+                foreach(string file in Directory.EnumerateFileSystemEntries(IOTests.Volume.RootDirectory + "\\_DIR_NOT_EXIST"))
+                {
+                    Log.Comment(file);
+                }
+                result = MFTestResults.Fail;
+            }
+            catch (IOException e1)
+            {
+                if (e1.ErrorCode != IOException.IOExceptionErrorCode.DirectoryNotFound)
+                    result = MFTestResults.Fail;
+            }
+
+            // make sure the directory was not created
+            try
+            {
+                foreach (string file in Directory.EnumerateFileSystemEntries(IOTests.Volume.RootDirectory + "\\_DIR_NOT_EXIST"))
+                {
+                    Log.Comment(file);
+                }
+                result = MFTestResults.Fail;
+            }
+            catch (IOException e1)
+            {
+                if (e1.ErrorCode != IOException.IOExceptionErrorCode.DirectoryNotFound)
+                    result = MFTestResults.Fail;
+            }
+           
+
             return result;
         }
 

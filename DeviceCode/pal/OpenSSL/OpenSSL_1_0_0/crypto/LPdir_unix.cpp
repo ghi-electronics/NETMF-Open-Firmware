@@ -75,7 +75,7 @@ const char *LP_find_file(LP_DIR_CTX **ctx, const char *directory)
   errno = 0;
   if (*ctx == NULL)
     {
-      *ctx = (LP_DIR_CTX *)malloc(sizeof(LP_DIR_CTX));
+      *ctx = (LP_DIR_CTX *)OPENSSL_malloc(sizeof(LP_DIR_CTX));
       if (*ctx == NULL)
 	{
 	  errno = ENOMEM;
@@ -87,7 +87,7 @@ const char *LP_find_file(LP_DIR_CTX **ctx, const char *directory)
       if ((*ctx)->dir == NULL)
 	{
 	  int save_errno = errno; /* Probably not needed, but I'm paranoid */
-	  free(*ctx);
+	  OPENSSL_free(*ctx);
 	  *ctx = NULL;
 	  errno = save_errno;
 	  return 0;
@@ -111,7 +111,7 @@ int LP_find_file_end(LP_DIR_CTX **ctx)
     {
       int ret = closedir((*ctx)->dir);
 
-      free(*ctx);
+      OPENSSL_free(*ctx);
       switch (ret)
 	{
 	case 0:

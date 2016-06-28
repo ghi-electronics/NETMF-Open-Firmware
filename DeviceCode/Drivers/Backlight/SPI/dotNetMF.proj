@@ -1,4 +1,5 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>spi_backlight</AssemblyName>
     <ProjectGuid>{d79093bb-6ed8-4b24-9e97-5e9840e224d2}</ProjectGuid>
@@ -41,10 +42,11 @@
   <PropertyGroup />
   <ItemGroup>
     <FastCompileCPPFile Include="spi_backlight_fastcompile.cpp" />
-    <HFiles Include="spi_backlight.h" />
     <Compile Include="spi_backlight_driver.cpp" />
     <Compile Include="spi_backlight_functions.cpp" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <HFiles Include="spi_backlight.h" />
+  </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

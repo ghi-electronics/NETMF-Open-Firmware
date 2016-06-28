@@ -7,6 +7,9 @@
 
 GestureDriver g_GestureDriver;
 
+BOOL GestureDriver::s_initialized = FALSE;
+
+
 #if defined(PLATFORM_DEPENDENT__GESTURE_COMPLETION_TIME_USEC)
 #define GESTURE_COMPLETION_TIME_USEC PLATFORM_DEPENDENT__GESTURE_COMPLETION_TIME_USEC
 #else
@@ -18,14 +21,14 @@ GestureDriver g_GestureDriver;
 
 HRESULT GestureDriver::Initialize()
 {
-    if (!m_initialized)
+    if (!GestureDriver::s_initialized)
     {
         g_GestureDriver.m_gestureCompletion.InitializeForUserMode( GestureContinuationRoutine );
 
         g_GestureDriver.m_gestureListener.m_palEventListener = EventListener;
         g_GestureDriver.m_gestureListener.m_eventMask = PAL_EVENT_TOUCH | PAL_EVENT_MOUSE;
         PalEvent_Enlist(&g_GestureDriver.m_gestureListener);
-        m_initialized = true;
+        GestureDriver::s_initialized = TRUE;
     }
 
     return S_OK;
@@ -33,9 +36,9 @@ HRESULT GestureDriver::Initialize()
 
 HRESULT GestureDriver::Uninitialize()
 {
-    if (m_initialized)
+    if (GestureDriver::s_initialized)
     {
-        m_initialized = false;
+        GestureDriver::s_initialized = FALSE;
 
         if (g_GestureDriver.m_gestureCompletion.IsLinked()) g_GestureDriver.m_gestureCompletion.Abort();
         ResetRecognition();
@@ -82,7 +85,7 @@ struct GestureState
 
 /// We have 8 directions (E, NE, N, NW, W, SW, S, SE) in this order. States changed
 /// based on identified direction.
-GestureState GestureStates[GESTURE_STATE_COUNT] = 
+static GestureState GestureStates[GESTURE_STATE_COUNT] = 
 {
 ///     E   NE  N  NW  W  SW  S  SE
 ///     0    1   2    3   4    5    6   7
@@ -98,7 +101,7 @@ GestureState GestureStates[GESTURE_STATE_COUNT] =
     {{1, 1, 1, 1, 1, 1, 1, 9}},
 };
 
-TouchGestures RecognizedGesture[GESTURE_STATE_COUNT] = 
+static TouchGestures RecognizedGesture[GESTURE_STATE_COUNT] = 
 {
     TouchGesture_NoGesture, 
     TouchGesture_NoGesture, 
@@ -112,9 +115,9 @@ TouchGestures RecognizedGesture[GESTURE_STATE_COUNT] =
     TouchGesture_DownRight,
 };
 
-bool GestureDriver::ProcessPoint(UINT32 flags, UINT16 source, UINT16 x, UINT16 y, INT64 time)
+BOOL GestureDriver::ProcessPoint(UINT32 flags, UINT16 source, UINT16 x, UINT16 y, INT64 time)
 {
-    if(!g_GestureDriver.m_initialized) return false;
+    if(!GestureDriver::s_initialized) return FALSE;
     
     g_GestureDriver.m_index = (flags >> 16);
     
@@ -131,7 +134,7 @@ bool GestureDriver::ProcessPoint(UINT32 flags, UINT16 source, UINT16 x, UINT16 y
         {
             PostManagedEvent(EVENT_GESTURE, gesture, 0, ((UINT32)g_GestureDriver.m_startx << 16) | g_GestureDriver.m_starty);
         }
-        return false;
+        return FALSE;
     }
     
     if (x == TouchPointLocationFlags_ContactDown) return true;
@@ -144,7 +147,7 @@ bool GestureDriver::ProcessPoint(UINT32 flags, UINT16 source, UINT16 x, UINT16 y
         g_GestureDriver.m_startx = x;
         g_GestureDriver.m_starty = y;
     
-        return true;
+        return TRUE;
     }
     
     INT16 dx = (INT16)x - (INT16)g_GestureDriver.m_lastx;
@@ -252,13 +255,13 @@ bool GestureDriver::ProcessPoint(UINT32 flags, UINT16 source, UINT16 x, UINT16 y
 
 void GestureDriver::ResetRecognition()
 {
-    m_currentState = 0;
-    m_lastx = 0xFFFF;
-    m_lasty = 0xFFFF;
-    m_stateIgnoreIndex = 0;
-    m_stateIgnoreHead = 0;
-    m_stateIgnoreTail = 0;
-    m_stateIgnoreBuffer[0] = 0;
+    g_GestureDriver.m_currentState = 0;
+    g_GestureDriver.m_lastx = 0xFFFF;
+    g_GestureDriver.m_lasty = 0xFFFF;
+    g_GestureDriver.m_stateIgnoreIndex = 0;
+    g_GestureDriver.m_stateIgnoreHead = 0;
+    g_GestureDriver.m_stateIgnoreTail = 0;
+    g_GestureDriver.m_stateIgnoreBuffer[0] = 0;
 }
 
 void GestureDriver::GestureContinuationRoutine(void *arg)

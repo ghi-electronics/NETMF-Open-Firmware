@@ -4,13 +4,13 @@
     <!-- EA_LPC2478 -->
     <Set Name="Valid" Value="false"/>
     <!-- ################################################################################ -->
-    <Set Name="Heap_Begin"        Value="0xA0100000"/>
-    <Set Name="Heap_End"          Value="0xA01FFFF8"/>
-    <Set Name="Custom_Heap_Begin" Value="0xA0200000"/>
-    <Set Name="Custom_Heap_End"   Value="0xA027FFF8"/>
+    <Set Name="Heap_Begin"        Value="0xA0110000"/>
+    <Set Name="Heap_End"          Value="0xA027FFF8"/>
+    <Set Name="Custom_Heap_Begin" Value="0xA0280000"/>
+    <Set Name="Custom_Heap_End"   Value="0xA02FFFF8"/>
    
-    <Set Name="Stack_Bottom"      Value="0xA0280000"/>
-    <Set Name="Stack_Top"         Value="0xA0300000"/>
+    <Set Name="Stack_Bottom"      Value="0x4000D000"/>
+    <Set Name="Stack_Top"         Value="0x4000FFF8"/>
 
     <IfDefined Name="PROFILE_BUILD">
         <Set Name="ProfileBuffer_Begin" Value="0xA0100000"/>
@@ -34,15 +34,15 @@
         <Set Name="IRAM_Size"                 Value="0x40"/>    
 
         <Set Name="IRAM_TC_BaseAddress"       Value="0x40000040"/>  <!-- skip SRAM vector table -->
-        <Set Name="IRAM_TC_Size"              Value="0x4000FFFF-%IRAM_TC_BaseAddress%"/>    <!-- Fill up SRAM -->
+        <Set Name="IRAM_TC_Size"              Value="0x4000D000-%IRAM_TC_BaseAddress%"/>    <!-- Fill up SRAM -->
         
         <!-- use internal FLASH for fast execution of application-critical tasks. Just RO code and data! -->
-        <Set Name="IFLASH_TC_BaseAddress"     Value="0x00028000"/>-->   <!-- skip TinyBooterDecompressor (0x185b0 bytes) -->
-        <Set Name="IFLASH_TC_Size"            Value="0x00055000"/>-->  
+        <Set Name="IFLASH_TC_BaseAddress"     Value="0x00028000"/>   <!-- skip TinyBooterDecompressor (0x185b0 bytes) -->
+        <Set Name="IFLASH_TC_Size"            Value="0x00055000"/>  
         
         
         <If Name="TARGETTYPE" In="RELEASE DEBUG">
-            <Set Name="Data_BaseAddress"      Value="0x80140000"/>
+            <Set Name="Data_BaseAddress"      Value="0x80150000"/>
         
             <Set Name="Code_Size"             Value="%Data_BaseAddress - Code_BaseAddress%"/>
             <Set Name="Data_Size"             Value="%Deployment_BaseAddress - Data_BaseAddress%"/>
@@ -117,8 +117,11 @@
         <FileMapping Name="*" Options="(i.*LPC24XX_TIME*)" />         
         <FileMapping Name="*" Options="(.text.*LPC24XX_TIME*)" />                
         <FileMapping Name="*" Options="(.text.*LPC24XX_LCDC_Driver*)" />                
-        <FileMapping Name="*" Options="(.text.*LPC24XX_EMAC*)" />             
-        <FileMapping Name="*" Options="(.text.*CLR_DBG_Debugger*)" />                
+        <FileMapping Name="*" Options="(.text.*TFT-G240320LTSW-118W*)" />
+
+        <Include File="%SPOCLIENT%\Solutions\%PLATFORM%\TinyCLR\scatterfile_ram_functions.xml"/>
+        <Include File="%SPOCLIENT%\Solutions\%PLATFORM%\TinyCLR\scatterfile_tinyclr_ram_functions.xml"/>
+           
       </ExecRegion>
 
       <ExecRegion Name="ER_RAM_RO" Align="0x10" Options="&gt;RELOC_RAM AT&gt;LR_%TARGETLOCATION%">
@@ -141,9 +144,12 @@
         <FileMapping Name="*" Options="(.text.*SmartPtr_IRQ*)" />
         <FileMapping Name="*" Options="(.text.*LPC24XX_*)" />    
 
-        <Include File="%SPOCLIENT%\Solutions\%PLATFORM%\TinyCLR\scatterfile_ram_functions.xml"/>
-        <Include File="%SPOCLIENT%\Solutions\%PLATFORM%\TinyCLR\scatterfile_tinyclr_ram_functions.xml"/>
 
+        <FileMapping Name="*" Options="(.text.*LPC24XX_EMAC*)" />             
+        <FileMapping Name="*" Options="(.text.*CLR_DBG_Debugger*)" />     
+        <FileMapping Name="*" Options="(.text.*crypto*)" />
+        <FileMapping Name="*" Options="(i.*crypto*)" />
+        <FileMapping Name="*" Options="(.text.*CLR*)" />
         
       </ExecRegion>      
 
@@ -156,10 +162,6 @@
       <ExecRegion Name="ER_IFLASH" Options="&gt;LR_IFLASH AT&gt;LR_IFLASH" Size="%IFLASH_TC_Size%">
         <FileMapping Name="*" Options="(SectionForInternalFLASH)" />
         <FileMapping Name="*" Options="(__aeabi*)" />
-
-        <FileMapping Name="*" Options="(.text.*crypto*)" />
-        <FileMapping Name="*" Options="(i.*crypto*)" />
-        <FileMapping Name="*" Options="(.text.*CLR*)" />
       </ExecRegion>
 
 

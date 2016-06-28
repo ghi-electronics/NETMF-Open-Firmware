@@ -213,13 +213,12 @@ void TinyBooter_OnStateChange( TinyBooterState state, void* data, void ** retDat
 #define CODE_BASEADDRESS   0x00060000
 #define EXCODE_BASEADDRESS 0x20040000 
 
-#define DATA_BASEADDRESS   0x001C0000
-#define EXDATA_BASEADDRESS 0x200C0000
+#define DATA_BASEADDRESS   0x002A0000
 
 #define CONFIG_BASEADDRESS 0x00020000
 #define CONGIG_Size        0x00020000
 
-#define DEPLOY_BASEADDRESS 0x00200000
+#define DEPLOY_BASEADDRESS 0x002E0000
 
 #define CODE_SIZE           DATA_BASEADDRESS-CODE_BASEADDRESS
 #define DATA_SIZE           DEPLOY_BASEADDRESS-DATA_BASEADDRESS
@@ -230,7 +229,7 @@ void TinyBooter_OnStateChange( TinyBooterState state, void* data, void ** retDat
                 hal_fprintf( STREAM_LCD, "Starting application at 0x%08x\r\n", address );
                 debug_printf( "Starting application at 0x%08x\r\n", address );
 
-                if (address == CODE_BASEADDRESS)
+                if (address == CODE_BASEADDRESS || address == EXCODE_BASEADDRESS)
                 {
                     BlockStorageDevice *device;
                     ByteAddress ByteAddress;

@@ -20,6 +20,10 @@ extern HAL_DblLinkedList<HAL_CONTINUATION> g_HAL_Completion_List;
 
 //--//
 
+bool HAL_CONTINUATION::IsLinked()
+{
+    return ((HAL_DblLinkedNode<HAL_CONTINUATION>*)this)->IsLinked();
+}
 
 void HAL_CONTINUATION::InitializeList()
 {

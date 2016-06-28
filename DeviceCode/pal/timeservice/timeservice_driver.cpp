@@ -7,18 +7,35 @@
 
 TimeServiceDriver g_TimeServiceDriver;
 
+BOOL TimeServiceDriver::m_initialized = FALSE;
+
 HRESULT TimeServiceDriver::Initialize()
 {
-    m_settings.RefreshTime = c_DefaultRefreshTime;
-    
-    m_TimeServiceCompletion.InitializeForUserMode(TimeServiceCompletionRoutine, NULL);      
+    if(!m_initialized)
+    {
+        m_settings.RefreshTime = c_DefaultRefreshTime;
+        
+        m_lastSyncStatus.CurrentTimeUTC = 0;
+        m_lastSyncStatus.Flags          = TimeService_Status_Flags_Failed;
+        m_lastSyncStatus.SyncOffset     = 0;
+        m_lastSyncStatus.ServerIP       = 0;
+        
+        m_TimeServiceCompletion.InitializeForUserMode(TimeServiceCompletionRoutine, NULL);      
+
+        m_initialized = TRUE;
+    }
 
     return S_OK;
 }
 
 HRESULT TimeServiceDriver::Uninitialize()
 {
-    Stop();
+    if(m_initialized)
+    {
+        Stop();
+        
+       m_initialized = FALSE; 
+    }
     return S_OK;
 }
 
@@ -36,21 +53,29 @@ void TimeServiceDriver::Completion(void *arg)
 
     hr = Update(m_settings.Tolerance, &status);    
 
-    m_lastSyncStatus = status;
+    if (m_TimeServiceCompletion.IsLinked()) 
+    {
+        m_TimeServiceCompletion.Abort();
+    }
 
     if (hr == CLR_E_RESCHEDULE)
     {
-        if (!m_TimeServiceCompletion.IsLinked()) m_TimeServiceCompletion.EnqueueDelta(c_AsyncRescheduleTime);
+        m_TimeServiceCompletion.EnqueueDelta(c_AsyncRescheduleTime);
     }
     else
     {
-        if (!m_TimeServiceCompletion.IsLinked()) m_TimeServiceCompletion.EnqueueDelta(m_settings.RefreshTime * c_SecToTimeUnits);
+        m_TimeServiceCompletion.EnqueueDelta(m_settings.RefreshTime * c_SecToTimeUnits);
     }
 }
 
 HRESULT TimeServiceDriver::Start()
 {    
-    /// Syncup is rather immediate.
+    m_lastSyncStatus.CurrentTimeUTC = 0;
+    m_lastSyncStatus.Flags          = TimeService_Status_Flags_Failed;
+    m_lastSyncStatus.SyncOffset     = 0;
+    m_lastSyncStatus.ServerIP       = 0;
+    
+    /// Sync up is rather immediate.
     if (!m_TimeServiceCompletion.IsLinked()) m_TimeServiceCompletion.EnqueueDelta(0);
 
     return S_OK;
@@ -107,6 +132,8 @@ HRESULT TimeServiceDriver::Update(UINT8* serverIPs, INT32 serverNum, UINT32 tole
         status->ServerIP = FromIPFragments(serverIPs);
         status->SyncOffset = 0;
         status->CurrentTimeUTC = time; 
+
+        m_lastSyncStatus = *status;
 
         PostManagedEvent(EVENT_TIMESERVICE, EVENT_TIMESERVICE_SYSTEMTIMECHANGED, 0, 0);
 

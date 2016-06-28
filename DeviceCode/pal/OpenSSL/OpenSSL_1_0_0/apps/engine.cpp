@@ -66,6 +66,7 @@
 #ifdef OPENSSL_NO_STDIO
 #define APPS_WIN16
 #endif
+#include "apps.h"
 #include <openssl/err.h>
 #ifndef OPENSSL_NO_ENGINE
 #include <openssl/engine.h>

@@ -131,9 +131,6 @@ int MAIN(int argc, char **argv)
 	char	*infile = NULL, *outfile = NULL, *prog;
 	BIO 	*in = NULL, *out = NULL;
 	int 	informat, outformat, noout = 0, C = 0, ret = 1;
-#ifndef OPENSSL_NO_ENGINE
-	ENGINE	*e = NULL;
-#endif
 	char	*engine = NULL;
 
 	BIGNUM	*ec_p = NULL, *ec_a = NULL, *ec_b = NULL,
@@ -259,9 +256,9 @@ bad:
 		BIO_printf(bio_err, " -outform arg      output format - "
 				"default PEM\n");
 		BIO_printf(bio_err, " -in  arg          input file  - "
-				"default OPENSSL_TYPE__FILE_STDIN\n");
+				"default stdin\n");
 		BIO_printf(bio_err, " -out arg          output file - "
-				"default OPENSSL_TYPE__FILE_STDOUT\n");
+				"default stdout\n");
 		BIO_printf(bio_err, " -noout            do not print the "
 				"ec parameter\n");
 		BIO_printf(bio_err, " -text             print the ec "
@@ -342,7 +339,7 @@ bad:
 		}
 
 #ifndef OPENSSL_NO_ENGINE
-	e = setup_engine(bio_err, engine, 0);
+	setup_engine(bio_err, engine, 0);
 #endif
 
 	if (list_curves)

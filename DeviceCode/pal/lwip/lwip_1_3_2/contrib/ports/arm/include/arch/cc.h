@@ -59,6 +59,8 @@ typedef u32_t mem_ptr_t;
 // supply a version of (non-ANSI) isascii()
 //#define isascii(i) ((int)(i) > 0 && (int)(i) < 128)
 
+#if !defined(BUILD_RTM)
+
 extern void lcd_printf( const char* format, ... );
 extern void debug_printf( const char* format, ...);
 
@@ -78,5 +80,12 @@ extern void debug_printf( const char* format, ...);
 #else
 #define LWIP_PLATFORM_ASSERT(x)
 #endif
+
+#else
+
+#define LWIP_PLATFORM_DIAG(x)
+#define LWIP_PLATFORM_ASSERT(x)
+
+#endif  // !defined(BUILD_RTM)
 
 #endif // _ARCH_CC_H_

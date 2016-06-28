@@ -96,7 +96,7 @@ int add_signed_seq2string(PKCS7_SIGNER_INFO *si, char *str1, char *str2)
 	i+=i2d_ASN1_OCTET_STRING(os2,NULL);
 	total=ASN1_object_size(1,i,V_ASN1_SEQUENCE);
 
-	data=TINYCLR_SSL_MALLOC(total);
+	data=OPENSSL_malloc(total);
 	p=data;
 	ASN1_put_object(&p,1,i,V_ASN1_SEQUENCE,V_ASN1_UNIVERSAL);
 	i2d_ASN1_OCTET_STRING(os1,&p);
@@ -104,7 +104,7 @@ int add_signed_seq2string(PKCS7_SIGNER_INFO *si, char *str1, char *str2)
 
 	seq=ASN1_STRING_new();
 	ASN1_STRING_set(seq,data,total);
-	TINYCLR_SSL_FREE(data);
+	OPENSSL_free(data);
 	ASN1_OCTET_STRING_free(os1);
 	ASN1_OCTET_STRING_free(os2);
 
@@ -147,8 +147,8 @@ int get_signed_seq2string(PKCS7_SIGNER_INFO *si, char **str1, char **str2)
 		c.slen-=(c.p-c.q);
 
 		if (!asn1_const_Finish(&c)) goto err;
-		*str1=TINYCLR_SSL_MALLOC(os1->length+1);
-		*str2=TINYCLR_SSL_MALLOC(os2->length+1);
+		*str1=OPENSSL_malloc(os1->length+1);
+		*str2=OPENSSL_malloc(os2->length+1);
 		TINYCLR_SSL_MEMCPY(*str1,os1->data,os1->length);
 		TINYCLR_SSL_MEMCPY(*str2,os2->data,os2->length);
 		(*str1)[os1->length]='\0';
@@ -260,7 +260,7 @@ X509_ATTRIBUTE *add_seq2string(PKCS7_SIGNER_INFO *si, char *str1, char *str2)
 	i+=i2d_ASN1_OCTET_STRING(os2,NULL);
 	total=ASN1_object_size(1,i,V_ASN1_SEQUENCE);
 
-	data=TINYCLR_SSL_MALLOC(total);
+	data=OPENSSL_malloc(total);
 	p=data;
 	ASN1_put_object(&p,1,i,V_ASN1_SEQUENCE,V_ASN1_UNIVERSAL);
 	i2d_ASN1_OCTET_STRING(os1,&p);
@@ -268,7 +268,7 @@ X509_ATTRIBUTE *add_seq2string(PKCS7_SIGNER_INFO *si, char *str1, char *str2)
 
 	seq=ASN1_STRING_new();
 	ASN1_STRING_set(seq,data,total);
-	TINYCLR_SSL_FREE(data);
+	OPENSSL_free(data);
 	ASN1_OCTET_STRING_free(os1);
 	ASN1_OCTET_STRING_free(os2);
 
@@ -314,8 +314,8 @@ int sk_get_seq2string(STACK_OF(X509_ATTRIBUTE) *sk, char **str1, char **str2)
 		c.slen-=(c.p-c.q);
 
 		if (!asn1_const_Finish(&c)) goto err;
-		*str1=TINYCLR_SSL_MALLOC(os1->length+1);
-		*str2=TINYCLR_SSL_MALLOC(os2->length+1);
+		*str1=OPENSSL_malloc(os1->length+1);
+		*str2=OPENSSL_malloc(os2->length+1);
 		TINYCLR_SSL_MEMCPY(*str1,os1->data,os1->length);
 		TINYCLR_SSL_MEMCPY(*str2,os2->data,os2->length);
 		(*str1)[os1->length]='\0';

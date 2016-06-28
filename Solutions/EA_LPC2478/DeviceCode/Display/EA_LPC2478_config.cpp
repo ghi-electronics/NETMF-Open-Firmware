@@ -31,11 +31,11 @@
 
 #if defined(__GNUC__)
 
-UINT8 __attribute__ ((aligned (16))) ScreenBuffer[(G240320LTSW_WIDTH*G240320LTSW_HEIGHT*G240320LTSW_BPP)/8];
+UINT8 __attribute__ ((aligned (8))) ScreenBuffer[(G240320LTSW_WIDTH*G240320LTSW_HEIGHT*G240320LTSW_BPP)/8];
 
 #else
 
-__align(16) UINT8 ScreenBuffer[(G240320LTSW_WIDTH*G240320LTSW_HEIGHT*G240320LTSW_BPP)/8];
+__align(8) UINT8 ScreenBuffer[(G240320LTSW_WIDTH*G240320LTSW_HEIGHT*G240320LTSW_BPP)/8];
 
 #endif
 
@@ -60,6 +60,10 @@ G240320LTSW_CONFIG g_G240320LTSW_Config =
             1,                     // CS setup time us
             1,                     // CS hold time us
             LPC24XX_SPI::c_SPI0,   // SPI Module
+            {
+                GPIO_PIN_NONE,     // SPI BusyPin
+                FALSE,             // SPI BusyPinActiveState
+            },
         },
     },
     {

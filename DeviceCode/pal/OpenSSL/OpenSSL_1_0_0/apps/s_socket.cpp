@@ -57,6 +57,12 @@
  */
 
 
+#ifdef FLAT_INC
+#include "e_os2.h"
+#else
+#include "../e_os2.h"
+#endif
+
 /* With IPv6, it looks like Digital has mixed up the proper order of
    recursive header file inclusion, resulting in the compiler complaining
    that u_int isn't defined, but only if _POSIX_C_SOURCE is defined, which
@@ -192,7 +198,7 @@ static int ssl_sock_init(void)
 		TINYCLR_SSL_MEMSET(&wsa_state,0,sizeof(wsa_state));
 		if (WSAStartup(0x0101,&wsa_state)!=0)
 			{
-			err=WSAGetLastError();
+			err=TINYCLR_SSL_GETLASTSOCKETERROR();
 			BIO_printf(bio_err,"unable to start WINSOCK, error code=%d\n",err);
 			return(0);
 			}
@@ -276,7 +282,7 @@ static int init_client_ip(int *sock, unsigned char ip[4], int port, int type)
 #endif
 
 	if (TINYCLR_SSL_CONNECT(s,(struct TINYCLR_SSL_SOCKADDR *)&them,sizeof(them)) == -1)
-		{ closesocket(s); TINYCLR_SSL_PERROR("connect"); return(0); }
+		{ TINYCLR_SSL_CLOSESOCKET(s); TINYCLR_SSL_PERROR("connect"); return(0); }
 	*sock=s;
 	return(1);
 	}
@@ -323,7 +329,7 @@ static int init_server_long(int *sock, int port, char *ip, int type)
 	{
 	int ret=0;
 	struct TINYCLR_SSL_SOCKADDR_IN server;
-	int s= -1,i;
+	int s= -1;
 
 	if (!ssl_sock_init()) return(0);
 
@@ -362,7 +368,6 @@ static int init_server_long(int *sock, int port, char *ip, int type)
 		}
 	/* Make it 128 for linux */
 	if (type==SOCK_STREAM && TINYCLR_SSL_LISTEN(s,128) == -1) goto err;
-	i=0;
 	*sock=s;
 	ret=1;
 err:
@@ -380,7 +385,7 @@ static int init_server(int *sock, int port, int type)
 
 static int do_accept(int acc_sock, int *sock, char **host)
 	{
-	int ret,i;
+	int ret;
 	struct hostent *h1,*h2;
 	static struct TINYCLR_SSL_SOCKADDR_IN from;
 	int len;
@@ -403,7 +408,8 @@ redoit:
 	if (ret == INVALID_SOCKET)
 		{
 #if defined(OPENSSL_SYS_WINDOWS) || (defined(OPENSSL_SYS_NETWARE) && !defined(NETWARE_BSDSOCK))
-		i=WSAGetLastError();
+		int i;
+		i=TINYCLR_SSL_GETLASTSOCKETERROR();
 		BIO_printf(bio_err,"accept error %d\n",i);
 #else
 		if (errno == EINTR)
@@ -420,11 +426,11 @@ redoit:
 /*
 	ling.l_onoff=1;
 	ling.l_linger=0;
-	i=setsockopt(ret,SOL_SOCKET,SO_LINGER,(char *)&ling,sizeof(ling));
-	if (i < 0) { perror("linger"); return(0); }
+	i=TINYCLR_SSL_SETSOCKOPT(ret,SOL_SOCKET,SO_LINGER,(char *)&ling,sizeof(ling));
+	if (i < 0) { TINYCLR_SSL_PERROR("linger"); return(0); }
 	i=0;
-	i=setsockopt(ret,SOL_SOCKET,SO_KEEPALIVE,(char *)&i,sizeof(i));
-	if (i < 0) { perror("keepalive"); return(0); }
+	i=TINYCLR_SSL_SETSOCKOPT(ret,SOL_SOCKET,SO_KEEPALIVE,(char *)&i,sizeof(i));
+	if (i < 0) { TINYCLR_SSL_PERROR("keepalive"); return(0); }
 */
 
 	if (host == NULL) goto end;
@@ -457,7 +463,6 @@ redoit:
 			BIO_printf(bio_err,"gethostbyname failure\n");
 			return(0);
 			}
-		i=0;
 		if (h2->h_addrtype != AF_INET)
 			{
 			BIO_printf(bio_err,"gethostbyname addr is not AF_INET\n");

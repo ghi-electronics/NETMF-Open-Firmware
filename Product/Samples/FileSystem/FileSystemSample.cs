@@ -763,16 +763,31 @@ namespace FileSystemSample
 
                             // Always go back to the root directory before 
                             // formatting.
-                            Directory.SetCurrentDirectory("\\");
+                            if(_selectedItem != null)
+                            {
+                                Directory.SetCurrentDirectory( "\\" );
 
-                            // Format the volume and call it ROOT.
-                            Microsoft.SPOT.IO.VolumeInfo volInfo =
-                                new VolumeInfo("ROOT");
-                            volInfo.Format(0);
+                                string volume = ( (ListViewSubItem)_selectedItem.SubItems[0] ).Text;
 
-                            // Refresh the list, then re-draw the list.
-                            myApplication.mainWindow.RefreshList();
-                            Invalidate();
+                                volume = volume.Trim( '[', ']', '\\' );
+
+                                // Format the volume and call it ROOT.
+                                Microsoft.SPOT.IO.VolumeInfo volInfo =
+                                    new VolumeInfo( volume );
+
+                                if(volInfo.FileSystem == null)
+                                {
+                                    volInfo.Format( "FAT", 0, volume + "FS", true );
+                                }
+                                else
+                                {
+                                    volInfo.Format( 0 );
+                                }
+
+                                // Refresh the list, then re-draw the list.
+                                myApplication.mainWindow.RefreshList();
+                                Invalidate();
+                            }
                         }
                     }
                     else if (y <= cy2)
@@ -1051,7 +1066,7 @@ namespace FileSystemSample
             StackPanel stackPanel = new StackPanel();
 
             // Create the list view.
-            ListView _listView = new ListView(320, 240);
+            ListView _listView = new ListView(SystemMetrics.ScreenWidth, SystemMetrics.ScreenHeight);
 
             // The window constructor.
             public MyWindow()
@@ -1084,7 +1099,6 @@ namespace FileSystemSample
             /// </summary>
             public void RefreshList()
             {
-
                 // Clear the list.
                 _listView.Items.Clear();
 
@@ -1139,7 +1153,6 @@ namespace FileSystemSample
         /// </summary>
         public static void Main()
         {
-
             // Create the main application.
             myApplication = new MyFileSystem();
 

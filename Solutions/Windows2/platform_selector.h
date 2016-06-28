@@ -9,6 +9,10 @@
 //
 // macros
 //
+
+#define FAT_FS__VALIDATE_READONLY_CACHELINE     1
+//#define FAT_FS__DO_NOT_UPDATE_FILE_ACCESS_TIME  1
+#define FAT_FS__CACHE_FLUSH_TIMEOUT_USEC        (5*1000*1000)
      
 #define GLOBAL_LOCK(x)             SmartPtr_IRQ x
 //#define DISABLE_INTERRUPTS()       SmartPtr_IRQ::ForceDisabled()

@@ -12,7 +12,6 @@
     <TemplateNameString>IEEE_802_15_4_Network</TemplateNameString>
     <TemplateDescriptionString>IEEE_802_15_4_Network Sample</TemplateDescriptionString>
     <TemplateSortOrder>1000</TemplateSortOrder>
-    <TargetFrameworkVersion>v4.1</TargetFrameworkVersion>
     <NetMfTargetsBaseDir Condition="'$(NetMfTargetsBaseDir)'==''">$(MSBuildExtensionsPath32)\Microsoft\.NET Micro Framework\</NetMfTargetsBaseDir>
   </PropertyGroup>
   <PropertyGroup Condition="!Exists('$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.CSharp.Targets') And '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

@@ -182,16 +182,18 @@ namespace Ws.Services.Binding
     }
 
     /// <summary>
-    /// Handles the processing chain for the chosen tranport
+    /// Handles the processing chain for the chosen transport
     /// </summary>
     public abstract class TransportBindingElement : BindingElement
     {
         protected Stream m_stream;
         protected Uri    m_serviceUrn;
         protected Uri    m_endpointUri;
+        protected Uri    m_transportUri;
 
-        public Uri ServiceUrn       { get { return m_serviceUrn;       } set { m_serviceUrn  = value; } }
-        public Uri EndpointAddress  { get { return m_endpointUri;      } set { m_endpointUri = value; } }
+        public Uri ServiceUrn       { get { return m_serviceUrn;       } set { m_serviceUrn   = value; } }
+        public Uri EndpointAddress  { get { return m_endpointUri;      } set { m_endpointUri  = value; } }
+        public Uri TransportAddress { get { return m_transportUri;     } set { m_transportUri = value; } }
         public int EndpointPort     { get { return m_endpointUri.Port; } }
     }
 }

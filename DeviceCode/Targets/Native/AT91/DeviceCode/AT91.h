@@ -18,9 +18,10 @@
 #include "AT91_SAM/AT91_SAM9261.h"
 #endif
 
-#if defined(PLATFORM_ARM_SAM92RL_ANY)
-#include "AT91_SAM/AT91_SAM9RL.h"
-#endif
+// THIS FILE DOESN'T EXIST
+//#if defined(PLATFORM_ARM_SAM92RL_ANY)
+//#include "AT91_SAM/AT91_SAM9RL.h"
+//#endif
 
 #if defined(PLATFORM_ARM_SAM9RL64_ANY)
 #include "AT91_SAM/AT91_SAM9RL64.h"
@@ -271,10 +272,15 @@ struct AT91_PMC {
 
 __inline void AT91_RSTC_EXTRST()
 {
-    (*(volatile UINT32 *)0xFFFFFD08) = 0xA5000100;
-    (*(volatile UINT32 *)0xFFFFFD00) = 0xA5000008;
+    volatile UINT32 *pReset       = (volatile UINT32*)AT91C_BASE_RSTC;
+    volatile UINT32 *pResetStatus = (volatile UINT32*)AT91C_BASE_RSTC_SR;
+    volatile UINT32 *pResetMode   = (volatile UINT32*)AT91C_BASE_RSTC_MR;
+
+    *pResetMode = (AT91C_RSTC__RESET_KEY | 4ul << 8);
+    *pReset     = (AT91C_RSTC__RESET_KEY | AT91C_RTSC__EXTRST);
+
     //Wait for hardware reset end
-    while(!((*(volatile UINT32 *)0xFFFFFD04) & 0x10000) ) {;}   
+    while(((*pResetStatus) & AT91C_RTSC_SR__SRCMP)) {;}   
 }
 
 //////////////////////////////////////////////////////////////////////////////

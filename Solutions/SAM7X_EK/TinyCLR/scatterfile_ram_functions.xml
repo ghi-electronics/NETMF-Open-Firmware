@@ -129,10 +129,11 @@
     <FileMapping Name="*" Options="(i.ClipToVisible__14CLR_GFX_BitmapFiN31R18CLR_GFX_RectAsSizePC14CLR_GFX_BitmapRiT7)"
         Comment="00001270 284 259079 ClipToVisible__14CLR_GFX_BitmapFiN31R18CLR_GFX_RectAsSizePC14CLR_GFX_BitmapRiT7" />
   </If>
-  <If Name="COMPILER_TOOL_VERSION" In="RVDS3.0 RVDS3.1 RVDS4.0">
+  <If Name="COMPILER_TOOL_VERSION" In="RVDS3.0 RVDS3.1 RVDS4.0 RVDS4.1">
     <FileMapping Name="*" Options="(i.IDelayLoop)" Comment="00004a98 24 16 IDelayLoop" />
     <FileMapping Name="*" Options="(i._Z23Time_Sleep_MicroSecondsj)" Comment="_Z23Time_Sleep_MicroSecondsj" />
     <FileMapping Name="*" Options="(i._Z40Time_Sleep_MicroSeconds_InterruptEnabledj)" Comment="_Z40Time_Sleep_MicroSeconds_InterruptEnabledj" />
+<!--
     <FileMapping Name="*" Options="(i._Z23CPU_MicrosecondsToTicksj)" Comment="_Z23CPU_MicrosecondsToTicksj" />    
     <FileMapping Name="*" Options="(i._ZN21CLR_RT_HeapBlock_Node6UnlinkEv)" Comment="00006fdc 44 2013044 Unlink__21CLR_RT_HeapBlock_NodeFv" />
     <FileMapping Name="*" Options="(i._ZN20CLR_RT_DblLinkedList10LinkAtBackEP21CLR_RT_HeapBlock_Node)"
@@ -252,5 +253,6 @@
     <FileMapping Name="*" Options="(i._ZN16CLR_RT_HeapBlock12Relocate_ClsEv)" Comment="101259fc 16 31705 Relocate_Cls__16CLR_RT_HeapBlockFv" />
     <FileMapping Name="*" Options="(i._ZN14CLR_GFX_Bitmap13ClipToVisibleERiS0_S0_S0_PKS_S0_S0_)"
         Comment="00001270 284 259079 ClipToVisible__14CLR_GFX_BitmapFiN31R18CLR_GFX_RectAsSizePC14CLR_GFX_BitmapRiT7" />
+-->
   </If>
 </ScatterFile>

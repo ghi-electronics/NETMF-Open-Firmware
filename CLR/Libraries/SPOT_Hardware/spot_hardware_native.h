@@ -8,6 +8,17 @@
 
 #include <TinyCLR_Interop.h>
 
+struct Library_spot_hardware_native_Microsoft_SPOT_Hardware_Cpu
+{
+    TINYCLR_NATIVE_DECLARE(get_SystemClock___STATIC__U4);
+    TINYCLR_NATIVE_DECLARE(get_SlowClock___STATIC__U4);
+    TINYCLR_NATIVE_DECLARE(get_GlitchFilterTime___STATIC__mscorlibSystemTimeSpan);
+    TINYCLR_NATIVE_DECLARE(set_GlitchFilterTime___STATIC__VOID__mscorlibSystemTimeSpan);
+
+    //--//
+
+};
+
 struct Library_spot_hardware_native_Microsoft_SPOT_Hardware_Battery
 {
     TINYCLR_NATIVE_DECLARE(ReadVoltage___STATIC__I4);
@@ -188,12 +199,36 @@ struct Library_spot_hardware_native_Microsoft_SPOT_Hardware_LargeBufferMarshalle
 
 };
 
-struct Library_spot_hardware_native_Microsoft_SPOT_Hardware_Cpu
+struct Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogInput
 {
-    TINYCLR_NATIVE_DECLARE(get_SystemClock___STATIC__U4);
-    TINYCLR_NATIVE_DECLARE(get_SlowClock___STATIC__U4);
-    TINYCLR_NATIVE_DECLARE(get_GlitchFilterTime___STATIC__mscorlibSystemTimeSpan);
-    TINYCLR_NATIVE_DECLARE(set_GlitchFilterTime___STATIC__VOID__mscorlibSystemTimeSpan);
+    static const int FIELD_STATIC__s_syncRoot = 4;
+
+    static const int FIELD__m_pin = 1;
+    static const int FIELD__m_channel = 2;
+    static const int FIELD__m_scale = 3;
+    static const int FIELD__m_offset = 4;
+    static const int FIELD__m_precision = 5;
+    static const int FIELD__m_disposed = 6;
+
+    TINYCLR_NATIVE_DECLARE(ReadRaw___I4);
+    TINYCLR_NATIVE_DECLARE(Initialize___STATIC__VOID__MicrosoftSPOTHardwareCpuAnalogChannel__I4);
+
+    //--//
+
+};
+
+struct Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogOutput
+{
+    static const int FIELD_STATIC__s_syncRoot = 5;
+
+    static const int FIELD__m_pin = 1;
+    static const int FIELD__m_channel = 2;
+    static const int FIELD__m_scale = 3;
+    static const int FIELD__m_offset = 4;
+    static const int FIELD__m_precision = 5;
+
+    TINYCLR_NATIVE_DECLARE(WriteRaw___VOID__I4);
+    TINYCLR_NATIVE_DECLARE(Initialize___STATIC__VOID__MicrosoftSPOTHardwareCpuAnalogOutputChannel__I4);
 
     //--//
 
@@ -201,7 +236,7 @@ struct Library_spot_hardware_native_Microsoft_SPOT_Hardware_Cpu
 
 struct Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider
 {
-    static const int FIELD_STATIC__s_hwProvider = 4;
+    static const int FIELD_STATIC__s_hwProvider = 6;
 
     TINYCLR_NATIVE_DECLARE(NativeGetSerialPins___VOID__I4__BYREF_MicrosoftSPOTHardwareCpuPin__BYREF_MicrosoftSPOTHardwareCpuPin__BYREF_MicrosoftSPOTHardwareCpuPin__BYREF_MicrosoftSPOTHardwareCpuPin);
     TINYCLR_NATIVE_DECLARE(NativeGetSerialPortsCount___I4);
@@ -218,6 +253,14 @@ struct Library_spot_hardware_native_Microsoft_SPOT_Hardware_HardwareProvider
     TINYCLR_NATIVE_DECLARE(NativeGetSupportedInterruptModes___MicrosoftSPOTHardwareCpuPinValidInterruptMode__MicrosoftSPOTHardwareCpuPin);
     TINYCLR_NATIVE_DECLARE(NativeGetButtonPins___MicrosoftSPOTHardwareCpuPin__MicrosoftSPOTHardwareButton);
     TINYCLR_NATIVE_DECLARE(NativeGetLCDMetrics___VOID__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4);
+    TINYCLR_NATIVE_DECLARE(NativeGetPWMChannelsCount___I4);
+    TINYCLR_NATIVE_DECLARE(NativeGetPWMPinForChannel___MicrosoftSPOTHardwareCpuPin__MicrosoftSPOTHardwareCpuPWMChannel);
+    TINYCLR_NATIVE_DECLARE(NativeGetAnalogChannelsCount___I4);
+    TINYCLR_NATIVE_DECLARE(NativeGetAnalogPinForChannel___MicrosoftSPOTHardwareCpuPin__MicrosoftSPOTHardwareCpuAnalogChannel);
+    TINYCLR_NATIVE_DECLARE(NativeGetAvailablePrecisionInBitsForChannel___SZARRAY_I4__MicrosoftSPOTHardwareCpuAnalogChannel);
+    TINYCLR_NATIVE_DECLARE(NativeGetAnalogOutputChannelsCount___I4);
+    TINYCLR_NATIVE_DECLARE(NativeGetAnalogOutputPinForChannel___MicrosoftSPOTHardwareCpuPin__MicrosoftSPOTHardwareCpuAnalogOutputChannel);    
+    TINYCLR_NATIVE_DECLARE(NativeGetAvailableAnalogOutputPrecisionInBitsForChannel___SZARRAY_I4__MicrosoftSPOTHardwareCpuAnalogOutputChannel);
 
     //--//
 
@@ -285,10 +328,10 @@ struct Library_spot_hardware_native_Microsoft_SPOT_Hardware_PowerEvent
 
 struct Library_spot_hardware_native_Microsoft_SPOT_Hardware_PowerState
 {
-    static const int FIELD_STATIC__s_CurrentPowerLevel = 5;
-    static const int FIELD_STATIC__OnSleepChange = 6;
-    static const int FIELD_STATIC__OnPowerLevelChange = 7;
-    static const int FIELD_STATIC__OnRebootEvent = 8;
+    static const int FIELD_STATIC__s_CurrentPowerLevel = 7;
+    static const int FIELD_STATIC__OnSleepChange = 8;
+    static const int FIELD_STATIC__OnPowerLevelChange = 9;
+    static const int FIELD_STATIC__OnRebootEvent = 10;
 
     TINYCLR_NATIVE_DECLARE(Reboot___STATIC__VOID__BOOLEAN);
     TINYCLR_NATIVE_DECLARE(WaitForIdleCPU___STATIC__BOOLEAN__I4__I4);

@@ -41,12 +41,12 @@ struct Library_spot_hardware_serial_native_System_IO_Ports_SerialPort
     static const int FIELD__m_callbacksErrorEvent = 7;
     static const int FIELD__m_callbacksDataEvent  = 8;
 
+    TINYCLR_NATIVE_DECLARE(Read___I4__SZARRAY_U1__I4__I4);
+    TINYCLR_NATIVE_DECLARE(Write___VOID__SZARRAY_U1__I4__I4);
+    TINYCLR_NATIVE_DECLARE(Flush___VOID);
     TINYCLR_NATIVE_DECLARE(InternalOpen___VOID);
     TINYCLR_NATIVE_DECLARE(InternalClose___VOID);
-    TINYCLR_NATIVE_DECLARE(Read___I4__SZARRAY_U1__I4__I4);
-    TINYCLR_NATIVE_DECLARE(Write___I4__SZARRAY_U1__I4__I4);
     TINYCLR_NATIVE_DECLARE(InternalDispose___VOID);
-    TINYCLR_NATIVE_DECLARE(Flush___VOID);
     TINYCLR_NATIVE_DECLARE(BytesInBuffer___I4__BOOLEAN);
     TINYCLR_NATIVE_DECLARE(DiscardBuffer___VOID__BOOLEAN);
 

@@ -4,6 +4,7 @@
   <ItemGroup>
     <Project Include="Targets\v3.0\build.dirproj" />
     <Project Include="Targets\v4.0\build.dirproj" />
-    <Project Include="Targets\v4.1\Targets_v4_1.wixproj" />
+    <Project Include="Targets\v4.1\build.dirproj" />
+    <Project Include="Targets\v4.2\Targets_v4_2.wixproj" />
   </ItemGroup>
 </Project>

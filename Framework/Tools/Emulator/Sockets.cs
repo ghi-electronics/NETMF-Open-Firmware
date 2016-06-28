@@ -709,7 +709,7 @@ namespace Microsoft.SPOT.Emulator.Sockets
 
                 sa.MarshalFromNative(address);
 
-                if (sa.sin_addr == 0 && sa.sin_port == 80)
+                if (sa.sin_port == 80)
                 {
                     sa.sin_port++;
                 }
@@ -1104,7 +1104,19 @@ namespace Microsoft.SPOT.Emulator.Sockets
             {
                 byte []data = new byte[optlen];
 
-                Marshal.Copy(optval, data, 0, optlen);
+                if (level == (int)SocketOptionLevel.Socket && optname == (int)SocketOptionName.Linger && optlen == 4)
+                {
+                    int linger = Marshal.ReadInt32(optval);
+
+                    LingerOption li = new LingerOption(linger != -1, linger < 0 ? 10 : linger);
+
+                    Array.Copy(BitConverter.GetBytes((UInt16)(li.Enabled ? 1 : 0)), 0, data, 0, 2);
+                    Array.Copy(BitConverter.GetBytes((UInt16)li.LingerTime       ), 0, data, 2, 2);
+                }
+                else
+                {
+                    Marshal.Copy(optval, data, 0, optlen);
+                }
 
                 sock.SetSocketOption((SocketOptionLevel)level, (SocketOptionName)optname, data);
             }
@@ -1129,8 +1141,24 @@ namespace Microsoft.SPOT.Emulator.Sockets
                 byte[] data = new byte[optlen];
 
                 sock.GetSocketOption((SocketOptionLevel)level, (SocketOptionName)optname, data);
-
-                Marshal.Copy(data, 0, optval, optlen);
+                
+                if (level == (int)SocketOptionLevel.Socket && optname == (int)SocketOptionName.Linger && optlen == 4)
+                {
+                    // if linger option is off, then we translate to -1 for the MF option
+                    if(data[0] == 0 && data[1] == 0)
+                    {
+                        Marshal.WriteInt32(optval, -1);
+                    }
+                    else
+                    {
+                        // convert back to a single integer value
+                        Marshal.WriteInt32(optval, (int)BitConverter.ToInt16(data, 2));
+                    }
+                }
+                else
+                {
+                    Marshal.Copy(data, 0, optval, optlen);
+                }
             }
             catch (SocketException se)
             {

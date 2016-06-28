@@ -715,12 +715,24 @@ struct Settings : CLR_RT_ParseOptions
         LPCWSTR szOutput = PARAM_EXTRACT_STRING( params, 1 );
         UINT32  address;
 
-        if((m_szEntryPoint == NULL) || (m_symdef.find( m_szEntryPoint ) == m_symdef.end()))
+        if(m_szEntryPoint == NULL)
         {
             TINYCLR_SET_AND_LEAVE(CLR_E_FAIL);
         }
-        
-        address = m_symdef[m_szEntryPoint];
+
+        if(m_symdef.find( m_szEntryPoint ) == m_symdef.end())
+        {
+            if(swscanf_s( m_szEntryPoint, L"%x", &address ) == 0)
+            {
+                TINYCLR_SET_AND_LEAVE(CLR_E_FAIL);
+            }
+        }
+        else
+        {
+            address = m_symdef[m_szEntryPoint];
+        }
+
+        wprintf( L"Compressing image at address '0x%08x'!\n", address );
 
         if(LZ77_Compress( szInput, szOutput, (UINT8*)&address, sizeof(address) ) == false)
         {
@@ -861,7 +873,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
     ::CoInitialize( 0 );
 
-    TINYCLR_CHECK_HRESULT(HAL_Windows::Memory_Resize( 4 * 1024 * 1024 ));
+    TINYCLR_CHECK_HRESULT(HAL_Windows::Memory_Resize( 64 * 1024 * 1024 ));
 
     HAL_Init_Custom_Heap();
 

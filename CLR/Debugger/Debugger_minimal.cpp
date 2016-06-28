@@ -13,6 +13,23 @@ const CLR_Messaging_CommandHandlerLookup c_Debugger_Lookup_Request[] =
     DEFINE_CMD2(Ping       ),
     DEFINE_CMD2(Reboot     ),
     DEFINE_CMD(Execution_QueryCLRCapabilities),
+
+    DEFINE_CMD2(ReadMemory ),
+    DEFINE_CMD2(WriteMemory),
+    DEFINE_CMD2(EraseMemory),
+    //
+    DEFINE_CMD2(Execute    ),
+    DEFINE_CMD2(MemoryMap  ),
+    DEFINE_CMD2(FlashSectorMap),
+
+    DEFINE_CMD(UpgradeToSsl),
+
+    DEFINE_CMD(MFUpdate_Start            ),
+    DEFINE_CMD(MFUpdate_AuthCommand      ),
+    DEFINE_CMD(MFUpdate_Authenticate     ),
+    DEFINE_CMD(MFUpdate_GetMissingPkts   ),
+    DEFINE_CMD(MFUpdate_AddPacket        ),
+    DEFINE_CMD(MFUpdate_Install          ),
 };
 
 const CLR_Messaging_CommandHandlerLookup c_Debugger_Lookup_Reply[] =

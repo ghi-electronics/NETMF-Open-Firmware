@@ -54,7 +54,7 @@ namespace Dpws.Device.Discovery
                 WsWsaHeader matchHeader = new WsWsaHeader(
                     this.Version.DiscoveryNamespace + "/ProbeMatches", // Action
                     header.MessageID,                                  // RelatesTo
-                    this.Version.AnonymousRoleUri,                     // To
+                    this.Version.AnonymousUri,                         // To
                     null, null, null);                                 // ReplyTo, From, Any
 
                 WsMessage msg = new WsMessage(matchHeader, null, WsPrefix.Wsd | WsPrefix.Wsdp, additionalPrefixes,
@@ -144,25 +144,28 @@ namespace Dpws.Device.Discovery
 
             epAddr = epRef.Address.AbsoluteUri;
 
-            // If the destination endpoint is ours send a resolve match else return null
-            int servicesCount = Device.HostedServices.Count;
-            DpwsHostedService hostedService;
-            for (int i = 0; i < servicesCount; i++)
+            if(Device.EndpointAddress != epAddr)
             {
-                hostedService = (DpwsHostedService)Device.HostedServices[i];
-                // Skip internal services
-                if (hostedService.ServiceTypeName == "Internal")
-                    continue;
-            
-                if (hostedService.EndpointAddress == epAddr)
+                // If the destination endpoint is ours send a resolve match else return null
+                int servicesCount = Device.HostedServices.Count;
+                DpwsHostedService hostedService;
+                for (int i = 0; i < servicesCount; i++)
                 {
-                    match = true;
-                    break;
+                    hostedService = (DpwsHostedService)Device.HostedServices[i];
+                    // Skip internal services
+                    if (hostedService.ServiceTypeName == "Internal")
+                        continue;
+                
+                    if (hostedService.EndpointAddress == epAddr)
+                    {
+                        match = true;
+                        break;
+                    }
                 }
-            }
 
-            if (!match && Device.EndpointAddress != epAddr)
-                return null;
+                if (!match)
+                    return null;
+            }
 
             // Build ResolveMatch
             using(XmlMemoryWriter xmlWriter = XmlMemoryWriter.Create())
@@ -178,7 +181,7 @@ namespace Dpws.Device.Discovery
                 WsWsaHeader matchHeader = new WsWsaHeader(
                     this.Version.DiscoveryNamespace + "/ResolveMatches",  // Action
                     header.MessageID,                                     // RelatesTo
-                    this.Version.AnonymousRoleUri,                        // To
+                    this.Version.AnonymousUri,                            // To
                     null, null, null);                                    // ReplyTo, From, Any
 
                 WsMessage msg = new WsMessage(matchHeader, null, WsPrefix.Wsd | WsPrefix.Wsdp, additionalPrefixes, 

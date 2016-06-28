@@ -86,7 +86,7 @@ int DES_enc_write(int fd, const void *_buf, int len,
 	return (-1);
 #else
 #ifdef _LIBC
-	extern unsigned long time();
+	extern unsigned long TINYCLR_SSL_TIME();
 	extern int write();
 #endif
 	const unsigned char *buf=(const unsigned char*)_buf;

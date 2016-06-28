@@ -65,11 +65,16 @@ sys_sem_t sys_sem_new(u8_t count)
     return (sys_sem_t)semaphore;
 }
 
+
 void sys_sem_signal(sys_sem_t sem)
 {
     volatile UINT32* semaphore = (volatile UINT32*)sem;
     ReleaseSemaphore(semaphore);
-    Events_Set(SYSTEM_EVENT_FLAG_NETWORK);
+
+    if(IsSemaphoreGreen(semaphore))
+    {
+        Events_Set(SYSTEM_EVENT_FLAG_NETWORK);
+    }
 }
 
 u32_t sys_arch_sem_wait(sys_sem_t sem, u32_t timeout)
@@ -89,9 +94,16 @@ u32_t sys_arch_sem_wait(sys_sem_t sem, u32_t timeout)
                 break;
             }
 
-            if(Events_WaitForEvents(SYSTEM_EVENT_FLAG_NETWORK, timeout))
+            if(INTERRUPTS_ENABLED_STATE())
             {
-                Events_Clear(SYSTEM_EVENT_FLAG_NETWORK);
+                if(Events_WaitForEvents(SYSTEM_EVENT_FLAG_NETWORK, timeout))
+                {
+                    Events_Clear(SYSTEM_EVENT_FLAG_NETWORK);
+                }
+            }
+            else
+            {
+                break;
             }
         }
     }
@@ -106,8 +118,15 @@ u32_t sys_arch_sem_wait(sys_sem_t sem, u32_t timeout)
                 break;
             }
             
-            Events_WaitForEvents(SYSTEM_EVENT_FLAG_NETWORK, EVENTS_TIMEOUT_INFINITE);
-            Events_Clear(SYSTEM_EVENT_FLAG_NETWORK);
+            if(INTERRUPTS_ENABLED_STATE())
+            {
+                Events_WaitForEvents(SYSTEM_EVENT_FLAG_NETWORK, EVENTS_TIMEOUT_INFINITE);
+                Events_Clear(SYSTEM_EVENT_FLAG_NETWORK);
+            }
+            else
+            {
+                break;
+            }
         }
     }
     
@@ -308,11 +327,21 @@ u32_t sys_now(void)
 #if SYS_LIGHTWEIGHT_PROT
 sys_prot_t sys_arch_protect(void)
 {
+    if(INTERRUPTS_ENABLED_STATE())
+    {
+        DISABLE_INTERRUPTS();
+        return 1;
+    }
+
     return 0;
 }
 
 void sys_arch_unprotect(sys_prot_t pval)
 {
+    if(pval == 1)
+    {
+        ENABLE_INTERRUPTS();
+    }
 }
 #endif
 

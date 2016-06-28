@@ -13,7 +13,6 @@
     <TemplateNameString>SimpleTouchInput</TemplateNameString>
     <TemplateDescriptionString>Touch Panel Simple Touch Input Sample</TemplateDescriptionString>
     <TemplateSortOrder>1000</TemplateSortOrder>
-    <TargetFrameworkVersion>v4.1</TargetFrameworkVersion>
     <NetMfTargetsBaseDir Condition="'$(NetMfTargetsBaseDir)'==''">$(MSBuildExtensionsPath32)\Microsoft\.NET Micro Framework\</NetMfTargetsBaseDir>
   </PropertyGroup>
   <PropertyGroup Condition="!Exists('$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.CSharp.Targets') And '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

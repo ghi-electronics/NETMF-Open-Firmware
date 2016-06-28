@@ -81,6 +81,9 @@ bool WaitForTinyBooterUpload( INT32 &timeout_ms )
 	///the rest will never execute! =)
 #endif*/
 
+    timeout_ms = 1000;
+    enterBooterMode = true;
+
 // wait forever when using RAM build 
 #if defined(TARGETLOCATION_RAM)
     enterBooterMode = true;
@@ -98,9 +101,6 @@ bool WaitForTinyBooterUpload( INT32 &timeout_ms )
             enterBooterMode = true;
         }
     }
-
-timeout_ms = 500;
-enterBooterMode = true;
 
     return enterBooterMode;
 }

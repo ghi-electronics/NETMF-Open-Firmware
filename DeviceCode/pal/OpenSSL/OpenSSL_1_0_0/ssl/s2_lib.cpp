@@ -118,7 +118,7 @@
 #include <openssl/evp.h>
 #include <openssl/md5.h>
 
-const char ssl2_version_str[]="SSLv2" OPENSSL_VERSION_PTEXT;
+//const char ssl2_version_str[]="SSLv2" OPENSSL_VERSION_PTEXT;
 
 #define SSL2_NUM_CIPHERS (sizeof(ssl2_ciphers)/sizeof(SSL_CIPHER))
 
@@ -486,7 +486,7 @@ int ssl2_generate_key_material(SSL *s)
 
 		EVP_DigestInit_ex(&ctx, md5, NULL);
 
-		OPENSSL_assert(s->session->master_key_length >= 0
+		TINYCLR_SSL_ASSERT(s->session->master_key_length >= 0
 		    && s->session->master_key_length
 		    < (int)sizeof(s->session->master_key));
 		EVP_DigestUpdate(&ctx,s->session->master_key,s->session->master_key_length);
@@ -527,7 +527,7 @@ void ssl2_write_error(SSL *s)
 
 	error=s->error; /* number of bytes left to write */
 	s->error=0;
-	OPENSSL_assert(error >= 0 && error <= (int)sizeof(buf));
+	TINYCLR_SSL_ASSERT(error >= 0 && error <= (int)sizeof(buf));
 	i=ssl2_write(s,&(buf[3-error]),error);
 
 /*	if (i == error) s->rwstate=state; */

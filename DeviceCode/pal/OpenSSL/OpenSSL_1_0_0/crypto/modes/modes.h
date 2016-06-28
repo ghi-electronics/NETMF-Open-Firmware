@@ -7,6 +7,10 @@
 
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef void (*block128_f)(const unsigned char in[16],
 			unsigned char out[16],
 			const void *key);
@@ -57,3 +61,7 @@ size_t CRYPTO_cts128_decrypt_block(const unsigned char *in, unsigned char *out,
 size_t CRYPTO_cts128_decrypt(const unsigned char *in, unsigned char *out,
 			size_t len, const void *key,
 			unsigned char ivec[16], cbc128_f cbc);
+#ifdef __cplusplus
+}
+#endif
+

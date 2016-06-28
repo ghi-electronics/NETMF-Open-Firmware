@@ -13,12 +13,15 @@ using Microsoft.SPOT;
 
 namespace Microsoft.SPOT.Touch
 {
+
     internal class TouchEventProcessor : IEventProcessor
     {
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         extern public BaseEvent ProcessEvent(uint data1, uint data2, DateTime time);
     }
 
+    //--//
+    
     public static class Touch
     {
         [MethodImplAttribute(MethodImplOptions.Synchronized)]

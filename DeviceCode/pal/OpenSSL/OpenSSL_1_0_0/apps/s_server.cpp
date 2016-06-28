@@ -1903,7 +1903,7 @@ static int sv_body(char *hostname, int s, unsigned char *context)
 			{
 			FD_ZERO(&readfds);
 #if !defined(OPENSSL_SYS_WINDOWS) && !defined(OPENSSL_SYS_MSDOS) && !defined(OPENSSL_SYS_NETWARE) && !defined(OPENSSL_SYS_BEOS_R5)
-			openssl_fdset(fileno(OPENSSL_TYPE__FILE_STDIN),&readfds);
+			openssl_fdset(TINYCLR_SSL_FILENO(OPENSSL_TYPE__FILE_STDIN),&readfds);
 #endif
 			openssl_fdset(s,&readfds);
 			/* Note: under VMS with SOCKETSHR the second parameter is
@@ -1928,13 +1928,13 @@ static int sv_body(char *hostname, int s, unsigned char *context)
 			/* Under BeOS-R5 the situation is similar to DOS */
 			tv.tv_sec = 1;
 			tv.tv_usec = 0;
-			(void)fcntl(fileno(OPENSSL_TYPE__FILE_STDIN), F_SETFL, O_NONBLOCK);
+			(void)fcntl(TINYCLR_SSL_FILENO(OPENSSL_TYPE__FILE_STDIN), F_SETFL, O_NONBLOCK);
 			i=TINYCLR_SSL_SELECT(width,(void *)&readfds,NULL,NULL,&tv);
-			if ((i < 0) || (!i && read(fileno(OPENSSL_TYPE__FILE_STDIN), buf, 0) < 0))
+			if ((i < 0) || (!i && read(TINYCLR_SSL_FILENO(OPENSSL_TYPE__FILE_STDIN), buf, 0) < 0))
 				continue;
-			if (read(fileno(OPENSSL_TYPE__FILE_STDIN), buf, 0) >= 0)
+			if (read(TINYCLR_SSL_FILENO(OPENSSL_TYPE__FILE_STDIN), buf, 0) >= 0)
 				read_from_terminal = 1;
-			(void)fcntl(fileno(OPENSSL_TYPE__FILE_STDIN), F_SETFL, 0);
+			(void)fcntl(TINYCLR_SSL_FILENO(OPENSSL_TYPE__FILE_STDIN), F_SETFL, 0);
 #else
 			if ((SSL_version(con) == DTLS1_VERSION) &&
 				DTLSv1_get_timeout(con, &timeout))
@@ -1950,7 +1950,7 @@ static int sv_body(char *hostname, int s, unsigned char *context)
 				}
 
 			if (i <= 0) continue;
-			if (FD_ISSET(fileno(OPENSSL_TYPE__FILE_STDIN),&readfds))
+			if (FD_ISSET(TINYCLR_SSL_FILENO(OPENSSL_TYPE__FILE_STDIN),&readfds))
 				read_from_terminal = 1;
 #endif
 			if (FD_ISSET(s,&readfds))
@@ -2010,7 +2010,7 @@ static int sv_body(char *hostname, int s, unsigned char *context)
 					TINYCLR_SSL_PRINTF("SSL_do_handshake -> %d\n",i);
 					i=0; /*13; */
 					continue;
-					/* strcpy(buf,"server side RE-NEGOTIATE\n"); */
+					/* TINYCLR_SSL_STRCPY(buf,"server side RE-NEGOTIATE\n"); */
 					}
 				if ((buf[0] == 'R') &&
 					((buf[1] == '\n') || (buf[1] == '\r')))
@@ -2254,11 +2254,10 @@ static int www_body(char *hostname, int s, unsigned char *context)
 	{
 	char *buf=NULL;
 	int ret=1;
-	int i,j,k,blank,dot;
+	int i,j,k,dot;
 	SSL *con;
 	const SSL_CIPHER *c;
 	BIO *io,*ssl_bio,*sbio;
-	long total_bytes;
 
 	buf=(char*)OPENSSL_malloc(bufsize);
 	if (buf == NULL) return(0);
@@ -2329,7 +2328,6 @@ static int www_body(char *hostname, int s, unsigned char *context)
 		SSL_set_msg_callback_arg(con, bio_s_out);
 		}
 
-	blank=0;
 	for (;;)
 		{
 		if (hack)
@@ -2546,7 +2544,7 @@ static int www_body(char *hostname, int s, unsigned char *context)
 				}
 
 			if (!s_quiet)
-				BIO_printf(bio_err,"TINYCLR_SSL_FILE:%s\n",p);
+				BIO_printf(bio_err,"FILE:%s\n",p);
 
                         if (www == 2)
                                 {
@@ -2559,7 +2557,6 @@ static int www_body(char *hostname, int s, unsigned char *context)
                                         BIO_puts(io,"HTTP/1.0 200 ok\r\nContent-type: text/plain\r\n\r\n");
                                 }
 			/* send the file */
-			total_bytes=0;
 			for (;;)
 				{
 				i=BIO_read(file,buf,bufsize);

@@ -458,10 +458,7 @@ namespace Microsoft.SPOT.Platform.Tests
                     serialPort.Open();
 
                     // buffer data in RX/TX
-                    while (serialPort.BytesToWrite < 512)
-                    {
-                        serialPort.Write(sendbuff, 0, sendbuff.Length);
-                    }
+                    serialPort.Write(sendbuff, 0, sendbuff.Length);
 
                     Log.Comment("bytes to send: " + serialPort.BytesToWrite);
                     Log.Comment("bytes to read: " + serialPort.BytesToRead);
@@ -624,8 +621,7 @@ namespace Microsoft.SPOT.Platform.Tests
                     Thread.Sleep(100);
                     if (eventCount >= 3)
                     {
-                        if (eventCount == 3)
-                            result = MFTestResults.Pass;
+                        result = MFTestResults.Pass;
                         break;
                     }
                 }
@@ -648,7 +644,7 @@ namespace Microsoft.SPOT.Platform.Tests
         [TestMethod]
         public MFTestResults ErrorRcvdEvent()
         {
-            if (!IsLoopback)
+            if (!IsLoopback || IsEmulator)
                 return MFTestResults.Skip;
 
             result = MFTestResults.Pass;

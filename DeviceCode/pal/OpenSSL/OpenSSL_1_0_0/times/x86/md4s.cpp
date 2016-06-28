@@ -71,7 +71,7 @@ void main(int argc,char *argv[])
 			GetTSC(e2);
 			md4_block_x86(&ctx,buffer,num);
 			}
-		printf("md4 (%d bytes) %d %d (%.2f)\n",num,
+		TINYCLR_SSL_PRINTF("md4 (%d bytes) %d %d (%.2f)\n",num,
 			e1-s1,e2-s2,(double)((e1-s1)-(e2-s2))/2);
 		}
 	}

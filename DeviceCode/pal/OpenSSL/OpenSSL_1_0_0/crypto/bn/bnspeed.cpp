@@ -200,7 +200,7 @@ void do_mul(BIGNUM *r, BIGNUM *a, BIGNUM *b, BN_CTX *ctx)
 			for (k=0; k<num; k++)
 				BN_mul(r,b,a,ctx);
 			tm=Time_F(STOP);
-			TINYCLR_SSL_FPRINTF("mul %4d x %4d -> %8.3fms\n",sizes[i],sizes[j],tm*1000.0/num);
+			TINYCLR_SSL_PRINTF("mul %4d x %4d -> %8.3fms\n",sizes[i],sizes[j],tm*1000.0/num);
 			}
 		}
 
@@ -213,7 +213,7 @@ void do_mul(BIGNUM *r, BIGNUM *a, BIGNUM *b, BN_CTX *ctx)
 		for (k=0; k<num; k++)
 			BN_sqr(r,a,ctx);
 		tm=Time_F(STOP);
-		TINYCLR_SSL_FPRINTF("sqr %4d x %4d -> %8.3fms\n",sizes[i],sizes[i],tm*1000.0/num);
+		TINYCLR_SSL_PRINTF("sqr %4d x %4d -> %8.3fms\n",sizes[i],sizes[i],tm*1000.0/num);
 		}
 
 	for (i=0; i<NUM_SIZES; i++)
@@ -228,7 +228,7 @@ void do_mul(BIGNUM *r, BIGNUM *a, BIGNUM *b, BN_CTX *ctx)
 			for (k=0; k<100000; k++)
 				BN_div(r, NULL, b, a,ctx);
 			tm=Time_F(STOP);
-			TINYCLR_SSL_FPRINTF("div %4d / %4d -> %8.3fms\n",sizes[j],sizes[i]-1,tm*1000.0/num);
+			TINYCLR_SSL_PRINTF("div %4d / %4d -> %8.3fms\n",sizes[j],sizes[i]-1,tm*1000.0/num);
 			}
 		}
 	}

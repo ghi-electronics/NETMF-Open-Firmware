@@ -24,46 +24,44 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
         ManualResetEvent         m_evtShutdown = new ManualResetEvent(false);
         AutoResetEvent           m_evtDeviceFinished = new AutoResetEvent(false);
         Thread                   m_thread;
+        EraseOptions[]           m_eraseBlocks;
+        string                   m_pwd;
 
         private void OnStatus(long value, long total, string status)
         {
-            int val, tot;
-
             if (m_evtShutdown.WaitOne(0, false)) return;
 
-            if (total > 100)
-            {
-                val = (int)(value / 100);
-                tot = (int)(total / 100);
-            }
-            else
-            {
-                val = (int)value;
-                tot = (int)total;
-            }
             textBox1.Invoke((MethodInvoker)delegate
             {
                 textBox1.Text = status;
                 textBox1.Invalidate();
-                progressBar1.Maximum = tot;
-                progressBar1.Value = val;
+                progressBar1.Maximum = (int)total;
+                progressBar1.Value = (int)value;
                 progressBar1.Invalidate();
                 this.Update();
             });
         }
 
         public DeploymentStatusDialog(MFDevice dev, ReadOnlyCollection<string> files, string[] sig_files)
+            : this(dev, files, sig_files, "")
+        {
+        }
+
+        public DeploymentStatusDialog(MFDevice dev, ReadOnlyCollection<string> files, string[] sig_files, string pwd)
         {
             m_dev       = dev;
             m_files     = files;
             m_sigFiles  = sig_files;
+            m_pwd       = pwd;
 
             InitializeComponent();
         }
 
-        public DeploymentStatusDialog(MFDevice dev) : this( dev, null, null)
+        public DeploymentStatusDialog(MFDevice dev, params EraseOptions[] eraseBlocks)
+            : this(dev, null, null)
         {
             m_fEraseCmd = true;
+            m_eraseBlocks = eraseBlocks;
             this.Text = Properties.Resources.DeploymentStatusTitleErase;
         }
 
@@ -79,11 +77,16 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
 
                 m_evtDevice = m_dev.EventCancel;
 
-                m_dev.DbgEngine.PauseExecution();
+                bool fMicroBooter = (m_dev.Ping() == PingConnectionType.MicroBooter);
+
+                if (!fMicroBooter)
+                {
+                    m_dev.DbgEngine.PauseExecution();
+                }
 
                 if (m_fEraseCmd)
                 {
-                    if (!m_dev.Erase())
+                    if (!m_dev.Erase(m_eraseBlocks))
                     {
                         throw new MFDeployEraseFailureException();
                     }
@@ -98,7 +101,13 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
                     {
                         uint entry = 0;
 
-                        if (!m_dev.Deploy(file, m_sigFiles[cnt++], ref entry))
+                        if (Path.GetExtension(file).ToLower() == ".nmf")
+                        {
+                            if (!m_dev.DeployUpdate(file)) throw new MFDeployDeployFailureException();
+
+                            return;
+                        }
+                        else if (!m_dev.Deploy(file, m_sigFiles[cnt++], ref entry))
                         {
                             throw new MFDeployDeployFailureException();
                         }
@@ -108,14 +117,29 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
                             executionPoints.Add(entry);
                         }
                     }
+
                     executionPoints.Add(0);
 
+                    if (!fMicroBooter)
+                    {
+                        for (int i = 0; i < 10; i++)
+                        {
+                            if (m_dev.Connect(500, true)) break;
+                        }
+                    }
                     OnStatus(100, 100, "Executing Application");
                     foreach (uint addr in executionPoints)
                     {
                         if (m_dev.Execute(addr)) break;
                     }
                 }
+
+                //if (!m_dev.CheckForMicroBooter() && m_dev.DbgEngine != null && m_dev.DbgEngine.IsConnected &&
+                //    m_dev.DbgEngine.ConnectionSource == SPOT.Debugger.ConnectionSource.TinyCLR)
+                //{
+                //    m_dev.DbgEngine.ResumeExecution();
+                //}
+
             }
             catch (ThreadAbortException)
             {
@@ -141,7 +165,16 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
 
                 if (m_dev.DbgEngine != null)
                 {
-                    m_dev.DbgEngine.ResumeExecution();
+                    try
+                    {
+                        if (m_dev.IsConnected && m_dev.DbgEngine.ConnectionSource == SPOT.Debugger.ConnectionSource.TinyCLR)
+                        {
+                            m_dev.DbgEngine.ResumeExecution();
+                        }
+                    }
+                    catch
+                    {
+                    }
                 }
                 
                 m_dev.OnProgress -= new MFDevice.OnProgressHandler(OnStatus);
@@ -182,16 +215,6 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
         {
             m_evtShutdown.Set();
 
-            try
-            {
-                if (m_dev != null && m_dev.DbgEngine.ConnectionSource == Microsoft.SPOT.Debugger.ConnectionSource.TinyBooter)
-                {
-                    m_dev.Execute(0);
-                }
-            }
-            catch
-            {
-            }
             Shutdown();
         }
 

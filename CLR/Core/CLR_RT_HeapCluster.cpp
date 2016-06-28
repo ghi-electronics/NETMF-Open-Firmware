@@ -6,7 +6,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void CLR_RT_HeapCluster::HeapCluster_Initialize( CLR_UINT32 size )
+void CLR_RT_HeapCluster::HeapCluster_Initialize( CLR_UINT32 size, CLR_UINT32 blockSize )
 {
     NATIVE_PROFILE_CLR_CORE();
     GenericNode_Initialize();
@@ -21,14 +21,19 @@ void CLR_RT_HeapCluster::HeapCluster_Initialize( CLR_UINT32 size )
     // Scan memory looking for possible objects to salvage.  This method returns false if HeapPersistence is stubbed
     // which requires us to set up the free list.
     //
-    if(!CLR_RT_HeapBlock_WeakReference::PrepareForRecovery( m_payloadStart, m_payloadEnd ))
+    if(!CLR_RT_HeapBlock_WeakReference::PrepareForRecovery( m_payloadStart, m_payloadEnd, blockSize ))
     {
         CLR_RT_HeapBlock_Node *ptr = m_payloadStart;
         
         while(ptr < m_payloadEnd)
         {
-            ptr->SetDataId( CLR_RT_HEAPBLOCK_RAW_ID(DATATYPE_FREEBLOCK,0,1) );
-            ptr++;
+            if((UINT32)(ptr + blockSize) > (UINT32)m_payloadEnd)
+            {
+                blockSize = (CLR_UINT32)(m_payloadEnd - ptr);
+            }
+            
+            ptr->SetDataId( CLR_RT_HEAPBLOCK_RAW_ID(DATATYPE_FREEBLOCK,0,blockSize) );
+            ptr += blockSize;
         }
     }
 

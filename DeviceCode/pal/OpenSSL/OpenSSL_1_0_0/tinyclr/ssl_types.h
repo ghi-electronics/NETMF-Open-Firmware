@@ -1,11 +1,10 @@
 #ifndef SSL_TYPES_H
 #define SSL_TYPES_H
 #include <crypto/o_str.h>
-
-
+#include <errno.h>
 struct OPENSSL_TYPE__FILE
 {
-    const char* buffer;
+    const char *buffer;
     int read;
 };
 #ifndef OPENSSL_SYS_WINDOWS
@@ -36,10 +35,15 @@ extern "C" {
 
 
 #define ENOENT                      2      /* No such file or directory */
-#define  EAGAIN                     11  /* Try again */
-#define EINVAL                      22      /* Invalid argument */
+#ifdef EAGAIN
+#undef EAGAIN
+#endif
+#define EAGAIN                      11     /* Try again (defined for LWIP) */
+#ifdef EINVAL
+#undef EINVAL
+#endif
+#define EINVAL                      22     /* Invalid argument */
 
-typedef long ssize_t;       //
 typedef int pid_t;          // for rand library
 #ifdef OPENSSL_SYS_SH
 typedef unsigned long size_t;
@@ -48,12 +52,33 @@ typedef unsigned int size_t;
 #endif
 typedef long int off_t; // for ccgost library
 
+#if !defined(OPENSSL_SYS_WINDOWS) && !defined(OPENSSL_SYS_WIN32)
+typedef int  _ssize_t; 
+typedef int  ssize_t;
+#endif
+
+#if defined(LITTLE_ENDIAN)
+#define SSL_LONG_LITTLE_ENDIAN(x) (x)
+#define SSL_ntohl(x) SOCK_htonl(x)
+#else
+#define SSL_LONG_LITTLE_ENDIAN(x) ( (((x) & 0x000000FFUL) << 24) | (((x) & 0x0000FF00UL) << 8) | (((x) & 0x00FF0000UL) >> 8) | (((x) & 0xFF000000UL) >> 24) )
+#define SSL_ntohl(x) ((UINT64)(x))
+#endif
 
 #ifndef OPENSSL_SYS_WINDOWS
 //From limits.h
-#define INT_MAX                     2147483647
-#define LONG_MAX                    9223372036854775807
-#define ULONG_MAX                   18446744073709551615
+#ifdef INT_MAX
+#undef INT_MAX
+#endif
+#define INT_MAX                     2147483647L
+#ifdef LONG_MAX
+#undef LONG_MAX
+#endif
+#define LONG_MAX                    2147483647L
+#ifdef ULONG_MAX
+#undef ULONG_MAX
+#endif
+#define ULONG_MAX                   4294967295L
 
 //For sockets
 #define AF_INET                     2       /* internetwork: UDP, TCP, etc. */
@@ -63,7 +88,7 @@ typedef long int off_t; // for ccgost library
 #define SOCK_RDM                    4
 #define SOCK_SEQPACKET              5
 #define IPPROTO_TCP                 6
-#define SOL_SOCKET                  0x7fff      /* options for socket level */
+#define SOL_SOCKET                  0xfff     /* options for socket level (from LWIP) */ 
 #define SO_ERROR                    0x1007    /* get error status and clear */
 #ifndef INADDR_ANY
 #define INADDR_ANY                  0x00000000UL
@@ -73,14 +98,23 @@ typedef long int off_t; // for ccgost library
 #endif /* INVALID_SOCKET */
 
 #ifndef EWOULDBLOCK
-#define EWOULDBLOCK                 10035
+#define EWOULDBLOCK                 EAGAIN
+#endif
+
+#ifndef WSAEWOULDBLOCK
+#define WSAEWOULDBLOCK              EWOULDBLOCK
 #endif
 
 #define SIGINT                      4 // attention request from user from signal.h 
+
+#ifdef BUFSIZ
+#undef BUFSIZ
+#endif
 #define BUFSIZ                      512
+
 typedef int sig_atomic_t;           // from signal.h
 void (*signal(int sig, void (*func)(int param)))(int);
-typedef unsigned long long time_t;     /* date/time in millisecs past 1601 */
+typedef long int time_t;            /* date/time in millisecs past 1601 */
 
 typedef struct tm {
     int tm_sec;   /* seconds after the minute, 0 to 60
@@ -144,14 +178,6 @@ struct hostent *gethostbyaddr(const char *addr, int length, int type);
 struct servent *getservbyname(const char *name, const char *proto);
 #endif
 
-#if defined(LITTLE_ENDIAN)
-#define SSL_LONG_LITTLE_ENDIAN(x) (x)
-#define SSL_ntohl(x) SOCK_htonl(x)
-#else
-#define SSL_LONG_LITTLE_ENDIAN(x) ( (((x) & 0x000000FFUL) << 24) | (((x) & 0x0000FF00UL) << 8) | (((x) & 0x00FF0000UL) >> 8) | (((x) & 0xFF000000UL) >> 24) )
-#define SSL_ntohl(x) ((UINT64)(x))
-#endif
-
 // located in cc.h in lwip
 // Define basic types used in lwIP
 typedef unsigned   char    u8_t;
@@ -173,6 +199,8 @@ typedef int                pid_t;
 #define isspace(c)           (c == ' ' || c == '\f' || c == '\n' || c == '\r' || c == '\t' || c == '\v')
 #define isalnum(c)           isdigit(c)
 
+#else
+#include <time.h>
 #endif // ndef(OPENSSL_SYS_WINDOWS)
 
 int tinyclr_ssl_toupper(int c);
@@ -197,9 +225,11 @@ time_t tinyclr_time ( time_t * timer );
 struct tm * tinyclr_localtime ( const time_t * timer );
 struct tm * tinyclr_gmtime ( const time_t * timer );
 time_t tinyclr_mktime ( struct tm * timeptr );;
-void tinyclr_qsort ( void * base, size_t num, size_t size, int ( * comparator ) ( const void *, const void * ) );
+extern void tinyclr_qsort ( void * base, size_t num, size_t size, int ( * comparator ) ( const void *, const void * ) );
 //struct tm * tinyclr_localtime ( const time_t * timer );
 
+
+extern int hal_fprintf_ssl(OPENSSL_TYPE__FILE* x, const char* format, ... );
 
 //--//
 // uncomment this to test on windows what will happen on the device
@@ -208,16 +238,16 @@ void tinyclr_qsort ( void * base, size_t num, size_t size, int ( * comparator ) 
 
 #if !defined(OPENSSL_SYS_WINDOWS)
 #define TINYCLR_SSL_STRCAT              strcat
-#define TINYCLR_SSL_STRCPY(a,b)         hal_strcpy_s(a,sizeof(a),b)
+#define TINYCLR_SSL_STRCPY(a,b)         hal_strcpy_s(a,hal_strlen_s(b)+1,b)
 #define TINYCLR_SSL_STRLEN              hal_strlen_s
-#define TINYCLR_SSL_STRNCPY(a,b,c)      hal_strncpy_s(a,sizeof(a),b,c)
+#define TINYCLR_SSL_STRNCPY(a,b,c)      hal_strncpy_s(a,c+1,b,c)
 #define TINYCLR_SSL_STRNCMP             OPENSSL_strncasecmp
 #define TINYCLR_SSL_STRCMP              tinyclr_strcmp
 #define TINYCLR_SSL_STRNCASECMP         OPENSSL_strncasecmp
 #define TINYCLR_SSL_STRCASECMP          OPENSSL_strcasecmp
-#define TINYCLR_SSL_FPRINTF(a,b)        hal_printf(b)
+#define TINYCLR_SSL_FPRINTF             hal_fprintf_ssl
 #define TINYCLR_SSL_SNPRINTF            hal_snprintf
-#define TINYCLR_SSL_PRINTF              lcd_printf
+#define TINYCLR_SSL_PRINTF              hal_printf
 #define TINYCLR_SSL_PERROR              TINYCLR_SSL_PRINTF
 
 #define TINYCLR_SSL_MEMCPY              memcpy
@@ -246,7 +276,7 @@ void tinyclr_qsort ( void * base, size_t num, size_t size, int ( * comparator ) 
 
 #define TINYCLR_SSL_ASSERT(x)           ASSERT(x)
 
-#define TINYCLR_SSL_QSORT               tinyclr_qsort
+#define TINYCLR_SSL_QSORT               qsort
 #define TINYCLR_SSL_EXIT(x)             if (x==0) return else TINYCLR_SSL_ASSERT(x)
 #define TINYCLR_SSL_ABORT()             {TINYCLR_SSL_PRINTF("%s:%d",__FILE__,__LINE__);TINYCLR_SSL_ASSERT(1);}
 #define TINYCLR_SSL_MALLOC              private_malloc 
@@ -292,7 +322,7 @@ void tinyclr_qsort ( void * base, size_t num, size_t size, int ( * comparator ) 
 #define TINYCLR_SSL_GETPID              getpid
 #define TINYCLR_SSL_FILE                FILE
 
-#define TINYCLR_SSL_ASSERT              assert
+#define TINYCLR_SSL_ASSERT(x)           ASSERT(x)
 #define TINYCLR_SSL_QSORT               qsort
 #define TINYCLR_SSL_EXIT                exit 
 #define TINYCLR_SSL_ABORT               abort
@@ -392,7 +422,7 @@ int tinyclr_fileno( OPENSSL_TYPE__FILE *stream );
 #define TINYCLR_SSL_GETHOSTBYNAME       tinyclr_ssl_gethostbyname
 #define TINYCLR_SSL_GETHOSTBYADDR       tinyclr_ssl_gethostbyaddr
 #define TINYCLR_SSL_GETSERVBYNAME       tinyclr_ssl_getservbyname
-#define TINYCLR_SSL_GETLASTSOCKETERROR  SOCK_getlasterror
+#define TINYCLR_SSL_GETLASTSOCKETERROR()errno
 #define TINYCLR_SSL_IOCTL               SOCK_ioctl
 #else
 #define TINYCLR_SSL_SELECT              select

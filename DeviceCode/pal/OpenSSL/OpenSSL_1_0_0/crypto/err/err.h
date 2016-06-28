@@ -113,12 +113,14 @@
 #define HEADER_ERR_H
 
 #include <openssl/e_os2.h>
+
 #ifdef OPENSSL_SYS_WINDOWS
 #ifndef OPENSSL_NO_FP_API
 #include <stdio.h>
 #include <stdlib.h>
 #endif
 #endif
+
 #include <openssl/ossl_typ.h>
 #ifndef OPENSSL_NO_BIO
 #include <openssl/bio.h>

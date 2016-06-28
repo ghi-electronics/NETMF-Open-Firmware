@@ -8,15 +8,15 @@
     <!-- ################################################################################ -->
     <!-- 16KB Stack and 16KB Heap -->
     <Set Name="Heap_Begin"      Value="+0"/>
-    <Set Name="Heap_End"        Value="0x0001BFF8"/>
-    <Set Name="Stack_Bottom"    Value="0x0001C000"/>
+    <Set Name="Heap_End"        Value="0x0001CFF8"/>
+    <Set Name="Stack_Bottom"    Value="0x0001D000"/>
     <Set Name="Stack_Top"       Value="0x0001FFF8"/>
 
     <If Name="TARGETLOCATION" In="FLASH">
         <!-- the TINYCLR and Hal Code should lie in one partition and the other data/LOG/DEPLOYMENT session should sit in another partition, -->
         <!-- in order to optimized for flash operations while erasing flash that it is still able to implement code from other flash partition -->
-        <Set Name="Code_BaseAddress"    Value="0x0010E000"/>
-        <Set Name="Deploy_BaseAddress"  Value="0x00170000"/>
+        <Set Name="Code_BaseAddress"    Value="0x0010C000"/>
+        <Set Name="Deploy_BaseAddress"  Value="0x0016E000"/>
         <Set Name="Code_Size"           Value="%Deploy_BaseAddress - Code_BaseAddress%"/>
         <Set Name="Config_BaseAddress"  Value="0x0017E000"/>    
         <Set Name="Config_Size"         Value="0x00002000"/>

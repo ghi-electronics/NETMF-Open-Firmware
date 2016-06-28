@@ -6,6 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <RequiredProjects Include="NativeSample\NativeSample.proj" />
+    <RequiredProjects Include="MicroBooter\MicroBooter.proj" Condition="'$(COMPILER_TOOL)'=='RVDS'"/>
     <RequiredProjects Include="TinyBooter\TinyBooter.proj" />
     <RequiredProjects Include="TinyBooter\TinyBooterDecompressor.proj" />
     <RequiredProjects Include="TinyCLR\TinyCLR.proj" />

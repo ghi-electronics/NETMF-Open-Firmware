@@ -85,6 +85,12 @@ namespace System.Net
             m_IsHTTPRequestParsed = false;
         }
 
+        public void Reset()
+        {
+            m_IsHTTPRequestParsed = false;
+            m_ClientRequest.Reset();
+        }
+
         /// <summary>
         /// Gets the <itemref>HttpListenerRequest</itemref> that represents a
         /// client's request for a resource.
@@ -133,22 +139,29 @@ namespace System.Net
             }
         }
 
+        public void Close()
+        {
+            Close(-2);
+        }
+
         /// <summary>
         /// Closes the stream attached to this listener context. 
         /// </summary>
-        public void Close()
+        public void Close(int lingerValue)
         {
             try
-            {
+            {                
                 // Close the underlying stream
                 if (m_clientOutputStream != null)
                 {
-                    m_clientOutputStream.HeadersDelegate = null;
+                    m_clientOutputStream.m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger, lingerValue);
                     m_clientOutputStream.Dispose();
+                    m_clientOutputStream = null;
                 }
                 if (m_clientInputStream != null)
                 {
                     m_clientInputStream.Dispose();
+                    m_clientInputStream = null;
                 }
             }
             catch

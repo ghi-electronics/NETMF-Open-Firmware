@@ -108,22 +108,50 @@ static void __section(SectionForBootstrapOperations) Prepare_Copy( UINT32* src, 
 {
     if(dst != src)
     {
-        while(len)
+        INT32 extraLen = len & 0x00000003;
+        len            = len & 0xFFFFFFFC;
+        
+        while(len != 0)
         {
             *dst++ = *src++;
 
             len -= 4;
+        }
+
+        // thumb2 code can be multiples of 2...
+
+        UINT8 *dst8 = (UINT8*) dst, *src8 = (UINT8*) src;
+
+        while (extraLen > 0)
+        {
+            *dst8++ = *src8++;
+
+            extraLen--;
         }
     }
 }
 
 static void __section(SectionForBootstrapOperations) Prepare_Zero( UINT32* dst, UINT32 len )
 {
-    while(len)
+    INT32 extraLen = len & 0x00000003;
+    len            = len & 0xFFFFFFFC;
+
+    while(len != 0)
     {
         *dst++ = 0;
 
         len -= 4;
+    }
+
+    // thumb2 code can be multiples of 2...
+
+    UINT8 *dst8 = (UINT8*) dst;
+
+    while (extraLen > 0)
+    {
+        *dst8++ = 0;
+
+        extraLen--;
     }
 }
 
@@ -168,7 +196,7 @@ void __section(SectionForBootstrapOperations) PrepareImageRegions()
 
 static void InitCRuntime()
 {
-#if (defined(HAL_REDUCESIZE) || defined(COMPILE_THUMB2) || defined(PLATFORM_EMULATED_FLOATINGPOINT))
+#if (defined(HAL_REDUCESIZE) || defined(PLATFORM_EMULATED_FLOATINGPOINT))
 
     // Don't initialize floating-point on small builds.
 
@@ -185,6 +213,26 @@ static void InitCRuntime()
 #if !defined(BUILD_RTM)
 static UINT32 g_Boot_RAMConstants_CRC = 0;
 #endif
+
+static ON_SOFT_REBOOT_HANDLER s_rebootHandlers[16] = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+
+void HAL_AddSoftRebootHandler(ON_SOFT_REBOOT_HANDLER handler)
+{
+    for(int i=0; i<ARRAYSIZE(s_rebootHandlers); i++)
+    {
+        if(s_rebootHandlers[i] == NULL)
+        {
+            s_rebootHandlers[i] = handler;
+            return;
+        }
+        else if(s_rebootHandlers[i] == handler)
+        {
+            return;
+        }
+    }
+
+    ASSERT(FALSE);
+}
 
 
 void HAL_EnterBooterMode()
@@ -298,6 +346,8 @@ void HAL_EnterBooterMode()
     }
 }
 
+bool g_fDoNotUninitializeDebuggerPort = false;
+
 void HAL_Initialize()
 {
     // this code assures that the configuration sector does not get thrown out in the link step for RTM builds.
@@ -375,9 +425,24 @@ void HAL_UnReserveAllGpios()
 
 void HAL_Uninitialize()
 {
+    int i;
+    
 #if defined(ENABLE_NATIVE_PROFILER)
     Native_Profiler_Stop();
 #endif
+ 
+    for(i=0; i<ARRAYSIZE(s_rebootHandlers); i++)
+    {
+        if(s_rebootHandlers[i] != NULL)
+        {
+            s_rebootHandlers[i]();
+        }
+        else
+        {
+            break;
+        }
+    }    
+
     LCD_Uninitialize();
 
     I2C_Uninitialize();
@@ -430,7 +495,7 @@ extern "C"
 void BootEntry()
 {
 
-#if (defined(GCCOP_V4_2) && defined(COMPILE_THUMB))
+#if (defined(GCCOP) && defined(COMPILE_THUMB))
 
 // the IRQ_Handler routine generated from the compiler is incorrect, the return address LR has been decrement twice
 // it decrements LR at the first instruction of IRQ_handler and then before return, it decrements LR again.
@@ -481,7 +546,6 @@ void BootEntry()
 
 
     CPU_Initialize();
-
 
     HAL_Time_Initialize();
 

@@ -12,7 +12,7 @@
     <FileMapping Name="*" Options="(i.ResetCounter__25MC9328MXL_WATCHDOG_DriverSFv)" Comment="00007adc 24 22218 ResetCounter__25MC9328MXL_WATCHDOG_DriverSFv" />
     <FileMapping Name="*" Options="(i.IRQ_Handler__21MC9328MXL_AITC_DriverSFv)" Comment="10133d18 216 430045 IRQ_Handler__21MC9328MXL_AITC_DriverSFv" />
   </If>
-  <If Name="COMPILER_TOOL_VERSION" In="RVDS3.0 RVDS3.1 RVDS4.0">
+  <If Name="COMPILER_TOOL_VERSION" In="RVDS3.0 RVDS3.1  RVDS4.0 RVDS4.1">
     <FileMapping Name="*" Options="(i._ZN16MC9328MXL_Driver5PauseEv)" />
     <FileMapping Name="*" Options="(i._ZN20MC9328MXL_SPI_Driver24Xaction_nWrite16_nRead16ER14SPI_XACTION_16)"
         Comment="000078c8 264 1382803 _ZN20MC9328MXL_SPI_Driver24Xaction_nWrite16_nRead16ER14SPI_XACTION_16" />
