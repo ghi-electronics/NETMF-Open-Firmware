@@ -81,7 +81,7 @@ HRESULT Library_corlib_native_System_Double::CompareTo___STATIC__I4__R8__R8( CLR
 
     stack.SetResult_I4((left < right) ? -1 : (left > right) ? 1 : 0);
 
-    TINYCLR_NOCLEANUP();
+    TINYCLR_NOCLEANUP_NOLABEL();
 }
 
 HRESULT Library_corlib_native_System_Double::IsInfinity___STATIC__BOOLEAN__R8( CLR_RT_StackFrame& stack )
@@ -91,7 +91,7 @@ HRESULT Library_corlib_native_System_Double::IsInfinity___STATIC__BOOLEAN__R8( C
 
     stack.SetResult_Boolean(false);
 
-    TINYCLR_NOCLEANUP();
+    TINYCLR_NOCLEANUP_NOLABEL();
 }
 
 HRESULT Library_corlib_native_System_Double::IsNaN___STATIC__BOOLEAN__R8( CLR_RT_StackFrame& stack )
@@ -101,7 +101,7 @@ HRESULT Library_corlib_native_System_Double::IsNaN___STATIC__BOOLEAN__R8( CLR_RT
 
     stack.SetResult_Boolean(false);
 
-    TINYCLR_NOCLEANUP();
+    TINYCLR_NOCLEANUP_NOLABEL();
 }
 
 HRESULT Library_corlib_native_System_Double::IsNegativeInfinity___STATIC__BOOLEAN__R8( CLR_RT_StackFrame& stack )
@@ -111,7 +111,7 @@ HRESULT Library_corlib_native_System_Double::IsNegativeInfinity___STATIC__BOOLEA
 
     stack.SetResult_Boolean(false);
 
-    TINYCLR_NOCLEANUP();
+    TINYCLR_NOCLEANUP_NOLABEL();
 }
 
 HRESULT Library_corlib_native_System_Double::IsPositiveInfinity___STATIC__BOOLEAN__R8( CLR_RT_StackFrame& stack )
@@ -121,6 +121,6 @@ HRESULT Library_corlib_native_System_Double::IsPositiveInfinity___STATIC__BOOLEA
 
     stack.SetResult_Boolean(false);
 
-    TINYCLR_NOCLEANUP();
+    TINYCLR_NOCLEANUP_NOLABEL();
 }
 #endif

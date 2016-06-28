@@ -2,8 +2,8 @@
   <PropertyGroup>
     <FeatureName>PWM</FeatureName>
   </PropertyGroup>
-  <Import Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
+  <Import Condition="'$(CORE_FEATUREPROJ)'    ==''" Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
+  <Import Condition="'$(HARDWARE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
   <ItemGroup>
     <InteropFeature Include="Microsoft_SPOT_Hardware_PWM" />
     <MMP_DAT_CreateDatabase Include="$(BUILD_TREE_CLIENT)\pe\$(ENDIANNESS)\Microsoft.SPOT.Hardware.PWM.pe" />
@@ -16,5 +16,6 @@
     <Groups>Hardware</Groups>
     <Documentation>
     </Documentation>
+    <PWM_FEATUREPROJ>True</PWM_FEATUREPROJ>
   </PropertyGroup>
 </Project>

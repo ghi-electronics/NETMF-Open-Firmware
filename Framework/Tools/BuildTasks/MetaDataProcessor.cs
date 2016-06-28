@@ -297,7 +297,7 @@ namespace Microsoft.SPOT.Tasks
 
                     if(Directory.Exists(path))
                     {
-                        string ver = m_bag.ContainsKey("TargetFrameworkVersion") ? (string)m_bag["TargetFrameworkVersion"] : "v4.2";
+                        string ver = m_bag.ContainsKey("TargetFrameworkVersion") ? (string)m_bag["TargetFrameworkVersion"] : "v4.3";
 
                         filenameMDP = Path.Combine(Path.Combine( path, ver ), "MetaDataProcessor.exe");
 

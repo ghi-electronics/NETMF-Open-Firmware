@@ -39,19 +39,18 @@
     <ScatterFileReferences Include="$(SRC_DIR)\scatterfile_tinyclr_$(COMPILER_TOOL).$(SCATTER_EXT)" />
     <ScatterFileReferences Include="$(SRC_DIR)\scatterfile_tinyclr_ram_functions.$(SCATTER_EXT)" />
   </ItemGroup>
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\NativeEventDispatcher.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\SOCKETS_Port.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\SPI.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\USB_Port.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\serial_port.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\SerialPort.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\BlockStorage.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\SPI.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Debugger.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\I2C.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\InterruptHandler.featureproj" />
+  <Import Condition="'$(CORE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
+  <Import Condition="'$(HARDWARE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
+  <Import Condition="'$(NATIVEEVENTDISPATCHER_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\NativeEventDispatcher.featureproj" />
+  <Import Condition="'$(SOCKETS_PORT_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\SOCKETS_Port.featureproj" />
+  <Import Condition="'$(SPI_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\SPI.featureproj" />
+  <Import Condition="'$(USB_PORT_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\USB_Port.featureproj" />
+  <Import Condition="'$(SERIAL_PORT_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\serial_port.featureproj" />
+  <Import Condition="'$(SERIALPORT_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\SerialPort.featureproj" />
+  <Import Condition="'$(BLOCKSTORAGE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\BlockStorage.featureproj" />
+  <Import Condition="'$(DEBUGGER_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Debugger.featureproj" />
+  <Import Condition="'$(I2C_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\I2C.featureproj" />
+  <Import Condition="'$(INTERRUPTHANDLER_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\InterruptHandler.featureproj" />
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Interop.Settings" />
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\MFUpdate\stubs\dotnetMF.proj" />

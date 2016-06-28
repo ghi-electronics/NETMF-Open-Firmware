@@ -594,23 +594,22 @@ void FAT_EntryEnumerator::Initialize( FAT_LogicDisk* logicDisk, UINT32 sectIndex
 
 FAT_Directory* FAT_EntryEnumerator::GetNext( BOOL forWrite )
 {
+    bool fFirst = false;
 
     if((m_flag & Flag_First) == Flag_First)
     {
-
+        fFirst  = true;
         m_flag &= ~Flag_First;
 
     }
     else if((m_flag & Flag_Done) == Flag_Done)
     {
-
         return NULL;
     }
     else
     {
         //move to next dir_entry position
         m_dataIndex += sizeof(FAT_Directory);
-
 
         if(m_dataIndex >= m_logicDisk->m_bytesPerSector)
         {
@@ -628,7 +627,7 @@ FAT_Directory* FAT_EntryEnumerator::GetNext( BOOL forWrite )
         }
     }
 
-    return (FAT_Directory*)(&(m_logicDisk->SectorCache.GetSector( m_sectIndex, forWrite ))[m_dataIndex]);
+    return (FAT_Directory*)(&(m_logicDisk->SectorCache.GetSector( m_sectIndex, fFirst || forWrite, forWrite ))[m_dataIndex]);
 }
 
 void FAT_EntryEnumerator::GetIndices( UINT32* sectIndex, UINT32* dataIndex )

@@ -4,9 +4,9 @@
     <Filter>RTIP</Filter>
   </PropertyGroup>
 
-  <Import Project="$(SPOCLIENT)\Framework\Features\Core.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\SOCKETS_Port.featureproj" />
+  <Import Condition="'$(CORE_FEATUREPROJ)'        ==''" Project="$(SPOCLIENT)\Framework\Features\Core.featureproj" />
+  <Import Condition="'$(HARDWARE_FEATUREPROJ)'    ==''" Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
+  <Import Condition="'$(SOCKETS_PORT_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\SOCKETS_Port.featureproj" />
 
   <ItemGroup>
     <InteropFeature Include="Microsoft_SPOT_Net" />
@@ -23,5 +23,6 @@
     <Groups>Networking</Groups>
     <Documentation>
     </Documentation>
+    <NETWORK_FEATUREPROJ>True</NETWORK_FEATUREPROJ>
   </PropertyGroup>
 </Project>

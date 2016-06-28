@@ -65,6 +65,7 @@ __asm BOOL SmartPtr_IRQ::WasDisabled()
 {
 // Also check for interrupt state != 0
 /*
+    register UINT32 IPSR __asm("ipsr");
     return m_state || IPSR != 0;
 */
     MRS      r1,IPSR
@@ -119,6 +120,7 @@ __asm void SmartPtr_IRQ::Probe()
     LDR      r1,[r0,#__cpp(offsetof(SmartPtr_IRQ, m_state))]
     MRS      r2,PRIMASK
     MSR      PRIMASK,r1
+    NOP
     MSR      PRIMASK,r2
     BX       lr
 }

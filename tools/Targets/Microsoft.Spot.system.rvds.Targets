@@ -26,9 +26,7 @@
     <LINK>$(ADS_WRAPPER) "$(ADS_TOOLS_BIN)\armlink.exe"</LINK>
     <AR  >$(ADS_WRAPPER) "$(ADS_TOOLS_BIN)\armar.exe"</AR>
     <FROMELF>$(ADS_WRAPPER) "$(ADS_TOOLS_BIN)\fromelf.exe"</FROMELF>
-<!-- WAIT UNTIL WE HAVE INTEGRATED LWIP 1.4.6
     <CC_CPP_COMMON_FLAGS>$(CC_CPP_COMMON_FLAGS) -D__errno_h</CC_CPP_COMMON_FLAGS>
--->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(COMPILER_TOOL_VERSION)'!='RVDS4.0' and '$(COMPILER_TOOL_VERSION)'!='RVDS4.1'">
@@ -236,6 +234,7 @@
     <CC_CPP_INCS>$(CC_CPP_INCS) -I$(SPO_SDK)\CLR\Libraries\SPOT_Net_Security</CC_CPP_INCS>
     <CC_CPP_INCS>$(CC_CPP_INCS) -I"$(ARMINC)"</CC_CPP_INCS>
     <CC_CPP_INCS>$(CC_CPP_INCS) @(IncludePaths->'-I$(CLRROOT)\%(relativedir)%(filename)',' ')</CC_CPP_INCS>
+    <CC_CPP_INCS>$(CC_CPP_INCS) @(DirectIncludePaths->'-I%(FullPath)',' ')</CC_CPP_INCS>
 
     <CC_CPP_COMMON_FLAGS>$(CC_CPP_COMMON_FLAGS) $(AS_CC_CPP_COMMON_FLAGS) $(CC_CPP_TARGETTYPE_FLAGS) $(CC_CPP_INCS) $(ExtraFlags)</CC_CPP_COMMON_FLAGS>
   </PropertyGroup>

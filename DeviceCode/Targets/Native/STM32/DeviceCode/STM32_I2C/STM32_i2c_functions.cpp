@@ -16,21 +16,21 @@
 
 
 #ifdef STM32_USE_I2C2
-#define I2Cx                   I2C2 
-#define I2Cx_EV_IRQn           I2C2_EV_IRQn
-#define I2Cx_ER_IRQn           I2C2_ER_IRQn
-#define RCC_APB1ENR_I2CxEN     RCC_APB1ENR_I2C2EN
-#define RCC_APB1RSTR_I2CxRST   RCC_APB1RSTR_I2C2RST
-#define I2Cx_SCL_Pin           (16 + 10) // PB10
-#define I2Cx_SDA_Pin           (16 + 11) // PB11
+    #define I2Cx                   I2C2 
+    #define I2Cx_EV_IRQn           I2C2_EV_IRQn
+    #define I2Cx_ER_IRQn           I2C2_ER_IRQn
+    #define RCC_APB1ENR_I2CxEN     RCC_APB1ENR_I2C2EN
+    #define RCC_APB1RSTR_I2CxRST   RCC_APB1RSTR_I2C2RST
+    #define I2Cx_SCL_Pin           (16 + 10) // PB10
+    #define I2Cx_SDA_Pin           (16 + 11) // PB11
 #else
-#define I2Cx                   I2C1 
-#define I2Cx_EV_IRQn           I2C1_EV_IRQn
-#define I2Cx_ER_IRQn           I2C1_ER_IRQn
-#define RCC_APB1ENR_I2CxEN     RCC_APB1ENR_I2C1EN
-#define RCC_APB1RSTR_I2CxRST   RCC_APB1RSTR_I2C1RST
-#define I2Cx_SCL_Pin           (16 + 6) // PB6
-#define I2Cx_SDA_Pin           (16 + 7) // PB7
+    #define I2Cx                   I2C1 
+    #define I2Cx_EV_IRQn           I2C1_EV_IRQn
+    #define I2Cx_ER_IRQn           I2C1_ER_IRQn
+    #define RCC_APB1ENR_I2CxEN     RCC_APB1ENR_I2C1EN
+    #define RCC_APB1RSTR_I2CxRST   RCC_APB1RSTR_I2C1RST
+    #define I2Cx_SCL_Pin           (16 + 6) // PB6
+    #define I2Cx_SDA_Pin           (16 + 7) // PB7
 #endif
 
 static I2C_HAL_XACTION* currentI2CXAction;
@@ -40,6 +40,9 @@ static I2C_HAL_XACTION_UNIT* currentI2CUnit;
 void STM32_I2C_ER_Interrupt (void* param) // Error Interrupt Handler
 {
     INTERRUPT_START
+    
+    // pre:
+    // I2C_SR1_BERR | I2C_SR1_ARLO | I2C_SR1_AF | I2C_SR1_TIMEOUT
     
     I2C_HAL_XACTION* xAction = currentI2CXAction;
     
@@ -53,6 +56,9 @@ void STM32_I2C_EV_Interrupt (void* param) // Event Interrupt Handler
 {
     INTERRUPT_START
     
+    // pre:
+    // I2C_SR1_SB | I2C_SR1_ADDR | I2C_SR1_BTF | I2C_CR2_ITBUFEN & (I2C_SR1_RXNE | I2C_SR1_TXE)
+    
     I2C_HAL_XACTION* xAction = currentI2CXAction;
     I2C_HAL_XACTION_UNIT* unit = currentI2CUnit;
     
@@ -62,64 +68,58 @@ void STM32_I2C_EV_Interrupt (void* param) // Event Interrupt Handler
     int cr1 = I2Cx->CR1;  // initial control register
     
     if (unit->IsReadXActionUnit()) { // read transaction
-        if (todo > 0) {
-            if (sr1 & I2C_SR1_SB) { // start bit
-                if (todo == 2) {
-                    I2Cx->CR1 = (cr1 |= I2C_CR1_POS); // prepare 2nd byte nack
+        if (sr1 & I2C_SR1_SB) { // start bit
+            if (todo == 1) {
+                I2Cx->CR1 = (cr1 &= ~I2C_CR1_ACK); // last byte nack
+            } else if (todo == 2) {
+                I2Cx->CR1 = (cr1 |= I2C_CR1_POS); // prepare 2nd byte nack
+            }
+            UINT8 addr = xAction->m_address << 1; // address bits
+            I2Cx->DR = addr + 1; // send header byte with read bit;
+        } else {
+            if (sr1 & I2C_SR1_ADDR) { // address sent
+                if (todo == 1) {
+                    I2Cx->CR1 = (cr1 |= I2C_CR1_STOP); // send stop after single byte
+                } else if (todo == 2) {
+                    I2Cx->CR1 = (cr1 &= ~I2C_CR1_ACK); // last byte nack
                 }
-                UINT8 addr = xAction->m_address << 1; // address bits
-                I2Cx->DR = addr + 1; // send header byte with read bit;
             } else {
-                if (sr1 & I2C_SR1_ADDR) { // address sent
-                    if (todo <= 2) {
-                        if (todo == 1) cr1 |= I2C_CR1_STOP; // send stop after single byte
+                while (sr1 & I2C_SR1_RXNE) { // data available
+                    if (todo == 2) { // 2 bytes remaining
+                        I2Cx->CR1 = (cr1 |= I2C_CR1_STOP); // stop after last byte
+                    } else if (todo == 3) { // 3 bytes remaining
+                        if (!(sr1 & I2C_SR1_BTF)) break; // assure 2 bytes are received
                         I2Cx->CR1 = (cr1 &= ~I2C_CR1_ACK); // last byte nack
                     }
-                } else {
-                    int n = 0;
-                    if (sr1 & I2C_SR1_BTF) { // two bytes available
-                        n = (todo & 1) + 1; // todo odd => read two bytes
-                        if (todo == 2) n = 2; // todo = 2 => read all
-                        if (todo == 3) {
-                            I2Cx->CR1 = (cr1 &= ~I2C_CR1_ACK); // last byte nack
-                        }
-                    } else if (todo == 1 && sr1 & I2C_SR1_RXNE) { // last byte
-                        n = 1;
-                        I2Cx->CR2 &= ~I2C_CR2_ITBUFEN; // disable I2C_SR1_RXNE interrupts
-                    }
-                    while (n != 0) {
-                        if (todo == 2) {
-                            I2Cx->CR1 = (cr1 |= I2C_CR1_STOP); // stop after last byte
-                        }
-                        UINT8 data = I2Cx->DR; // read data
-                        *(unit->m_dataQueue.Push()) = data; // save data
-                        unit->m_bytesTransferred++;
-                        unit->m_bytesToTransfer = --todo; // update todo
-                        n--;
-                    }
+                    UINT8 data = I2Cx->DR; // read data
+                    *(unit->m_dataQueue.Push()) = data; // save data
+                    unit->m_bytesTransferred++;
+                    unit->m_bytesToTransfer = --todo; // update todo
+                    sr1 = I2Cx->SR1;  // update status register copy
                 }
-                if (todo == 1) {
-                    I2Cx->CR2 |= I2C_CR2_ITBUFEN; // enable I2C_SR1_RXNE interrupt
-                }
+            }
+            if (todo == 1) {
+                I2Cx->CR2 |= I2C_CR2_ITBUFEN; // enable I2C_SR1_RXNE interrupt
             }
         }
     } else { // write transaction
         if (sr1 & I2C_SR1_SB) { // start bit
             UINT8 addr = xAction->m_address << 1; // address bits
             I2Cx->DR = addr; // send header byte with write bit;
-        } else if (sr1 & I2C_SR1_ADDR || sr1 & I2C_SR1_BTF) { // tx idle
-            int n = todo < 2 ? todo : 2; // write at most 2 bytes
-            while (n != 0) {
+        } else {
+            while (todo && (sr1 & I2C_SR1_TXE)) {
                 I2Cx->DR = *(unit->m_dataQueue.Pop()); // next data byte;
                 unit->m_bytesTransferred++;
-                unit->m_bytesToTransfer--; // no todo update!
-                n--;
+                unit->m_bytesToTransfer = --todo; // update todo
+                sr1 = I2Cx->SR1;  // update status register copy
             }
+            if (!(sr1 & I2C_SR1_BTF)) todo++; // last byte not yet sent
         }
     }
     
-    if (todo == 0) {
+    if (todo == 0) { // all received or all sent
         if (!xAction->ProcessingLastUnit()) { // start next unit
+            I2Cx->CR2 &= ~I2C_CR2_ITBUFEN; // disable I2C_SR1_RXNE interrupt
             currentI2CUnit = xAction->m_xActionUnits[ xAction->m_current++ ];
             I2Cx->CR1 = I2C_CR1_PE | I2C_CR1_START | I2C_CR1_ACK; // send restart
         } else {

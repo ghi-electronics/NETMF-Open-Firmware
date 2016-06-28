@@ -15,7 +15,13 @@
 
 struct K9F2G_8_BS_Driver
 {
+#if USE_16_BIT_TRANSFERS
+    typedef UINT16 CHIP_WORD;
+#else
     typedef UINT8 CHIP_WORD;
+#endif
+    static const UINT32 c_SectorsPerPage       = 1;
+    static const UINT32 c_SizeOfSectorMetadata = 16;
 
     //--//
     
@@ -37,14 +43,19 @@ struct K9F2G_8_BS_Driver
 private:
 
     static BOOL WriteX( void* context, ByteAddress StartSector, UINT32 NumBytes, BYTE * pSectorBuff, BOOL ReadModifyWrite, BOOL fIncrementDataPtr );
-    static void WaitReady();
+    static BOOL WaitReady();
     static void EnableCE() { CPU_GPIO_SetPinState(AT91_NAND_CE, FALSE); };
     static void DisableCE() { CPU_GPIO_SetPinState(AT91_NAND_CE, TRUE); };
     static void WriteCommand(UINT8 command) { *((volatile UINT8 *)cmndAddress) = command; };
     static void WriteAddress(UINT8 Address) { *((volatile UINT8 *)addrAddress) = Address; };
     static void WriteData8(UINT8 Data) { *((volatile UINT8 *)dataAddress) = Data; };
     static UINT8 ReadData8() { return  (*((volatile UINT8 *)dataAddress)); };
-    static BOOL ReadPage(ByteAddress StartSector, BYTE *outBuf, BYTE* inBuf, UINT32 size, UINT32 offset, UINT32 sectorSize, BOOL fIncrementDataPtr);
+#if USE_16_BIT_TRANSFERS
+    static void WriteCommand16(UINT16 command) { *((volatile UINT16 *)cmndAddress) = command; };
+    static void WriteAddress16(UINT16 Address) { *((volatile UINT16 *)addrAddress) = Address; };
+    static void WriteData16(UINT16 Data) { *((volatile UINT16 *)dataAddress) = Data; };
+    static UINT16 ReadData16() { return  (*((volatile UINT16 *)dataAddress)); };
+#endif
 };
 
 /// Nand flash commands

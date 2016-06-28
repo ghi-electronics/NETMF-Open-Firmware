@@ -50,7 +50,7 @@
     <Compile Include="FAT_SectorCache.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <HFiles Include="$(SPOCLIENT)\clr\include\clr_defines.h" />
+    <HFiles Include="$(PLATFORM_INDEPENDENT_LIB_DIR)\CLR_defines.h" />
     <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_errorcodes.h" />
     <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_interop.h" />
     <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_platformdef.h" />

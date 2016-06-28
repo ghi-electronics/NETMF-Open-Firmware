@@ -48,7 +48,7 @@ extern WIRELESS_CONFIG g_WirelessConfig;
     return ret != SOCK_SOCKET_ERROR;    \
 
 #define SOCKET_CHECK_RESULT(x)        \
-    if((x) == SOCK_SOCKET_ERROR)      \
+    if((ret = (x)) == SOCK_SOCKET_ERROR)\
     {                                 \
         goto SOCKET_CHECK_RETURN;     \
     }                                 \
@@ -179,7 +179,6 @@ private:
     static HAL_COMPLETION s_DebuggerTimeoutCompletion;
     HAL_COMPLETION   m_TCP_IP_state_machine;
     HAL_CALLBACK_FPN m_TCP_IP_state_machine_callback;
-    HAL_COMPLETION   m_TCP_IP_timer;
 
     SOCK_SOCKET    m_SocketDebugListener;
     SOCK_SOCKET    m_SocketDebugStream;

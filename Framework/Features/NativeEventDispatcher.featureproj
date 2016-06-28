@@ -12,5 +12,6 @@
     <Documentation>
     </Documentation>
     <Required>true</Required>
+    <NATIVEEVENTDISPATCHER_FEATUREPROJ>True</NATIVEEVENTDISPATCHER_FEATUREPROJ>
   </PropertyGroup>
 </Project>

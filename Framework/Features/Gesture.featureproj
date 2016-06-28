@@ -2,9 +2,9 @@
   <PropertyGroup>
     <FeatureName>Gesture</FeatureName>
   </PropertyGroup>  
-  <Import Project="$(SPOCLIENT)\Framework\Features\TouchScreen.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\PalEvent_PAL.libcatproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
+  <Import Condition="'$(TOUCHSCREEN_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\TouchScreen.featureproj" />
+  <Import Condition="'$(HARDWARE_FEATUREPROJ)'   ==''" Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
+  <Import Condition="'$(PALEVENT_PAL_LIBCATPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\PalEvent_PAL.libcatproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\Gesture_PAL.libcatproj" />
   <PropertyGroup>
     <Description>Gesture support for touch panel</Description>
@@ -13,5 +13,6 @@
     </Groups>
     <Documentation>
     </Documentation>
+    <GESTURE_FEATUREPROJ>True</GESTURE_FEATUREPROJ>
   </PropertyGroup>
 </Project>

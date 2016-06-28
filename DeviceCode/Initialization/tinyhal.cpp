@@ -349,13 +349,7 @@ void HAL_EnterBooterMode()
 bool g_fDoNotUninitializeDebuggerPort = false;
 
 void HAL_Initialize()
-{
-    // this code assures that the configuration sector does not get thrown out in the link step for RTM builds.
-    if(g_ConfigurationSector.Version.Major != VERSION_MAJOR)
-    {
-        debug_printf("Configuration version != version\n");
-    }
-    
+{    
     HAL_CONTINUATION::InitializeList();
     HAL_COMPLETION  ::InitializeList();
 

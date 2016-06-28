@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <ComponentGuid>{E5AE640F-C86B-47E0-92C8-EAFD3856B968}</ComponentGuid>
-<!--    <DirectoryRef>VsFrameworkAssemblyBase_v3_0</DirectoryRef> -->
-    <DirectoryRef>AssembliesDir_V3_0</DirectoryRef>
+    <DirectoryRef>VsFrameworkAssemblyBase_v3_0</DirectoryRef>
+<!--    <DirectoryRef>AssembliesDir_V3_0</DirectoryRef> -->
     <_curdir>$(SPOCLIENT)\Framework\IDE\Targets\v3.0\Assemblies</_curdir>
   </PropertyGroup>
 

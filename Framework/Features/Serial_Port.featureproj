@@ -12,5 +12,6 @@
     <Documentation>
     </Documentation>
     <IsSolutionWizardVisible>false</IsSolutionWizardVisible>
+    <SERIAL_PORT_FEATUREPROJ>True</SERIAL_PORT_FEATUREPROJ>
   </PropertyGroup>
 </Project>

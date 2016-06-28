@@ -16,7 +16,8 @@ struct BS_WL_BlockCache
 //
 // Sector meta data should only be 16 bytes
 //
-struct WL_SectorMetadata
+ADS_PACKED 
+struct GNU_PACKED WL_SectorMetadata
 {
     WORD  wBlockOffset[2];      // block offsets
     WORD  wOwnerBlock;          // Backwards link to the owner block (the block that maps to this one)

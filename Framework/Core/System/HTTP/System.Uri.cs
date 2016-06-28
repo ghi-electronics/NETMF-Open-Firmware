@@ -65,6 +65,24 @@ namespace System
     /// </summary>
     public class Uri
     {
+        private int DefaultPort(string scheme)
+        {
+            switch (scheme)
+            {
+                case "http": return 80;
+                case "https": return 443;
+                case "ftp": return 21;
+                case "gopher": return 70;
+                case "nntp": return 119;
+                case "telnet": return 23;
+                case "ldap": return 389;
+                case "mailto": return 25;
+                case "net.tcp": return 808;
+                case "ws": return 80;
+                default: return UnknownPort;
+            }
+        }
+
         /// <summary>
         /// Defines flags kept in m_Flags variable.
         /// </summary>
@@ -138,6 +156,11 @@ namespace System
         protected bool m_isUnc = false;
 
         /// <summary>
+        /// Member variable that keeps absolute uri (generated in method ParseUriString)
+        /// </summary>
+        protected string m_absoluteUri = null;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="System.Uri"/> class
         /// with the specified URI.
         /// </summary>
@@ -179,7 +202,7 @@ namespace System
         /// </exception>
         public Uri(string uriString)
         {
-            ConstructAbsoluteUri(ref uriString);
+            ConstructAbsoluteUri(uriString);
         }
 
         /// <summary>
@@ -189,11 +212,11 @@ namespace System
         /// <remarks>
         /// See <see cref="System.Uri(string)"/>.
         /// </remarks>
-        protected void ConstructAbsoluteUri(ref string uriString)
+        protected void ConstructAbsoluteUri(string uriString)
         {
             // ParseUriString provides full validation including testing for
             // null.
-            ParseUriString(ref uriString);
+            ParseUriString(uriString);
             m_OriginalUriString = uriString;
         }
 
@@ -207,7 +230,7 @@ namespace System
             // ParseUriString provides full validation including testing for null.
             switch (kind)
             {
-                case UriKind.Absolute: { ConstructAbsoluteUri(ref uriString); break; }
+                case UriKind.Absolute: { ConstructAbsoluteUri(uriString); break; }
                 // Do not support unknown type of Uri. User should decide what he wants.
                 case UriKind.RelativeOrAbsolute: { throw new ArgumentException(); }
                 // Relative Uri. Store in original string.
@@ -286,14 +309,17 @@ namespace System
         /// <exception cref="System.Exception">
         /// See constructor description.
         /// </exception>
-        protected void ParseUriString(ref string uriString)
+        protected void ParseUriString(string uriString)
         {
             int startIndex = 0;
             int endIndex = 0;
 
             // Check for null or empty string.
             if (uriString == null || uriString.Length == 0)
+            {
                 throw new ArgumentNullException();
+            }
+            uriString = uriString.Trim();
 
             // Check for presence of ':'. Colon always should be present in URI.
             if (uriString.IndexOf(':') == -1)
@@ -319,128 +345,241 @@ namespace System
 
             // Validate Scheme
             endIndex = uriString.IndexOf(':');
-            m_scheme = uriString.Substring(0, endIndex); ;
+            m_scheme = uriString.Substring(0, endIndex);
             if (!IsAlpha(m_scheme[0]))
+            {
                 throw new ArgumentException();
+            }
+
             for (int i = 1; i < m_scheme.Length; ++i)
+            {
                 if (!(IsAlphaNumeric(m_scheme[i]) || m_scheme[i] == '+' || m_scheme[i] == '-' || m_scheme[i] == '.'))
+                {
                     throw new ArgumentException();
+                }
+            }
 
             // Get past the colon
             startIndex = endIndex + 1;
-
-            // If this is an http uri parse the host. IP host should start with //
-            string schemeLower = m_scheme.ToLower();
-            if (schemeLower == "http" || schemeLower == "https")
+            if (startIndex >= uriString.Length)
             {
-                if (uriString.Substring(startIndex).IndexOf("//") == 0)
-                {
-                    m_host = "";
-
-                    // Set the host start index an determine if the host includes a port
-                    startIndex = startIndex + 2;
-                    if (uriString[startIndex] == '[')
-                    {
-                        if(-1 == (endIndex = uriString.IndexOf(']', startIndex)))
-                        {
-                            throw new ArgumentException();
-                        }
-
-                        endIndex++;
-
-                        m_host = uriString.Substring(startIndex, endIndex - startIndex);
-
-                        startIndex = endIndex;
-                    }
-                    else if ((endIndex = uriString.IndexOf(':', startIndex)) != -1)
-                    {
-                        // If port is listed, parse to port sentinel
-                        m_host = uriString.Substring(startIndex, endIndex - startIndex);
-                        startIndex = endIndex;
-                    }
-
-                    if(m_host != "")
-                    {
-                        // Look for the path sentinel
-                        endIndex = uriString.IndexOf('/', startIndex);
-
-                        // If there was no '/' at the end, we add it. For HTTP it means root page if address is http://www.microsoft.com
-                        if (endIndex == -1)
-                        {
-                            uriString += '/';
-                            endIndex = uriString.IndexOf('/', startIndex);
-                        }
-
-                        ++startIndex;
-                        int portLength = endIndex - startIndex;
-                        m_port = Convert.ToInt32(uriString.Substring(startIndex, portLength));
-                        startIndex += portLength;
-                    }
-                    else
-                    {
-                        if ((endIndex = uriString.IndexOf('/', startIndex)) == -1)
-                        {
-                            // If "/" was not found, means it is just host address like http://itgproxy.dns.microsoft.com
-                            // In this case we add add "/" and repeat the same operation as in prevo
-                            uriString += '/';
-                            endIndex = uriString.IndexOf('/', startIndex);
-                        }
-
-                        m_host = uriString.Substring(startIndex, endIndex - startIndex);
-                        startIndex = startIndex + m_host.Length;
-                        // The control flow comes here only if schemeLower is http or https.
-                        // Thus we have only 2 cases.
-                        switch (schemeLower)
-                        {
-                            case "http": m_port = HttpDefaultPort; break;
-                            case "https": m_port = HttpsDefaultPort; break;
-                        }
-                    }
-
-                    m_isAbsoluteUri = true;
-                }
-                else
-                    throw new ArgumentException();
-
-                if (m_host[0] == '[')
-                {
-                    m_hostNameType = UriHostNameType.IPv6;
-                }
-                else if (IsIPv4(m_host))
-                {
-                    m_hostNameType = UriHostNameType.IPv4;
-                }
-                else
-                {
-                    m_hostNameType = UriHostNameType.Dns;
-                }
+                throw new ArgumentException();
             }
 
-            // The last test is for a scheme and valid path
+            // Get host, port and absolute path
+            bool bRooted = ParseSchemeSpecificPart(uriString, startIndex);
+
+            if ((m_scheme == "file" || m_scheme == "mailto") && m_host.Length == 0)
+            {
+                m_hostNameType = UriHostNameType.Basic;
+            }
+            else if (m_host.Length == 0)
+            {
+                m_hostNameType = UriHostNameType.Unknown;
+            }
+            else if (m_host[0] == '[')
+            {
+                if (!IsIPv6(m_host))
+                {
+                    throw new ArgumentException();
+                }
+
+                m_hostNameType = UriHostNameType.IPv6;
+            }
+            else if (IsIPv4(m_host))
+            {
+                m_hostNameType = UriHostNameType.IPv4;
+            }
             else
             {
-                if (m_scheme == null)
-                { throw new ArgumentException(); }
-
-                // Check that remaining part of Uri is valid
-                ValidateUriPart(uriString, startIndex);
-                m_hostNameType = UriHostNameType.Unknown;
-                m_isAbsoluteUri = true;
+                m_hostNameType = UriHostNameType.Dns;
             }
 
-            // Set Uri properties
-            m_AbsolutePath = uriString.Substring(startIndex, uriString.Length - startIndex);
             if (m_host != null)
             {
-                string hostLower = m_host.ToLower();
-                if (hostLower == "localhost" || hostLower == "loopback")
+                if (m_host == "localhost" ||
+                    m_host == "loopback" ||
+                    (m_scheme == "file" || m_scheme == "mailto") && m_host.Length == 0)
                 {
                     m_Flags |= m_Flags | (int)Flags.LoopbackHost;
                 }
             }
 
-            m_isUnc = false;
-            return;
+            m_absoluteUri = m_scheme + ":" +
+                (bRooted ? "//" : string.Empty) +
+                m_host +
+                ((DefaultPort(m_scheme) == m_port) ? string.Empty : ":" + m_port.ToString()) +
+                (m_scheme == "file" && m_AbsolutePath.Length >= 2 && IsAlpha(m_AbsolutePath[0]) && m_AbsolutePath[1] == ':' ? "/" : string.Empty) +
+                m_AbsolutePath;
+
+            m_isAbsoluteUri = true;
+            m_isUnc = m_scheme == "file" && m_host.Length > 0;
+        }
+
+        /// <summary>
+        /// Parse Scheme-specific part of uri for host, port and absolute path
+        /// Briefed syntax abstracted from .NET FX:
+        /// Group 1 - http, https, ftp, file, gopher, nntp, telnet, ldap, net.tcp and net.pipe
+        ///     Must be rooted. The 1st segment is authority. Empty path should be replace as '/'
+        ///     
+        /// Group 2 - file
+        ///     Reminder: Treat all '\' as '/'
+        ///     If it starts with only one '/', host should be empty
+        ///     Otherwise, all leading '/' should be ignored before searching for 1st segment. The 1st segment is host
+        /// 
+        /// Group 3 - news and uuid
+        ///     Authority always be empty. Everything goes to path.
+        ///     
+        /// Group 4 - mailto and all other shemes
+        ///     The 1st segment is authority iff it was not rooted.
+        ///         
+        /// Group 5 - all other schemes
+        ///     The 1st segment is authority iff it was rooted. Empty path should be replace as '/'
+        /// </summary>
+        /// <param name="sInput">Scheme-specific part of uri</param>
+        protected bool ParseSchemeSpecificPart(string sUri, int iStart)
+        {
+            bool bRooted = sUri.Length >= iStart + 2 && sUri.Substring(iStart, 2) == "//";
+            bool bAbsoluteUriRooted;
+
+            string sAuthority;
+            switch (m_scheme)
+            {
+                case "http":
+                case "https":
+                case "ftp":
+                case "gopher":
+                case "nntp":
+                case "telnet":
+                case "ldap":
+                case "net.tcp":
+                case "net.pipe":
+                    if (!bRooted)
+                    {
+                        throw new ArgumentException();
+                    }
+
+                    bAbsoluteUriRooted = bRooted;
+                    Split(sUri, iStart + 2, out sAuthority, out m_AbsolutePath, true);
+                    break;
+
+                case "file":
+                    if (!bRooted)
+                    {
+                        throw new ArgumentException();
+                    }
+
+                    sUri = sUri.Substring(iStart + 2);
+                    if (sUri.Length > 0)
+                    {
+                        var array = sUri.ToCharArray();
+                        for (int i = 0; i < array.Length; i++)
+                        {
+                            if (array[i] == '\\')
+                            {
+                                array[i] = '/';
+                            }
+                        }
+                        sUri = new string(array);
+                    }
+
+                    string sTrimmed = sUri.TrimStart('/');
+
+                    if (sTrimmed.Length >= 2 && IsAlpha(sTrimmed[0]) && sTrimmed[1] == ':')
+                    {
+                        //Windows style path
+                        if (sTrimmed.Length < 3 || sTrimmed[2] != '/')
+                        {
+                            throw new ArgumentException();
+                        }
+
+                        sAuthority = string.Empty;
+                        m_AbsolutePath = sTrimmed;
+                    }
+                    else
+                    {
+                        //Unix style path
+                        if (sUri.Length - sTrimmed.Length == 1 || sTrimmed.Length == 0)
+                        {
+                            sAuthority = string.Empty;
+                            m_AbsolutePath = sUri.Length > 0 ? sUri : "/";
+                        }
+                        else
+                        {
+                            Split(sTrimmed, 0, out sAuthority, out m_AbsolutePath, true);
+                        }
+                    }
+
+                    bAbsoluteUriRooted = bRooted;
+                    break;
+
+                case "news":
+                case "uuid":
+                    sAuthority = string.Empty;
+                    m_AbsolutePath = sUri.Substring(iStart);
+                    bAbsoluteUriRooted = false;
+                    break;
+
+                case "mailto":
+                    if (bRooted)
+                    {
+                        sAuthority = string.Empty;
+                        m_AbsolutePath = sUri.Substring(iStart);
+                    }
+                    else
+                    {
+                        Split(sUri, iStart, out sAuthority, out m_AbsolutePath, false);
+                    }
+                    bAbsoluteUriRooted = false;
+                    break;
+
+                default:
+                    if (bRooted)
+                    {
+                        Split(sUri, iStart + 2, out sAuthority, out m_AbsolutePath, true);
+                    }
+                    else
+                    {
+                        sAuthority = string.Empty;
+                        m_AbsolutePath = sUri.Substring(iStart);
+                    }
+                    bAbsoluteUriRooted = bRooted;
+                    break;
+            }
+
+            int iPortSplitter = sAuthority.LastIndexOf(':');
+            if (iPortSplitter < 0 || sAuthority.LastIndexOf(']') > iPortSplitter)
+            {
+                m_host = sAuthority;
+                m_port = DefaultPort(m_scheme);
+            }
+            else
+            {
+                m_host = sAuthority.Substring(0, iPortSplitter);
+                m_port = Convert.ToInt32(sAuthority.Substring(iPortSplitter + 1));
+            }
+
+            return bAbsoluteUriRooted;
+        }
+
+        protected void Split(string sUri, int iStart, out string sAuthority, out string sPath, bool bReplaceEmptyPath)
+        {
+            int iSplitter = sUri.IndexOf('/', iStart);
+            if (iSplitter < 0)
+            {
+                sAuthority = sUri.Substring(iStart);
+                sPath = string.Empty;
+            }
+            else
+            {
+                sAuthority = sUri.Substring(iStart, iSplitter - iStart);
+                sPath = sUri.Substring(iSplitter);
+            }
+
+            if (bReplaceEmptyPath && sPath.Length == 0)
+            {
+                sPath = "/";
+            }
         }
 
         /// <summary>
@@ -486,6 +625,11 @@ namespace System
             }
 
             return (dots == 3) && haveNumber;
+        }
+
+        protected bool IsIPv6(string host)
+        {
+            return host[0] == '[' && host[host.Length - 1] == ']';
         }
 
         /// <summary>
@@ -593,6 +737,7 @@ namespace System
             m_hostNameType = UriHostNameType.Unknown;
             m_port = UnknownPort;
             m_scheme = "urn";
+            m_absoluteUri = uri;
 
             return;
         }
@@ -631,7 +776,7 @@ namespace System
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();   
+            return base.GetHashCode();
         }
 
         public override bool Equals(object o)
@@ -647,7 +792,7 @@ namespace System
             {
                 return (r == null);
             }
-            else if(r == null)
+            else if (r == null)
             {
                 return false;
             }
@@ -672,7 +817,7 @@ namespace System
             {
                 return (r != null);
             }
-            else if(r == null)
+            else if (r == null)
             {
                 return true;
             }
@@ -817,7 +962,7 @@ namespace System
             {
                 if (m_isAbsoluteUri == false)
                     throw new InvalidOperationException();
-                return m_OriginalUriString;
+                return m_absoluteUri;
             }
         }
 
@@ -910,5 +1055,3 @@ namespace System
         }
     }
 }
-
-

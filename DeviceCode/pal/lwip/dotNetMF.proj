@@ -9,7 +9,7 @@
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Settings" />
 
   <ItemGroup>
-    <SubDirectories Include="lwip_1_3_2" />
+    <SubDirectories Include="LWIP" />
     <SubDirectories Include="SocketsDriver" /> 
     <SubDirectories Include="tinyclr" />
   </ItemGroup>

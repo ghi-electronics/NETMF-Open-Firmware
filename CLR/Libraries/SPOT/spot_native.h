@@ -153,6 +153,7 @@ struct Library_spot_native_Microsoft_SPOT_ExtendedWeakReference
     TINYCLR_NATIVE_DECLARE(set_Priority___VOID__I4);
     TINYCLR_NATIVE_DECLARE(PushBackIntoRecoverList___VOID);
     TINYCLR_NATIVE_DECLARE(Recover___STATIC__MicrosoftSPOTExtendedWeakReference__mscorlibSystemType__U4);
+    TINYCLR_NATIVE_DECLARE(FlushAll___STATIC__VOID);
 
     //--//
 
@@ -254,7 +255,7 @@ struct Library_spot_native_Microsoft_SPOT_ResourceUtility
     static const int FIELD_STATIC__s_ewr = 3;
 
     TINYCLR_NATIVE_DECLARE(GetObject___STATIC__OBJECT__mscorlibSystemResourcesResourceManager__mscorlibSystemEnum);
-    TINYCLR_NATIVE_DECLARE(GetObject___STATIC__OBJECT__mscorlibSystemResourcesResourceManager__mscorlibSystemEnum__I4__I4);    
+    TINYCLR_NATIVE_DECLARE(GetObject___STATIC__OBJECT__mscorlibSystemResourcesResourceManager__mscorlibSystemEnum__I4__I4);
     TINYCLR_NATIVE_DECLARE(set_CurrentUICultureInternal___STATIC__VOID__mscorlibSystemGlobalizationCultureInfo);
 
     //--//
@@ -315,6 +316,19 @@ struct Library_spot_native_Microsoft_SPOT_Touch_TouchEvent
 
 };
 
+struct Library_spot_native_Microsoft_SPOT_Touch_TouchGestureEventArgs
+{
+    static const int FIELD__Timestamp = 1;
+    static const int FIELD__Gesture   = 2;
+    static const int FIELD__X         = 3;
+    static const int FIELD__Y         = 4;
+    static const int FIELD__Arguments = 5;
+
+
+    //--//
+
+};
+
 struct Library_spot_native_Microsoft_SPOT_Touch_TouchInput
 {
     static const int FIELD__X             = 1;
@@ -328,6 +342,16 @@ struct Library_spot_native_Microsoft_SPOT_Touch_TouchInput
     static const CLR_UINT32 FLAG__Primary = 0x10;
     static const CLR_UINT32 FLAG__Pen     = 0x40;
     static const CLR_UINT32 FLAG__Palm    = 0x80;
+
+    //--//
+
+};
+
+struct Library_spot_native_Microsoft_SPOT_Touch_TouchScreenEventArgs
+{
+    static const int FIELD__Touches   = 1;
+    static const int FIELD__TimeStamp = 2;
+    static const int FIELD__Target    = 3;
 
     //--//
 

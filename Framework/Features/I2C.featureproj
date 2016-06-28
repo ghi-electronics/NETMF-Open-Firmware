@@ -2,7 +2,7 @@
   <PropertyGroup>
     <FeatureName>I2C</FeatureName>
   </PropertyGroup>
-  <Import Project="$(SPOCLIENT)\Framework\Features\hardware.featureproj" />
+  <Import Condition="'$(HARDWARE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\hardware.featureproj" />
   <ItemGroup>
     <RequiredManagedProjects Include="$(SPOCLIENT)\Framework\Core\Native_Hardware\Core_Native_Hardware.csproj" Condition="'$(AUTOMATED_BUILD)'==''" />
   </ItemGroup>
@@ -14,5 +14,6 @@
     <Groups>Hardware</Groups>
     <Documentation>
     </Documentation>
+    <I2C_FEATUREPROJ>True</I2C_FEATUREPROJ>
   </PropertyGroup>
 </Project>

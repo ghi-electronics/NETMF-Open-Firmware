@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PreBuildProjects Include="$(SPOCLIENT)\Framework\Tools\CreateCLRDefines.proj" />
     <SubDirectories Include="Support"     Condition="'$(AUTOMATED_BUILD)'!=''"/>
     <SubDirectories Include="CLR"         Condition="'$(AUTOMATED_BUILD)'!=''"/>
     <SubDirectories Include="Application" Condition="'$(AUTOMATED_BUILD)'!=''"/>

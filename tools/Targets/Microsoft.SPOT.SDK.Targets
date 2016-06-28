@@ -12,11 +12,15 @@
     <OUTPUT_WIXOBJ_DIR>$(OutputWiXObjRoot)Fragments\$(MSBuildProjectName)\</OUTPUT_WIXOBJ_DIR>
     <OUTPUT_WIXOBJ_DIR_LE>$(OutputWiXObjRoot)Fragments\le\$(MSBuildProjectName)\</OUTPUT_WIXOBJ_DIR_LE>
     <OUTPUT_WIXOBJ_DIR_BE>$(OutputWiXObjRoot)Fragments\be\$(MSBuildProjectName)\</OUTPUT_WIXOBJ_DIR_BE>
+    <DO_NOT_BUILD_DOCS>Tru</DO_NOT_BUILD_DOCS>
+    <!--
     <VSIPInstalled>false</VSIPInstalled>
     <XBUILD_OUTDIR>$(SPOCLIENT)\UE\Public\Docs\Built</XBUILD_OUTDIR>
     <SPO_BASEDIR>$(SPOCLIENT)\UE</SPO_BASEDIR>
     <XBUILDEXE>$(SPOCLIENT)\UE\Public\Binaries\Built\Xanx.Build.XBuild.exe</XBUILDEXE>
-    <VSIPInstallDir>$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\VSIP\10.0@InstallDir)</VSIPInstallDir>
+    <VSIPInstallDir>$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\VSIP\11.0@InstallDir)</VSIPInstallDir>
+    <VSIPInstallDir Condition="'$(VSIPInstallDir)'==''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\VSIP\11.0@InstallDir)</VSIPInstallDir> 
+    -->
     <WiXLibDirectory>$(SPOCLIENT)\Setup\LIB\</WiXLibDirectory>
     <DoCandle>false</DoCandle>
     <CandleInput>$(CandleInput);$(SPOCLIENT)\ReleaseInfo.settings</CandleInput>
@@ -575,6 +579,7 @@
 
     <CreateAssemblyFragment
       ComponentGuid="$(ComponentGuid)"
+      ComponentShortcut="$(ComponentShortcut)"
       DirectoryRef="$(DirectoryRef)"
       AssemblyName="$(TargetName)"
       ComponentFiles="@(WiXComponentFiles)"

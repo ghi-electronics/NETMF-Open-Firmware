@@ -43,3 +43,14 @@ HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogOutput::Initi
 
     TINYCLR_NOCLEANUP();
 }
+
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogOutput::Uninitialize___STATIC__VOID__MicrosoftSPOTHardwareCpuAnalogOutputChannel( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+    
+    ::DA_Uninitialize((DA_CHANNEL)stack.Arg0().NumericByRef().s4);
+    
+    TINYCLR_NOCLEANUP_NOLABEL();
+}
+

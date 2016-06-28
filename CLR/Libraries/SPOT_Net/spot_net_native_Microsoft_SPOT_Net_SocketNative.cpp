@@ -319,7 +319,14 @@ CLR_INT32 Library_spot_net_native_Microsoft_SPOT_Net_SocketNative::Helper__Selec
     res = SOCK_select( 1, readfds, writefds, exceptfds, &timeval );
 
     // socket is in the exception state (only return error if caller was NOT looking for the excepted state)
-    if((mode != 2) && fdsExcept.fd_count != 0) return SOCK_SOCKET_ERROR;
+    if((mode != 2) && (fdsExcept.fd_count != 0))
+    {
+        // For read mode ignore exception if we have data to read
+        if(!(mode == 0 && fds.fd_count != 0))
+        {
+            return SOCK_SOCKET_ERROR;
+        }
+    }
 
     return res;
     
@@ -375,7 +382,7 @@ HRESULT Library_spot_net_native_Microsoft_SPOT_Net_SocketNative::poll___STATIC__
 
     TINYCLR_CHECK_HRESULT(ThrowOnError( stack, res ));
 
-    stack.SetResult_Boolean( res == 1 );   
+    stack.SetResult_Boolean( res != 0 );   
 
     TINYCLR_NOCLEANUP();
 }
@@ -563,11 +570,9 @@ HRESULT Library_spot_net_native_Microsoft_SPOT_Net_SocketNative::SendRecvHelper(
     CLR_INT32  ret = 0;
 
     FAULT_ON_NULL(socket);
-    handle = socket[ FIELD__m_Handle ].NumericByRef().s4;
-
     FAULT_ON_NULL(arrData);
     
-    if(offset + count > arrData->m_numOfElements) TINYCLR_SET_AND_LEAVE(CLR_E_INDEX_OUT_OF_RANGE);    
+    handle = socket[ FIELD__m_Handle ].NumericByRef().s4;
 
     /* Because we could have been a rescheduled call due to a prior call that would have blocked, we need to see
      * if our handle has been shutdown before continuing. */
@@ -576,6 +581,9 @@ HRESULT Library_spot_net_native_Microsoft_SPOT_Net_SocketNative::SendRecvHelper(
         ThrowError( stack, CLR_E_OBJECT_DISPOSED );
         TINYCLR_SET_AND_LEAVE (CLR_E_PROCESS_EXCEPTION);
     }
+
+    if(offset + count > arrData->m_numOfElements) TINYCLR_SET_AND_LEAVE(CLR_E_INDEX_OUT_OF_RANGE);    
+
 
     hbTimeout.SetInteger( timeout_ms );
         

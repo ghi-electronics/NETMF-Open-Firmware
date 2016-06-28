@@ -72,7 +72,7 @@
 
 #include <string.h> //MS: for TINYCLR_SSL_MEMCPY
 
-static const char EC_version[] = "EC" OPENSSL_VERSION_PTEXT;
+//static const char EC_version[] = "EC" OPENSSL_VERSION_PTEXT;
 
 
 /* functions for EC_GROUP objects */

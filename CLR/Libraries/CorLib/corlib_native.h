@@ -27,10 +27,11 @@ struct Library_corlib_native_System_Object
 };
 
 /* // THIS CLASS IS BUILT INTO mscorlib and we need to offset static fields accordingly
-struct Library_corlib_native__<PrivateImplementationDetails>{4B8EAD93-DDEB-433E-BB4A-6ECBAB495BC6}
+struct Library_corlib_native__<PrivateImplementationDetails>{232B98F2-8B22-4CE9-8AB0-12C746226FA4}
 {
-    static const int FIELD_STATIC__$$method0x60003e4-1 = 0;
-    static const int FIELD_STATIC__$$method0x60003e4-2 = 1;
+    static const int FIELD_STATIC__$$method0x60003e6-1 = 0;
+    static const int FIELD_STATIC__$$method0x60003e6-2 = 1;
+    static const int FIELD_STATIC__$$method0x60003e6-3 = 2;
 
 
     //--//
@@ -48,12 +49,12 @@ struct Library_corlib_native_System_ValueType
 
 struct Library_corlib_native_System_Collections_Hashtable
 {
-    static const int FIELD___buckets = 1;
+    static const int FIELD___buckets         = 1;
     static const int FIELD___numberOfBuckets = 2;
-    static const int FIELD___count = 3;
-    static const int FIELD___loadFactor = 4;
-    static const int FIELD___maxLoadFactor = 5;
-    static const int FIELD___growthFactor = 6;
+    static const int FIELD___count           = 3;
+    static const int FIELD___loadFactor      = 4;
+    static const int FIELD___maxLoadFactor   = 5;
+    static const int FIELD___growthFactor    = 6;
 
 
     //--//
@@ -62,9 +63,9 @@ struct Library_corlib_native_System_Collections_Hashtable
 
 struct Library_corlib_native_System_Collections_Hashtable__Entry
 {
-    static const int FIELD__key = 1;
+    static const int FIELD__key   = 1;
     static const int FIELD__value = 2;
-    static const int FIELD__next = 3;
+    static const int FIELD__next  = 3;
 
 
     //--//
@@ -73,9 +74,9 @@ struct Library_corlib_native_System_Collections_Hashtable__Entry
 
 struct Library_corlib_native_System_Collections_Hashtable__HashtableEnumerator
 {
-    static const int FIELD__ht = 1;
-    static const int FIELD__temp = 2;
-    static const int FIELD__index = 3;
+    static const int FIELD__ht         = 1;
+    static const int FIELD__temp       = 2;
+    static const int FIELD__index      = 3;
     static const int FIELD__returnType = 4;
 
 
@@ -155,7 +156,7 @@ struct Library_corlib_native_System_Array__SZArrayEnumerator
 
 struct Library_corlib_native_System_Globalization_Resources_CultureInfo
 {
-    static const int FIELD_STATIC__manager = 2;
+    static const int FIELD_STATIC__manager = 3;
 
 
     //--//
@@ -211,10 +212,43 @@ struct Library_corlib_native_System_MulticastDelegate
 
 };
 
+struct Library_corlib_native_System_BitConverter
+{
+    TINYCLR_NATIVE_DECLARE(get_IsLittleEndian___STATIC__BOOLEAN);
+    TINYCLR_NATIVE_DECLARE(DoubleToInt64Bits___STATIC__I8__R8);
+    TINYCLR_NATIVE_DECLARE(GetBytes___STATIC__SZARRAY_U1__BOOLEAN);
+    TINYCLR_NATIVE_DECLARE(GetBytes___STATIC__SZARRAY_U1__CHAR);
+    TINYCLR_NATIVE_DECLARE(GetBytes___STATIC__SZARRAY_U1__R8);
+    TINYCLR_NATIVE_DECLARE(GetBytes___STATIC__SZARRAY_U1__R4);
+    TINYCLR_NATIVE_DECLARE(GetBytes___STATIC__SZARRAY_U1__I4);
+    TINYCLR_NATIVE_DECLARE(GetBytes___STATIC__SZARRAY_U1__I8);
+    TINYCLR_NATIVE_DECLARE(GetBytes___STATIC__SZARRAY_U1__I2);
+    TINYCLR_NATIVE_DECLARE(GetBytes___STATIC__SZARRAY_U1__U4);
+    TINYCLR_NATIVE_DECLARE(GetBytes___STATIC__SZARRAY_U1__U8);
+    TINYCLR_NATIVE_DECLARE(GetBytes___STATIC__SZARRAY_U1__U2);
+    TINYCLR_NATIVE_DECLARE(Int64BitsToDouble___STATIC__R8__I8);
+    TINYCLR_NATIVE_DECLARE(ToBoolean___STATIC__BOOLEAN__SZARRAY_U1__I4);
+    TINYCLR_NATIVE_DECLARE(ToChar___STATIC__CHAR__SZARRAY_U1__I4);
+    TINYCLR_NATIVE_DECLARE(ToDouble___STATIC__R8__SZARRAY_U1__I4);
+    TINYCLR_NATIVE_DECLARE(ToInt16___STATIC__I2__SZARRAY_U1__I4);
+    TINYCLR_NATIVE_DECLARE(ToInt32___STATIC__I4__SZARRAY_U1__I4);
+    TINYCLR_NATIVE_DECLARE(ToInt64___STATIC__I8__SZARRAY_U1__I4);
+    TINYCLR_NATIVE_DECLARE(ToSingle___STATIC__R4__SZARRAY_U1__I4);
+    TINYCLR_NATIVE_DECLARE(ToString___STATIC__STRING__SZARRAY_U1);
+    TINYCLR_NATIVE_DECLARE(ToString___STATIC__STRING__SZARRAY_U1__I4);
+    TINYCLR_NATIVE_DECLARE(ToString___STATIC__STRING__SZARRAY_U1__I4__I4);
+    TINYCLR_NATIVE_DECLARE(ToUInt16___STATIC__U2__SZARRAY_U1__I4);
+    TINYCLR_NATIVE_DECLARE(ToUInt32___STATIC__U4__SZARRAY_U1__I4);
+    TINYCLR_NATIVE_DECLARE(ToUInt64___STATIC__U8__SZARRAY_U1__I4);
+
+    //--//
+
+};
+
 struct Library_corlib_native_System_Boolean
 {
-    static const int FIELD_STATIC__FalseString = 3;
-    static const int FIELD_STATIC__TrueString  = 4;
+    static const int FIELD_STATIC__FalseString = 4;
+    static const int FIELD_STATIC__TrueString  = 5;
 
     static const int FIELD__m_value = 1;
 
@@ -260,7 +294,7 @@ struct Library_corlib_native_System_Collections_ArrayList
 
 struct Library_corlib_native_System_Collections_DictionaryEntry
 {
-    static const int FIELD__Key = 1;
+    static const int FIELD__Key   = 1;
     static const int FIELD__Value = 2;
 
 
@@ -301,8 +335,10 @@ struct Library_corlib_native_System_Collections_Stack
 
 struct Library_corlib_native_System_Convert
 {
-    static const int FIELD_STATIC__s_rgchBase64Encoding = 5;
-    static const int FIELD_STATIC__s_rgbBase64Decode = 6;
+    static const int FIELD_STATIC__s_rgchBase64EncodingDefault = 6;
+    static const int FIELD_STATIC__s_rgchBase64EncodingRFC4648 = 7;
+    static const int FIELD_STATIC__s_rgchBase64Encoding        = 8;
+    static const int FIELD_STATIC__s_rgbBase64Decode           = 9;
 
 
     //--//
@@ -330,9 +366,9 @@ struct Library_corlib_native_System_CurrentSystemTimeZone
 
 struct Library_corlib_native_System_DateTime
 {
-    static const int FIELD_STATIC__MinValue      = 7;
-    static const int FIELD_STATIC__MaxValue      = 8;
-    static const int FIELD_STATIC__ticksAtOrigin = 9;
+    static const int FIELD_STATIC__MinValue      = 10;
+    static const int FIELD_STATIC__MaxValue      = 11;
+    static const int FIELD_STATIC__ticksAtOrigin = 12;
 
     static const int FIELD__m_ticks = 1;
 
@@ -406,7 +442,6 @@ struct Library_corlib_native_System_Globalization_CultureInfo
    
     TINYCLR_NATIVE_DECLARE(get_CurrentUICultureInternal___STATIC__SystemGlobalizationCultureInfo);
     TINYCLR_NATIVE_DECLARE(set_CurrentUICultureInternal___STATIC__VOID__SystemGlobalizationCultureInfo);
-    TINYCLR_NATIVE_DECLARE(GetAssemblies___STATIC__SZARRAY_SystemReflectionAssembly);
 
     //--//
 
@@ -473,8 +508,8 @@ struct Library_corlib_native_System_Globalization_NumberFormatInfo
 
 struct Library_corlib_native_System_Guid
 {
-    static const int FIELD_STATIC__m_rand = 10;
-    static const int FIELD_STATIC__Empty  = 11;
+    static const int FIELD_STATIC__m_rand = 13;
+    static const int FIELD_STATIC__Empty  = 14;
 
     static const int FIELD__m_data        = 1;
 
@@ -810,7 +845,7 @@ struct Library_corlib_native_System_Single
 
 struct Library_corlib_native_System_String
 {
-    static const int FIELD_STATIC__Empty = 12;
+    static const int FIELD_STATIC__Empty = 15;
 
     TINYCLR_NATIVE_DECLARE(CompareTo___I4__OBJECT);
     TINYCLR_NATIVE_DECLARE(get_Chars___CHAR__I4);
@@ -1028,9 +1063,9 @@ struct Library_corlib_native_System_Threading_Timer
 
 struct Library_corlib_native_System_TimeSpan
 {
-    static const int FIELD_STATIC__Zero     = 13;
-    static const int FIELD_STATIC__MaxValue = 14;
-    static const int FIELD_STATIC__MinValue = 15;
+    static const int FIELD_STATIC__Zero     = 16;
+    static const int FIELD_STATIC__MaxValue = 17;
+    static const int FIELD_STATIC__MinValue = 18;
 
     static const int FIELD__m_ticks = 1;
 

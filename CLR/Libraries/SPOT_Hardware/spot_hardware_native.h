@@ -212,6 +212,7 @@ struct Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogInput
 
     TINYCLR_NATIVE_DECLARE(ReadRaw___I4);
     TINYCLR_NATIVE_DECLARE(Initialize___STATIC__VOID__MicrosoftSPOTHardwareCpuAnalogChannel__I4);
+    TINYCLR_NATIVE_DECLARE(Uninitialize___STATIC__VOID__MicrosoftSPOTHardwareCpuAnalogChannel);
 
     //--//
 
@@ -229,6 +230,7 @@ struct Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogOutput
 
     TINYCLR_NATIVE_DECLARE(WriteRaw___VOID__I4);
     TINYCLR_NATIVE_DECLARE(Initialize___STATIC__VOID__MicrosoftSPOTHardwareCpuAnalogOutputChannel__I4);
+    TINYCLR_NATIVE_DECLARE(Uninitialize___STATIC__VOID__MicrosoftSPOTHardwareCpuAnalogOutputChannel);
 
     //--//
 

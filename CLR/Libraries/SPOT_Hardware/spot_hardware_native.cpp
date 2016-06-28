@@ -107,6 +107,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogInput::ReadRaw___I4,
     Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogInput::Initialize___STATIC__VOID__MicrosoftSPOTHardwareCpuAnalogChannel__I4,
+    Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogInput::Uninitialize___STATIC__VOID__MicrosoftSPOTHardwareCpuAnalogChannel,
     NULL,
     NULL,
     NULL,
@@ -123,6 +124,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogOutput::WriteRaw___VOID__I4,
     Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogOutput::Initialize___STATIC__VOID__MicrosoftSPOTHardwareCpuAnalogOutputChannel__I4,
+    Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogOutput::Uninitialize___STATIC__VOID__MicrosoftSPOTHardwareCpuAnalogOutputChannel,
     NULL,
     NULL,
     NULL,
@@ -282,7 +284,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_Microsoft_SPOT_Hardware =
 {
     "Microsoft.SPOT.Hardware", 
-    0xBF718024,
+    0x9E2117AF,
     method_lookup
 };
 

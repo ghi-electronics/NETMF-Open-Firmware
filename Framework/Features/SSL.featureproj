@@ -3,7 +3,7 @@
     <FeatureName>SSL (RTIP)</FeatureName>
     <Filter>RTIP</Filter>
   </PropertyGroup>
-  <Import Project="$(SPOCLIENT)\Framework\Features\Network.featureproj" />
+  <Import Condition="'$(NETWORK_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Network.featureproj" />
   <ItemGroup>
     <InteropFeature Include="Microsoft_SPOT_Net_Security" />
     <MMP_DAT_CreateDatabase Include="$(BUILD_TREE_CLIENT)\pe\$(ENDIANNESS)\Microsoft.SPOT.Net.Security.pe" />
@@ -19,5 +19,6 @@
     <Groups>Networking</Groups>
     <Documentation>
     </Documentation>
+    <SSL_FEATUREPROJ>True</SSL_FEATUREPROJ>
   </PropertyGroup>
 </Project>

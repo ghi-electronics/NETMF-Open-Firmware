@@ -49,6 +49,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
     Library_spot_native_Microsoft_SPOT_ExtendedWeakReference::PushBackIntoRecoverList___VOID,
     NULL,
     Library_spot_native_Microsoft_SPOT_ExtendedWeakReference::Recover___STATIC__MicrosoftSPOTExtendedWeakReference__mscorlibSystemType__U4,
+    Library_spot_native_Microsoft_SPOT_ExtendedWeakReference::FlushAll___STATIC__VOID,
     NULL,
     NULL,
     Library_spot_native_Microsoft_SPOT_Hardware_SystemInfo::GetSystemVersion___STATIC__VOID__BYREF_I4__BYREF_I4__BYREF_I4__BYREF_I4,
@@ -87,7 +88,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
     NULL,
     NULL,
     NULL,
-    Library_spot_native_Microsoft_SPOT_ResourceUtility::GetObject___STATIC__OBJECT__mscorlibSystemResourcesResourceManager__mscorlibSystemEnum,    
+    Library_spot_native_Microsoft_SPOT_ResourceUtility::GetObject___STATIC__OBJECT__mscorlibSystemResourcesResourceManager__mscorlibSystemEnum,
     Library_spot_native_Microsoft_SPOT_ResourceUtility::GetObject___STATIC__OBJECT__mscorlibSystemResourcesResourceManager__mscorlibSystemEnum__I4__I4,
     Library_spot_native_Microsoft_SPOT_ResourceUtility::set_CurrentUICultureInternal___STATIC__VOID__mscorlibSystemGlobalizationCultureInfo,
     NULL,
@@ -133,7 +134,7 @@ static const CLR_RT_MethodHandler method_lookup[] =
 const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_Microsoft_SPOT_Native =
 {
     "Microsoft.SPOT.Native", 
-    0xC1787BD4,
+    0x4BF34DF8,
     method_lookup
 };
 

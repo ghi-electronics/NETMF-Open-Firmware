@@ -264,7 +264,7 @@ namespace Microsoft.SPOT.Tasks
                 {
                     string[] verParts = myInformationalVersionAttributes[0].InformationalVersion.Split(new Char[]{'.'});
                     if ( verParts == null || verParts.Length == 0)
-                        runtimeVersion = "v4.2";
+                        runtimeVersion = "v4.3";
                     else if (verParts.Length == 1)
                         runtimeVersion = String.Format("v{0}.0", verParts[0]);
                     else

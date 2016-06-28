@@ -188,9 +188,9 @@ namespace Microsoft.SPOT.Platform.Tests
                         Log.Exception("Device class of default configuration is not set to 'no class' (0)");
                         result = false;
                     }
-                    if (device.bcdUSB != 0x0110)
+                    if (device.bcdUSB != 0x0200)
                     {
-                        Log.Exception("USB version of default class is " + Microsoft.SPOT.Platform.Test.MFUtilities.UintToHex(device.bcdUSB) + " instead of 0x0110");
+                        Log.Exception("USB version of default class is " + Microsoft.SPOT.Platform.Test.MFUtilities.UintToHex(device.bcdUSB) + " instead of 0x0200");
                         result = false;
                     }
                     Log.Comment("Default configuration has Vid = " + Microsoft.SPOT.Platform.Test.MFUtilities.UintToHex(device.idVendor) + " and Pid of " + Microsoft.SPOT.Platform.Test.MFUtilities.UintToHex(device.idProduct));

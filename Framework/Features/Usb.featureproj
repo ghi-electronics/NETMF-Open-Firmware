@@ -2,9 +2,9 @@
   <PropertyGroup>
     <FeatureName>UsbClient</FeatureName>
   </PropertyGroup>
-  <Import Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\USB_Port.featureproj" />
+  <Import Condition="'$(CORE_FEATUREPROJ)'    ==''" Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
+  <Import Condition="'$(HARDWARE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
+  <Import Condition="'$(USB_PORT_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\USB_Port.featureproj" />
   <ItemGroup>
     <InteropFeature Include="Microsoft_SPOT_Hardware_Usb" />
     <MMP_DAT_CreateDatabase Include="$(BUILD_TREE_CLIENT)\pe\$(ENDIANNESS)\Microsoft.SPOT.Hardware.Usb.pe" />
@@ -17,5 +17,6 @@
     <Groups>Hardware</Groups>
     <Documentation>
     </Documentation>
+    <USB_FEATUREPROJ>True</USB_FEATUREPROJ>
   </PropertyGroup>
 </Project>

@@ -74,7 +74,31 @@ namespace Microsoft.SPOT.Platform.Tests
             // you should not be able to truncate the value only leading zeros
             bRet &= "1234567890123456" == ((ulong )0x1234567890123456).ToString("x06");
             bRet &=   "34567890123456" == ((ulong )0x0034567890123456).ToString("x14");
-            
+
+            string tst = 3210.ToString("D");
+            bRet &= "3210" == tst;
+
+            tst = (-3210).ToString("d");
+            bRet &= "-3210" == tst;
+
+            tst = 3210.ToString("d06");
+            bRet &= "003210" == tst;
+
+            tst = (-3210).ToString("d06");
+            bRet &= "-003210" == tst;
+
+            tst = 3210.ToString("d1");
+            bRet &= "3210" == tst;
+
+            tst = (-3210).ToString("d1");
+            bRet &= "-3210" == tst;
+
+            tst = 3210.ToString("g");
+            bRet &= "3210" == tst;
+
+            tst = (-3210).ToString("g");
+            bRet &= "-3210" == tst;
+
             if (bRet)
             {
                 return MFTestResults.Pass;

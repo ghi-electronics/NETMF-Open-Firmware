@@ -7,6 +7,7 @@
     <AssemblyFoldersSuffix Condition=" '$(AssemblyFoldersSuffix)' == '' ">AssemblyFoldersEx</AssemblyFoldersSuffix>
     <GenerateManifests>true</GenerateManifests>
     <TargetCompactFramework>true</TargetCompactFramework>
+    <DefineConstants>$(DefineConstants),MF_FRAMEWORK_VERSION_V3_0</DefineConstants>
   </PropertyGroup>
   
   <ItemGroup>

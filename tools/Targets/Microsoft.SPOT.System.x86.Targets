@@ -107,6 +107,7 @@
     <ExtraFlags>$(ExtraFlags) $(SubSysDefines)</ExtraFlags>
 
     <IncludeFlags>@(IncludePaths->'/I $(CLRROOT)\%(relativedir)%(filename)',' ')</IncludeFlags>
+    <IncludeFlags>$(IncludeFlags) @(DirectIncludePaths->'/I %(FullPath)',' ')</IncludeFlags>
 
     <CharSet Condition="'$(CharSet)'==''">1</CharSet>
     <CharSetFlags Condition="'$(CharSet)'=='2'">/D "_MBCS"</CharSetFlags>

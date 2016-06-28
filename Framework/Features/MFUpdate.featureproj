@@ -5,6 +5,7 @@
     <Guid>{defc90df-c860-49b4-92e7-bdb2db938a8d}</Guid>
     <Description>Micro Framework update utilities</Description>
     <Groups />
+    <MFUPDATE_FEATUREPROJ>True</MFUPDATE_FEATUREPROJ>
   </PropertyGroup>
   <ItemGroup>
     <InteropFeature Include="Microsoft_SPOT_Update" />

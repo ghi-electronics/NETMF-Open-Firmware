@@ -76,7 +76,7 @@
 #include <ctype.h>
 #endif
 
-const char PEM_version[]="PEM" OPENSSL_VERSION_PTEXT;
+//const char PEM_version[]="PEM" OPENSSL_VERSION_PTEXT;
 
 #define MIN_LENGTH	4
 

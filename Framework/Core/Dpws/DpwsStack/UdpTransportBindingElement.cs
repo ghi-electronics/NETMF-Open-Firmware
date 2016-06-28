@@ -112,8 +112,16 @@ namespace Ws.Services.Binding
         {
             m_udpReceiveClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             IPEndPoint localEP = new IPEndPoint(s_localIP, m_config.DiscoveryPort);
-            m_udpReceiveClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            m_udpReceiveClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, 0x5000);
+            try
+            {
+                m_udpReceiveClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            }
+            catch{}
+            try
+            {
+                m_udpReceiveClient.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBuffer, 0x5000);
+            }
+            catch{}
 
             // Join Multicast Group
             byte[] discoveryAddr = m_config.DiscoveryAddress.GetAddressBytes();
@@ -121,8 +129,13 @@ namespace Ws.Services.Binding
             byte[] multicastOpt  = new byte[] {  discoveryAddr[0], discoveryAddr[1], discoveryAddr[2], discoveryAddr[3],   // WsDiscovery Multicast Address: 239.255.255.250
                                                  ipAddr       [0], ipAddr       [1], ipAddr       [2], ipAddr       [3] }; // Local IPAddress
             m_udpReceiveClient.Bind(localEP);
-            m_udpReceiveClient.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, ipAddr );
-            m_udpReceiveClient.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, multicastOpt);
+
+            try
+            {
+                m_udpReceiveClient.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, ipAddr );
+                m_udpReceiveClient.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, multicastOpt);
+            }
+            catch{}
 
             return ChainResult.Continue;
         }
@@ -219,7 +232,11 @@ namespace Ws.Services.Binding
                 using(Socket udpSendClient = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
                 {
                     IPEndPoint localEP = new IPEndPoint(s_localIP, 0);
-                    udpSendClient.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, (int)WsNetworkServices.GetLocalIPV4AddressValue());
+                    try
+                    {
+                        udpSendClient.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, (int)WsNetworkServices.GetLocalIPV4AddressValue());
+                    }
+                    catch{}
                     udpSendClient.Bind(localEP);
 
                     for (int i = cnt - 1; i >= 0; i--)

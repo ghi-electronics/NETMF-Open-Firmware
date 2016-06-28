@@ -182,7 +182,11 @@ namespace Microsoft.SPOT.Net.Ftp
         private void WorkerThread()
         {
             m_ListenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            m_ListenSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            try
+            {
+                m_ListenSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            }
+            catch{}
 
             IPAddress hostIp = new IPAddress(new byte[] { 0, 0, 0, 0 }); //IPAddress.Any;
             IPEndPoint ep = new IPEndPoint(hostIp, m_HostPort);
@@ -193,7 +197,12 @@ namespace Microsoft.SPOT.Net.Ftp
             try
             {
                 aSocket = m_ListenSocket.Accept();
-                aSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+
+                try
+                {
+                    aSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                }
+                catch{}
 
                 while (m_IsStarted)
                 {

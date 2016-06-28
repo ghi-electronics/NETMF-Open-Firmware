@@ -31,32 +31,24 @@ namespace Microsoft.SPOT.Samples.Sockets
 
         private void SocketThread()
         {
-            byte[] buff = new byte[100];
+            byte[] buff = new byte[1024];
             Socket s = m_sockets[m_sockets.Count - 1] as Socket;
             m_evt.Set();
 
-            s.Send(StringToByteArray("Socket " + m_sockets.Count + " created\r\n"));
             try
             {
+                s.Send(StringToByteArray("Socket " + m_sockets.Count + " created\r\n"));
+
                 while (true)
                 {
-                    if(s.Poll(-1, SelectMode.SelectRead))
+                    int len = s.Receive(buff);
+                    if (len > 0)
                     {
-                        Thread.Sleep(0);
-
-                        int len = s.Available;
-
-                        if (len > buff.Length) len = buff.Length;
-
-                        len = s.Receive(buff, len, SocketFlags.None);
-                        if (len > 0)
-                        {
-                            s.Send(buff, len, SocketFlags.None);
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        s.Send(buff, len, SocketFlags.None);
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
             }
@@ -65,9 +57,16 @@ namespace Microsoft.SPOT.Samples.Sockets
             }
             finally
             {
-                s.Close();
+                try
+                {
+                    s.Close();
+                }
+                catch { }
                 m_socketCloseEvt.Set();
-                m_sockets.Remove(s);
+                lock (m_sockets)
+                {
+                    m_sockets.Remove(s);
+                }
             }
         }
         private AutoResetEvent m_evt = new AutoResetEvent(false);
@@ -98,6 +97,8 @@ namespace Microsoft.SPOT.Samples.Sockets
             //socketServer.Bind(new IPEndPoint(IPAddress.Any, 0));
             //socketServer.Bind(new IPEndPoint(DottedDecimalToIp(192, 168, 187, 163), 0));
 
+            int retries = (int)Debug.GC(false) / 1000;
+
             socketServer.Listen(1);
 
             try
@@ -108,17 +109,40 @@ namespace Microsoft.SPOT.Samples.Sockets
                     {
                         Debug.Print("Waiting for client to connect");
                         Socket s = socketServer.Accept();
-                        m_sockets.Add(s);
+
+                        s.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger, 0);
+                        lock (m_sockets)
+                        {
+                            m_sockets.Add(s);
+                        }
                         Debug.Print("Socket " + m_sockets.Count + " connected");
                         Thread th = new Thread(new ThreadStart(SocketThread));
+                        m_evt.Reset();
                         th.Start();
                         m_threads.Add(th);
-                        m_evt.WaitOne();
+                        m_evt.WaitOne(500, true);
+
+                        foreach (Thread th2 in m_threads.ToArray())
+                        {
+                            if (!th2.IsAlive)
+                            {
+                                m_threads.Remove(th2);
+                            }
+                        }
+
                     }
                     catch (Exception e)
                     {
                         Debug.Print("Exception: " + e.ToString());
-                        m_socketCloseEvt.WaitOne();
+                        m_socketCloseEvt.WaitOne(500, true);
+                    }
+                    if (retries <= 0)
+                    {
+                        retries = (int)Debug.GC(true) / 1000;
+                    }
+                    else
+                    {
+                        retries -= 100;
                     }
                 }
             }
@@ -149,13 +173,20 @@ namespace Microsoft.SPOT.Samples.Sockets
 
             while (true)
             {
-                int len;
-                EndPoint ep = new IPEndPoint(IPAddress.Any, 0);
-                if (0 < (len = listener.ReceiveFrom(data, SocketFlags.None, ref ep)))
+                try
                 {
-                    ep = new IPEndPoint(((IPEndPoint)ep).Address, 1237);
+                    int len;
+                    EndPoint ep = new IPEndPoint(IPAddress.Any, 0);
+                    if (0 < (len = listener.ReceiveFrom(data, SocketFlags.None, ref ep)))
+                    {
+                        ep = new IPEndPoint(((IPEndPoint)ep).Address, 1237);
 
-                    listener.SendTo(data, len, SocketFlags.None, ep);
+                        listener.SendTo(data, len, SocketFlags.None, ep);
+                    }
+                }
+                catch
+                {
+                    Thread.Sleep(100);
                 }
             }
         }
@@ -173,7 +204,7 @@ namespace Microsoft.SPOT.Samples.Sockets
             {
                 NetworkInterface[] nis = NetworkInterface.GetAllNetworkInterfaces();
 
-                if (nis[0].IPAddress != "192.168.5.100")
+                if (nis[0].IPAddress != "192.168.5.100" && nis[0].IPAddress != "0.0.0.0")
                     break;
 
                 Thread.Sleep(1000);

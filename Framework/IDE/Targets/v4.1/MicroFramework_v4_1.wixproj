@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <ComponentGuid>{9AD79F5C-FB7B-4694-9929-8FEEE7DF7324}</ComponentGuid>
-    <DirectoryRef>AssembliesDir_V4_1</DirectoryRef>
+    <DirectoryRef>VsFrameworkAssemblyBase_v4_1</DirectoryRef>
     <_curdir>$(SPOCLIENT)\Framework\IDE\Targets\v4.1\Assemblies</_curdir>
   </PropertyGroup>
 

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <VisualStudioPropertySheet
 	ProjectType="Visual C++"
-	Version="10.00"
+	Version="11.00"
 	Name="MFPK default settings for all builds"
 	InheritedPropertySheets="$(SPOCLIENT)\Support\MfPkVersion.vsprops"
 	OutputDirectory="$(BUILD_ROOT)\$(ConfigurationName)\Server\lib"

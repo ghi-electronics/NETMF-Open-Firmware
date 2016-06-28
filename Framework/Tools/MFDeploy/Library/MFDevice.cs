@@ -143,15 +143,24 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
                     {
                         try
                         {
-                            uint addr = uint.Parse(key, System.Globalization.NumberStyles.HexNumber);
-                            if (!m_srecHash.ContainsKey(addr))
-                            {
-                                m_srecHash[addr] = 1;
+                            uint addr;
 
-                                if (OnProgress != null)
+                            if (uint.TryParse(key, System.Globalization.NumberStyles.HexNumber, null, out addr))
+                            {
+                                if (!m_srecHash.ContainsKey(addr) && m_minSrecAddr <= addr && m_maxSrecAddr >= addr)
                                 {
-                                    OnProgress(m_srecHash.Count, m_totalSrecs, string.Format(Properties.Resources.StatusFlashing, key));
+                                    m_srecHash[addr] = 1;
+
+                                    if (OnProgress != null)
+                                    {
+                                        OnProgress(m_srecHash.Count, m_totalSrecs, string.Format(Properties.Resources.StatusFlashing, key));
+                                    }
+
                                 }
+                            }
+                            else
+                            {
+                                Console.WriteLine(key);
                             }
 
                             m_evtMicroBooter.Set();
@@ -275,6 +284,84 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
             }
 
             return false;
+        }
+
+        internal bool ConnectTo(int timeout_ms, bool tryToConnect, _DBG.ConnectionSource target)
+        {
+            int retries = m_port is _DBG.PortDefinition_Tcp ? 2 : timeout_ms / 300;
+            if (retries == 0) retries = 1;
+
+            try
+            {
+                if (m_eng == null)
+                {
+                    m_eng = new _DBG.Engine(m_port);
+
+                    m_eng.OnNoise += new _DBG.NoiseEventHandler(OnNoiseHandler);
+                    m_eng.OnMessage += new _DBG.MessageEventHandler(OnMessage);
+
+                    m_eng.Start();
+                }
+
+                if (tryToConnect)
+                {
+                    for (int j = retries; j > 0; j--)
+                    {
+                        switch (target)
+                        {
+                            case _DBG.ConnectionSource.MicroBooter:
+                                if (CheckForMicroBooter()) return true;
+                                Thread.Sleep(timeout_ms / retries);
+                                break;
+
+                            default:
+                                if (m_eng.TryToConnect(0, timeout_ms / retries, true, _DBG.ConnectionSource.Unknown))
+                                {
+                                    if (m_eng.ConnectionSource == _DBG.ConnectionSource.TinyCLR)
+                                    {
+                                        m_eng.UnlockDevice(m_data);
+                                    }
+                                    else if (m_eng.ConnectionSource == _DBG.ConnectionSource.TinyBooter)
+                                    {
+                                        if (target == _DBG.ConnectionSource.TinyCLR)
+                                        {
+                                            m_eng.ExecuteMemory(0);
+                                            Thread.Sleep(100);
+                                        }
+                                    }
+                                    break;
+                                }
+
+                                if (EventCancel.WaitOne(0, false)) throw new MFUserExitException();
+                                break;
+                        }
+                        if (m_eng.IsConnected && target == m_eng.ConnectionSource)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (target != m_eng.ConnectionSource)
+                    {
+                        Disconnect();
+                    }
+                }
+
+            }
+            catch (ThreadAbortException)
+            {
+            }
+            catch (MFUserExitException)
+            {
+                Disconnect();
+                throw;
+            }
+            catch
+            {
+                Disconnect();
+            }
+
+            return (m_eng != null && (!tryToConnect || m_eng.IsConnected));
         }
 
         internal bool Connect( int timeout_ms, bool tryConnect )
@@ -661,6 +748,14 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
             {
                 Connect(1000, true);
             }
+            else
+            {
+                m_eng.OnNoise -= new _DBG.NoiseEventHandler(OnNoiseHandler);
+                m_eng.OnMessage -= new _DBG.MessageEventHandler(OnMessage);
+
+                m_eng.OnNoise += new _DBG.NoiseEventHandler(OnNoiseHandler);
+                m_eng.OnMessage += new _DBG.MessageEventHandler(OnMessage);
+            }
 
             if (m_eng != null)
             {
@@ -671,26 +766,19 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
                         return PingConnectionType.MicroBooter;
                     }
 
-                    if (Connect(200, true))
-                    {
-                        _WP.Commands.Monitor_Ping.Reply reply = m_eng.GetConnectionSource();
+                    _WP.Commands.Monitor_Ping.Reply reply = m_eng.GetConnectionSource();
 
-                        if (reply != null)
-                        {
-                            switch (reply.m_source)
-                            {
-                                case _WP.Commands.Monitor_Ping.c_Ping_Source_TinyCLR:
-                                    ret = PingConnectionType.TinyCLR;
-                                    break;
-                                case _WP.Commands.Monitor_Ping.c_Ping_Source_TinyBooter:
-                                    ret = PingConnectionType.TinyBooter;
-                                    break;
-                            }
-                        }
-                    }
-                    else
+                    if (reply != null)
                     {
-                        Disconnect();
+                        switch (reply.m_source)
+                        {
+                            case _WP.Commands.Monitor_Ping.c_Ping_Source_TinyCLR:
+                                ret = PingConnectionType.TinyCLR;
+                                break;
+                            case _WP.Commands.Monitor_Ping.c_Ping_Source_TinyBooter:
+                                ret = PingConnectionType.TinyBooter;
+                                break;
+                        }
                     }
                 }
                 catch (ThreadAbortException)
@@ -873,12 +961,18 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
         }
 
         private int m_totalSrecs = 0;
+        private uint m_minSrecAddr = 0;
+        private uint m_maxSrecAddr = 0;
+
         private bool DeploySREC(string srecFile, ref uint entryPoint)
         {
             entryPoint = 0;
             uint imageSize = 0;
             m_srecHash.Clear();
             m_execSrecHash.Clear();
+            m_totalSrecs = 0;
+            m_minSrecAddr = uint.MaxValue;
+            m_maxSrecAddr = 0;
 
             if (File.Exists(srecFile))
             {
@@ -922,6 +1016,8 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
 
                         foreach(uint key in keys)
                         {
+                            if (key < m_minSrecAddr) m_minSrecAddr = key;
+                            if (key > m_maxSrecAddr) m_maxSrecAddr = key;
                             if (m_srecHash.ContainsKey(key))
                             {
                                 remove.Add(key);
@@ -1392,20 +1488,13 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
         {
             if (m_eng == null) throw new MFDeviceNoResponseException(); 
 
-            m_eng.RebootDevice(coldBoot? _DBG.Engine.RebootOption.NoReconnect: _DBG.Engine.RebootOption.RebootClrWaitForDebugger);
+            m_eng.RebootDevice(coldBoot? _DBG.Engine.RebootOption.NoReconnect: _DBG.Engine.RebootOption.RebootClrOnly);
 
             if(!coldBoot)
             {
-                try
-                {
-                    Thread.Sleep(200);
-                }
-                catch
-                {
-                }
+                Thread.Sleep(200);
 
-                this.Disconnect();
-                this.Connect(1000, true);                
+                this.ConnectTo(1000, true, _DBG.ConnectionSource.TinyCLR);                
             }
         }
         /// <summary>

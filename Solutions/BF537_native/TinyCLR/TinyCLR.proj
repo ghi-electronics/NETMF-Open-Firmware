@@ -24,16 +24,16 @@
     <ObjFiles Include="$(OBJ_DIR)\tinyclr_dat.$(OBJ_EXT)" />
     <ExtraCleanFiles Include="$(OBJ_DIR)\tinyclr_dat.*" />
   </ItemGroup>
-  <Import Project="$(SPOCLIENT)\Framework\Features\Core.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\TinyCore.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\NativeEventDispatcher.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\InterruptHandler.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\SerialPort.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Usb.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\DataStorage.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Debugger.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Diagnostics.featureproj" Condition="'$(FLAVOR)'!='rtm'" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Serialization.featureproj" />
+  <Import Condition="'$(CORE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Core.featureproj" />
+  <Import Condition="'$(TINYCORE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\TinyCore.featureproj" />
+  <Import Condition="'$(NATIVEEVENTDISPATCHER_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\NativeEventDispatcher.featureproj" />
+  <Import Condition="'$(INTERRUPTHANDLER_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\InterruptHandler.featureproj" />
+  <Import Condition="'$(SERIALPORT_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\SerialPort.featureproj" />
+  <Import Condition="'$(USB_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Usb.featureproj" />
+  <Import Condition="'$(DATASTORAGE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\DataStorage.featureproj" />
+  <Import Condition="'$(DEBUGGER_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Debugger.featureproj" />
+  <Import Condition="'$(DIAGNOSTICS_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Diagnostics.featureproj" Condition="'$(FLAVOR)'!='rtm'" />
+  <Import Condition="'$(SERIALIZATION_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Serialization.featureproj" />
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Interop.Settings" />
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\drivers\LargeBuffer\stubs\dotnetmf.proj" />

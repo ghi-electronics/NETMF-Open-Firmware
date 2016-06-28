@@ -91,7 +91,7 @@
         <TargetFrameworkDirectory>$(BUILD_TREE_DLL)</TargetFrameworkDirectory>
         <FrameworkRegistryBase>Software\Microsoft\.NETMicroFramework</FrameworkRegistryBase>
         <TargetFrameworkIdentifier>.NETMicroFramework</TargetFrameworkIdentifier>
-        <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)'== ''">v4.2</TargetFrameworkVersion>
+        <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)'== ''">v4.3</TargetFrameworkVersion>
         <AssemblyFoldersSuffix  Condition="'$(AssemblyFoldersSuffix)' == ''">AssemblyFoldersEx</AssemblyFoldersSuffix>
       </PropertyGroup>
 
@@ -113,7 +113,7 @@
         <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
         <OutputType Condition=" '$(TinyCLR_OutputTypeServer)' != ''">$(TinyCLR_OutputTypeServer)</OutputType>
         <TinyCLR_Skip_ConvertResources>true</TinyCLR_Skip_ConvertResources>
-        <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)'== ''">v4.0</TargetFrameworkVersion>
+        <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)'== ''">v4.5</TargetFrameworkVersion>
       </PropertyGroup>
     </Otherwise>
   </Choose>

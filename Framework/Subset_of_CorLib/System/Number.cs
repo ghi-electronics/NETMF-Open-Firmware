@@ -351,6 +351,7 @@ namespace System
                 case 'X':
                 case 'F':
                 case 'N':
+                case 'D':
                     if (formatLen == 1) precision = 2; // if no precision is specified, use the default
                     break;
                 default:

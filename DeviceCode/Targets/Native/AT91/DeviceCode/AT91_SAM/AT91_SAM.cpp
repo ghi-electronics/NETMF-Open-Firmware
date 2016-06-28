@@ -52,7 +52,8 @@ BOOL AT91_SAM_Driver::Initialize()
 
 void AT91_SAM_Driver::Halt(void)      
 {
-    while(true);
+    volatile bool fContinue=false;
+    while(!fContinue);
 }
 void AT91_SAM_Driver::Reset(void)     
 {

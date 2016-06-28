@@ -336,7 +336,7 @@ void CLR_Messaging::Initialize(
     m_Lookup_Replies[ 1 ].owner = owner;
     m_Lookup_Replies[ 1 ].size  = replyLookupCount;
 
-    DebuggerPort_Initialize( port );
+    m_fDebuggerInitialized = DebuggerPort_Initialize( port );
 
     m_fInitialized = true;
 
@@ -373,6 +373,8 @@ void CLR_Messaging::Cleanup()
     m_cacheMaster     .DblLinkedList_Release();
 
     m_cacheTotalSize = 0;
+
+    m_fDebuggerInitialized = false;
 
     m_fInitialized = false;
 }

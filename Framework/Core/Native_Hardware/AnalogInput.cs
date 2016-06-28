@@ -120,6 +120,8 @@ namespace Microsoft.SPOT.Hardware
         private void Dispose(bool fDisposing)
         {
             Port.ReservePin(m_pin, false);
+
+            Uninitialize(m_channel);
         }
 
         /// <summary>
@@ -204,7 +206,10 @@ namespace Microsoft.SPOT.Hardware
         //--//
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        protected static extern void Initialize(Cpu.AnalogChannel channel, int precisionInBits);        
+        protected static extern void Initialize(Cpu.AnalogChannel channel, int precisionInBits);     
+        
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        protected static extern void Uninitialize(Cpu.AnalogChannel channel);        
     }
 }
 

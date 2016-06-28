@@ -122,91 +122,154 @@
 /* MEM_ALIGNMENT: should be set to the alignment of the CPU for which
    lwIP is compiled. 4 byte alignment -> define MEM_ALIGNMENT to 4, 2
    byte alignment -> define MEM_ALIGNMENT to 2. */
+#ifndef MEM_ALIGNMENT
 #define MEM_ALIGNMENT           4
+#endif
 
 /* These two control whether reclaimer functions should be compiled
    in. Should always be turned on (1). */
+#ifndef MEM_RECLAIM
 #define MEM_RECLAIM             1
+#endif
+#ifndef MEMP_RECLAIM
 #define MEMP_RECLAIM            1
+#endif
+
+#ifndef ETH_PAD_SIZE
+#define ETH_PAD_SIZE            0
+#endif
 
 /* PBUF_LINK_HLEN: the number of bytes that should be allocated for a
    link level header. */
-#define PBUF_LINK_HLEN          16
+#ifndef PBUF_LINK_HLEN
+#define PBUF_LINK_HLEN          (14 + ETH_PAD_SIZE)
+#endif
 
 /* ---------- TCP options ---------- */
+#ifndef LWIP_TCP
 #define LWIP_TCP                1
+#endif
+#ifndef TCP_TTL
 #define TCP_TTL                 255
+#endif
+
+#ifndef TCP_OVERSIZE
+#define TCP_OVERSIZE            TCP_MSS
+#endif
 
 /* Controls if TCP should queue segments that arrive out of
    order. Define to 0 if your device is low on memory. */
-#define TCP_QUEUE_OOSEQ         1
+#ifndef TCP_QUEUE_OOSEQ
+#define TCP_QUEUE_OOSEQ         0
+#endif
 
 /* Maximum number of retransmissions of data segments. */
-#define TCP_MAXRTX              12
+#ifndef TCP_MAXRTX
+#define TCP_MAXRTX              6
+#endif
 
 /* Maximum number of retransmissions of SYN segments. */
+#ifndef TCP_SYNMAXRTX
 #define TCP_SYNMAXRTX           4
+#endif
 
 /* ---------- ARP options ---------- */
+#ifndef ARP_TABLE_SIZE
 #define ARP_TABLE_SIZE          10
-#define ARP_QUEUEING            1
+#endif
+#ifndef ARP_QUEUEING
+#define ARP_QUEUEING            0
+#endif
 
 /* ---------- IP options ---------- */
 /* Define IP_FORWARD to 1 if you wish to have the ability to forward
    IP packets across network interfaces. If you are going to run lwIP
    on a device with only one network interface, define this to 0. */
+#ifndef IP_FORWARD
 #define IP_FORWARD              1
+#endif
 
 /* If defined to 1, IP options are allowed (but not parsed). If
    defined to 0, all packets with IP options are dropped. */
+#ifndef IP_OPTIONS
 #define IP_OPTIONS              1
+#endif
 
 /* IP reassembly and segmentation.These are orthogonal even
  * if they both deal with IP fragments */
+#ifndef IP_REASSEMBLY
 #define IP_REASSEMBLY           1
+#endif
+#ifndef IP_FRAG
 #define IP_FRAG                 1
+#endif
 
 /* ---------- ICMP options ---------- */
+#ifndef ICMP_TTL
 #define ICMP_TTL                255
+#endif
 
 /* ---------- DHCP options ---------- */
 /* Define LWIP_DHCP to 1 if you want DHCP configuration of
    interfaces. */
+#ifndef LWIP_DHCP
 #define LWIP_DHCP               1
+#endif
 
 /* 1 if you want to do an ARP check on the offered address
    (recommended). */
+#ifndef DHCP_DOES_ARP_CHECK
 #define DHCP_DOES_ARP_CHECK     0
+#endif
 
 /* ---------- UDP options ---------- */
+#ifndef LWIP_UDP
 #define LWIP_UDP                1
+#endif
+#ifndef UDP_TTL
 #define UDP_TTL                 255
+#endif
 
 /* ---------- Statistics options ---------- */
+#ifndef LWIP_STATS
 #define LWIP_STATS              0
+#endif
 
 /** SYS_LIGHTWEIGHT_PROT
  * define SYS_LIGHTWEIGHT_PROT in lwipopts.h if you want inter-task
  * protection for certain critical regions during buffer allocation
  * and deallocation and memory allocation and deallocation.
  */
+#ifndef SYS_LIGHTWEIGHT_PROT
 #define SYS_LIGHTWEIGHT_PROT    1
+#endif
 
+#ifndef LWIP_COMPAT_SOCKETS
 #define LWIP_COMPAT_SOCKETS     1
+#endif
 
+#ifndef LWIP_PROVIDE_ERRNO
 #define LWIP_PROVIDE_ERRNO      1
+#endif
 
 /* ---------- SNMP options ---------- */
+#ifndef LWIP_SNMP
 #define LWIP_SNMP               0 /*LwIP 1.2.0*/
+#endif
+#ifndef LWIP_IGMP
 #define LWIP_IGMP               1 /*LwIP 1.2.0*/
+#endif
 
 // thread priorities are in VDK terms - 1 is highest, 30 is lowest
+#ifndef TCPIP_THREAD_PRIO
 #define TCPIP_THREAD_PRIO       5
+#endif
+#ifndef DEFAULT_THREAD_PRIO
 #define DEFAULT_THREAD_PRIO     10
+#endif
+#ifndef LOW_THREAD_PRIO
 #define LOW_THREAD_PRIO         29
-
-#define OPENSSL_SMALL_FOOTPRINT 1
-
+#endif
 
 //--// RAM size estimate macro
 

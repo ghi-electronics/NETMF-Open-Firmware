@@ -12,8 +12,6 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WinUsb</RootNamespace>
     <AssemblyName>WinUsbInvoke</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

@@ -73,7 +73,7 @@
 #endif
 
 static void get_current_time(struct TINYCLR_SSL_TIMEVAL *t);
-const char dtls1_version_str[]="DTLSv1" OPENSSL_VERSION_PTEXT;
+//const char dtls1_version_str[]="DTLSv1" OPENSSL_VERSION_PTEXT;
 int dtls1_listen(SSL *s, struct TINYCLR_SSL_SOCKADDR *client);
 
 SSL3_ENC_METHOD DTLSv1_enc_data={

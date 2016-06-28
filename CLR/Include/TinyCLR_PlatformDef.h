@@ -5,7 +5,7 @@
 #ifndef _TINYCLR_PLATFORMDEF_H_
 #define _TINYCLR_PLATFORMDEF_H_
 
-#include "CLR_Defines.h"
+#include <CLR_Defines.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // PLATFORMS GENERAL DEFINITIONS

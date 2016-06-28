@@ -338,11 +338,12 @@ void AT91_USBHS_Driver::TxPacket( USB_CONTROLLER_STATE* State, int endpoint )
     // transmit a packet on UsbPortNum, if there are no more packets to transmit, then die
     USB_PACKET64* Packet64;
 
-    for(;;)
-    {
-        Packet64 = USB_TxDequeue( State, endpoint, TRUE );
+    Packet64 = USB_TxDequeue( State, endpoint, TRUE );
 
-        if(Packet64 == NULL || Packet64->Size > 0) break;
+    if(Packet64 != NULL && Packet64->Size == 0)
+    {
+        g_AT91_USBHS_Driver.TxNeedZLPS[endpoint] = TRUE;
+        Packet64 = NULL;
     }
 
     while (pUdp->UDPHS_EPT[endpoint].UDPHS_EPTSTA & AT91C_UDPHS_TX_PK_RDY);

@@ -16,6 +16,12 @@
     <CommonAssemblyInfoTemplate>$(SPOCLIENT)\tools\AssemblyInfo.vb.template</CommonAssemblyInfoTemplate>
     <CommonAssemblyInfoItemName>Compile</CommonAssemblyInfoItemName>
     <CommonAssemblyInfoLanguage>VisualBasic</CommonAssemblyInfoLanguage>
+
+    <DefineConstants Condition="'$(TargetFrameworkVersion)'=='v3.0'">$(DefineConstants),MF_FRAMEWORK_VERSION_V3_0</DefineConstants>
+    <DefineConstants Condition="'$(TargetFrameworkVersion)'=='v4.0'">$(DefineConstants),MF_FRAMEWORK_VERSION_V4_0</DefineConstants>
+    <DefineConstants Condition="'$(TargetFrameworkVersion)'=='v4.1'">$(DefineConstants),MF_FRAMEWORK_VERSION_V4_1</DefineConstants>
+    <DefineConstants Condition="'$(TargetFrameworkVersion)'=='v4.2'">$(DefineConstants),MF_FRAMEWORK_VERSION_V4_2</DefineConstants>
+    <DefineConstants Condition="'$(TargetFrameworkVersion)'=='v4.3'">$(DefineConstants),MF_FRAMEWORK_VERSION_V4_3</DefineConstants>
   </PropertyGroup>  
 
   <!-- for DEV11, we will not need to refer to the runtime anymore, it will be embedded -->

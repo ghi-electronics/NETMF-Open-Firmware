@@ -23,7 +23,9 @@
 
 /////////////////////////////////////////////////////////
 //
+#if !defined(HAL_REDUCESIZE)
 #define AT91EMAC_SOCKETS_ENABLED               1
+#endif
 
 #if (AT91EMAC_SOCKETS_ENABLED)
 
@@ -73,12 +75,20 @@
 
 #define INSTRUMENTATION_H_GPIO_PIN      GPIO_PIN_NONE
 
+//#if (AT91EMAC_SOCKETS_ENABLED)
+//    #define DEBUG_TEXT_PORT    USB1
+//    #define STDIO              USB1
+//    #define DEBUGGER_PORT      COM_SOCKET_DBG
+//    #define MESSAGING_PORT     COM_SOCKET_DBG
+//
+//#elif 1
 #if 1
 
     #define DEBUG_TEXT_PORT    USB1
     #define STDIO              USB1
     #define DEBUGGER_PORT      USB1
     #define MESSAGING_PORT     USB1
+
 #else
 
     #define DEBUG_TEXT_PORT    COM1

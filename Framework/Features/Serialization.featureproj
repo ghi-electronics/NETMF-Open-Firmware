@@ -13,5 +13,6 @@
     </Groups>
     <Documentation>
     </Documentation>
+    <SERIALIZATION_FEATUREPROJ>True</SERIALIZATION_FEATUREPROJ>
   </PropertyGroup>
 </Project>

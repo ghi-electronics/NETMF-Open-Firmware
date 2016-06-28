@@ -11,7 +11,7 @@
     <IsSolutionWizardVisible>True</IsSolutionWizardVisible>
     <ENDIANNESS>le</ENDIANNESS>
     <TARGETBSP>iMXS</TARGETBSP>
-    <TCP_IP_STACK Condition="'$(TCP_IP_STACK)'==''">RTIP</TCP_IP_STACK>
+    <TCP_IP_STACK Condition="'$(TCP_IP_STACK)'==''">LWIP</TCP_IP_STACK>
   </PropertyGroup>
   <ItemGroup>
     <IncludePaths Include="Solutions\iMXS_net" />

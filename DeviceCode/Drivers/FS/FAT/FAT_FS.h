@@ -8,7 +8,11 @@
 #include "tinyhal.h"
 #include "FS_decl.h"
 
-//#define FAT_FS__VALIDATE_READONLY_CACHELINE 1
+#ifdef _DEBUG
+#ifndef FAT_FS__VALIDATE_READONLY_CACHELINE
+#define FAT_FS__VALIDATE_READONLY_CACHELINE 1
+#endif
+#endif
 
 #ifndef FAT_FS__CACHE_FLUSH_TIMEOUT_USEC
 #define FAT_FS__CACHE_FLUSH_TIMEOUT_USEC (60*1000*1000)

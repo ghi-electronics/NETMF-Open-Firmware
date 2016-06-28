@@ -10,7 +10,7 @@
     
     <If Name="TARGETLOCATION" In="FLASH">
         <Set Name="Code_BaseAddress"   Value="0x00100000"/>
-        <Set Name="Code_Size"          Value="0x00010000"/>
+        <Set Name="Code_Size"          Value="0x00012000"/>
         <Set Name="Valid"            Value="true"/>
     </If>
 

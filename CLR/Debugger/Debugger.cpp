@@ -513,7 +513,7 @@ bool CLR_DBG_Debugger::CheckPermission( ByteAddress address, int mode )
             if(!DebuggerPort_IsUsingSsl(HalSystemConfig.DebuggerPorts[ 0 ]))
                 break;
 #endif
-            if(range.IsDeployment())
+            if(range.IsDeployment() || range.IsConfig())
             {
                 hasPermission = true;
             }
@@ -536,11 +536,8 @@ bool CLR_DBG_Debugger::CheckPermission( ByteAddress address, int mode )
                 case BlockRange::BLOCKTYPE_SIMPLE_A:
                 case BlockRange::BLOCKTYPE_SIMPLE_B:
                 case BlockRange::BLOCKTYPE_UPDATE:
-                    hasPermission = true;
-                    break;
-
                 case BlockRange::BLOCKTYPE_CONFIG:         // fall through
-                    hasPermission = (bool)DebuggerPort_IsUsingSsl(HalSystemConfig.DebuggerPorts[ 0 ]);
+                    hasPermission = true;
                     break;
             }
             break;

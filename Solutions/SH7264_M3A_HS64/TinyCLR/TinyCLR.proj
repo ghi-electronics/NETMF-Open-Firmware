@@ -44,24 +44,23 @@
     <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2a\DeviceCode\bootstrap\sbrk.c" />
     <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2a\DeviceCode\bootstrap\vecttbl.c" />
   </ItemGroup>
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\hardware.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\NativeEventDispatcher.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\DataStorage.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\BlockStorage.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Debugger.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Diagnostics.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\InterruptHandler.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\serial_port.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\SerialPort.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Stream.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Graphics.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\TinyCore.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\I2C.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Serialization.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\TimeService.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Stream.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\FileSystem.featureproj" />
+  <Import Condition="'$(CORE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
+  <Import Condition="'$(HARDWARE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
+  <Import Condition="'$(NATIVEEVENTDISPATCHER_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\NativeEventDispatcher.featureproj" />
+  <Import Condition="'$(DATASTORAGE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\DataStorage.featureproj" />
+  <Import Condition="'$(BLOCKSTORAGE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\BlockStorage.featureproj" />
+  <Import Condition="'$(DEBUGGER_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Debugger.featureproj" />
+  <Import Condition="'$(DIAGNOSTICS_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Diagnostics.featureproj" />
+  <Import Condition="'$(INTERRUPTHANDLER_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\InterruptHandler.featureproj" />
+  <Import Condition="'$(SERIAL_PORT_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\serial_port.featureproj" />
+  <Import Condition="'$(SERIALPORT_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\SerialPort.featureproj" />
+  <Import Condition="'$(STREAM_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Stream.featureproj" />
+  <Import Condition="'$(GRAPHICS_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Graphics.featureproj" />
+  <Import Condition="'$(TINYCORE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\TinyCore.featureproj" />
+  <Import Condition="'$(I2C_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\I2C.featureproj" />
+  <Import Condition="'$(SERIALIZATION_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Serialization.featureproj" />
+  <Import Condition="'$(TIMESERVICE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\TimeService.featureproj" />
+  <Import Condition="'$(FILESYSTEM_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\FileSystem.featureproj" />
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Interop.Settings" />
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\MFUpdate\stubs\dotnetMF.proj" />

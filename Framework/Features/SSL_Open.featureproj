@@ -2,7 +2,7 @@
   <PropertyGroup>
     <FeatureName>SSL (Open)</FeatureName>
   </PropertyGroup>
-  <Import Project="$(SPOCLIENT)\Framework\Features\Network_LWIP.featureproj" />
+  <Import Condition="'$(NETWORK_LWIP_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Network_LWIP.featureproj" />
   <ItemGroup>
     <InteropFeature Include="Microsoft_SPOT_Net_Security" />
     <MMP_DAT_CreateDatabase Include="$(BUILD_TREE_CLIENT)\pe\$(ENDIANNESS)\Microsoft.SPOT.Net.Security.pe" />
@@ -18,5 +18,6 @@
     <Groups>Networking</Groups>
     <Documentation>
     </Documentation>
+    <SSL_OPEN_FEATUREPROJ>True</SSL_OPEN_FEATUREPROJ>
   </PropertyGroup>
 </Project>

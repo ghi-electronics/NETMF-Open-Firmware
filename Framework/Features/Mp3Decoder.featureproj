@@ -4,6 +4,7 @@
     <Guid>{004c36c0-048a-4f5e-be7f-bc81d497d66e}</Guid>
     <Description>MP3 decoding API, NXP Research</Description>
     <Groups></Groups>
+    <MP3DECODER_FEATUREPROJ>True</MP3DECODER_FEATUREPROJ>
   </PropertyGroup>
   <ItemGroup>
     <InteropFeature Include="Mp3Decoder" />

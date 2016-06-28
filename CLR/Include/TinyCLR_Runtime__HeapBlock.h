@@ -173,13 +173,8 @@ private:
 
                 U8& operator=( const CLR_UINT64 num )
                 {
-#if !defined(BIG_ENDIAN)
                     _L = (CLR_UINT32)((ULONGLONGCONSTANT(0x00000000FFFFFFFF) & num)      );
                     _H = (CLR_UINT32)((ULONGLONGCONSTANT(0xFFFFFFFF00000000) & num) >> 32);
-#else
-                    _L = (CLR_UINT32) (( ULONGLONGCONSTANT(0x00000000FFFFFFFF) & num)       );
-                    _H = (CLR_UINT32) (( ULONGLONGCONSTANT(0xFFFFFFFF00000000) & num) >> 32 );
-#endif
                     return *this;
                 }
                 U8& operator+=( const U8& num )
@@ -326,13 +321,8 @@ private:
 
                 S8& operator=( const CLR_INT64 num )
                 {
-#if !defined(BIG_ENDIAN)
                     _L = (CLR_UINT32) (( ULONGLONGCONSTANT(0x00000000FFFFFFFF) & num)       );
                     _H = (CLR_UINT32) (( ULONGLONGCONSTANT(0xFFFFFFFF00000000) & num) >> 32 );
-#else
-                    _L = (CLR_UINT32) (( ULONGLONGCONSTANT(0x00000000FFFFFFFF) & num)       );
-                    _H = (CLR_UINT32) (( ULONGLONGCONSTANT(0xFFFFFFFF00000000) & num) >> 32 );
-#endif
                     return *this;
                 }
 
@@ -732,13 +722,8 @@ private:
 
                 R8& operator=( const CLR_INT64 num )
                 {
-#if !defined(BIG_ENDIAN)
                     _L = (CLR_UINT32) (( ULONGLONGCONSTANT(0x00000000FFFFFFFF) & num)       );
                     _H = (CLR_UINT32) (( ULONGLONGCONSTANT(0xFFFFFFFF00000000) & num) >> 32 );
-#else
-                    _L = (CLR_UINT32) (( ULONGLONGCONSTANT(0x00000000FFFFFFFF) & num)       );
-                    _H = (CLR_UINT32) (( ULONGLONGCONSTANT(0xFFFFFFFF00000000) & num) >> 32 );
-#endif
                     return *this;
                 }
 

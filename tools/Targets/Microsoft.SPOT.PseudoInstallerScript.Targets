@@ -9,7 +9,7 @@
         <MFSDKInstallerFile>$(BUILD_TREE_SERVER)\msm\MicroFrameworkSDK.MSI</MFSDKInstallerFile>
         <PseudoInstallerScript Condition="'$(PseudoInstallerScript)'==''">$(SPOCLIENT)\tools\scripts\mfpseudoinstaller.cmd</PseudoInstallerScript>
         <PseudoInstallerExists Condition="Exists('$(PseudoInstallerScript)')">true</PseudoInstallerExists>
-        <VSVER Condition="'$(VSVER)'==''" >10.0</VSVER>
+        <VSVER Condition="'$(VSVER)'==''" >11.0</VSVER>
     </PropertyGroup>
 
     <!-- The ComponentReplacements group are registry settings whose values are WiX -->
@@ -30,8 +30,8 @@
             <ReplaceWith>$(VSIP_DIR)</ReplaceWith>
         </ComponentReplacements>
 
-        <ComponentReplacements Include="Component_Targets_v4_2">
-            <ReplaceWith>%SPOCLIENT%\Framework\IDE\Targets\v4.2</ReplaceWith>
+        <ComponentReplacements Include="Component_Targets_v4_3">
+            <ReplaceWith>%SPOCLIENT%\Framework\IDE\Targets\v4.3</ReplaceWith>
         </ComponentReplacements>
 
         <ComponentReplacements Include="ToolsDir">
@@ -104,6 +104,25 @@
         </ComponentReplacements>
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- v4.2 backcompat components -->
+        <ComponentReplacements Include="VERSIONDIR_v4_2">
+            <ReplaceWith>%SPOCLIENT%\Framework\IDE\Targets\v4.2</ReplaceWith>
+        </ComponentReplacements>
+
+        <ComponentReplacements Include="ToolsDir_v4_2">
+            <ReplaceWith>%SPOCLIENT%\Framework\IDE\Targets\v4.2\Tools\</ReplaceWith>
+        </ComponentReplacements>
+
+        <ComponentReplacements Include="Component_Targets_v4_2">
+            <ReplaceWith>%SPOCLIENT%\Framework\IDE\Targets\v4.2</ReplaceWith>
+        </ComponentReplacements>
+
+        <ComponentReplacements Include="AssembliesDir_V4_2">
+            <ReplaceWith>%SPOCLIENT%\Framework\IDE\Targets\v4.2\Assemblies</ReplaceWith>
+        </ComponentReplacements>
+    </ItemGroup>
+
     <!-- The KeyReplacements group are those registry settings where we want to map the -->
     <!-- key used in the installer to an equivalent key that does not require admin     -->
     <!-- privs or potentially mess up the global registration environment               -->
@@ -138,6 +157,12 @@
         <IgnoreKeys Include="VCS Express registry keys -- requires admin rights to succeed">
             <Prefix>HKLM\SOFTWARE\Microsoft\VCSExpress</Prefix>
         </IgnoreKeys>
+        <IgnoreKeys Include="VB Express registry keys -- requires admin rights to succeed">
+            <Prefix>HKLM\SOFTWARE\Microsoft\VBExpress</Prefix>
+        </IgnoreKeys>
+        <IgnoreKeys Include="Windows Desktop Express registry keys -- requires admin rights to succeed">
+            <Prefix>HKLM\SOFTWARE\Microsoft\WDExpress</Prefix>
+        </IgnoreKeys>
         <IgnoreKeys Include="VC Runtime merge modules">
             <Prefix>HKLM\SOFTWARE\Microsoft\Windows</Prefix>
         </IgnoreKeys>
@@ -158,6 +183,7 @@
     <Target Name="Uninstall">
         <Exec Condition="'$(PseudoInstallerExists)'=='true' "
             Command="$(PseudoInstallerScript) /u"
+            ContinueOnError="true"
             />
     </Target>
 

@@ -66,6 +66,8 @@ namespace Microsoft.SPOT
         extern static public ExtendedWeakReference Recover(Type selector, uint id);
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         extern public void PushBackIntoRecoverList();
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        extern static public void FlushAll();
     }
 }
 

@@ -187,6 +187,7 @@
     <CC_CPP_INCS>$(CC_CPP_INCS) -I$(SPO_SDK)\CLR\Libraries\SPOT_Net</CC_CPP_INCS>
     <CC_CPP_INCS>$(CC_CPP_INCS) -I$(ARMINC)</CC_CPP_INCS>
     <CC_CPP_INCS>$(CC_CPP_INCS) @(IncludePaths->'-I$(CLRROOT)\%(relativedir)%(filename)',' ')</CC_CPP_INCS>
+    <CC_CPP_INCS>$(CC_CPP_INCS) @(DirectIncludePaths->'-I%(FullPath)',' ')</CC_CPP_INCS>
 
     <CC_CPP_COMMON_FLAGS>$(CC_CPP_COMMON_FLAGS) $(AS_CC_CPP_COMMON_FLAGS) $(CC_CPP_TARGETTYPE_FLAGS) $(CC_CPP_INCS) $(ExtraFlags)</CC_CPP_COMMON_FLAGS>
   </PropertyGroup>
@@ -312,8 +313,20 @@
   </Target>
 
   <Target Name="BuildAXF" Condition="'$(OutputType)'=='Executable'" DependsOnTargets="ArmCompileCPP;ArmCompileC;ArmAssemble;$(ExtraEXETargets);BuildScatterfile" Inputs="@(EXEInputs);@(InputLibs);@(PlatformIndependentLibs->'$(PLATFORM_INDEPENDENT_RELATIVE_LIB_DIR)\%(FileName)%(Extension)');@(DriverLibs->'$(LIB_DIR)\%(FileName)%(Extension)');@(EXEScatterFile)" Outputs="@(EXEOutput)">
-    <Exec WorkingDirectory="$(LIB_DIR)" Condition="'$(COMPILER_TOOL)'=='GCC'"    Command="$(LINK) $(LINK_FLAGS) -u ARM_Vectors -u _start --Map $(EXEName).map --output=@(EXEOutput) --script=@(EXEScatterFile,' ') @(EXEInputs,' ') -( @(PlatformIndependentLibs->'$(PLATFORM_INDEPENDENT_RELATIVE_LIB_DIR)%(FileName)%(Extension)',' ') @(DriverLibs->'%(FileName)%(Extension)',' ')  @(InputLibs,' ') -) -( &#x22;$(GNU_LIB_DIR)\libm.a&#x22; &#x22;$(GNU_LIB_DIR)\$(LIBCGCC)&#x22; &#x22;$(GNU_LIBGCC_DIR)\$(LIBGCC)&#x22; -) -( $(ExtraLibs) -)"/>
-    <Exec WorkingDirectory="$(LIB_DIR)" Condition="'$(COMPILER_TOOL)'=='GCCOP'"  Command="$(LINK) $(LINK_FLAGS) -u ARM_Vectors -u _start --Map $(EXEName).map --output=@(EXEOutput) --script=@(EXEScatterFile,' ') @(EXEInputs,' ') -( @(PlatformInd	ependentLibs->'$(PLATFORM_INDEPENDENT_RELATIVE_LIB_DIR)%(FileName)%(Extension)',' ') @(DriverLibs->'%(FileName)%(Extension)',' ')  @(InputLibs,' ') -) -( &#x22;$(GNU_LIBGCC_DIR)\$(LIBGCC)&#x22;  -) -( $(ExtraLibs) -)"/>
+    <!-- 
+        The GCC archiver does not support concatening libraries into a single one. The only way is to extract all the obj files then rearchive them altogether. 
+        However, we probably want to consider using a BuildTask instead of using the following ugly script. 
+    -->
+    <Exec command="PrepareLibsForConcat.cmd $(LIB_DIR) @(DriverLibs,' ')" />
+    <Exec Command="$(AR) $(ARFLAGS) $(LIB_DIR)\tmp_$(AssemblyName).$(LIB_EXT) $(LIB_DIR)\tmp\*.$(OBJ_EXT)" />
+    <Exec Command="del $(LIB_DIR)\tmp\*.$(OBJ_EXT)" />
+    <Exec Command="rmdir $(LIB_DIR)\tmp" />
+    
+    <Exec Condition="'$(COMPILER_TOOL)'=='GCC'" Command="$(LINK) $(LINK_FLAGS) -u ARM_Vectors -u _start --Map $(EXEName).map --output=@(EXEOutput) --script=@(EXEScatterFile,' ') @(EXEInputs,' ') -( @(PlatformIndependentLibs->'$(PLATFORM_INDEPENDENT_RELATIVE_LIB_DIR)%(FileName)%(Extension)',' ') $(LIB_DIR)\tmp_$(AssemblyName).$(LIB_EXT) @(InputLibs,' ') -) -( &#x22;$(GNU_LIB_DIR)\libm.a&#x22; &#x22;$(GNU_LIB_DIR)\libc.a&#x22; &#x22;$(GNU_LIBGCC_DIR)\$(LIBGCC)&#x22; -) -( $(ExtraLibs) -)"/>
+    
+    <Exec Condition="'$(COMPILER_TOOL)'=='GCCOP'"  Command="$(LINK) $(LINK_FLAGS) -u ARM_Vectors -u _start --Map $(EXEName).map --output=@(EXEOutput) --script=@(EXEScatterFile,' ') @(EXEInputs,' ') -( @(PlatformIndependentLibs->'$(PLATFORM_INDEPENDENT_RELATIVE_LIB_DIR)%(FileName)%(Extension)',' ') $(LIB_DIR)\tmp_$(AssemblyName).$(LIB_EXT) @(InputLibs,' ') -) -( &#x22;$(GNU_LIBGCC_DIR)\$(LIBGCC)&#x22;  -) -( $(ExtraLibs) -)"/>
+    <Exec Command="del /q $(LIB_DIR)\tmp_$(AssemblyName).$(LIB_EXT)"/>    
+
 
     <Exec Command="$(OBJDUMP) -d -EL @(EXEOutput) > $(EXEName).axfdump" />
 

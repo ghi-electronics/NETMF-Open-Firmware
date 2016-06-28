@@ -28,65 +28,100 @@
 // indexed port configuration access
 #define Port(port) ((GPIO_TypeDef *) (GPIOA_BASE + (port << 10)))
 
+typedef struct {
+    HAL_COMPLETION completion; // debounce completion
+    BYTE pin;      // pin number
+    BYTE mode;     // edge mode
+    BYTE debounce; // debounce flag
+    BYTE expected; // expected pin state
+    GPIO_INTERRUPT_SERVICE_ROUTINE ISR; // interrupt handler
+    void* param;   // interrupt handler parameter
+} STM32_Int_State;
+
+static STM32_Int_State g_int_state[STM32_Gpio_MaxInt]; // interrupt state
+
 static UINT32 g_debounceTicks;
 static UINT16 g_pinReserved[STM32_Gpio_MaxPorts]; //  1 bit per pin
 
-static GPIO_INTERRUPT_SERVICE_ROUTINE g_ISR[STM32_Gpio_MaxInt]; // interrupt handlers
-static void* g_ISR_Param[STM32_Gpio_MaxInt]; // interrupt handler parameters
 
+/*
+ * Debounce Completion Handler
+ */
+void STM32_GPIO_DebounceHandler (void* arg)
+{
+    STM32_Int_State* state = (STM32_Int_State*)arg;
+    if (state->ISR) {
+        UINT32 actual = CPU_GPIO_GetPinState(state->pin); // get actual pin state
+        if (actual == state->expected) {
+            state->ISR(state->pin, actual, state->param);
+            if (state->mode == GPIO_INT_EDGE_BOTH) { // both edges
+                state->expected ^= 1; // update expected state
+            }
+        }
+    }
+}
 
 /*
  * Interrupt Handler
  */
-
 void STM32_GPIO_ISR (int num)  // 0 <= num <= 15
 {
     INTERRUPT_START
     
-    GPIO_INTERRUPT_SERVICE_ROUTINE isr = g_ISR[num];
-    if (isr) {
-        int port = (AFIO->EXTICR[num >> 2] >> ((num & 0x3) << 2)) & 0xF;
-        isr((port << 4) | num, (Port(port)->IDR >> num) & 1, g_ISR_Param[num]);
+    STM32_Int_State* state = &g_int_state[num];
+    state->completion.Abort();
+    UINT32 bit = 1 << num;
+    UINT32 actual;
+    do {
+        EXTI->PR = bit;   // reset pending bit
+        actual = CPU_GPIO_GetPinState(state->pin); // get actual pin state
+    } while (EXTI->PR & bit); // repeat if pending again
+    if (state->ISR) {
+        if (state->debounce) { // debounce enabled
+            state->completion.EnqueueTicks(HAL_Time_CurrentTicks() + g_debounceTicks);
+        } else {
+            state->ISR(state->pin, state->expected, state->param);
+            if (state->mode == GPIO_INT_EDGE_BOTH) { // both edges
+                if (actual != state->expected) { // fire another isr to keep in synch
+                    state->ISR(state->pin, actual, state->param);
+                } else {
+                    state->expected ^= 1; // update expected state
+                }
+            }
+        }
     }
-    
+
     INTERRUPT_END
 }
 
 void STM32_GPIO_Interrupt0 (void* param) // EXTI0
 {
-    EXTI->PR = 1 << 0;   // reset pending bit
     STM32_GPIO_ISR(0);
 }
 
 void STM32_GPIO_Interrupt1 (void* param) // EXTI1
 {
-    EXTI->PR = 1 << 1;   // reset pending bit
     STM32_GPIO_ISR(1);
 }
 
 void STM32_GPIO_Interrupt2 (void* param) // EXTI2
 {
-    EXTI->PR = 1 << 2;   // reset pending bit
     STM32_GPIO_ISR(2);
 }
 
 void STM32_GPIO_Interrupt3 (void* param) // EXTI3
 {
-    EXTI->PR = 1 << 3;   // reset pending bit
     STM32_GPIO_ISR(3);
 }
 
 void STM32_GPIO_Interrupt4 (void* param) // EXTI4
 {
-    EXTI->PR = 1 << 4;   // reset pending bit
     STM32_GPIO_ISR(4);
 }
 
 void STM32_GPIO_Interrupt5 (void* param) // EXTI5 - EXTI9
 {
-    UINT32 pending = EXTI->PR & 0x03E0; // pending bits 5..9
-    EXTI->PR = pending;    // reset pending bits 5..9
-    pending &= EXTI->IMR;  // remove masked bits
+    UINT32 pending = EXTI->PR & EXTI->IMR & 0x03E0; // pending bits 5..9
     int num = 5; pending >>= 5;
     do {
         if (pending & 1) STM32_GPIO_ISR(num);
@@ -96,9 +131,7 @@ void STM32_GPIO_Interrupt5 (void* param) // EXTI5 - EXTI9
 
 void STM32_GPIO_Interrupt10 (void* param) // EXTI10 - EXTI15
 {
-    UINT32 pending = EXTI->PR & 0xFC00; // pending bits 10..15
-    EXTI->PR = pending;    // reset pending bits 10..15
-    pending &= EXTI->IMR;  // remove masked bits
+    UINT32 pending = EXTI->PR & EXTI->IMR & 0xFC00; // pending bits 10..15
     int num = 10; pending >>= 10;
     do {
         if (pending & 1) STM32_GPIO_ISR(num);
@@ -106,7 +139,7 @@ void STM32_GPIO_Interrupt10 (void* param) // EXTI10 - EXTI15
     } while (pending);
 }
 
-BOOL STM32_GPIO_Set_Interrupt( UINT32 pin, GPIO_INTERRUPT_SERVICE_ROUTINE ISR, void* ISR_Param, GPIO_INT_EDGE mode)
+BOOL STM32_GPIO_Set_Interrupt( UINT32 pin, GPIO_INTERRUPT_SERVICE_ROUTINE ISR, void* ISR_Param, GPIO_INT_EDGE mode, BOOL GlitchFilterEnable)
 {
     UINT32 num = pin & 0x0F;
     UINT32 bit = 1 << num;
@@ -115,6 +148,11 @@ BOOL STM32_GPIO_Set_Interrupt( UINT32 pin, GPIO_INTERRUPT_SERVICE_ROUTINE ISR, v
     UINT32 mask = 0xF << shift;
     UINT32 config = (pin >> 4) << shift; // port number configuration
     
+    STM32_Int_State* state = &g_int_state[num];
+    state->ISR = ISR;
+    state->completion.Abort();
+    state->completion.SetArgument(state);
+    
     GLOBAL_LOCK(irq);
     
     if (ISR) {
@@ -122,23 +160,43 @@ BOOL STM32_GPIO_Set_Interrupt( UINT32 pin, GPIO_INTERRUPT_SERVICE_ROUTINE ISR, v
             if (EXTI->IMR & bit) return FALSE; // interrupt in use
             AFIO->EXTICR[idx] = AFIO->EXTICR[idx] & ~mask | config;
         }
-        g_ISR[num] = ISR;
-        g_ISR_Param[num] = ISR_Param;
-        if (mode == GPIO_INT_EDGE_HIGH || mode == GPIO_INT_EDGE_BOTH) {
-            EXTI->RTSR |= bit;
-        } else {
-            EXTI->RTSR &= ~bit;
-        }
-        if (mode == GPIO_INT_EDGE_LOW || mode == GPIO_INT_EDGE_BOTH) {
+        state->pin = (BYTE)pin;
+        state->mode = (BYTE)mode;
+        state->debounce = (BYTE)GlitchFilterEnable;
+        state->param = ISR_Param;
+        
+        EXTI->RTSR &= ~bit;
+        EXTI->FTSR &= ~bit;
+        switch (mode) {
+        case GPIO_INT_EDGE_LOW:
+        case GPIO_INT_LEVEL_LOW:
             EXTI->FTSR |= bit;
-        } else {
-            EXTI->FTSR &= ~bit;
+            state->expected = FALSE;
+            break;
+        case GPIO_INT_EDGE_HIGH:
+        case GPIO_INT_LEVEL_HIGH:
+            EXTI->RTSR |= bit;
+            state->expected = TRUE;
+            break;
+        case GPIO_INT_EDGE_BOTH:
+            EXTI->FTSR |= bit;
+            EXTI->RTSR |= bit;
+            UINT32 actual;
+            do {
+                EXTI->PR = bit; // remove pending interrupt
+                actual = CPU_GPIO_GetPinState(pin); // get actual pin state
+            } while (EXTI->PR & bit); // repeat if pending again
+            state->expected = (BYTE)(actual ^ 1);
         }
-        EXTI->PR = bit; // remove pending interrupt
+        
         EXTI->IMR |= bit; // enable interrupt
+        // check for level interrupts
+        if (mode == GPIO_INT_LEVEL_HIGH && CPU_GPIO_GetPinState(pin)
+         || mode == GPIO_INT_LEVEL_LOW && !CPU_GPIO_GetPinState(pin)) {
+            EXTI->SWIER = bit; // force interrupt
+        }
     } else if ((AFIO->EXTICR[idx] & mask) == config) {
         EXTI->IMR &= ~bit; // disable interrupt
-        g_ISR[num] = NULL;
     }
     return TRUE;
 }
@@ -172,6 +230,10 @@ BOOL CPU_GPIO_Initialize()
         g_pinReserved[i] = 0;
     }
     
+    for (int i = 0; i < STM32_Gpio_MaxInt; i++) {
+        g_int_state[i].completion.InitializeForISR(&STM32_GPIO_DebounceHandler);
+    }
+    
     EXTI->IMR = 0; // disable all external interrups;
     CPU_INTC_ActivateInterrupt(EXTI0_IRQn, STM32_GPIO_Interrupt0, 0);
     CPU_INTC_ActivateInterrupt(EXTI1_IRQn, STM32_GPIO_Interrupt1, 0);
@@ -188,6 +250,10 @@ BOOL CPU_GPIO_Uninitialize()
 {
     NATIVE_PROFILE_HAL_PROCESSOR_GPIO();
 
+    for (int i = 0; i < STM32_Gpio_MaxInt; i++) {
+        g_int_state[i].completion.Abort();
+    }
+    
     EXTI->IMR = 0; // disable all external interrups;
     CPU_INTC_DeactivateInterrupt(EXTI0_IRQn);
     CPU_INTC_DeactivateInterrupt(EXTI1_IRQn);
@@ -229,7 +295,7 @@ void CPU_GPIO_DisablePin( GPIO_PIN pin, GPIO_RESISTOR resistor, UINT32 output, G
             CPU_GPIO_SetPinState(pin, resistor == RESISTOR_PULLUP); // pull up or down
         }
         STM32_GPIO_Pin_Config(pin, config);
-        STM32_GPIO_Set_Interrupt(pin, NULL, 0, GPIO_INT_NONE); // disable interrupt
+        STM32_GPIO_Set_Interrupt(pin, NULL, 0, GPIO_INT_NONE, FALSE); // disable interrupt
     }
 }
 
@@ -239,7 +305,7 @@ void CPU_GPIO_EnableOutputPin( GPIO_PIN pin, BOOL initialState )
     if (pin < STM32_Gpio_MaxPins) {
         CPU_GPIO_SetPinState(pin, initialState);
         STM32_GPIO_Pin_Config(pin, 0x1); // general purpose output
-        STM32_GPIO_Set_Interrupt(pin, NULL, 0, GPIO_INT_NONE); // disable interrupt
+        STM32_GPIO_Set_Interrupt(pin, NULL, 0, GPIO_INT_NONE, FALSE); // disable interrupt
     }
 }
 
@@ -260,9 +326,7 @@ BOOL CPU_GPIO_EnableInputPin2( GPIO_PIN pin, BOOL GlitchFilterEnable, GPIO_INTER
         CPU_GPIO_SetPinState(pin, resistor == RESISTOR_PULLUP);
     }
     STM32_GPIO_Pin_Config(pin, config);
-
-    if (edge > GPIO_INT_EDGE_BOTH) return FALSE;
-    return STM32_GPIO_Set_Interrupt(pin, ISR, ISR_Param, edge);
+    return STM32_GPIO_Set_Interrupt(pin, ISR, ISR_Param, edge, GlitchFilterEnable);
 }
 
 BOOL CPU_GPIO_GetPinState( GPIO_PIN pin )
@@ -301,14 +365,19 @@ BOOL CPU_GPIO_ReservePin( GPIO_PIN pin, BOOL fReserve )
     if (pin >= STM32_Gpio_MaxPins) return FALSE;
     int port = pin >> 4, bit = 1 << (pin & 0x0F);
     GLOBAL_LOCK(irq);
-    if (fReserve) g_pinReserved[port] |= bit; else g_pinReserved[port] &= ~bit;
+    if (fReserve) {
+        if (g_pinReserved[port] & bit) return FALSE; // already reserved
+        g_pinReserved[port] |= bit;
+    } else {
+        g_pinReserved[port] &= ~bit;
+    }
     return TRUE;
 }
 
 UINT32 CPU_GPIO_GetDebounce()
 {
     NATIVE_PROFILE_HAL_PROCESSOR_GPIO();
-    return CPU_TicksToTime(g_debounceTicks) / 10000; // ticks -> 100ns -> ms
+    return g_debounceTicks / (SLOW_CLOCKS_PER_SECOND / 1000); // ticks -> ms
 }
 
 BOOL CPU_GPIO_SetDebounce( INT64 debounceTimeMilliseconds )
@@ -344,5 +413,6 @@ UINT8 CPU_GPIO_GetSupportedResistorModes( GPIO_PIN pin )
 UINT8 CPU_GPIO_GetSupportedInterruptModes( GPIO_PIN pin )
 {
     NATIVE_PROFILE_HAL_PROCESSOR_GPIO();
-    return (1 << GPIO_INT_EDGE_LOW) | (1 << GPIO_INT_EDGE_HIGH ) | (1 << GPIO_INT_EDGE_BOTH);
+    return (1 << GPIO_INT_EDGE_LOW) | (1 << GPIO_INT_EDGE_HIGH ) | (1 << GPIO_INT_EDGE_BOTH)
+         | (1 << GPIO_INT_LEVEL_LOW) | (1 << GPIO_INT_LEVEL_HIGH );
 }

@@ -6,12 +6,12 @@
   <!-- Version info for the release built in this client -->
   <PropertyGroup>
     <MajorVersion Condition="'$(MajorVersion)'==''">4</MajorVersion>
-    <MinorVersion Condition="'$(MinorVersion)'==''">2</MinorVersion>
+    <MinorVersion Condition="'$(MinorVersion)'==''">3</MinorVersion>
     <BuildNumber Condition="'$(BuildNumber)'==''">0</BuildNumber>
     <BuildBase>66335</BuildBase>
     <RevisionNumber Condition="'$(RevisionNumber)'==''">0</RevisionNumber>
     <ReleaseName Condition="'$(ReleaseName)'==''">(RTM)</ReleaseName>
-    <BuildNumber>0</BuildNumber>
+    <BuildNumber>1</BuildNumber>
   </PropertyGroup>
   <!-- Other info particular to this release -->
   <PropertyGroup>

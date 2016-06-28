@@ -728,7 +728,7 @@ namespace Microsoft.SPOT.Debugger.WireProtocol
 
                         if (avail == 0)
                         {
-                            Thread.Sleep(10);
+                            Thread.Sleep(100);
                             continue;
                         }
                     }
@@ -747,7 +747,7 @@ namespace Microsoft.SPOT.Debugger.WireProtocol
                     }
                     else if (read == 0)
                     {
-                        Thread.Sleep(10);
+                        Thread.Sleep(100);
                     }
                 }
                 catch (ProcessExitException)
@@ -774,20 +774,20 @@ namespace Microsoft.SPOT.Debugger.WireProtocol
 
                         ((IController)this).ClosePort();
 
-                        Thread.Sleep(TimeSpan.FromMilliseconds(400));
+                        Thread.Sleep(200);
                     }
                 }
                 catch (IOException)
                 {
                     ((IController)this).ClosePort();
 
-                    Thread.Sleep(TimeSpan.FromMilliseconds(400));
+                    Thread.Sleep(200);
                 }
                 catch
                 {
                     ((IController)this).ClosePort();
 
-                    Thread.Sleep(TimeSpan.FromMilliseconds(100));
+                    Thread.Sleep(200);
                 }
             }
         }

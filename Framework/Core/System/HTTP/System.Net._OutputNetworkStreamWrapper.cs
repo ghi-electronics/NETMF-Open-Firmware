@@ -128,6 +128,8 @@ namespace System.Net
             }
 
             m_Stream.Close();
+            m_Stream = null;
+            m_Socket = null;
         }
 
         /// <summary>

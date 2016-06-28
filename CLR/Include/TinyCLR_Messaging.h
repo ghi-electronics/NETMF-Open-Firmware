@@ -150,9 +150,13 @@ struct CLR_Messaging
     static bool App_ProcessPayload( void* state,  WP_Message* msg );
     static bool App_Release       ( void* state,  WP_Message* msg );
 
+    bool IsDebuggerInitialized() { return m_fDebuggerInitialized; }
+    void InitializeDebugger() { m_fDebuggerInitialized = (DebuggerPort_Initialize( m_port ) == TRUE); }
+
 private:
 
     bool m_fInitialized;
+    bool m_fDebuggerInitialized;
 
     bool AllocateAndQueueMessage( CLR_UINT32 cmd, UINT32 length, UINT8* data, CLR_RT_HeapBlock_EndPoint::Port port, CLR_RT_HeapBlock_EndPoint::Address addr, CLR_UINT32 found );
 

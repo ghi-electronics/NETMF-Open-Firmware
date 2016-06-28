@@ -121,6 +121,7 @@
 
   <!-- at the common.mk-->
   <ItemGroup>
+    <DirectIncludePaths Include="$(PLATFORM_INDEPENDENT_LIB_DIR)" />
     <IncludePaths Include="DeviceCode\Targets\$(TARGETCODEBASETYPE)\$(TARGETCODEBASE)\$(PLATFORM)" />
     <IncludePaths Include="Support\Include"/>
     <IncludePaths Include="DeviceCode\include"/>

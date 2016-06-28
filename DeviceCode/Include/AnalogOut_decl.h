@@ -35,6 +35,7 @@ enum DA_CHANNEL
 //--//
 
 BOOL DA_Initialize                      ( DA_CHANNEL channel, INT32 precisionInBits );
+void DA_Uninitialize                    ( DA_CHANNEL channel );
 void DA_Write                           ( DA_CHANNEL channel, INT32 level );
 UINT32 DA_DAChannels                    ( );
 GPIO_PIN DA_GetPinForChannel            ( DA_CHANNEL channel );

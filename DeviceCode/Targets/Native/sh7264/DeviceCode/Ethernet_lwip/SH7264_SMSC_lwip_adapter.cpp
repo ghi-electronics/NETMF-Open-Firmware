@@ -60,6 +60,8 @@ err_t SH7264_SMSC_ethhw_init( netif * myNetIf)
 { 
     myNetIf->mtu = ETHERSIZE;
 
+    myNetIf->flags = NETIF_FLAG_IGMP | NETIF_FLAG_ETHARP | NETIF_FLAG_ETHERNET;
+
     /* ethhw_init() is user-defined */
     /* use ip_input instead of ethernet_input for non-ethernet hardware */
     /* (this function is assigned to netif.input and should be called by the hardware driver) */

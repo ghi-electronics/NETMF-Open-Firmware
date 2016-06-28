@@ -26,10 +26,9 @@
     <IncludePaths Include="DeviceCode\Drivers\Ethernet\enc28j60_lwip" />
     <IncludePaths Include="DeviceCode\Drivers\Ethernet\loopback_lwip" />
     <IncludePaths Include="DeviceCode\pal\COM\sockets\openssl" />
-    <IncludePaths Include="DeviceCode\pal\lwip\lwip_1_3_2\contrib\ports\arm\include" />
-    <IncludePaths Include="DeviceCode\pal\lwip\lwip_1_3_2\contrib\ports\arm\proj\lwIPv4lib" />
-    <IncludePaths Include="DeviceCode\pal\lwip\lwip_1_3_2\src\include" />
-    <IncludePaths Include="DeviceCode\pal\lwip\lwip_1_3_2\src\include\ipv4" />
+    <IncludePaths Include="DeviceCode\pal\lwip\LWIP\src\include\arch" />
+    <IncludePaths Include="DeviceCode\pal\lwip\LWIP\src\include" />
+    <IncludePaths Include="DeviceCode\pal\lwip\LWIP\src\include\ipv4" />
     <IncludePaths Include="DeviceCode\pal\lwip\SocketsDriver" />
     <IncludePaths Include="DeviceCode\pal\lwip\TinyCLR" />
     <IncludePaths Include="DeviceCode\pal\OpenSSL\OpenSSL_1_0_0\" />

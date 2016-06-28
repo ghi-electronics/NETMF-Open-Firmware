@@ -1,4 +1,5 @@
-﻿<Project DefaultTargets="TinyCLR_Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="TinyCLR_Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <AssemblyName>Microsoft.SPOT.Platform.Tests.IO.FileStreamTests</AssemblyName>
     <OutputType>Exe</OutputType>
@@ -8,6 +9,9 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{44B47FC4-356F-4BDB-BDF8-873C42923DC4}</ProjectGuid>
     <NoWarn>,1668</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Microsoft.SPOT.Platform.Tests.IOTests</StartupObject>
   </PropertyGroup>
   <Import Project="$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.Test.CSharp.Targets" />
   <ItemGroup>

@@ -308,6 +308,7 @@ namespace System.Net
             Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
             // If there was no exception up to this point, means we succeded to start listening.
             m_ServiceRunning = true;
+            int retry = 0;
 
             // The Start function is waiting on this event. We set it to indicate that
             // thread that waits for connections is already started.
@@ -327,8 +328,36 @@ namespace System.Net
                     // This is a blocking call waiting for connection.
                     clientSock = m_listener.Accept();
 
-                    // set NoDelay to increase HTTP(s) response times
-                    clientSock.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
+                    retry = 0;
+                    try
+                    {
+                        // set NoDelay to increase HTTP(s) response times
+                        clientSock.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
+                    }
+                    catch
+                    {
+
+                    }
+                }
+                catch (SocketException)
+                {
+                    if (retry > 5)
+                    {
+                        // If request to stop listener flag is set or locking call is interupted return
+                        // On exception we stop the service and record the exception.
+                        if (m_ServiceRunning && !m_Closed)
+                        {
+                            Stop();
+                        }
+
+                        // Set event to unblock thread waiting for accept.
+                        m_RequestArrived.Set();
+
+                        break;
+                    }
+
+                    retry++;
+                    continue;
                 }
                 catch
                 {
@@ -417,11 +446,19 @@ namespace System.Net
                 
                 m_listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-                // set NoDelay to increase HTTP(s) response times
-                m_listener.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
+                try
+                {
+                    // set NoDelay to increase HTTP(s) response times
+                    m_listener.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
+                }
+                catch {}
 
-                // Start server socket to accept incoming connections.
-                m_listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                try
+                {
+                    // Start server socket to accept incoming connections.
+                    m_listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                }
+                catch {}
 
                 IPAddress addr;
 

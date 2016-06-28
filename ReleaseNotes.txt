@@ -1,6 +1,6 @@
 ===============================================================================
 ===============================================================================
-Release Notes for the Microsoft .NET Micro Framework Porting Kit Version 4.2
+Release Notes for the Microsoft .NET Micro Framework Porting Kit Version 4.3
 
 This document details the system requirements, migration information, and 
 known issues in the Porting Kit.
@@ -11,22 +11,22 @@ known issues in the Porting Kit.
 ===============================================================================
 System Requirements
 ===============================================================================
-Microsoft Windows XP, Vista or Windows 7
+Microsoft Windows XP, Vista, Windows 7 or Windows 8
 
 2 GB of free hard-disk space
 
-Either Visual Studio 2010 (Express edition or greater) or both .NET 
+Either Visual Studio 2012 (Express edition or greater) or both .NET 
 Framework 3.5 and Windows SDK for Windows (downloadable from microsoft.com).
 
 Compatible build tools for your processor. The following toolsets have been 
 tested by Microsoft.
 * ARM RealView 3.x,4.x
 * Keil MDK 3.x
-* GCC 4.2.1 for ARM 
+* GCC 4.2.1, 4.6.1 for ARM 
 * VisualDSP++ 5.0 for Blackfin 
 
 
-NOTE: The .NET Micro Framework SDK Version 4.2 does not support side-by-side 
+NOTE: The .NET Micro Framework SDK Version 4.3 does not support side-by-side 
 installation with any other previous version of the same product. Please 
 uninstall any previous versions before proceeding. Choose the appropriate 
 target framework from the Application tab of your project properties to 
@@ -36,7 +36,7 @@ address legacy applications.
 ===============================================================================
 Migrating from the V3.0 porting kit to the V4.0 porting kit and later
 ===============================================================================
-If you are upgrading your HAL from version 3.0 to 4.2, you should be aware of 
+If you are upgrading your HAL from version 3.0 to 4.3, you should be aware of 
 the following differences:
 
 1) Block Storage API: The block storage API has changed substantially. 
@@ -51,7 +51,7 @@ For information about these topics, refer to the Porting Kit documentation.
 
 
 ===============================================================================
-Migrating from the V4.0 porting kit to the V4.2 porting kit
+Migrating from the V4.0 porting kit to the V4.3 porting kit
 ===============================================================================
 Please refer to the Porting Kit Documentation
 

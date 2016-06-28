@@ -12,7 +12,7 @@
     
         <!-- MOTE2 has 32MB of 16-bit FLASH at 0x00000000 -->
         <Set Name="Code_BaseAddress"   Value="0x00100000"/>
-        <Set Name="Code_Size"          Value="0x0000E000"/>
+        <Set Name="Code_Size"          Value="0x0000C000"/>
         <Set Name="Valid"            Value="true"/>
 
     </If>

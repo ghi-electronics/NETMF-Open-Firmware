@@ -473,7 +473,10 @@ struct ASN1_ADB_st {
 
 struct ASN1_ADB_TABLE_st {
 	long value;		/* NID for an object or value for an int */
-	const ASN1_TEMPLATE tt;		/* item for this value */
+//[MS_CHANGE] remove const to stop compiler errors
+//	const 
+//[MS_CHANGE_END]
+	ASN1_TEMPLATE tt;		/* item for this value */
 };
 
 /* template flags */

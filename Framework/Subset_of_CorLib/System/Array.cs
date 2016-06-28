@@ -128,7 +128,24 @@ namespace System
             while (lo <= hi)
             {
                 int i = (lo + hi) >> 1;
-                int c = comparer.Compare(array.GetValue(i), value);
+
+                int c;
+                if (comparer == null)
+                {
+                    try
+                    {
+                        var elementComparer = array.GetValue(i) as IComparable;
+                        c = elementComparer.CompareTo(value);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new InvalidOperationException("Failed to compare two elements in the array", e);
+                    }
+                }
+                else
+                {
+                    c = comparer.Compare(array.GetValue(i), value);
+                }
 
                 if (c == 0) return i;
                 if (c < 0)

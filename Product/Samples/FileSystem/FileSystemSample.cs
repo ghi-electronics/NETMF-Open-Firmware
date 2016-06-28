@@ -777,7 +777,11 @@ namespace FileSystemSample
 
                                 if(volInfo.FileSystem == null)
                                 {
+#if MF_FRAMEWORK_VERSION_V3_0 || MF_FRAMEWORK_VERSION_V4_0 || MF_FRAMEWORK_VERSION_V4_1
+                                    volInfo.Format( "FAT", 0, true );
+#else
                                     volInfo.Format( "FAT", 0, volume + "FS", true );
+#endif
                                 }
                                 else
                                 {

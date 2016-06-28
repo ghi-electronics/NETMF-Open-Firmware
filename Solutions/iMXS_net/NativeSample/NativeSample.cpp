@@ -30,7 +30,6 @@ void  Network_PostEvent(UINT32 evt, UINT32 data)
 #ifdef TCPIP_LWIP 
 #include "ipv4\lwip\ip_addr.h"
 #include "netif\etharp.h"
-#include "netif\loopif.h"
 #include "loopback_lwip_driver.h"
 #include "lwip\init.h"
 #include "lwip\tcpip.h"

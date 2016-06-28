@@ -40,19 +40,19 @@
     <ScatterFileReferences Include="$(SRC_DIR)\scatterfile_tinyclr_$(COMPILER_TOOL).$(SCATTER_EXT)" />
     <ScatterFileReferences Include="$(SRC_DIR)\scatterfile_tinyclr_ram_functions.$(SCATTER_EXT)" />
   </ItemGroup>
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Core.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\NativeEventDispatcher.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\BlockStorage.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Debugger.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\SOCKETS_Port.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\serial_port.featureproj" />
-  <Import Condition="'$(TCP_IP_STACK)'=='RTIP'" Project="$(SPOCLIENT)\Framework\Features\Network.featureproj" />
-  <Import Condition="'$(TCP_IP_STACK)'=='LWIP'" Project="$(SPOCLIENT)\Framework\Features\Network_LWIP.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\SerialPort.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\USB_Port.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\I2C.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\InterruptHandler.featureproj" />
+  <Import Condition="'$(CORE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
+  <Import Condition="'$(HARDWARE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
+  <Import Condition="'$(NATIVEEVENTDISPATCHER_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\NativeEventDispatcher.featureproj" />
+  <Import Condition="'$(BLOCKSTORAGE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\BlockStorage.featureproj" />
+  <Import Condition="'$(DEBUGGER_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Debugger.featureproj" />
+  <Import Condition="'$(SOCKETS_PORT_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\SOCKETS_Port.featureproj" />
+  <Import Condition="'$(SERIAL_PORT_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\serial_port.featureproj" />
+  <Import Condition="'$(NETWORK_FEATUREPROJ)'=='' AND '$(TCP_IP_STACK)'=='RTIP'" Project="$(SPOCLIENT)\Framework\Features\Network.featureproj" />
+  <Import Condition="'$(NETWORK_LWIP_FEATUREPROJ)'=='' AND '$(TCP_IP_STACK)'=='LWIP'" Project="$(SPOCLIENT)\Framework\Features\Network_LWIP.featureproj" />
+  <Import Condition="'$(SERIALPORT_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\SerialPort.featureproj" />
+  <Import Condition="'$(USB_PORT_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\USB_Port.featureproj" />
+  <Import Condition="'$(I2C_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\I2C.featureproj" />
+  <Import Condition="'$(INTERRUPTHANDLER_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\InterruptHandler.featureproj" />
   <Import Condition="" Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Interop.Settings" />
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\MFUpdate\stubs\dotnetMF.proj" />
@@ -316,19 +316,19 @@
     <DriverLibs Include="sockets_hal_async_LWIP.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup Condition="'$(TCP_IP_STACK)'=='LWIP'">
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\lwip_1_3_2\src\dotNetMF_sockets.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\LWIP\src\dotNetMF_sockets.proj" />
     <DriverLibs Include="sockets_hal_sockets_LWIP.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup Condition="'$(TCP_IP_STACK)'=='LWIP'">
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\lwip_1_3_2\src\dotNetMF_dhcp.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\LWIP\src\dotNetMF_dhcp.proj" />
     <DriverLibs Include="sockets_hal_dhcp_LWIP.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup Condition="'$(TCP_IP_STACK)'=='LWIP'">
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\lwip_1_3_2\src\dotNetMF_tcp.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\LWIP\src\dotNetMF_tcp.proj" />
     <DriverLibs Include="sockets_hal_tcp_LWIP.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup Condition="'$(TCP_IP_STACK)'=='LWIP'">
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\lwip_1_3_2\src\dotNetMF_udp.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\LWIP\src\dotNetMF_udp.proj" />
     <DriverLibs Include="sockets_hal_udp_LWIP.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup Condition="'$(TCP_IP_STACK)'=='LWIP'">

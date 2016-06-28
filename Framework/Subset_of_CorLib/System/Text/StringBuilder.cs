@@ -1050,6 +1050,11 @@ namespace System.Text
             ReplaceValue:
                 //Replace the value                 
                 this.ReplaceInPlaceAtChunk(ref chunk, ref indexInChunk, chars, ref replacementIndex, value.Length);
+                if (replacementIndex == value.Length)
+                {
+                    replacementIndex = 0;
+                }
+
                 //Determine the next replacement 
                 int valueIndex = replacements[index] + removeCount;
                 //Move the pointer of the working replacement
@@ -1105,8 +1110,8 @@ namespace System.Text
                     indexInChunk = 0;
                 }
                 count -= length;
-                if (count == 0) return;
                 valueIndex += length;
+                if (count == 0) return;
             }
         }
 
@@ -1141,7 +1146,7 @@ namespace System.Text
                     int nextLength = indexInChunk - length;
                     if (nextLength >= 0)
                     {
-                        System.Array.Copy(chunk.m_ChunkChars, length, builder.m_ChunkChars, 0, nextLength);
+                        System.Array.Copy(chunk.m_ChunkChars, length, chunk.m_ChunkChars, 0, nextLength);
                         indexInChunk = nextLength;
                     }
                 }

@@ -9,5 +9,6 @@
     <Groups>BlockStorage</Groups>
     <Documentation>
     </Documentation>
+    <WEARLEVELING_FEATUREPROJ>True</WEARLEVELING_FEATUREPROJ>
   </PropertyGroup>
 </Project>

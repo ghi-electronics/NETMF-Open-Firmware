@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <AssemblyName>MFDeployCom</AssemblyName>
@@ -11,21 +12,18 @@
     <DirectoryRef>ToolsDir</DirectoryRef>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
-
   <Import Project="$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.CSharp.Host.Targets" />
-
   <ItemGroup>
-    <Reference Include="System"/>
-    <Reference Include="System.Data"/>
-    <Reference Include="System.Deployment"/>
-    <Reference Include="System.Drawing"/>
-    <Reference Include="System.Windows.Forms"/>
-    <Reference Include="System.Xml"/>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
     <Reference Include="MFDeploy">
       <HintPath>$(BUILD_TREE_DLL)\MFDeploy.exe</HintPath>
     </Reference>
   </ItemGroup>
-
   <ItemGroup>
     <Compile Include="Program.cs" />
   </ItemGroup>

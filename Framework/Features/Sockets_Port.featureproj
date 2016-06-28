@@ -10,5 +10,6 @@
     <Documentation>
     </Documentation>
     <IsSolutionWizardVisible>false</IsSolutionWizardVisible>
+    <SOCKETS_PORT_FEATUREPROJ>True</SOCKETS_PORT_FEATUREPROJ>
   </PropertyGroup>
 </Project>

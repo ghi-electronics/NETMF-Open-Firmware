@@ -3,7 +3,9 @@
 #include "loopback_lwip_driver.h"
  
 #include "netif\etharp.h"
-#include "netif\loopif.h"
+
+
+extern "C" err_t netif_loopif_init(struct netif *netif);
 
 
 #if defined(ADS_LINKER_BUG__NOT_ALL_UNUSED_VARIABLES_ARE_REMOVED)
@@ -31,7 +33,7 @@ err_t   loop_ethhw_init( netif * myNetIf)
     /*  Assign the netif_loop_output routine to this netif */
     /*  WRONG: this is handled directly per the above comment */
 #if LWIP_HAVE_LOOPIF
-    loopif_init( myNetIf );
+    netif_loopif_init( myNetIf );
 #else
     /* Assign the xmit routine to the stack's netif  */
     myNetIf->linkoutput = g_pLOOPBACK_LWIP_Driver_Routines->xmit;

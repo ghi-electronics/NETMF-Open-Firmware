@@ -243,7 +243,7 @@
 
     
   <PropertyGroup>
-    <CC_CPP_COMMON_FLAGS>$(CC_CPP_COMMON_FLAGS) $(AS_CC_CPP_COMMON_FLAGS) $(CC_CPP_TARGETTYPE_FLAGS) -Include=@(IncludePaths->'$(CLRROOT)\%(relativedir)%(filename)',', '), @(CC_CPP_INCS,', ')  -define=@(CC_CPP_MARCO_FLAGS,', ') $(ExtraFlags)</CC_CPP_COMMON_FLAGS>
+    <CC_CPP_COMMON_FLAGS>$(CC_CPP_COMMON_FLAGS) $(AS_CC_CPP_COMMON_FLAGS) $(CC_CPP_TARGETTYPE_FLAGS) -Include=@(IncludePaths->'$(CLRROOT)\%(relativedir)%(filename)',', '), @(CC_CPP_INCS,', '), @(DirectIncludePaths->'%(FullPath)',', ')  -define=@(CC_CPP_MARCO_FLAGS,', ') $(ExtraFlags)</CC_CPP_COMMON_FLAGS>
   </PropertyGroup>
 
   <!-- CC flags -->

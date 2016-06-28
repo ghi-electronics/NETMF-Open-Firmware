@@ -124,8 +124,6 @@ BYTE* FAT_SectorCache::GetSector( UINT32 sectorIndex, BOOL useLRU, BOOL forWrite
 #endif
     }
 
-    cacheLine->SetReadWrite( forWrite );
-
     if(forWrite)
     {
         cacheLine->SetDirty( TRUE );
@@ -161,8 +159,10 @@ FAT_SectorCache::FAT_CacheLine* FAT_SectorCache::GetUnusedCacheLine(BOOL useLRU)
 {
     FAT_CacheLine* cacheLine;
     FAT_CacheLine* topCandidate = NULL;
+    FAT_CacheLine* topReadOnlyCandidate = NULL;
     UINT32 counter;
     UINT32 minLRUCounter = useLRU ? 0x7FFFFFFF : 0;
+    UINT32 minLRUReadOnlyCounter = useLRU ? 0x7FFFFFFF : 0;
     
     for(int i = 0; i < SECTORCACHE_MAXSIZE; i++)
     {
@@ -180,7 +180,26 @@ FAT_SectorCache::FAT_CacheLine* FAT_SectorCache::GetUnusedCacheLine(BOOL useLRU)
         {
             minLRUCounter = counter;
             topCandidate  = cacheLine;
+
+            if(useLRU && !cacheLine->IsReadWrite())
+            {
+                topReadOnlyCandidate = cacheLine;
+                minLRUReadOnlyCounter = counter;
+            }   
         }
+        else if(useLRU && !cacheLine->IsReadWrite())
+        {
+            if(counter < minLRUReadOnlyCounter)
+            {
+                topReadOnlyCandidate = cacheLine;
+                minLRUReadOnlyCounter = counter;
+            }
+        }
+    }
+
+    if(topReadOnlyCandidate != NULL && minLRUReadOnlyCounter != m_LRUCounter)
+    {
+        topCandidate = topReadOnlyCandidate;
     }
 
     FlushSector( topCandidate );
@@ -237,8 +256,12 @@ void FAT_SectorCache::FlushSector( FAT_CacheLine* cacheLine, BOOL fClearDirtyBit
         UINT32 crc = SUPPORT_ComputeCRC(cacheLine->m_buffer, SECTORCACHE_LINESIZE, 0);
 #endif
 
+#ifdef FAT_FS__VALIDATE_READONLY_CACHELINE
+        if(cacheLine->IsReadWrite() && cacheLine->m_crc != crc)
+#else
         if(cacheLine->IsDirty())
-        {        
+#endif
+        {
             m_blockStorageDevice->Write( cacheLine->m_bsByteAddress, SECTORCACHE_LINESIZE, cacheLine->m_buffer, TRUE );
 
             if(fClearDirtyBit)
@@ -254,11 +277,6 @@ void FAT_SectorCache::FlushSector( FAT_CacheLine* cacheLine, BOOL fClearDirtyBit
         else
         {
             ASSERT(cacheLine->m_crc == crc);
-
-            if(cacheLine->m_crc != crc)
-            {
-                m_blockStorageDevice->Write( cacheLine->m_bsByteAddress, SECTORCACHE_LINESIZE, cacheLine->m_buffer, TRUE );    
-            }
         }
 #endif
     }

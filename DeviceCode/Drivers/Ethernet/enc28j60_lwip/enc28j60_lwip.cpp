@@ -113,11 +113,20 @@ void enc28j60_lwip_close( struct netif *pNetIF )
    ******************************************************************** */
 #define TRANSMIT_RETRIES 5
 static UINT8 s_retriesTransmit = TRANSMIT_RETRIES;
+#define RECEIVE_RETRIES 5
+static UINT8 s_receiveRetries = 10;
 
 
 void enc28j60_handle_recv_error( struct netif *pNetIF, SPI_CONFIGURATION  *SpiConf )
 {
     UINT8 byteData;
+
+    if(--s_receiveRetries <= 0)
+    {
+        s_receiveRetries = RECEIVE_RETRIES;
+        enc28j60_lwip_setup_device(pNetIF);
+        return;
+    }
 
     /* Reset the receiver logic */
     byteData = (1 << ENC28J60_ECON1_RXRST_BIT);
@@ -276,7 +285,11 @@ void enc28j60_lwip_interrupt( struct netif *pNetIF )
         {
             enc28j60_handle_recv_error( pNetIF, SpiConf );
         }
-
+        else
+        {
+            s_receiveRetries = RECEIVE_RETRIES;
+        }
+        
         if (cntPkts)
         {
             packetsLeft = enc28j60_lwip_recv( pNetIF );
@@ -287,10 +300,10 @@ void enc28j60_lwip_interrupt( struct netif *pNetIF )
     enc28j60_lwip_read_spi(SpiConf, ENC28J60_SPI_READ_CONTROL_REGISTER_OPCODE, ENC28J60_ECON1, &byteData, 1, 0);
     
     /* Is the receiver or transmitter in reset state */
-    if ( (byteData & (1 << ENC28J60_ECON1_TXRST_BIT)) || (byteData & (1 << ENC28J60_ECON1_TXRST_BIT)) )
+    if ( (byteData & (1 << ENC28J60_ECON1_TXRST_BIT)) || (byteData & (1 << ENC28J60_ECON1_RXRST_BIT)) )
     {
         /* If so, take it out of reset */
-        byteData &= ~((1 << ENC28J60_ECON1_TXRST_BIT) | (1 << ENC28J60_ECON1_TXRST_BIT));
+        byteData &= ~((1 << ENC28J60_ECON1_TXRST_BIT) | (1 << ENC28J60_ECON1_RXRST_BIT));
     }
 
     byteData |= (1 << ENC28J60_ECON1_RXEN_BIT);
@@ -486,6 +499,7 @@ err_t enc28j60_lwip_xmit( struct netif *pNetIF, struct pbuf *pPBuf)
     struct pbuf*            pTmp;
     UINT8*                  pTx;
     int                     idx;
+    int                     retries = 100;
     
         
     GLOBAL_LOCK(encIrq);
@@ -502,14 +516,10 @@ err_t enc28j60_lwip_xmit( struct netif *pNetIF, struct pbuf *pPBuf)
 
     length = pPBuf->tot_len;
     
-    if (length < ETHER_MIN_LEN)
-    {
-        length = ETHER_MIN_LEN;
-    }
-    
     if (length > ETHERSIZE) // (ETHERSIZE+4))
     {
         debug_printf("xmit - length is too large, truncated \r\n" );
+        ASSERT(FALSE);
         length = ETHERSIZE; // ETHERSIZE+4;         /* what a terriable hack! */
     }
 
@@ -519,6 +529,13 @@ err_t enc28j60_lwip_xmit( struct netif *pNetIF, struct pbuf *pPBuf)
     {
         s_ENC28J60_TRANSMIT_BUFFER_START = ENC28J60_TRANSMIT_BUFFER_START;
     }
+
+    do
+    {
+        enc28j60_lwip_read_spi(SpiConf, ENC28J60_SPI_READ_CONTROL_REGISTER_OPCODE, ENC28J60_ECON1, &dataByte, 1, 0);
+    }
+    while(0 != (dataByte & (1 << ENC28J60_ECON1_TXRTS_BIT)) && retries-- > 0);        
+    
     
     /*  1. Appropriately program the ETXST pointer to
             point to an unused location in memory. It will
@@ -602,7 +619,7 @@ err_t enc28j60_lwip_xmit( struct netif *pNetIF, struct pbuf *pPBuf)
     dataByte = 1 << ENC28J60_EIR_TXIF_BIT;
     enc28j60_lwip_write_spi(SpiConf,  ENC28J60_SPI_BIT_FIELD_CLEAR_OPCODE, ENC28J60_EIR, dataByte);
     
-    dataByte = ((1 << ENC28J60_EIE_TXIE_BIT) | (1 << ENC28J60_EIE_INTIE_BIT) | ((1 << ENC28J60_EIE_TXERIE_BIT)));
+    dataByte = ((1 << ENC28J60_EIE_INTIE_BIT) | (1 << ENC28J60_EIE_TXERIE_BIT));
     enc28j60_lwip_write_spi(SpiConf,  ENC28J60_SPI_BIT_FIELD_SET_OPCODE, ENC28J60_EIE, dataByte);
 
     /* 5. */
@@ -751,9 +768,7 @@ bool enc28j60_lwip_setup_device( struct netif *pNetIF )
     /* Configure the PADCFT, TXCRECEN, AND FULLDPS bits
         of MACON3 */
 
-    byteData = (1 << ENC28J60_MACON3_PADCFG2_BIT) |
-                (1 << ENC28J60_MACON3_PADCFG1_BIT) |
-                (1 << ENC28J60_MACON3_PADCFG0_BIT);
+    byteData = (5 << ENC28J60_MACON3_PADCFG0_BIT) | ENC28J60_MACON3_TXCRCEN_BIT;
     //(1 << ENC28J60_MACON3_TXCRCEN_BIT);
 #if (ENC28J60_FULL_DUPLEX)
     byteData |= (1 << ENC28J60_MACON3_FULDPX_BIT);
@@ -851,7 +866,7 @@ bool enc28j60_lwip_setup_device( struct netif *pNetIF )
     /* -------------------------------------- START THE DEVICE -------------------------------------------- */         
     /*                                                                                                      */
     /* enable interrupts when a packet is received and when transmit is done */
-    enc28j60_lwip_write_spi(SpiConf, ENC28J60_SPI_BIT_FIELD_SET_OPCODE, ENC28J60_EIE, (UINT8)((1 << ENC28J60_EIE_INTIE_BIT) | (1 << ENC28J60_EIE_PKTIE_BIT) | (1 << ENC28J60_EIE_TXIE_BIT) |(1 << ENC28J60_EIE_TXERIE_BIT)));
+    enc28j60_lwip_write_spi(SpiConf, ENC28J60_SPI_BIT_FIELD_SET_OPCODE, ENC28J60_EIE, (UINT8)((1 << ENC28J60_EIE_INTIE_BIT) | (1 << ENC28J60_EIE_PKTIE_BIT) | (1 << ENC28J60_EIE_TXERIE_BIT)));
     
     /* enable auto- increment */
     enc28j60_lwip_write_spi(SpiConf, ENC28J60_SPI_BIT_FIELD_SET_OPCODE, ENC28J60_ECON2, (UINT8)(1 << ENC28J60_ECON2_AUTOINC_BIT));
@@ -891,6 +906,7 @@ unsigned short enc28j60_lwip_read_phy_register(SPI_CONFIGURATION *spiConf, UINT8
     NATIVE_PROFILE_HAL_DRIVERS_ETHERNET();
     unsigned char   byteData;
     unsigned short  returnValue;
+    UINT32 retries = 100;
 
     /* Select Bank 2 */
     enc28j60_lwip_select_bank(spiConf, ENC28J60_CONTROL_REGISTER_BANK2);
@@ -909,7 +925,7 @@ unsigned short enc28j60_lwip_read_phy_register(SPI_CONFIGURATION *spiConf, UINT8
     {
         enc28j60_lwip_read_spi(spiConf, ENC28J60_SPI_READ_CONTROL_REGISTER_OPCODE, ENC28J60_MISTAT, &byteData, 1, 1);
         byteData &= (0x1 << ENC28J60_MISTAT_BUSY_BIT);
-    } while (byteData);
+    } while (byteData && retries-- > 0);
     
     /* Select Bank 2 */                                               
     enc28j60_lwip_select_bank(spiConf, ENC28J60_CONTROL_REGISTER_BANK2);   
@@ -1021,7 +1037,7 @@ void enc28j60_lwip_soft_reset(SPI_CONFIGURATION* spiConf)
     NATIVE_PROFILE_HAL_DRIVERS_ETHERNET();
     UINT8 byteData;
     UINT16 shortData;
-    int timeout = 10000; // 1 second
+    int timeout = 1000; // 1 second
 
     /* First turn off RX/TX */
     enc28j60_lwip_select_bank( spiConf, ENC28J60_CONTROL_REGISTER_BANK0);
@@ -1031,17 +1047,17 @@ void enc28j60_lwip_soft_reset(SPI_CONFIGURATION* spiConf)
     /* Wait for RX to flush */
     do
     {
-        HAL_Time_Sleep_MicroSeconds(100);
+        HAL_Time_Sleep_MicroSeconds(1000);
         
         enc28j60_lwip_read_spi(spiConf, ENC28J60_SPI_READ_CONTROL_REGISTER_OPCODE, ENC28J60_ESTAT, &byteData, 1, 0);
     }
     while(timeout-- && (byteData & (1 << ENC28J60_ESTAT_RXBUSY)) != 0);
 
-    timeout = 10000; 
+    timeout = 1000; 
     /* Wait for TX to flush */
     do 
     {
-        HAL_Time_Sleep_MicroSeconds(100);
+        HAL_Time_Sleep_MicroSeconds(1000);
 
         enc28j60_lwip_read_spi(spiConf, ENC28J60_SPI_READ_CONTROL_REGISTER_OPCODE, ENC28J60_ECON1, &byteData, 1, 0);
     }
@@ -1053,10 +1069,10 @@ void enc28j60_lwip_soft_reset(SPI_CONFIGURATION* spiConf)
     /* Reset PHY */
     enc28j60_lwip_write_phy_register(spiConf, ENC28J60_PHCON1, (UINT16)(1ul << ENC28J60_PHCON1_PRST));
 
-    timeout = 10000; 
+    timeout = 1000; 
     do
     {
-        HAL_Time_Sleep_MicroSeconds(100);
+        HAL_Time_Sleep_MicroSeconds(1000);
 
         shortData = enc28j60_lwip_read_phy_register(spiConf, ENC28J60_PHCON1);
     } while(timeout-- && (shortData & (1ul << ENC28J60_PHCON1_PRST)) != 0);    
@@ -1070,7 +1086,7 @@ void enc28j60_lwip_soft_reset(SPI_CONFIGURATION* spiConf)
     CPU_SPI_nWrite8_nRead8 (*spiConf, (UINT8 *)&byteData, 1, 0, 0, 0);
 
     /* Errata : After reset wait for 100 ms */
-    for(byteData=0; byteData<100; byteData++)
+    for(byteData=0; byteData<200; byteData++)
     {
         HAL_Time_Sleep_MicroSeconds(1000);
     }
@@ -1136,4 +1152,15 @@ void enc28j60_lwip_select_bank(SPI_CONFIGURATION *spiConf, UINT8 bankNumber)
     byteData |= bankNumber;
     enc28j60_lwip_write_spi( spiConf, ENC28J60_SPI_WRITE_CONTROL_REGISTER_OPCODE, ENC28J60_ECON1, byteData);
 }
+
+BOOL enc28j60_get_link_status(SPI_CONFIGURATION* spiConf)
+{
+    GLOBAL_LOCK(irq);
+
+    UINT16 phyStat = enc28j60_lwip_read_phy_register(spiConf, ENC28J60_PHSTAT2);
+
+    // linkstatus bit
+    return (0 != (phyStat & (1ul << ENC28J60_PHSTAT2_LSTAT_BIT)));    
+}
+
 

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <ComponentGuid>{55E400C4-52D0-4520-BB38-93BF97E9FB7C}</ComponentGuid>
-    <DirectoryRef>MSBuildExtensionsPathVersion</DirectoryRef>
+    <DirectoryRef>MSBuildExtensionsPath_MFv4_2</DirectoryRef>
     <_curdir>$(SPOCLIENT)\Framework\IDE\Targets\v4.2</_curdir>
   </PropertyGroup>
 

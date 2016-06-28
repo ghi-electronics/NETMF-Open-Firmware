@@ -35,6 +35,9 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Interop.SimpleService.MFSimpleServiceClient</StartupObject>
+  </PropertyGroup>
   <Import Project="$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.CSharp.Targets" Condition="Exists('$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.CSharp.Targets')" />
   <Import Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" Condition="!Exists('$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.CSharp.Targets')" />
   <ItemGroup>

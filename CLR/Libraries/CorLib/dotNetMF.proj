@@ -35,6 +35,7 @@
     <Compile Include="corlib_native_System_AppDomain.cpp" />
     <Compile Include="corlib_native_System_Array.cpp" />
     <Compile Include="corlib_native_System_Attribute.cpp" />
+    <Compile Include="corlib_native_System_BitConverter.cpp" />
     <Compile Include="corlib_native_System_Collections_ArrayList.cpp" />
     <Compile Include="corlib_native_System_Collections_Queue.cpp" />
     <Compile Include="corlib_native_System_Collections_Stack.cpp" />
@@ -87,7 +88,7 @@
     <IncludePaths Include="CLR\libraries\corlib" />
   </ItemGroup>
   <ItemGroup>
-    <HFiles Include="$(SPOCLIENT)\clr\include\clr_defines.h" />
+    <HFiles Include="$(PLATFORM_INDEPENDENT_LIB_DIR)\CLR_defines.h" />
     <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_checks.h" />
     <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_debugging.h" />
     <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_diagnostics.h" />

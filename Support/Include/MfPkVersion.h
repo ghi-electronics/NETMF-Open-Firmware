@@ -4,19 +4,19 @@
 #define MFPK_VER_MAJOR                 4
 #endif
 #ifndef MFPK_VER_MINOR
-#define MFPK_VER_MINOR                 2
+#define MFPK_VER_MINOR                 3
 #endif
 #ifndef MFPK_VER_BUILD
-#define MFPK_VER_BUILD                 0
+#define MFPK_VER_BUILD                 1
 #endif
 #ifndef MFPK_VER_REVISION
 #define MFPK_VER_REVISION              0
 #endif
 #ifndef MFPK_VER_VERSIONSTRING
-#define MFPK_VER_VERSIONSTRING         "4.2.0.0"
+#define MFPK_VER_VERSIONSTRING         "4.3.1.0"
 #endif
 #ifndef MFPK_VER_SHORTVERSIONSTRING
-#define MFPK_VER_SHORTVERSIONSTRING    "4.2"
+#define MFPK_VER_SHORTVERSIONSTRING    "4.3"
 #endif
 #ifndef MFPK_VER_PRODUCTNAME
 #define MFPK_VER_PRODUCTNAME           "Microsoft .NET Micro Framework"

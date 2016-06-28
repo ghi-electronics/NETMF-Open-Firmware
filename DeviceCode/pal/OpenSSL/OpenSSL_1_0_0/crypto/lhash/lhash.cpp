@@ -102,7 +102,7 @@
 #include <string.h>
 #endif
 
-const char lh_version[]="lhash" OPENSSL_VERSION_PTEXT;
+//const char lh_version[]="lhash" OPENSSL_VERSION_PTEXT;
 
 #undef MIN_NODES 
 #define MIN_NODES	16

@@ -2,11 +2,11 @@
   <PropertyGroup>
     <FeatureName>DpwsStack</FeatureName>
   </PropertyGroup>
-  <Import Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\HTTP.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\XML.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Stream.featureproj" />
+  <Import Condition="'$(CORE_FEATUREPROJ)'    ==''" Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
+  <Import Condition="'$(HARDWARE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
+  <Import Condition="'$(HTTP_FEATUREPROJ)'    ==''" Project="$(SPOCLIENT)\Framework\Features\HTTP.featureproj" />
+  <Import Condition="'$(XML_FEATUREPROJ)'     ==''" Project="$(SPOCLIENT)\Framework\Features\XML.featureproj" />
+  <Import Condition="'$(STREAM_FEATUREPROJ)'  ==''" Project="$(SPOCLIENT)\Framework\Features\Stream.featureproj" />
   <ItemGroup>
     <MMP_DAT_CreateDatabase Include="$(BUILD_TREE_CLIENT)\pe\$(ENDIANNESS)\MFDpwsExtensions.pe" />
     <RequiredManagedProjects Include="$(SPOCLIENT)\Framework\Core\Dpws\DpwsExtensions\Dpws.Extensions.csproj" Condition="'$(AUTOMATED_BUILD)'==''" />
@@ -20,5 +20,6 @@
     <Groups>DPWS</Groups>
     <Documentation>
     </Documentation>
+    <DPWSSTACK_FEATURPROJ>True</DPWSSTACK_FEATUREPROJ>
   </PropertyGroup>
 </Project>

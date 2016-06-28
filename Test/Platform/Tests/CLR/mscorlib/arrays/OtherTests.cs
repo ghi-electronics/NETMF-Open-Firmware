@@ -185,8 +185,30 @@ namespace Microsoft.SPOT.Platform.Tests
             }
             return MFTestResults.Fail;
         }
+        [TestMethod]
+        public MFTestResults BinarySearch_Test()
+        {
+            Log.Comment("Array.BinarySearch");
 
-        class MyClass 
+            var objects = new MyClass[6];
+            for (int i = 0; i < 6; i++)
+            {
+                objects[i] = new MyClass(i + 1);
+            }
+
+            int y = Array.BinarySearch(objects, new MyClass(5), null);
+            if (y == 4)
+            {
+                return MFTestResults.Pass;
+            }
+            else
+            {
+                Log.Comment("BinarySearch returns " + y.ToString());
+                return MFTestResults.Fail;
+            }
+        }
+        
+        class MyClass : IComparable
         {
             int m_int;
 
@@ -196,6 +218,17 @@ namespace Microsoft.SPOT.Platform.Tests
             }
 
             public int Value { get { return m_int; } }
+
+            public int CompareTo(object obj)
+            {
+                var target = obj as MyClass;
+                if (target == null)
+                {
+                    throw new ArgumentException();
+                }
+
+                return m_int - target.m_int;
+            }
         }
 
         //Compiled Test Cases 
@@ -269,21 +302,21 @@ namespace Microsoft.SPOT.Platform.Tests
                     array[i] = value;
             }
             public static int Main_old()
-	{
-		string[] strings = new string[100];
-		Fill(strings, 0, 100, "Undefined");
-		Fill(strings, 0,  10, null);
+    {
+        string[] strings = new string[100];
+        Fill(strings, 0, 100, "Undefined");
+        Fill(strings, 0,  10, null);
 
-		try
-		{
-			Fill(strings, 90, 10, 0);
-		}
-		catch (System.Exception)
-		{
-			return 0;
-		}
-		return 1;
-	}
+        try
+        {
+            Fill(strings, 90, 10, 0);
+        }
+        catch (System.Exception)
+        {
+            return 0;
+        }
+        return 1;
+    }
             public static bool testMethod()
             {
                 return (Main_old() == 0);
@@ -297,21 +330,21 @@ namespace Microsoft.SPOT.Platform.Tests
         class Other_TestClass_covariance_exception_02
         {
             public static int Main_old()
-	{
-		string[] stringArr = new string[10];
-		object[] objectArr = stringArr;
-		objectArr[0] = "hello";
+    {
+        string[] stringArr = new string[10];
+        object[] objectArr = stringArr;
+        objectArr[0] = "hello";
 
-		try
-		{
-			objectArr[1] = new Queue();
-		}
-		catch (System.Exception)
-		{
-			return 0;
-		}
-		return 1;
-	}
+        try
+        {
+            objectArr[1] = new Queue();
+        }
+        catch (System.Exception)
+        {
+            return 0;
+        }
+        return 1;
+    }
             public static bool testMethod()
             {
                 return (Main_old() == 0);
@@ -324,18 +357,18 @@ namespace Microsoft.SPOT.Platform.Tests
         class Other_TestClass_covariance_explicit_01
         {
             public static int Main_old()
-	{
-		Other_TestClass_covariance_explicit_01_Imp[] mc = new Other_TestClass_covariance_explicit_01_Imp[10];
-		for (int x=0; x < 10; x++)
-		{
-			mc[x] = new Other_TestClass_covariance_explicit_01_Imp();
-			mc[x].x = x;
-		}
-		object[] o = new Other_TestClass_covariance_explicit_01_Imp[10];
-		mc = (Other_TestClass_covariance_explicit_01_Imp[])o;
+    {
+        Other_TestClass_covariance_explicit_01_Imp[] mc = new Other_TestClass_covariance_explicit_01_Imp[10];
+        for (int x=0; x < 10; x++)
+        {
+            mc[x] = new Other_TestClass_covariance_explicit_01_Imp();
+            mc[x].x = x;
+        }
+        object[] o = new Other_TestClass_covariance_explicit_01_Imp[10];
+        mc = (Other_TestClass_covariance_explicit_01_Imp[])o;
 
-		return 0;
-	}
+        return 0;
+    }
             public static bool testMethod()
             {
                 return (Main_old() == 0);

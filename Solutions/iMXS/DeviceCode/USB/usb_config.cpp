@@ -71,7 +71,7 @@ const ADS_PACKED struct GNU_PACKED USB_DYNAMIC_CONFIGURATION
         },
         USB_DEVICE_DESCRIPTOR_LENGTH,       // Length of device descriptor
         USB_DEVICE_DESCRIPTOR_TYPE,         // USB device descriptor type
-        0x0110,                             // USB Version 1.10 (BCD)
+        USB_VERSION,                        // USB Version
         0,                                  // Device class (none)
         0,                                  // Device subclass (none)
         0,                                  // Device protocol (none)

@@ -220,7 +220,7 @@ namespace iMXS_Compound
             Configuration.DeviceDescriptor device = new Configuration.DeviceDescriptor(0x15A2, 0x0026, 0x0100);
             device.iManufacturer = 1;       // String 1 is the manufacturer name
             device.iProduct = 2;       // String 2 is the product name
-            device.bcdUSB = 0x0110;  // USB version 1.10
+            device.bcdUSB = 0x200;  // USB version 2.00
 
             // Create the compound configuration descriptor
             Configuration.Endpoint endpoint1 = new Configuration.Endpoint(1, Configuration.Endpoint.ATTRIB_Bulk | Configuration.Endpoint.ATTRIB_Write);
@@ -395,7 +395,7 @@ namespace iMXS_Compound
             Configuration.DeviceDescriptor device = new Configuration.DeviceDescriptor(0x15A2, 0x0026, 0x0100);
             device.iManufacturer = 1;       // String 1 is the manufacturer name
             device.iProduct = 2;       // String 2 is the product name
-            device.bcdUSB = 0x0110;  // USB version 1.10
+            device.bcdUSB = 0x0200;  // USB version 2.00
 
             // Create the simple configuration descriptor
             Configuration.Endpoint endpoint1 = new Configuration.Endpoint(1, Configuration.Endpoint.ATTRIB_Bulk | Configuration.Endpoint.ATTRIB_Write);

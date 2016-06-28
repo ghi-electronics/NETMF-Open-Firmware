@@ -2,8 +2,9 @@
   <PropertyGroup>
     <FeatureName>XML</FeatureName>
   </PropertyGroup>
-  <Import Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
+  <Import Condition="'$(CORE_FEATUREPROJ)'    ==''" Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
+  <Import Condition="'$(HARDWARE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
+
   <Import Project="$(SPOCLIENT)\Framework\Features\XML_CLR.libcatproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\XML_core_CLR.libcatproj" />
 
@@ -19,5 +20,6 @@
     </Groups>
     <Documentation>
     </Documentation>
+    <XML_FEATUREPROJ>True</XML_FEATUREPROJ>
   </PropertyGroup>
 </Project>

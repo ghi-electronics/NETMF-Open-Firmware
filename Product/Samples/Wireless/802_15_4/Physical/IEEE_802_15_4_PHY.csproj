@@ -1,4 +1,5 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <AssemblyName>IEEE_802_15_4_PHY_Sample</AssemblyName>
     <OutputType>Exe</OutputType>
@@ -31,14 +32,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <Import Project="$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.CSharp.Targets"       Condition="Exists('$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.CSharp.Targets')" />
+  <PropertyGroup>
+    <StartupObject>IEEE_802_15_4_Sample.Program</StartupObject>
+  </PropertyGroup>
+  <Import Project="$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.CSharp.Targets" Condition="Exists('$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.CSharp.Targets')" />
   <Import Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" Condition="!Exists('$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.CSharp.Targets')" />
-
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="Microsoft.SPOT.Hardware">
       <HintPath>$(BUILD_TREE_DLL)\Microsoft.SPOT.Hardware.dll</HintPath>
@@ -65,7 +67,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="ReadMe.txt" />
   </ItemGroup>

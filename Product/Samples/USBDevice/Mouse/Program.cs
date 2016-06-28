@@ -198,7 +198,7 @@ namespace USBMouseSample
                     // Create the device descriptor.
                     device = new Configuration.DeviceDescriptor(0xBADA, 0x0026,
                         0x0100);
-                    device.bcdUSB = 0x110;
+                    device.bcdUSB = 0x200;    // USB 2.00
                     device.bDeviceClass = 0;
                     device.bDeviceSubClass = 0;
                     device.bDeviceProtocol = 0;

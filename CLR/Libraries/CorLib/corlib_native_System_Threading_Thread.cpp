@@ -11,8 +11,6 @@ HRESULT Library_corlib_native_System_Threading_Thread::_ctor___VOID__SystemThrea
     NATIVE_PROFILE_CLR_CORE();
     TINYCLR_HEADER();
 
-    hr = S_OK;
-
     CLR_RT_HeapBlock* pThis = stack.This();
 
     pThis[ FIELD__m_Delegate ].Assign            ( stack.Arg1() );
@@ -26,9 +24,11 @@ HRESULT Library_corlib_native_System_Threading_Thread::_ctor___VOID__SystemThrea
            
 #if defined(TINYCLR_APPDOMAINS)
     TINYCLR_CHECK_HRESULT(CLR_RT_ObjectToEvent_Source::CreateInstance( g_CLR_RT_ExecutionEngine.GetCurrentAppDomain(), *pThis, pThis[ FIELD__m_AppDomain ] ));
+    TINYCLR_NOCLEANUP();
+#else
+    TINYCLR_NOCLEANUP_NOLABEL();
 #endif
 
-    TINYCLR_NOCLEANUP();
 }
 
 HRESULT Library_corlib_native_System_Threading_Thread::Start___VOID( CLR_RT_StackFrame& stack )

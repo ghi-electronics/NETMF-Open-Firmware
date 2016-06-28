@@ -84,6 +84,7 @@ namespace Microsoft.SPOT.Tasks
                 bpg.AddProperty("Guid", System.Guid.NewGuid().ToString("B"));
                 bpg.AddProperty("Description", "<Add Feature Description Here>");
                 bpg.AddProperty("Groups", "");
+                bpg.AddProperty( m_name.ToUpper().Replace(".", "_") + "_FEATUREPROJ", "True");
 
                 ProjectItemGroupElement big = proj.Xml.AddItemGroup();
                 big.AddItem("InteropFeature", Path.GetFileNameWithoutExtension(m_assemblyName).Replace('.', '_'));

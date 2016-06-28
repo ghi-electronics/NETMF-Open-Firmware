@@ -1,16 +1,24 @@
+
+
+
 #ifndef SSL_TYPES_H
 #define SSL_TYPES_H
 #include <crypto/o_str.h>
-#include <errno.h>
 struct OPENSSL_TYPE__FILE
 {
     const char *buffer;
     int read;
 };
 #ifndef OPENSSL_SYS_WINDOWS
+//#include <errno.h>
 extern OPENSSL_TYPE__FILE SSL_STDERR;
 extern OPENSSL_TYPE__FILE SSL_STDOUT;
 extern OPENSSL_TYPE__FILE SSL_STDIN;
+#if defined(__RENESAS__)
+extern "C" volatile int errno;
+#else
+extern "C" int errno;
+#endif
 #endif
 
 #ifdef OPENSSL_SYS_ARM
@@ -78,7 +86,7 @@ typedef int  ssize_t;
 #ifdef ULONG_MAX
 #undef ULONG_MAX
 #endif
-#define ULONG_MAX                   4294967295L
+#define ULONG_MAX                   4294967295UL
 
 //For sockets
 #define AF_INET                     2       /* internetwork: UDP, TCP, etc. */
@@ -91,7 +99,7 @@ typedef int  ssize_t;
 #define SOL_SOCKET                  0xfff     /* options for socket level (from LWIP) */ 
 #define SO_ERROR                    0x1007    /* get error status and clear */
 #ifndef INADDR_ANY
-#define INADDR_ANY                  0x00000000UL
+#define INADDR_ANY                  ((UINT32)0x00000000UL)
 #endif
 #ifndef INVALID_SOCKET
 #define INVALID_SOCKET              -1
@@ -188,16 +196,32 @@ typedef unsigned   long    u32_t;
 typedef signed     long    s32_t;
 typedef int                pid_t;
 
-//these are located in lwip_1_3_2\src\core\ipv4\inet.c
+//these are located in LWIP\src\core\ipv4\inet.c
 //Maybe these should go into a public header?
+#ifndef in_range
 #define in_range(c, lo, up)  ((u8_t)c >= lo && (u8_t)c <= up)
+#endif
+#ifndef isprint
 #define isprint(c)           in_range(c, 0x20, 0x7f)
+#endif
+#ifndef isdigit
 #define isdigit(c)           in_range(c, '0', '9')
+#endif
+#ifndef isxdigit
 #define isxdigit(c)          (isdigit(c) || in_range(c, 'a', 'f') || in_range(c, 'A', 'F'))
+#endif
+#ifndef islower
 #define islower(c)           in_range(c, 'a', 'z')
+#endif
+#ifndef isupper
 #define isupper(c)           in_range(c, 'A', 'Z')
+#endif
+#ifndef isspace
 #define isspace(c)           (c == ' ' || c == '\f' || c == '\n' || c == '\r' || c == '\t' || c == '\v')
+#endif
+#ifndef isalnum
 #define isalnum(c)           isdigit(c)
+#endif
 
 #else
 #include <time.h>

@@ -1290,6 +1290,11 @@ namespace Microsoft.SPOT.Debugger.WireProtocol
                 public ushort iMinorVersion;
                 public ushort iBuildNumber;
                 public ushort iRevisionNumber;
+
+                public override string ToString()
+                {
+                    return string.Format("{0}.{1}.{2}.{3}", iMajorVersion, iMinorVersion, iBuildNumber, iRevisionNumber);
+                }
             }
 
             public class Reply

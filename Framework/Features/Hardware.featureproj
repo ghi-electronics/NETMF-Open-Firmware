@@ -2,7 +2,7 @@
   <PropertyGroup>
     <FeatureName>Hardware</FeatureName>
   </PropertyGroup>
-  <Import Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
+  <Import Condition="'$(CORE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
   <ItemGroup>
     <InteropFeature Include="Microsoft_SPOT_Hardware" />
     <InteropFeature Include="Microsoft_SPOT_EventSink_DriverProcs" />
@@ -18,6 +18,7 @@
     <Guid>{823f4e8c-a71d-459f-a6be-950986a1c2f6}</Guid>
     <Groups>Hardware</Groups>
     <Required>true</Required>
+    <HARDWARE_FEATUREPROJ>true</HARDWARE_FEATUREPROJ>
     <Documentation>
     </Documentation>
   </PropertyGroup>

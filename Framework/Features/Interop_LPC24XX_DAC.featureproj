@@ -4,6 +4,7 @@
     <Guid>{3d1b2667-ee53-43bd-8bf4-95f881e925cb}</Guid>
     <Description>Managed access to native DAC driver, NXP Research</Description>
     <Groups></Groups>
+    <INTEROP_LPC24XX_DAC_FEATUREPROJ>True</INTEROP_LPC24XX_DAC_FEATUREPROJ>
   </PropertyGroup>
   <ItemGroup>
     <InteropFeature Include="DAC" />
@@ -11,7 +12,5 @@
  <!--   <MMP_DAT_CreateDatabase Include="$(SPOCLIENT)\Solutions\EA_LPC2478\DeviceCode\Interop\LPC24XX_DAC\ManagedCode\DAC\bin\Debug\DAC.pe" /> -->
     <MMP_DAT_CreateDatabase Include="$(BUILD_TREE_CLIENT)\pe\DAC.pe"/>
     <RequiredProjects Include="$(SPOCLIENT)\Solutions\EA_LPC2478\DeviceCode\Interop\LPC24XX_DAC\NativeCode\DAC\dotnetmf.proj" />
-
-    
   </ItemGroup>
 </Project>

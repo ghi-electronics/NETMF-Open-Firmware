@@ -2,7 +2,7 @@
   <PropertyGroup>
     <FeatureName>SPI</FeatureName>
   </PropertyGroup>
-  <Import Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
+  <Import Condition="'$(HARDWARE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\SPI_HAL.libcatproj" />
   <PropertyGroup>
     <Description>SPI support</Description>
@@ -10,5 +10,6 @@
     <Groups>Hardware</Groups>
     <Documentation>
     </Documentation>
+    <SPI_FEATUREPROJ>True</SPI_FEATUREPROJ>
   </PropertyGroup>
 </Project>

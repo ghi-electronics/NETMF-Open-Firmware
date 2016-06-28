@@ -1,4 +1,4 @@
-The following list is a list of files available with the Microsoft .NET Micro Framework 4.2 Software Development Kit for redistribution under the .NET Micro Framework 4.2 SDK license.
+The following list is a list of files available with the Microsoft .NET Micro Framework 4.3 Software Development Kit for redistribution under the .NET Micro Framework 4.3 SDK license.
 
 As of the 4.0 version and subsequent versions, the .NET Micro Framework has an Apache 2.0 license and there is no limitation to redistributing binaries, although the RTIP TCP/IP stack from  EBSnet Inc. and the Crypto Libraries are subject to special conditions.  Please refer to the specific licenses for details.
 

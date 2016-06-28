@@ -86,11 +86,11 @@ err_t LPC24XX_EMAC_lwip_xmit ( struct netif *pNetIf, struct pbuf *pPBuf )
         // src = (UINT32 *)pPBuf->payload;
         // LPC24XX_EMAC_lwip_FastCopy(dst, src, bytes_out);
         memcpy(dst, pPBuf->payload, pPBuf->len);
-        pPBuf = pPBuf->next;
         dst += pPBuf->len;
+        pPBuf = pPBuf->next;
     }
     
-    TX_DESC_CTRL(idx) = bytes_out | TCTRL_LAST | TCTRL_INT;
+    TX_DESC_CTRL(idx) = (bytes_out-1) | TCTRL_LAST | TCTRL_INT;
     idx++;
     /* Reset the index if last descriptor */
     if (idx == NUM_TX_FRAG) 

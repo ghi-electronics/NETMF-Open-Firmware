@@ -10,5 +10,6 @@
     <Documentation>
     </Documentation>
     <IsSolutionWizardVisible>false</IsSolutionWizardVisible>
+    <USB_PORT_FEATUREPROJ>True</USB_PORT_FEATUREPROJ>
   </PropertyGroup>
 </Project>

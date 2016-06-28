@@ -165,7 +165,7 @@ HRESULT Library_corlib_native_System_Resources_ResourceManager::GetObjectInterna
                 {
                     if(offset + length >= size)
                     {
-                        length -= size - offset;
+                        length = size - offset;
                     }
                 }
                 

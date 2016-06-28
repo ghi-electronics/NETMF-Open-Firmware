@@ -493,7 +493,7 @@ namespace System
         /// <summary>
         /// Conversion array from 6 bit of value into base64 encoded character.
         /// </summary>
-        static char[] s_rgchBase64Encoding = new char[]
+        static char[] s_rgchBase64EncodingDefault = new char[]
         {
            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', /* 12 */
            'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', /* 24 */
@@ -502,6 +502,18 @@ namespace System
            'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', /* 60 */
            '8', '9', '!', '*'            /* 64 */
         };
+
+        static char[] s_rgchBase64EncodingRFC4648 = new char[]
+        {
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', /* 12 */
+            'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', /* 24 */
+            'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', /* 36 */
+            'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', /* 48 */
+            'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', /* 60 */
+            '8', '9', '+', '/'            /* 64 */
+        };
+
+        static char[] s_rgchBase64Encoding = s_rgchBase64EncodingDefault;
 
         static byte[] s_rgbBase64Decode = new byte[]
         {
@@ -532,6 +544,12 @@ namespace System
         {
             return (((binaryLen / 3) + (((binaryLen % 3) != 0) ? 1 : 0)) * 4);
 
+        }
+
+        public static bool UseRFC4648Encoding
+        {
+            get { return s_rgchBase64Encoding == s_rgchBase64EncodingRFC4648; }
+            set { s_rgchBase64Encoding = (value ? s_rgchBase64EncodingRFC4648 : s_rgchBase64EncodingDefault); }
         }
 
         /// <summary>

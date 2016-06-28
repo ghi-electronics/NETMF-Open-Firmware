@@ -13,12 +13,17 @@ extern "C"
 #include "lwip\netifapi.h"
 
 #include "lwip\tcp.h"
-#include <errno.h>
-
 }
+
 extern const HAL_CONFIG_BLOCK   g_NetworkConfigHeader;
 extern LOOPBACK_LWIP_Driver     g_LOOPBACK_LWIP_Driver;
 extern NETWORK_CONFIG           g_NetworkConfig;
+
+#if defined(__RENESAS__)
+volatile int errno;
+#else
+int errno;
+#endif
 
 //--// 
 
@@ -108,6 +113,8 @@ BOOL LWIP_SOCKETS_Driver::Uninitialize()
 {
     NATIVE_PROFILE_PAL_NETWORK();
 
+    lwip_uninit();
+
 #if defined(NETWORK_USE_LOOPBACK)
     // close the loopback driver
     g_LOOPBACK_LWIP_Driver.Close();
@@ -117,8 +124,6 @@ BOOL LWIP_SOCKETS_Driver::Uninitialize()
     {
         Network_Interface_Close(i);
     }
-
-    lwip_uninit();
 
     return TRUE;
 }
@@ -390,8 +395,9 @@ static void MARSHAL_FDSET_TO_SOCK_FDSET(SOCK_fd_set *sf, fd_set *f)
 {
     if(sf != NULL && f != NULL) 
     { 
+        int cnt = sf->fd_count;
         sf->fd_count = 0; 
-        for(int i=0; i<sf->fd_count; i++) 
+        for(int i=0; i<cnt; i++) 
         { 
             if(FD_ISSET(sf->fd_array[i],f)) 
             { 
@@ -705,9 +711,9 @@ HRESULT LWIP_SOCKETS_Driver::UpdateAdapterConfiguration( UINT32 interfaceIndex, 
         // resetting dhcp if necessary.
         if(fDynamicDns || (config->dnsServer1 == 0 && config->dnsServer2 == 0))
         {
-            if(0 == (pNetIf->flags & NETIF_FLAG_DYNAMIC_DNS))
+            if(0 == (pNetIf->flagsExt & NETIF_FLAG_EXT_DYNAMIC_DNS))
             {
-                pNetIf->flags |= NETIF_FLAG_DYNAMIC_DNS;
+                pNetIf->flagsExt |= NETIF_FLAG_EXT_DYNAMIC_DNS;
 
                 // if dhcp is active, we need to reset in order to get the dynamic
                 // dns
@@ -734,7 +740,7 @@ HRESULT LWIP_SOCKETS_Driver::UpdateAdapterConfiguration( UINT32 interfaceIndex, 
                 dns_setserver(idx, (struct ip_addr *)&config->dnsServer2);
             }
 
-            pNetIf->flags &= ~NETIF_FLAG_DYNAMIC_DNS;
+            pNetIf->flagsExt &= ~NETIF_FLAG_EXT_DYNAMIC_DNS;
         }
     }
 #endif
@@ -752,9 +758,12 @@ HRESULT LWIP_SOCKETS_Driver::UpdateAdapterConfiguration( UINT32 interfaceIndex, 
                 }
             }
         }
-        else if(fDhcpStarted)
+        else
         {
-            dhcp_stop(pNetIf);
+            if(fDhcpStarted)
+            {
+                dhcp_stop(pNetIf);
+            }
 
             netif_set_addr(pNetIf, (struct ip_addr *) &config->ipaddr, (struct ip_addr *)&config->subnetmask, (struct ip_addr *)&config->gateway);
 

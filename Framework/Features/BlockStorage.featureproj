@@ -9,5 +9,6 @@
     <Groups>BlockStorage</Groups>
     <Documentation>
     </Documentation>
+    <BLOCKSTORAGE_FEATUREPROJ>True</BLOCKSTORAGE_FEATUREPROJ>
   </PropertyGroup>
 </Project>

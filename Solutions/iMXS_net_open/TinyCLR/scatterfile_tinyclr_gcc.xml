@@ -6,7 +6,8 @@
     <Set Name="Valid" Value="false"/>
 
     <!-- ################################################################################ -->
-    <Set Name="Heap_Begin"        Value="0x08100000"/>
+    <Set Name="RAMZI_Begin"       Value="0x08100000"/>
+    <Set Name="Heap_Begin"        Value="0x08200000"/>
     <Set Name="Heap_End"          Value="0x084FFFF8"/>
     <Set Name="Custom_Heap_Begin" Value="0x08500000"/>
     <Set Name="Custom_Heap_End"   Value="0x088FFFF8"/>
@@ -106,7 +107,7 @@
         <FileMapping Name="*" Options="(rwdata)" />
         <FileMapping Name="*" Options="(.data*)" />
       </ExecRegion>      
-      <ExecRegion Name=".bss" Align="0x8" Options="&gt;RELOC_RAM ">
+      <ExecRegion Name=".bss" Align="0x8" Base="%RAMZI_Begin%" Size="0x100000">
         <FileMapping Name="*" Options="(.bss*)" />
         <FileMapping Name="*" Options="(.zidata*)" />
         <FileMapping Name="PROVIDE(__exidx_start = .);" />

@@ -266,7 +266,7 @@ BOOL BS_WearLeveling_Driver::GetFreeBlock(BS_WearLeveling_Config* config, ByteAd
     //
     for(i=0; i<2; i++)
     {    
-        while(start >= end && start <= BaseAddressEnd)
+        while(start >= end && start < BaseAddressEnd)
         {
             if(GetSectorMetadataInternal( config, start, (SectorMetadata*)meta ) 
                 && !meta->IsBadBlock()
@@ -459,7 +459,7 @@ BOOL BS_WearLeveling_Driver::CompactBlocks(BS_WearLeveling_Config* config, ByteA
 {
     if(s_inCompaction) return FALSE;
     
-    GLOBAL_LOCK(x);
+    //GLOBAL_LOCK(x);
     
     const BlockDeviceInfo *pDevInfo          = config->Device->GetDeviceInfo(config->BlockConfig);
     WL_SectorMetadata      meta;
@@ -911,6 +911,8 @@ BOOL BS_WearLeveling_Driver::FormatBlock(BS_WearLeveling_Config* config, ByteAdd
 {
     WL_SectorMetadata meta;
 
+    phyBlockAddress = GetBlockStartAddress(phyBlockAddress, config->BaseAddress, config->BytesPerBlock);
+
     //
     // If the block is bad, change the replacement block 
     //
@@ -924,7 +926,7 @@ BOOL BS_WearLeveling_Driver::FormatBlock(BS_WearLeveling_Config* config, ByteAdd
     }
     else
     {
-        _WEAR_LEVEL_ASSERT(!meta.IsBlockFormatted() || !meta.IsValidBlockMapOffset() && !meta.IsValidOwnerBlock());
+        _WEAR_LEVEL_ASSERT(!meta.IsBlockFormatted() || (!meta.IsValidBlockMapOffset() && !meta.IsValidOwnerBlock()));
         //
         // Erase the block and mark it as formatted
         //
@@ -1592,7 +1594,7 @@ BOOL BS_WearLeveling_Driver::GetPhysicalAddress(BS_WearLeveling_Config* config, 
 
 BOOL BS_WearLeveling_Driver::Read(void *context, ByteAddress virtAddress, UINT32 NumBytes, BYTE *pSectorBuff)
 {
-    GLOBAL_LOCK(x);
+    //GLOBAL_LOCK(x);
 
     BS_WearLeveling_Config *config = (BS_WearLeveling_Config*)context;
 
@@ -1652,6 +1654,7 @@ BOOL BS_WearLeveling_Driver::WriteToPhysicalSector(BS_WearLeveling_Config* confi
     //
     if(!config->Device->Write(config->BlockConfig, sectStart, length, pSectorData, FALSE))
     {
+        _WEAR_LEVEL_ASSERT(FALSE);
         goto CLEANUP;
     }
 
@@ -1661,6 +1664,7 @@ BOOL BS_WearLeveling_Driver::WriteToPhysicalSector(BS_WearLeveling_Config* confi
     if(!config->Device->Read(config->BlockConfig, sectStart, length, pCrcBuffer) 
        || (0 != memcmp(pSectorData, pCrcBuffer, length)))
     {
+        _WEAR_LEVEL_ASSERT(FALSE);
         goto CLEANUP;
     }
 
@@ -1773,6 +1777,11 @@ BOOL BS_WearLeveling_Driver::WriteToSector(BS_WearLeveling_Config* config, ByteA
     //
     // we only need a new sector if we are moving any bits from 0 -> 1 
     // 
+    //if(origPhyMeta.IsSectorDirty())
+    //{
+    //    fReadModifyNeeded = TRUE;
+    //}
+    //else 
     if((!fMemFill || *pSectorData != 0) && origPhyMeta.IsSectorDirty()) 
     { 
         for(UINT32 i=0; i<length; i++)
@@ -1972,7 +1981,7 @@ CLEANUP:
 
 BOOL BS_WearLeveling_Driver::WriteInternal(void *context, ByteAddress Address, UINT32 NumBytes, BYTE *pSectorBuff, BOOL ReadModifyWrite, BOOL fFillMem)
 {
-    GLOBAL_LOCK(x);
+    //GLOBAL_LOCK(x);
 
     BS_WearLeveling_Config *config = (BS_WearLeveling_Config*)context;
 
@@ -2095,7 +2104,7 @@ BOOL BS_WearLeveling_Driver::IsBlockErased(void *context, ByteAddress Address, U
 
     if(!GetSectorMetadataInternal(config, phyAddr, (SectorMetadata*)&meta)) return FALSE;
 
-    return (!meta.IsBadBlock() && (!meta.IsBlockDirty() || meta.IsBlockTrash()));
+    return (!meta.IsBadBlock() && (meta.IsBlockFree() || meta.IsBlockTrash()));
 }
 
 void BS_WearLeveling_Driver::ValidateOwnerBlock(BS_WearLeveling_Config *config, SectorAddress virtAddr)
@@ -2156,7 +2165,7 @@ void BS_WearLeveling_Driver::ValidateOwnerBlock(BS_WearLeveling_Config *config, 
 
 BOOL BS_WearLeveling_Driver::EraseBlock(void *context, ByteAddress Address)
 {
-    GLOBAL_LOCK(x);
+    //GLOBAL_LOCK(x);
     
     BS_WearLeveling_Config *config = (BS_WearLeveling_Config*)context;
 
@@ -2183,12 +2192,7 @@ BOOL BS_WearLeveling_Driver::EraseBlock(void *context, ByteAddress Address)
         //
         // if the block is free, then the block is already erased
         //
-        if(meta.IsBlockFree() || !meta.IsSectorDirty()) 
-        {
-            return TRUE;
-        }
-
-        if(!meta.IsBlockTrash())
+        if(!meta.IsBlockTrash() && !meta.IsBlockFree())
         {
             meta.SetBlockTrash();
 

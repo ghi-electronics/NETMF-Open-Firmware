@@ -186,7 +186,14 @@ HRESULT AT91_USB_Driver::Initialize( int Controller )
 
 HRESULT AT91_USB_Driver::Uninitialize( int Controller )
 {
-    GLOBAL_LOCK(irq);
+#if defined(PLATFORM_ARM_SAM7_ANY)
+    // FOR SAM7 we cannot restart the USB controller with out a hard reboot
+    // and this method is only called for soft reboot, so do not reset 
+    // Also, change the state to indicate it is initialized
+    USB_CONTROLLER_STATE     &State = UsbControllerState[Controller];
+    State.Initialized = TRUE;
+#else
+    GLOBAL_LOCK(irq);    
 
     ProtectPins( Controller, TRUE );
     // Enable USB device clock
@@ -210,7 +217,7 @@ HRESULT AT91_USB_Driver::Uninitialize( int Controller )
     #if defined(AT91_UDP_EXTERNAL_PULLUP)
         CPU_GPIO_EnableOutputPin(AT91_DP_PULLUP, TRUE);
     #endif
-
+#endif
     return S_OK;
 }
 
@@ -289,11 +296,12 @@ void AT91_USB_Driver::TxPacket( USB_CONTROLLER_STATE* State, int endpoint )
     // transmit a packet on UsbPortNum, if there are no more packets to transmit, then die
     USB_PACKET64* Packet64;
 
-    for(;;)
-    {
-        Packet64 = USB_TxDequeue( State, endpoint, TRUE );
+    Packet64 = USB_TxDequeue( State, endpoint, TRUE );
 
-        if(Packet64 == NULL || Packet64->Size > 0) break;
+    if(Packet64 != NULL && Packet64->Size == 0)
+    {
+        g_AT91_USB_Driver.TxNeedZLPS[endpoint] = TRUE;
+        Packet64 = NULL;
     }
 
     if(Packet64)

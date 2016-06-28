@@ -12,5 +12,6 @@
     <Groups>Hardware</Groups>
     <Documentation>
     </Documentation>
+    <SD_FEATUREPROJ>True</SD_FEATUREPROJ>
   </PropertyGroup>
 </Project>

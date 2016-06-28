@@ -71,25 +71,30 @@ HRESULT Library_corlib_native_System_Number::FormatNative___STATIC__STRING__OBJE
     }
     else
     {
+        if(formatCh == 'G' && precision == 0)
+        {
+            precision = 1;
+        }
+        
         switch(dt)
         {
         case DATATYPE_I1: 
-            hal_snprintf( result, ARRAYSIZE(result), "%d", value->NumericByRef().s1 ); 
+            hal_snprintf( result, ARRAYSIZE(result), "%.*d", precision, value->NumericByRef().s1 ); 
             break;
         case DATATYPE_U1: 
-            hal_snprintf( result, ARRAYSIZE(result), "%u", value->NumericByRef().u1 ); 
+            hal_snprintf( result, ARRAYSIZE(result), "%.*u", precision, value->NumericByRef().u1 ); 
             break;
         case DATATYPE_I2: 
-            hal_snprintf( result, ARRAYSIZE(result), "%d", value->NumericByRef().s2 ); 
+            hal_snprintf( result, ARRAYSIZE(result), "%.*d", precision, value->NumericByRef().s2 ); 
             break;
         case DATATYPE_U2: 
-            hal_snprintf( result, ARRAYSIZE(result), "%u", value->NumericByRef().u2 ); 
+            hal_snprintf( result, ARRAYSIZE(result), "%.*u", precision, value->NumericByRef().u2 ); 
             break;
         case DATATYPE_I4: 
-            hal_snprintf( result, ARRAYSIZE(result), "%d", value->NumericByRef().s4 ); 
+            hal_snprintf( result, ARRAYSIZE(result), "%.*d", precision, value->NumericByRef().s4 ); 
             break;
         case DATATYPE_U4: 
-            hal_snprintf( result, ARRAYSIZE(result), "%u", value->NumericByRef().u4 ); 
+            hal_snprintf( result, ARRAYSIZE(result), "%.*u", precision, value->NumericByRef().u4 ); 
             break;
 #if defined(PLATFORM_WINDOWS) || defined(PLATFORM_WINCE)
         case DATATYPE_I8: 
@@ -102,13 +107,13 @@ HRESULT Library_corlib_native_System_Number::FormatNative___STATIC__STRING__OBJE
         case DATATYPE_I8: 
             {   // use local 64 bit variable to assure 8-byte boundary.
                 INT64 i64 = (CLR_INT64_TEMP_CAST)value->NumericByRef().s8;
-                hal_snprintf( result, ARRAYSIZE(result), "%lld", i64); 
+                hal_snprintf( result, ARRAYSIZE(result), "%.*lld", precision, i64); 
             }
             break;
         case DATATYPE_U8: 
             {   // use local 64 bit variable to assure 8-byte boundary.
                 UINT64 ui64 = (CLR_UINT64_TEMP_CAST)value->NumericByRef().u8;
-                hal_snprintf( result, ARRAYSIZE(result), "%llu", ui64 ); 
+                hal_snprintf( result, ARRAYSIZE(result), "%.*llu", precision, ui64 ); 
             }
             break;
 #endif
@@ -116,7 +121,7 @@ HRESULT Library_corlib_native_System_Number::FormatNative___STATIC__STRING__OBJE
         case DATATYPE_R8:
             {
                 // All the formatCh have been converted to upper case in the managed layer
-                _ASSERTE(formatCh == 'G' || formatCh == 'N' || formatCh == 'F');
+                _ASSERTE(formatCh == 'G' || formatCh == 'N' || formatCh == 'F' || formatCh == 'D');
 
                 if (precision < 0 || precision > 99) 
                 {

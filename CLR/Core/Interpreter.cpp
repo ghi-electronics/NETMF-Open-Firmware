@@ -115,11 +115,17 @@ HRESULT CLR_RT_HeapBlock::Convert_Internal( CLR_DataType et )
     case DATATYPE_I4      :
     case DATATYPE_U4      :
         {
-            CLR_UINT32 shift = 64 - dtlSrc.m_sizeInBits;
-            CLR_UINT64 res   = NumericByRef().u8 << shift;
+            CLR_UINT64 res   = (CLR_UINT64)NumericByRef().u4;
 
-            if((dtlSrc.m_flags & CLR_RT_DataTypeLookup::c_Signed) && (dtlDst.m_flags & CLR_RT_DataTypeLookup::c_Signed)) NumericByRef().u8 = (CLR_UINT64)((CLR_INT64 )res >> shift);
-            else                                                                                                         NumericByRef().u8 = (CLR_UINT64)((CLR_UINT64)res >> shift);
+            if((dtlSrc.m_flags & CLR_RT_DataTypeLookup::c_Signed) && (dtlDst.m_flags & CLR_RT_DataTypeLookup::c_Signed))
+            {
+                CLR_UINT32 shift = 64 - dtlSrc.m_sizeInBits;
+
+                res <<= shift;
+                res = (CLR_UINT64)((CLR_INT64 )res >> shift);
+            }
+
+            NumericByRef().u8 = res;
         }
         //
         // Fall-through!!!

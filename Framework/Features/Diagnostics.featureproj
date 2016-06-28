@@ -10,5 +10,6 @@
     </Groups>
     <Documentation>
     </Documentation>
+    <DIAGNOSTICS_FEATUREPROJ>True</DIAGNOSTICS_FEATUREPROJ>
   </PropertyGroup>
 </Project>

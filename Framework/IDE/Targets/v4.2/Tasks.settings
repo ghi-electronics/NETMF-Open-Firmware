@@ -1,8 +1,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
 
     <PropertyGroup>
-        <TasksAssembly Condition="EXISTS('$(BUILD_ROOT)\$(Configuration)\server\dll\Microsoft.SPOT.Tasks.dll')">$(BUILD_ROOT)\$(Configuration)\server\dll\Microsoft.SPOT.Tasks.dll</TasksAssembly>
-        <TasksAssembly Condition="!EXISTS('$(BUILD_ROOT)\$(Configuration)\server\dll\Microsoft.SPOT.Tasks.dll')">$(PROGRAMFILES)\Reference Assemblies\Microsoft\Framework\.NETMicroFramework\$(TargetFrameworkVersion)\Microsoft.SPOT.Tasks.dll</TasksAssembly>
+        <TasksAssembly>$(SPOCLIENT)\Framework\IDE\Targets\v4.2\Tools\Microsoft.SPOT.Tasks.dll</TasksAssembly>
     </PropertyGroup>
 
   

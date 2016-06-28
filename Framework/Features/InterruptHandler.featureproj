@@ -10,5 +10,6 @@
     <Groups>Hardware</Groups>
     <Documentation>
     </Documentation>
+    <INTERRUPTHANDLER_FEATUREPROJ>True</INTERRUPTHANDLER_FEATUREPROJ>
   </PropertyGroup>
 </Project>

@@ -45,7 +45,7 @@
     <IncludePaths Include="DeviceCode\include" />
   </ItemGroup>
   <ItemGroup>
-    <HFiles Include="Double_decl.h" />
+    <HFiles Include="$(SPOCLIENT)\DeviceCode\include\Double_decl.h" />
   </ItemGroup>
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Targets" />
 </Project>

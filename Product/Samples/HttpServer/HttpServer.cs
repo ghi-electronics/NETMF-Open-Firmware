@@ -14,6 +14,7 @@ using System.Collections;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.SPOT.MFUpdate;
 using Microsoft.SPOT.Hardware;
+using System.Net.Sockets;
 
 namespace HttpServerSample
 {
@@ -27,7 +28,7 @@ namespace HttpServerSample
             // make sure the date is set on the device
             if (Microsoft.SPOT.Hardware.SystemInfo.SystemID.SKU != 3)
             {
-                Microsoft.SPOT.Hardware.Utility.SetLocalTime(new DateTime(2012, 7, 24));
+                Microsoft.SPOT.Hardware.Utility.SetLocalTime(new DateTime(2012, 8, 24));
             }
 
             // Wait for DHCP (on LWIP devices)
@@ -110,7 +111,6 @@ namespace HttpServerSample
 
         private static void HandleRequestThread()
         {
-            HttpListenerResponse response = null;
             HttpListenerContext context = null;
 
             try
@@ -120,15 +120,17 @@ namespace HttpServerSample
                     context = (HttpListenerContext)m_responseQueue.Dequeue();
                 }
 
-                response = context.Response;
-                HttpListenerRequest request = context.Request;
-                switch (request.HttpMethod.ToUpper())
+                if (context != null)
                 {
-                    case "GET": ProcessClientGetRequest(context); break;
-                    case "POST": ProcessClientPostRequest(context); break;
+                    HttpListenerRequest request = context.Request;
+                    switch (request.HttpMethod.ToUpper())
+                    {
+                        case "GET": ProcessClientGetRequest(context); break;
+                        case "POST": ProcessClientPostRequest(context); break;
+                    }
                 }
             }
-            catch
+            catch (SocketException)
             {
             }
             finally
@@ -188,7 +190,7 @@ namespace HttpServerSample
                 catch(InvalidOperationException)
                 {
                     listener.Stop();
-                    Thread.Sleep(1000);
+                    Thread.Sleep(200);
                 }
                 catch(ObjectDisposedException)
                 {
@@ -196,7 +198,7 @@ namespace HttpServerSample
                 }
                 catch
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(200);
                 }
             }
         }

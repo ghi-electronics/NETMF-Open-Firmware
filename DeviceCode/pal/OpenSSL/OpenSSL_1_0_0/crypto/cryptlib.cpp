@@ -454,6 +454,8 @@ void CRYPTO_THREADID_set_pointer(CRYPTO_THREADID *id, void *ptr)
 		id->val = (unsigned long)id->ptr;
 		return;
 		}
+	else
+	{
 	/* hash ptr ==> val. Each byte of 'val' gets the mod-256 total of a
 	 * linear function over the bytes in 'ptr', the co-efficients of which
 	 * are a sequence of low-primes (hash_coeffs is an 8-element cycle) -
@@ -473,6 +475,7 @@ void CRYPTO_THREADID_set_pointer(CRYPTO_THREADID *id, void *ptr)
 		accum += dnum;
 		*(dest++) = accum & 255;
 		}
+	}
 	}
 
 int CRYPTO_THREADID_set_callback(void (*func)(CRYPTO_THREADID *))

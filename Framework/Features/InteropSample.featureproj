@@ -23,5 +23,6 @@
     <Groups>Interop</Groups>
     <Documentation>
     </Documentation>
+    <INTEROPSAMPLE_FEATUREPROJ>True</INTEROPSAMPLE_FEATUREPROJ>
   </PropertyGroup>
 </Project>

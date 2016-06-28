@@ -119,7 +119,7 @@
 #include <stdio.h>
 #endif
 
-const char tls1_version_str[]="TLSv1" OPENSSL_VERSION_PTEXT;
+//const char tls1_version_str[]="TLSv1" OPENSSL_VERSION_PTEXT;
 
 #ifndef OPENSSL_NO_TLSEXT
 static int tls_decrypt_ticket(SSL *s, const unsigned char *tick, int ticklen,

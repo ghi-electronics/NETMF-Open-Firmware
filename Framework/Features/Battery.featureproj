@@ -2,7 +2,7 @@
   <PropertyGroup>
     <FeatureName>Battery</FeatureName>
   </PropertyGroup>
-  <Import Project="$(SPOCLIENT)\Framework\Features\hardware.featureproj" />
+  <Import Condition="'$(HARDWARE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\hardware.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\BatteryMeasurement_HAL.libcatproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\BatteryCharger_HAL.libcatproj" />
   <PropertyGroup>
@@ -11,6 +11,7 @@
     <Groups>Hardware</Groups>
     <Documentation>
     </Documentation>
+    <BATTERY_FEATUREPROJ>True</BATTERY_FEATUREPROJ>
   </PropertyGroup>
   <ItemGroup>
     <RequiredManagedProjects Include="$(SPOCLIENT)\Framework\Core\Native_Hardware\Core_Native_Hardware.csproj" Condition="'$(AUTOMATED_BUILD)'==''" />

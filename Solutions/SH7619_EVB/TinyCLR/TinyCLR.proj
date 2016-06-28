@@ -48,26 +48,26 @@
     <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2\DeviceCode\sh7619\sbrk.c" />
     <Compile Include="$(SPOCLIENT)\DeviceCode\Targets\Native\sh2\DeviceCode\sh7619\vecttbl.c" />
   </ItemGroup>
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\hardware.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\NativeEventDispatcher.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\DataStorage.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\BlockStorage.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Debugger.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\SOCKETS_Port.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Network.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\InterruptHandler.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\serial_port.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\SerialPort.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Diagnostics.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Graphics.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\TinyCore.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\I2C.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\SPI.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\Serialization.featureproj" />
-  <Import Condition="'$(TCP_IP_STACK)'!='LWIP' and '$(EnableTCPIP)'=='true'" Project="$(SPOCLIENT)\Framework\Features\TimeService.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Stream.featureproj" />
-  <Import Condition="" Project="$(SPOCLIENT)\Framework\Features\FileSystem.featureproj" />
+  <Import Condition="'$(CORE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
+  <Import Condition="'$(HARDWARE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
+  <Import Condition="'$(NATIVEEVENTDISPATCHER_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\NativeEventDispatcher.featureproj" />
+  <Import Condition="'$(DATASTORAGE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\DataStorage.featureproj" />
+  <Import Condition="'$(BLOCKSTORAGE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\BlockStorage.featureproj" />
+  <Import Condition="'$(DEBUGGER_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Debugger.featureproj" />
+  <Import Condition="'$(SOCKETS_PORT_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\SOCKETS_Port.featureproj" />
+  <Import Condition="'$(NETWORK_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Network.featureproj" />
+  <Import Condition="'$(INTERRUPTHANDLER_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\InterruptHandler.featureproj" />
+  <Import Condition="'$(SERIAL_PORT_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\serial_port.featureproj" />
+  <Import Condition="'$(SERIALPORT_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\SerialPort.featureproj" />
+  <Import Condition="'$(DIAGNOSTICS_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Diagnostics.featureproj" />
+  <Import Condition="'$(GRAPHICS_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Graphics.featureproj" />
+  <Import Condition="'$(TINYCORE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\TinyCore.featureproj" />
+  <Import Condition="'$(I2C_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\I2C.featureproj" />
+  <Import Condition="'$(SPI_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\SPI.featureproj" />
+  <Import Condition="'$(SERIALIZATION_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Serialization.featureproj" />
+  <Import Condition="'$(TIMESERVICE_FEATUREPROJ)'=='' AND '$(TCP_IP_STACK)'!='LWIP' and '$(EnableTCPIP)'=='true'" Project="$(SPOCLIENT)\Framework\Features\TimeService.featureproj" />
+  <Import Condition="'$(STREAM_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Stream.featureproj" />
+  <Import Condition="'$(FILESYSTEM_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\FileSystem.featureproj" />
   <Import Project="$(SPOCLIENT)\tools\targets\Microsoft.SPOT.System.Interop.Settings" />
   <ItemGroup>
     <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\MFUpdate\stubs\dotnetMF.proj" />
@@ -351,7 +351,7 @@
     <DriverLibs Include="sockets_hal_async_LWIP.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup Condition="'$(EnableTCPIP)'=='true' and '$(TCP_IP_STACK)'=='LWIP'">
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\lwip_1_3_2\src\dotNetMF.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\LWIP\src\dotNetMF.proj" />
     <DriverLibs Include="sockets_hal_sockets_LWIP.$(LIB_EXT)" />
     <DriverLibs Include="sockets_hal_dhcp_LWIP.$(LIB_EXT)" />
     <DriverLibs Include="sockets_hal_tcp_LWIP.$(LIB_EXT)" />

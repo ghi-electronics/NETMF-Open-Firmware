@@ -2,8 +2,8 @@
   <PropertyGroup>
     <FeatureName>TouchPanel</FeatureName>
   </PropertyGroup>
-  <Import Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
+  <Import Condition="'$(CORE_FEATUREPROJ)'    ==''" Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
+  <Import Condition="'$(HARDWARE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
   <ItemGroup>
     <InteropFeature Include="Microsoft_SPOT_Touch" />
     <MMP_DAT_CreateDatabase Include="$(BUILD_TREE_CLIENT)\pe\$(ENDIANNESS)\Microsoft.SPOT.Touch.pe" />
@@ -17,5 +17,6 @@
     <Groups>Touch</Groups>
     <Documentation>
     </Documentation>
+    <TOUCHSCREEN_FEATUREPROJ>True</TOUCHSCREEN_FEATUREPROJ>
   </PropertyGroup>
 </Project>

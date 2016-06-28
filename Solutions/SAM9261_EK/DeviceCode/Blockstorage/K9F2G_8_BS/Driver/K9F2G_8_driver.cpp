@@ -9,14 +9,25 @@
 
 extern K9F2G_8_BS_Driver g_K9F2G_8_BS_Driver;
 
-static BYTE  s_sectorBuff[2048];
-
 //--//
 
-void K9F2G_8_BS_Driver::WaitReady()
+BOOL K9F2G_8_BS_Driver::WaitReady()
 {
+    UINT32 Status;
+    
     // Loop uintl Ready/Busy Pin returns to High state
     while (!CPU_GPIO_GetPinState(AT91_NAND_RB));
+
+    
+    do
+    {
+        WriteCommand(COMMAND_STATUS);
+
+        Status = ReadData8();
+    }
+    while(((Status & STATUS_READY) != STATUS_READY) && ((Status & STATUS_ERROR) != 0));
+
+    return (Status & STATUS_ERROR) == 0;
 }
 
 
@@ -33,22 +44,37 @@ BOOL K9F2G_8_BS_Driver::ChipInitialize( void* context )
 
     // Configures the EBI for NandFlash access at 48MHz
     smctrl.SMC_SETUP3 = 0x00010001;
-    smctrl.SMC_PULSE3 = 0x04030302;
-    smctrl.SMC_CYCLE3 = 0x00070004;
-    smctrl.SMC_CTRL3  = (AT91_SMC::SMC_READMODE
+    smctrl.SMC_PULSE3 = 0x03030303;
+    smctrl.SMC_CYCLE3 = 0x00050005;
+    smctrl.SMC_CTRL3  =  AT91_SMC::SMC_READMODE
                        | AT91_SMC::SMC_WRITEMODE
                        | AT91_SMC::SMC_NWAITM_NWAIT_DISABLE
-                       | ((0x1 << 16) & AT91_SMC::SMC_TDF))
+                       | (0x2 << 16)  | AT91_SMC::SMC_TDFEN
+                       | (0x2 << 28) | AT91_SMC::SMC_PMEN
+#if USE_16_BIT_TRANSFERS
+                       | AT91_SMC::SMC_DBW_WIDTH_SIXTEEN_BITS;
+#else
                        | AT91_SMC::SMC_DBW_WIDTH_EIGTH_BITS;
+#endif
 
     CPU_GPIO_DisablePin(AT91_NAND_RE, RESISTOR_DISABLED, 0, GPIO_ALT_MODE_1);
-    CPU_GPIO_DisablePin(AT91_NAND_WE, RESISTOR_DISABLED, 0, GPIO_ALT_MODE_1);	
-    CPU_GPIO_EnableInputPin(AT91_NAND_RB, TRUE, NULL, GPIO_INT_NONE, RESISTOR_PULLUP);
+    CPU_GPIO_DisablePin(AT91_NAND_WE, RESISTOR_DISABLED, 0, GPIO_ALT_MODE_1);
+    CPU_GPIO_EnableInputPin(AT91_NAND_RB, FALSE, NULL, GPIO_INT_NONE, RESISTOR_PULLUP);
     CPU_GPIO_EnableOutputPin(AT91_NAND_CE, TRUE);
 
     EnableCE();
+#if USE_16_BIT_TRANSFERS
+    WriteCommand16(COMMAND_RESET);
+#else 
     WriteCommand(COMMAND_RESET);
-    WaitReady();
+#endif
+    if(!WaitReady())
+    {
+        DisableCE();
+        ASSERT(FALSE);
+        return FALSE;
+    }
+    
     DisableCE();
 
     
@@ -68,40 +94,7 @@ BOOL K9F2G_8_BS_Driver::ChipInitialize( void* context )
         debug_printf( "Flash_ChipInitialize: DeviceCode failure!\r\n" );
         return FALSE;		
     }
-/* Test
-    {
-        UINT8 Buf[2048];
 
-        EraseBlock(0);
-        ReadSector(0, 1, Buf, NULL);
-        for(UINT32 i = 0; i < 2048; i++)
-        {
-            if(Buf[i] != 0xFF)
-            {
-                debug_printf("Erase operation failed!\r\n");
-                return FALSE;
-            }
-        }
-        for(UINT32 i = 0; i < 2048; i++)
-        {
-            Buf[i] = i & 0xFF;
-        }
-        WriteSector(0, 1, Buf, NULL);
-        for(UINT32 i = 0; i < 2048; i++)
-        {
-            Buf[i] = 0;
-        }
-        ReadSector(0, 1, Buf, NULL);
-        for(UINT32 i = 0; i < 2048; i++)
-        {
-            if(Buf[i] != (i &0xFF))
-            {
-                debug_printf("Write operation failed!\r\n");
-                return FALSE;
-            }
-        }
-    }
-*/
     return TRUE;
 
 }
@@ -115,11 +108,20 @@ BOOL K9F2G_8_BS_Driver::ReadProductID( void* context, FLASH_WORD& ManufacturerCo
 {
     EnableCE();
 
+#if USE_16_BIT_TRANSFERS
+    WriteCommand16(COMMAND_READID);
+#else
     WriteCommand(COMMAND_READID);
+#endif
     WriteAddress(0);
 
-    ManufacturerCode  = (FLASH_WORD)ReadData8();
-    DeviceCode = (FLASH_WORD)ReadData8();
+#if USE_16_BIT_TRANSFERS
+    ManufacturerCode = (FLASH_WORD)ReadData16();
+    DeviceCode       = (FLASH_WORD)ReadData16();
+#else
+    ManufacturerCode = (FLASH_WORD)ReadData8();
+    DeviceCode       = (FLASH_WORD)ReadData8();
+#endif
    
     DisableCE();
 
@@ -146,17 +148,20 @@ BOOL K9F2G_8_BS_Driver::Read( void* context, ByteAddress byteAddr, UINT32 NumByt
     
     if (pConfig->BlockDeviceInformation->FindRegionFromAddress( byteAddr, RegionIndex, RangeIndex))
     {
-        const BlockRegionInfo* pRegion = &pConfig->BlockDeviceInformation->Regions[RegionIndex];
-        
-        UINT32 BytesPerSector = pConfig->BlockDeviceInformation->BytesPerSector;
+        const BlockRegionInfo* pRegion      = &pConfig->BlockDeviceInformation->Regions[RegionIndex];
+        UINT32                 BytesPerPage = pConfig->BlockDeviceInformation->BytesPerSector * c_SectorsPerPage;
+        ByteAddress            PageStart    = pConfig->BlockDeviceInformation->PhysicalToSectorAddress( pRegion, byteAddr ) / c_SectorsPerPage;
+        INT32                  offset       = ((byteAddr - pRegion->Start) % BytesPerPage); 
 
-        ByteAddress StartSector = pConfig->BlockDeviceInformation->PhysicalToSectorAddress( pRegion, byteAddr );
-
-        INT32 offset = ((byteAddr - pRegion->Start) % BytesPerSector);
+#if USE_16_BIT_TRANSFERS
+         offset >>= 1; // 16-bit addressing
+#endif
 
         CHIP_WORD *pBuf = (CHIP_WORD *)pSectorBuff;
 
-        BytesToRead = (NumBytes + offset > BytesPerSector ? BytesPerSector - offset : NumBytes);
+        ASSERT(PageStart < (pConfig->BlockDeviceInformation->Size / BytesPerPage));
+
+        BytesToRead = (NumBytes + offset > BytesPerPage ? BytesPerPage - offset : NumBytes);
 
         EnableCE();
 
@@ -166,25 +171,32 @@ BOOL K9F2G_8_BS_Driver::Read( void* context, ByteAddress byteAddr, UINT32 NumByt
 
             WriteAddress((offset >> 0) & 0xFF);
             WriteAddress((offset >> 8) & 0xFF);
-            WriteAddress((StartSector >>  0) & 0xFF);
-            WriteAddress((StartSector >>  8) & 0xFF);
-            WriteAddress((StartSector >> 16) & 0xFF);
+            WriteAddress((PageStart >>  0) & 0xFF);
+            WriteAddress((PageStart >>  8) & 0xFF);
+            WriteAddress((PageStart >> 16) & 0xFF);
 
             WriteCommand(COMMAND_READ_2);
-            WaitReady();
+
+            // Loop uintl Ready/Busy Pin returns to High state
+            while (!CPU_GPIO_GetPinState(AT91_NAND_RB));
+
             // Read loop
-            for (UINT32 j = 0; j < BytesToRead; j++)
+            for (UINT32 j = 0; j < BytesToRead; j+=sizeof(CHIP_WORD))
             {
+#if USE_16_BIT_TRANSFERS
+                *pBuf++ = ReadData16();
+#else
                 *pBuf++ = ReadData8();
+#endif
             }
 
             offset = 0;
 
             NumBytes -= BytesToRead;
 
-            BytesToRead = __min(NumBytes, BytesPerSector);
+            BytesToRead = __min(NumBytes, BytesPerPage);
 
-            StartSector++;
+            PageStart++;
 
         }
 
@@ -194,50 +206,12 @@ BOOL K9F2G_8_BS_Driver::Read( void* context, ByteAddress byteAddr, UINT32 NumByt
     }
     else
     {
+        ASSERT(FALSE);
         return FALSE;
     }
 
 }
 
-
-BOOL K9F2G_8_BS_Driver::ReadPage(SectorAddress StartSector, BYTE *outBuf, BYTE* inBuf, UINT32 size, UINT32 offset, UINT32 sectorSize, BOOL fIncrementDataPtr)
-{
-    // EnableCE and DisableCE is done by caller.
-    BYTE* wrBur = outBuf;
-    BOOL fModifyRequired = FALSE;
-
-    WriteCommand(COMMAND_READ_1);
-    
-    WriteAddress(0);
-    WriteAddress(0);
-    WriteAddress((StartSector >>  0) & 0xFF);
-    WriteAddress((StartSector >>  8) & 0xFF);
-    WriteAddress((StartSector >> 16) & 0xFF);
-
-    WriteCommand(COMMAND_READ_2);
-    WaitReady();
-    // Read loop
-    for (UINT32 j = 0; j < sectorSize; j++)
-    {
-        *wrBur++ = ReadData8();
-    }
-
-    // replace the data be written
-    outBuf = (BYTE*) ((UINT32)outBuf + offset);
-    for(UINT32 i = 0; i<size; i++)
-    {
-        if(!fModifyRequired && (0 != (~*outBuf & *inBuf)))
-        {
-            fModifyRequired = TRUE;
-        }
-        
-        *outBuf ++ = *inBuf;
-
-        if(fIncrementDataPtr) inBuf++;
-    }
-    
-    return fModifyRequired;
-}
 
 BOOL K9F2G_8_BS_Driver::Write( void* context, ByteAddress byteAddr, UINT32 NumBytes, BYTE * pSectorBuff, BOOL ReadModifyWrite )
 {
@@ -253,22 +227,22 @@ BOOL K9F2G_8_BS_Driver::Memset( void* context, ByteAddress byteAddr, UINT8 Data,
 
     memset(&chipData, Data, sizeof(CHIP_WORD));
 
-    return WriteX( context, byteAddr, NumBytes, &chipData, TRUE, FALSE );
+    return WriteX( context, byteAddr, NumBytes, (BYTE*)&chipData, TRUE, FALSE );
 }
 
 BOOL K9F2G_8_BS_Driver::WriteX( void* context, ByteAddress byteAddr, UINT32 NumBytes, BYTE * pSectorBuff, BOOL ReadModifyWrite, BOOL fIncrementDataPtr )
 {
     NATIVE_PROFILE_PAL_FLASH();
 
-    UINT32 RegionIndex, RangeIndex;
-    UINT32 BytesToWrite;
-    UINT32 Status;
+    UINT32                 RegionIndex, RangeIndex;
+    UINT32                 BytesToWrite;
+    const BlockRegionInfo* pRegion;
+    CHIP_WORD*             pData;
+    BLOCK_CONFIG*          pConfig      = (BLOCK_CONFIG*)context;
+    UINT32                 BytesPerPage = pConfig->BlockDeviceInformation->BytesPerSector * c_SectorsPerPage;
 
-    const BlockRegionInfo *pRegion;
-
-    CHIP_WORD * pData;
-
-    BLOCK_CONFIG* pConfig = (BLOCK_CONFIG*)context;
+    // not supported
+    ASSERT(!ReadModifyWrite);
 
     if (pSectorBuff == NULL) return FALSE;
     
@@ -277,19 +251,25 @@ BOOL K9F2G_8_BS_Driver::WriteX( void* context, ByteAddress byteAddr, UINT32 NumB
         return FALSE;
     }
 
-    UINT32 BytesPerSector = pConfig->BlockDeviceInformation->BytesPerSector;
-
     pRegion = &pConfig->BlockDeviceInformation->Regions[RegionIndex];
+
+    ASSERT(0 == ((byteAddr - pRegion->Start) % BytesPerPage));
 
     pData = (CHIP_WORD *)pSectorBuff;
 
-    SectorAddress StartSector = pConfig->BlockDeviceInformation->PhysicalToSectorAddress( pRegion, byteAddr );
+    SectorAddress PageStart = pConfig->BlockDeviceInformation->PhysicalToSectorAddress( pRegion, byteAddr ) / c_SectorsPerPage;
 
-    INT32 offset = (byteAddr - pRegion->Start) % BytesPerSector;
+    INT32 offset = ((byteAddr - pRegion->Start) % BytesPerPage);
 
-    BytesToWrite = (NumBytes + offset > BytesPerSector ? BytesPerSector - offset : NumBytes);
+#if USE_16_BIT_TRANSFERS
+    offset >>= 1; //16-bit transfers
+#endif
 
-    CHIP_WORD* pWrite;
+    BytesToWrite = (NumBytes + offset > BytesPerPage ? BytesPerPage - offset : NumBytes);
+
+    ASSERT(PageStart < (pConfig->BlockDeviceInformation->Size / BytesPerPage));
+
+    CHIP_WORD* pWrite = (CHIP_WORD*)pData;
     
     EnableCE();
 
@@ -298,67 +278,40 @@ BOOL K9F2G_8_BS_Driver::WriteX( void* context, ByteAddress byteAddr, UINT32 NumB
         BOOL fIncr = fIncrementDataPtr; 
         BOOL fRMW = ReadModifyWrite;
 
-        // less than a page, read a page in 
-        if (ReadModifyWrite)
-        {
-            pWrite = &s_sectorBuff[0];
-            
-            if(ReadPage( StartSector, pWrite, pData, BytesToWrite, offset, BytesPerSector, fIncrementDataPtr ))
-            {
-                EraseBlock( context, StartSector * BytesPerSector );
-
-                offset = 0;
-                fIncr = TRUE;
-            }
-            else
-            {
-                fRMW = FALSE;
-                pWrite = pData;
-            }
-        }
-        else
-        {
-            pWrite = pData;
-        }
-
         WriteCommand(COMMAND_WRITE_1);
 
         WriteAddress((offset >> 0) & 0xFF);
         WriteAddress((offset >> 8) & 0xFF);
-        WriteAddress((StartSector >>  0) & 0xFF);
-        WriteAddress((StartSector >>  8) & 0xFF);
-        WriteAddress((StartSector >> 16) & 0xFF);
+        WriteAddress((PageStart >>  0) & 0xFF);
+        WriteAddress((PageStart >>  8) & 0xFF);
+        WriteAddress((PageStart >> 16) & 0xFF);
 
         // Write loop
-        for (UINT32 j = 0; j < (fRMW ? BytesPerSector : BytesToWrite); j++)
+        for (UINT32 j = 0; j < (fRMW ? BytesPerPage : BytesToWrite); j+=sizeof(CHIP_WORD))
         {
+#if USE_16_BIT_TRANSFERS
+            WriteData16(*pWrite);
+#else
             WriteData8(*pWrite);
+#endif
 
-            if(fIncr) pWrite++;
+            if(fIncr) pWrite+=sizeof(CHIP_WORD);
         }
 
         WriteCommand(COMMAND_WRITE_2);
 
-        WaitReady();
-        WriteCommand(COMMAND_STATUS);
-        Status = ReadData8();
-
-        if (((Status & STATUS_READY) != STATUS_READY) || ((Status & STATUS_ERROR) != 0))
+        if(!WaitReady())
         {
             DisableCE();
-            return FALSE;	
+            ASSERT(FALSE);
+            return FALSE;
         }
 
-        if(fIncrementDataPtr) 
-        {
-            pData += BytesToWrite;
-        }
-        
         NumBytes -= BytesToWrite;
 
-        BytesToWrite = __min(NumBytes, BytesPerSector);
+        BytesToWrite = __min(NumBytes, BytesPerPage);
 
-        StartSector++;
+        PageStart++;
     }
 
     DisableCE();
@@ -373,12 +326,15 @@ BOOL K9F2G_8_BS_Driver::GetSectorMetadata(void* context, ByteAddress byteAddress
     if (pSectorMetadata == NULL) return FALSE;
 
     BLOCK_CONFIG* pConfig = (BLOCK_CONFIG*)context;
-    UINT32 offset         = pConfig->BlockDeviceInformation->BytesPerSector;
+    UINT32 BytesPerPage   = pConfig->BlockDeviceInformation->BytesPerSector * c_SectorsPerPage;
+    UINT32 offset         = BytesPerPage;
     UINT32 BytesToRead    = sizeof(SectorMetadata);
-    UINT8* pData          = (UINT8*)pSectorMetadata;
+    CHIP_WORD* pData      = (CHIP_WORD*)pSectorMetadata;
     UINT32 RegionIndex, RangeIndex;
     const BlockRegionInfo* pRegion;
-    SectorAddress sectorStart;
+    SectorAddress PageStart;
+
+    ASSERT(BytesToRead == c_SizeOfSectorMetadata);
 
     if (!pConfig->BlockDeviceInformation->FindRegionFromAddress( byteAddress, RegionIndex, RangeIndex))
     {
@@ -387,7 +343,19 @@ BOOL K9F2G_8_BS_Driver::GetSectorMetadata(void* context, ByteAddress byteAddress
 
     pRegion = &pConfig->BlockDeviceInformation->Regions[RegionIndex];
 
-    sectorStart = pConfig->BlockDeviceInformation->PhysicalToSectorAddress( pRegion, byteAddress );
+    PageStart = pConfig->BlockDeviceInformation->PhysicalToSectorAddress( pRegion, byteAddress );
+
+    ASSERT(0 == ((byteAddress - pRegion->Start) % BytesPerPage));
+
+    offset += c_SizeOfSectorMetadata * (PageStart % c_SectorsPerPage);
+
+#if USE_16_BIT_TRANSFERS
+    offset >>= 1; // 16 bit addressing
+#endif
+
+    PageStart /= c_SectorsPerPage;
+
+    ASSERT(PageStart < (pConfig->BlockDeviceInformation->Size / BytesPerPage));
     
     EnableCE();
 
@@ -395,17 +363,23 @@ BOOL K9F2G_8_BS_Driver::GetSectorMetadata(void* context, ByteAddress byteAddress
 
     WriteAddress((offset >> 0) & 0xFF);
     WriteAddress((offset >> 8) & 0xFF);
-    WriteAddress((sectorStart >>  0) & 0xFF);
-    WriteAddress((sectorStart >>  8) & 0xFF);
-    WriteAddress((sectorStart >> 16) & 0xFF);
+    WriteAddress((PageStart >>  0) & 0xFF);
+    WriteAddress((PageStart >>  8) & 0xFF);
+    WriteAddress((PageStart >> 16) & 0xFF);
 
     WriteCommand(COMMAND_READ_2);
-    WaitReady();
+
+    // Loop uintl Ready/Busy Pin returns to High state
+    while (!CPU_GPIO_GetPinState(AT91_NAND_RB));
 
     // Read loop
-    while(BytesToRead--)
+    for(; BytesToRead > 0; BytesToRead -= sizeof(CHIP_WORD))
     {
+#if USE_16_BIT_TRANSFERS
+        *pData++ = ReadData16();
+#else
         *pData++ = ReadData8();
+#endif
     }
 
     DisableCE();
@@ -416,13 +390,15 @@ BOOL K9F2G_8_BS_Driver::GetSectorMetadata(void* context, ByteAddress byteAddress
 BOOL K9F2G_8_BS_Driver::SetSectorMetadata(void* context, ByteAddress byteAddress, SectorMetadata* pSectorMetadata)
 {
     BLOCK_CONFIG* pConfig = (BLOCK_CONFIG*)context;
-    UINT32 offset         = pConfig->BlockDeviceInformation->BytesPerSector;
+    UINT32 BytesPerPage   = pConfig->BlockDeviceInformation->BytesPerSector * c_SectorsPerPage;
+    UINT32 offset         = BytesPerPage;
     UINT32 BytesToWrite   = sizeof(SectorMetadata);
-    UINT8* pData          = (UINT8*)pSectorMetadata;
-    UINT8  Status;
+    CHIP_WORD* pData      = (CHIP_WORD*)pSectorMetadata;
     UINT32 RegionIndex, RangeIndex;
     const BlockRegionInfo* pRegion;
-    SectorAddress sectorStart;
+    SectorAddress PageStart;
+
+    ASSERT(BytesToWrite == c_SizeOfSectorMetadata);
 
     if (!pConfig->BlockDeviceInformation->FindRegionFromAddress( byteAddress, RegionIndex, RangeIndex))
     {
@@ -431,7 +407,19 @@ BOOL K9F2G_8_BS_Driver::SetSectorMetadata(void* context, ByteAddress byteAddress
 
     pRegion = &pConfig->BlockDeviceInformation->Regions[RegionIndex];
 
-    sectorStart = pConfig->BlockDeviceInformation->PhysicalToSectorAddress( pRegion, byteAddress );
+    PageStart = pConfig->BlockDeviceInformation->PhysicalToSectorAddress( pRegion, byteAddress );
+
+    ASSERT(0 == ((byteAddress - pRegion->Start) % BytesPerPage));
+
+    offset += c_SizeOfSectorMetadata * (PageStart % c_SectorsPerPage);
+
+#if USE_16_BIT_TRANSFERS
+    offset >>= 1; // 16-bit addressing
+#endif
+
+    PageStart /= c_SectorsPerPage;
+
+    ASSERT(PageStart < (pConfig->BlockDeviceInformation->Size / BytesPerPage));
     
     EnableCE();
 
@@ -439,26 +427,27 @@ BOOL K9F2G_8_BS_Driver::SetSectorMetadata(void* context, ByteAddress byteAddress
 
     WriteAddress((offset >> 0) & 0xFF);
     WriteAddress((offset >> 8) & 0xFF);
-    WriteAddress((sectorStart >>  0) & 0xFF);
-    WriteAddress((sectorStart >>  8) & 0xFF);
-    WriteAddress((sectorStart >> 16) & 0xFF);
+    WriteAddress((PageStart >>  0) & 0xFF);
+    WriteAddress((PageStart >>  8) & 0xFF);
+    WriteAddress((PageStart >> 16) & 0xFF);
 
     // Write loop
-    while(BytesToWrite--)
+    for(; BytesToWrite > 0; BytesToWrite -= sizeof(CHIP_WORD))
     {
+#if USE_16_BIT_TRANSFERS
+        WriteData16(*pData++);
+#else
         WriteData8(*pData++);
+#endif
     }
 
     WriteCommand(COMMAND_WRITE_2);
 
-    WaitReady();
-    WriteCommand(COMMAND_STATUS);
-    Status = ReadData8();
-
-    if (((Status & STATUS_READY) != STATUS_READY) || ((Status & STATUS_ERROR) != 0))
+    if(!WaitReady())
     {
         DisableCE();
-        return FALSE;	
+        ASSERT(FALSE);
+        return FALSE;
     }
 
     DisableCE();
@@ -483,37 +472,45 @@ BOOL K9F2G_8_BS_Driver::IsBlockErased( void* context, ByteAddress BlockStartAddr
 
     const BlockRegionInfo* pRegion = &pConfig->BlockDeviceInformation->Regions[RegionIndex];
 
-    // we can do this because we know the block length is 2^n
-    ByteAddress StartSector = pConfig->BlockDeviceInformation->PhysicalToSectorAddress( pRegion, BlockStartAddress );
-    UINT32 BytesPerSector   = pConfig->BlockDeviceInformation->BytesPerSector;
-    UINT32 SectorsPerBlock  = pRegion->BytesPerBlock / BytesPerSector;
-    BOOL fErased = TRUE;
+    ByteAddress   PageStart     = pConfig->BlockDeviceInformation->PhysicalToSectorAddress( pRegion, BlockStartAddress ) / c_SectorsPerPage;
+    UINT32        BytesPerPage  = pConfig->BlockDeviceInformation->BytesPerSector * c_SectorsPerPage;
+    UINT32        PagesPerBlock = pRegion->BytesPerBlock / BytesPerPage;
+    BOOL          fErased       = TRUE;
+
+    ASSERT(0 == ((BlockStartAddress - pRegion->Start) % pRegion->BytesPerBlock));
 
     EnableCE();
 
-    for(UINT32 i=0; i<SectorsPerBlock && fErased; i++)
+    for(UINT32 i=0; i<PagesPerBlock && fErased; i++)
     {
         WriteCommand(COMMAND_READ_1);
 
         WriteAddress(0);
         WriteAddress(0);
-        WriteAddress((StartSector >>  0) & 0xFF);
-        WriteAddress((StartSector >>  8) & 0xFF);
-        WriteAddress((StartSector >> 16) & 0xFF);
+        WriteAddress((PageStart >>  0) & 0xFF);
+        WriteAddress((PageStart >>  8) & 0xFF);
+        WriteAddress((PageStart >> 16) & 0xFF);
 
         WriteCommand(COMMAND_READ_2);
-        WaitReady();
-        // Read loop
-        for (UINT32 j = 0; j < BytesPerSector; j++)
+
+        // Loop uintl Ready/Busy Pin returns to High state
+        while (!CPU_GPIO_GetPinState(AT91_NAND_RB));
+        
+        // Read loop - 64 bytes for sector metadata
+        for (UINT32 j = 0; j < BytesPerPage + (c_SizeOfSectorMetadata*c_SectorsPerPage); j+=sizeof(CHIP_WORD))
         {
-            if( ReadData8() != 0xFF)
+#if USE_16_BIT_TRANSFERS
+            if(ReadData16() != 0xFFFF)
+#else
+            if(ReadData8() != 0xFF)
+#endif
             {
                 fErased = FALSE;
                 break;
             }
         }
 
-        StartSector++;
+        PageStart++;
 
     }
 
@@ -528,7 +525,6 @@ BOOL K9F2G_8_BS_Driver::EraseBlock( void* context, ByteAddress byteAddress )
     NATIVE_PROFILE_HAL_DRIVERS_FLASH();
 
     UINT32 RegionIndex, RangeIndex;
-    UINT8  Status;
 
     BLOCK_CONFIG* pConfig = (BLOCK_CONFIG*)context;
 
@@ -537,30 +533,32 @@ BOOL K9F2G_8_BS_Driver::EraseBlock( void* context, ByteAddress byteAddress )
         return FALSE;
     }
 
-    const BlockRegionInfo* pRegion = &pConfig->BlockDeviceInformation->Regions[RegionIndex];
+    const BlockRegionInfo* pRegion       = &pConfig->BlockDeviceInformation->Regions[RegionIndex];
+    UINT32                 PagesPerBlock = pRegion->BytesPerBlock / (c_SectorsPerPage * pConfig->BlockDeviceInformation->BytesPerSector);
+    UINT32                 PageStart     = pConfig->BlockDeviceInformation->PhysicalToSectorAddress( pRegion, byteAddress ) / c_SectorsPerPage;
+    SectorAddress          BlockStart    = PageStart - (PageStart % PagesPerBlock);
 
-    SectorAddress RdSector = pConfig->BlockDeviceInformation->PhysicalToSectorAddress( pRegion, byteAddress );
+    
+    ASSERT(0 == ((byteAddress - pRegion->Start) % pRegion->BytesPerBlock));
 
     EnableCE();
 
     WriteCommand(COMMAND_ERASE_1);
 
-    WriteAddress((RdSector >>  0) & 0xFF);
-    WriteAddress((RdSector >>  8) & 0xFF);
-    WriteAddress((RdSector >> 16) & 0xFF);
+    WriteAddress((BlockStart >>  0) & 0xFF);
+    WriteAddress((BlockStart >>  8) & 0xFF);
+    WriteAddress((BlockStart >> 16) & 0xFF);
 
     WriteCommand(COMMAND_ERASE_2);
 
-    WaitReady();
-
-    WriteCommand(COMMAND_STATUS);
-
-    Status = ReadData8();
+    if(!WaitReady())
+    {
+        DisableCE();
+        ASSERT(FALSE);
+        return FALSE;
+    }
 
     DisableCE();
-
-    if (((Status & STATUS_READY) != STATUS_READY) || ((Status & STATUS_ERROR) != 0))
-        return FALSE;
 
     return TRUE;
 

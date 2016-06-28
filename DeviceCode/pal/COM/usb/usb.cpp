@@ -798,11 +798,7 @@ BOOL USB_Driver::Flush( int UsbStream )
     {
         CPU_USB_StartOutput( State, endpoint );
 
-        // if the interrupts are off, then we need to push chars through (with CPU_USB_StartOutput), otherwise let the interrupts work while we sleep
-        if(INTERRUPTS_ENABLED_STATE() && CPU_USB_GetInterruptState() && (0 != CPU_INTC_InterruptEnableState( USB_IRQ_INDEX )))
-        {
-            HAL_Time_Sleep_MicroSeconds_InterruptEnabled(500); // don't call Events_WaitForEventsXXX because it will turn off interrupts
-        }
+        HAL_Time_Sleep_MicroSeconds_InterruptEnabled(100); // don't call Events_WaitForEventsXXX because it will turn off interrupts
 
         int cnt = State->Queues[endpoint]->NumberOfElements();
         retries  = (queueCnt == cnt) ? retries-1: USB_FLUSH_RETRY_COUNT;
@@ -1299,7 +1295,10 @@ UINT8 USB_HandleConfigurationRequests( USB_CONTROLLER_STATE* State, USB_SETUP_PA
 
     if(State->Expected == 0)
     {
-        return USB_STATE_DONE;
+        // just return an empty Status packet
+         State->ResidualCount = 0;
+         State->DataCallback = USB_DataCallback;
+         return USB_STATE_DATA;
     }
 
     //

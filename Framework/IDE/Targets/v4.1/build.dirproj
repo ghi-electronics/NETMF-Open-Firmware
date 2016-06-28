@@ -3,6 +3,7 @@
 
   <ItemGroup>
     <Project Include="Targets_v4_1.wixproj" />
+    <Project Include="MicroFramework_v4_1.wixproj" />
     <Project Include="MicroFramework_v4_1_BE.wixproj" />
     <Project Include="MicroFramework_v4_1_LE.wixproj" />
     <Project Include="Assemblies\RedistList\MicroFramework_v4_1_redist.wixproj" />

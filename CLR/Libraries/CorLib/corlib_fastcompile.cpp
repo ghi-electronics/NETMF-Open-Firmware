@@ -6,6 +6,7 @@
 #include "corlib_native_System_AppDomain.cpp"
 #include "corlib_native_System_Array.cpp"
 #include "corlib_native_System_Attribute.cpp"
+#include "corlib_native_System_BitConverter.cpp"
 #include "corlib_native_System_Collections_ArrayList.cpp"
 #include "corlib_native_System_Collections_Queue.cpp"
 #include "corlib_native_System_Collections_Stack.cpp"

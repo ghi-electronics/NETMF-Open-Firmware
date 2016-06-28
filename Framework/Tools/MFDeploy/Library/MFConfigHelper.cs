@@ -279,10 +279,14 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
         {
             m_device = device;
 
-            if (device.DbgEngine.ConnectionSource == Microsoft.SPOT.Debugger.ConnectionSource.TinyBooter)
+            Microsoft.SPOT.Debugger.ConnectionSource src = device.DbgEngine.ConnectionSource;
+
+            if(src == _DBG.ConnectionSource.Unknown)
             {
-                m_fRestartClr = false;
+                device.Connect(500, true);
             }
+
+            m_fRestartClr = device.DbgEngine.ConnectionSource == Microsoft.SPOT.Debugger.ConnectionSource.TinyCLR;
         }
 
         private byte[] MarshalData(object obj)
@@ -426,15 +430,9 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool.Engine
                 throw new MFDeviceNoResponseException();
             }
 
-            if (!m_device.UpgradeToSsl())
+            if(m_device.DbgEngine.PortDefinition is _DBG.PortDefinition_Tcp)
             {
-                if (m_device.DbgEngine.ConnectionSource != Microsoft.SPOT.Debugger.ConnectionSource.TinyBooter)
-                {
-                    if (!m_device.ConnectToTinyBooter())
-                    {
-                        throw new MFDeviceNoResponseException();
-                    }
-                }
+                m_device.UpgradeToSsl();
             }
 
             _DBG.WireProtocol.Commands.Monitor_FlashSectorMap.Reply reply = engine.GetFlashSectorMap();

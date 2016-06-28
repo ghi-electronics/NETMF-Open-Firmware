@@ -85,7 +85,7 @@ enum CLR_OPCODE
 CEE_COUNT,        /* number of instructions and macros pre-defined */
 };
 
-#if defined(PLATFORM_BLACKFIN)
+#if defined(__ADSPBLACKFIN__) || defined (__GNUC__) || defined(_ARC) || defined(__RENESAS__)
 #define __int64 long long
 #endif
 

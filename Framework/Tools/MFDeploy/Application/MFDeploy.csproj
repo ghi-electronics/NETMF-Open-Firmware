@@ -12,6 +12,7 @@
     <StartupObject>Microsoft.NetMicroFramework.Tools.MFDeployTool.Program</StartupObject>
     <ApplicationIcon>MFDeployIcon.ico</ApplicationIcon>
     <ComponentGuid>{3b010426-1924-4ef8-892d-f22eeca01d94}</ComponentGuid>
+    <ComponentShortcut>.NET Micro Framework Deploy Tool (MFDeploy)</ComponentShortcut>
     <DirectoryRef>ToolsDir</DirectoryRef>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>

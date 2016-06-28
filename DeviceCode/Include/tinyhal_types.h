@@ -33,10 +33,13 @@ inline void* hal_memcpy( void* dst, const void* src, size_t len )
 
 #endif
 
-#if defined(__ADSPBLACKFIN__)
-#define PLATFORM_BLACKFIN
+#if defined(__ADSPBLACKFIN__) || defined (__GNUC__) || defined(_ARC) || defined(__RENESAS__)
 #define __int64 long long
 #undef NULL
+#endif
+
+#if defined(__ADSPBLACKFIN__)
+#define PLATFORM_BLACKFIN
 #endif
 
 #if defined(__arm) || defined(PLATFORM_BLACKFIN) || defined(__GNUC__) || defined(_ARC) || defined(__RENESAS__)
@@ -60,16 +63,10 @@ typedef signed   short int INT16;
 typedef unsigned int       UINT32;
 typedef signed   int       INT32;
 
-#if defined (__GNUC__) || defined(_ARC) || defined(__RENESAS__)
-typedef unsigned long long int UINT64;
-typedef signed long long int   INT64;
-#else
 typedef unsigned __int64   UINT64;
 typedef signed   __int64   INT64;
 
 #define NULL 0
-
-#endif //defined (__GNUC__) || defined(_ARC) || defined(__RENESAS__)
 
 typedef char               CHAR;
 typedef char*              LPSTR;

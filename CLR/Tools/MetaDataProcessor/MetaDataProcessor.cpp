@@ -1164,7 +1164,7 @@ TinyCLR_Cleanup:
 
                 //CLR_RT_UnicodeHelper::ConvertFromUTF8( assm->m_szName, strName ); m_assemblies[strName] = bufferSub;
 
-                printf( "Assembly %d: %s (%d.%d.%d.%d), size: %d\n", ++number, assm->m_szName, header->version.iMajorVersion, header->version.iMinorVersion, header->version.iBuildNumber, header->version.iRevisionNumber, header->TotalSize() );
+                printf( "Assembly %d: %s (%d.%d.%d.%d), size: %d\r\n", ++number, assm->m_szName, header->version.iMajorVersion, header->version.iMinorVersion, header->version.iBuildNumber, header->version.iRevisionNumber, header->TotalSize() );
 
                 // jump to next assembly
                 header = (CLR_RECORD_ASSEMBLY*)ROUNDTOMULTIPLE( (size_t)header + header->TotalSize(), CLR_UINT32 );
@@ -1329,7 +1329,7 @@ TinyCLR_Cleanup:
 
                 if(g_CLR_RT_TypeSystem.FindAssembly( szName, &src->version, true ) == NULL)
                 {
-                    printf( "Missing assembly: %s (%d.%d.%d.%d)\n", szName, src->version.iMajorVersion, src->version.iMinorVersion, src->version.iBuildNumber, src->version.iRevisionNumber );
+                    printf( "Missing assembly: %s (%d.%d.%d.%d)\r\n", szName, src->version.iMajorVersion, src->version.iMinorVersion, src->version.iBuildNumber, src->version.iRevisionNumber );
 
                     fError = true;
                 }

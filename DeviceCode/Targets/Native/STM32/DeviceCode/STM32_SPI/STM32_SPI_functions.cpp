@@ -47,19 +47,11 @@ static SPI_TypeDef* g_STM32_Spi[] = {SPI1, SPI2, SPI3}; // IO addresses
 
 BOOL CPU_SPI_Initialize()
 {
-    NATIVE_PROFILE_HAL_PROCESSOR_SPI();
-    RCC->APB2ENR |= RCC_APB2ENR_SPI1EN; // enable SPI clocks
-    RCC->APB1ENR |= RCC_APB1ENR_SPI2EN;
-    RCC->APB1ENR |= RCC_APB1ENR_SPI3EN;
     return TRUE;
 }
 
 void CPU_SPI_Uninitialize()
 {
-    NATIVE_PROFILE_HAL_PROCESSOR_SPI();
-    RCC->APB2ENR &= ~RCC_APB2ENR_SPI1EN; // disable SPI clocks
-    RCC->APB1ENR &= ~RCC_APB1ENR_SPI2EN;
-    RCC->APB1ENR &= ~RCC_APB1ENR_SPI3EN;
 }
 
 BOOL CPU_SPI_nWrite16_nRead16( const SPI_CONFIGURATION& Configuration, UINT16* Write16, INT32 WriteCount, UINT16* Read16, INT32 ReadCount, INT32 ReadStartOffset )
@@ -95,7 +87,13 @@ BOOL CPU_SPI_nWrite8_nRead8( const SPI_CONFIGURATION& Configuration, UINT8* Writ
 BOOL CPU_SPI_Xaction_Start( const SPI_CONFIGURATION& Configuration )
 {
     NATIVE_PROFILE_HAL_PROCESSOR_SPI();
-    if (Configuration.SPI_mod >= 3) return FALSE;
+    // enable SPI
+    switch (Configuration.SPI_mod) {
+        case 0: RCC->APB2ENR |= RCC_APB2ENR_SPI1EN; break;
+        case 1: RCC->APB1ENR |= RCC_APB1ENR_SPI2EN; break;
+        case 2: RCC->APB1ENR |= RCC_APB1ENR_SPI3EN; break;
+        default: return FALSE;
+    }
     
     SPI_TypeDef* spi = g_STM32_Spi[Configuration.SPI_mod];
     
@@ -107,7 +105,7 @@ BOOL CPU_SPI_Xaction_Start( const SPI_CONFIGURATION& Configuration )
     
     // set clock prescaler
     UINT32 clock = SYSTEM_APB2_CLOCK_HZ / 2000; // SPI1 on APB2
-    if (Configuration.SPI_mod > 0) clock = SYSTEM_APB1_CLOCK_HZ / 2000; // SPI2/3 on APB1
+    if (Configuration.SPI_mod != 0) clock = SYSTEM_APB1_CLOCK_HZ / 2000; // SPI2/3 on APB1
     
     if (clock > Configuration.Clock_RateKHz << 3) {
         clock >>= 4;
@@ -160,6 +158,13 @@ BOOL CPU_SPI_Xaction_Stop( const SPI_CONFIGURATION& Configuration )
     CPU_GPIO_EnableInputPin( miso, FALSE, NULL, GPIO_INT_NONE, RESISTOR_PULLDOWN );
     CPU_GPIO_EnableInputPin( mosi, FALSE, NULL, GPIO_INT_NONE, RESISTOR_PULLDOWN );
     
+    // disable SPI
+    switch (Configuration.SPI_mod) {
+        case 0: RCC->APB2ENR &= ~RCC_APB2ENR_SPI1EN; break;
+        case 1: RCC->APB1ENR &= ~RCC_APB1ENR_SPI2EN; break;
+        case 2: RCC->APB1ENR &= ~RCC_APB1ENR_SPI3EN; break;
+    }
+
     return TRUE;
 }
 

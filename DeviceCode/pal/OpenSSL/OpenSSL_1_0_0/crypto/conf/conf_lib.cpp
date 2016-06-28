@@ -65,7 +65,7 @@
 #include <stdio.h>
 #endif
 
-const char CONF_version[]="CONF" OPENSSL_VERSION_PTEXT;
+//const char CONF_version[]="CONF" OPENSSL_VERSION_PTEXT;
 
 static CONF_METHOD *default_CONF_method=NULL;
 

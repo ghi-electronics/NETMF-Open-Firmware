@@ -1,5 +1,6 @@
 ﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
+    <PALEVENT_PAL_LIBCATPROJ>True</PALEVENT_PAL_LIBCATPROJ>
     <PKUI_LibraryCategory>
 <LibraryCategory xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="">
   <Name xmlns="http://schemas.microsoft.com/netmf/InventoryFormat.xsd">palevent_PAL</Name>

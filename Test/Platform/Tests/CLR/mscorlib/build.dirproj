@@ -15,6 +15,13 @@
     <Project Include="basicconcepts\basicconcepts.slnproj" >
       <InProject>false</InProject>
     </Project>
+	
+    <Project Include="bitconverter\bitconverter.csproj" >
+      <InProject>false</InProject>
+    </Project>
+    <Project Include="bitconverter\bitconverter.slnproj" >
+      <InProject>false</InProject>
+    </Project>
 
     <Project Include="classes\classes1\classes1.csproj" >
       <InProject>false</InProject>

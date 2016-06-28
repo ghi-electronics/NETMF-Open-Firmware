@@ -11,6 +11,10 @@ BOOL AD_Initialize( ANALOG_CHANNEL channel, INT32 precisionInBits )
     return TRUE;
 }
 
+void AD_Uninitialize( ANALOG_CHANNEL channel )
+{
+}
+
 INT32 AD_Read( ANALOG_CHANNEL channel )
 {
     return 0;
@@ -87,6 +91,10 @@ BOOL AD_GetAvailablePrecisionsForChannel( ANALOG_CHANNEL channel, INT32* precisi
 BOOL DA_Initialize( DA_CHANNEL channel, INT32 precisionInBits )
 {
     return TRUE;
+}
+
+void DA_Uninitialize( DA_CHANNEL channel )
+{
 }
 
 void DA_Write( DA_CHANNEL channel, INT32 level )

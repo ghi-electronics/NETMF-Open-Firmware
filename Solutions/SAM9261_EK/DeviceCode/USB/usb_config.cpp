@@ -43,23 +43,23 @@
 
 const ADS_PACKED struct GNU_PACKED USB_DYNAMIC_CONFIGURATION
 {
-    USB_DEVICE_DESCRIPTOR        device;
-    USB_CONFIGURATION_DESCRIPTOR config;
-    USB_INTERFACE_DESCRIPTOR   itfc0;
-    USB_ENDPOINT_DESCRIPTOR  ep1;
-    USB_ENDPOINT_DESCRIPTOR  ep2;
-    USB_STRING_DESCRIPTOR_HEADER manHeader;
-    USB_STRING_CHAR            manString[MANUFACTURER_NAME_SIZE];
-    USB_STRING_DESCRIPTOR_HEADER prodHeader;
-    USB_STRING_CHAR            prodString[PRODUCT_NAME_SIZE];
-    USB_STRING_DESCRIPTOR_HEADER string4;
-    USB_STRING_CHAR            displayString[DISPLAY_NAME_SIZE];
-    USB_STRING_DESCRIPTOR_HEADER string5;
-    USB_STRING_CHAR            friendlyString[FRIENDLY_NAME_SIZE];
-    USB_OS_STRING_DESCRIPTOR     OS_String;
-    USB_XCOMPATIBLE_OS_ID        OS_XCompatible_ID;
-    USB_XPROPERTIES_OS_WINUSB    OS_XProperty;
-    USB_DESCRIPTOR_HEADER        endList;
+    USB_DEVICE_DESCRIPTOR           device;
+    USB_CONFIGURATION_DESCRIPTOR    config;
+    USB_INTERFACE_DESCRIPTOR        itfc0;
+    USB_ENDPOINT_DESCRIPTOR         ep1;
+    USB_ENDPOINT_DESCRIPTOR         ep2;
+    USB_STRING_DESCRIPTOR_HEADER    manHeader;
+    USB_STRING_CHAR                 manString[MANUFACTURER_NAME_SIZE];
+    USB_STRING_DESCRIPTOR_HEADER    prodHeader;
+    USB_STRING_CHAR                 prodString[PRODUCT_NAME_SIZE];
+    USB_STRING_DESCRIPTOR_HEADER    string4;
+    USB_STRING_CHAR                 displayString[DISPLAY_NAME_SIZE];
+    USB_STRING_DESCRIPTOR_HEADER    string5;
+    USB_STRING_CHAR                 friendlyString[FRIENDLY_NAME_SIZE];
+    USB_OS_STRING_DESCRIPTOR        OS_String;
+    USB_XCOMPATIBLE_OS_ID           OS_XCompatible_ID;
+    USB_XPROPERTIES_OS_WINUSB       OS_XProperty;
+    USB_DESCRIPTOR_HEADER           endList;
 } UsbDefaultConfiguration =
 {
     // Device descriptor
@@ -71,7 +71,7 @@ const ADS_PACKED struct GNU_PACKED USB_DYNAMIC_CONFIGURATION
         },
         USB_DEVICE_DESCRIPTOR_LENGTH,       // Length of device descriptor
         USB_DEVICE_DESCRIPTOR_TYPE,         // USB device descriptor type
-        0x0110,                             // USB Version 1.10 (BCD)
+        USB_VERSION,                        // USB Version
         0,                                  // Device class (none)
         0,                                  // Device subclass (none)
         0,                                  // Device protocol (none)
@@ -191,7 +191,7 @@ const ADS_PACKED struct GNU_PACKED USB_DYNAMIC_CONFIGURATION
     { 'a', '7', 'e', '7', '0', 'e', 'a', '2' },
 
     // OS Descriptor string for WinUSB
-	{
+    {
         {
             USB_STRING_DESCRIPTOR_MARKER,
             OS_DESCRIPTOR_STRING_INDEX,
@@ -204,7 +204,7 @@ const ADS_PACKED struct GNU_PACKED USB_DYNAMIC_CONFIGURATION
         0x00
     },
 
-    // OS Extended Compatible ID for WinUSB
+    // OS Extended Compatible ID WinUSB
     {
         // Generic Descriptor header
         {
@@ -307,3 +307,6 @@ const ADS_PACKED struct GNU_PACKED USB_DYNAMIC_CONFIGURATION
         0
     },
 };
+
+
+

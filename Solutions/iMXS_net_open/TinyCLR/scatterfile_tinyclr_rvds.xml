@@ -6,8 +6,8 @@
     <Set Name="Valid" Value="false"/>
 
     <!-- ################################################################################ -->
-    <Set Name="RAMRW_Begin"       Value="0x08200000"/>
-    <Set Name="Heap_Begin"        Value="0x08280000"/>
+    <Set Name="RAMRW_Begin"       Value="0x08100000"/>
+    <Set Name="Heap_Begin"        Value="0x08300000"/>
     <Set Name="Heap_End"          Value="0x084FFFF8"/>
     <Set Name="Custom_Heap_Begin" Value="0x08500000"/>
     <Set Name="Custom_Heap_End"   Value="0x088FFFF8"/>
@@ -36,7 +36,8 @@
     </If>
 
     <If Name="TARGETLOCATION" Value="RAM">
-        <Set Name="Heap_Begin"          Value="0x08300000"/>
+        <Set Name="RAMRW_Begin"         Value="0x08200000"/>
+        <Set Name="Heap_Begin"          Value="0x08400000"/>
         <Set Name="Heap_End"            Value="0x085FFFF8"/>
         <Set Name="Custom_Heap_Begin"   Value="0x08600000"/>
         <Set Name="Custom_Heap_End"     Value="0x088FFFF8"/>
@@ -73,12 +74,14 @@
 
         </ExecRegion>
 
-        <ExecRegion Name="ER_RAM_ZI" Base="%RAMRW_Begin%" Options="ABSOLUTE" Size="0x080000">
+
+        <ExecRegion Name="ER_RAM_ZI" Base="%RAMRW_Begin%" Options="ABSOLUTE" Size="0x200000">
 
             <FileMapping Name="mem.obj" Options="(+ZI)" />
             <FileMapping Name="memp.obj" Options="(+ZI)" />
 
         </ExecRegion>
+
 
         <ExecRegion Name="ER_RAM_RO" Base="0x00000000" Options="ABSOLUTE" Size="0x00012000">
 
@@ -98,11 +101,10 @@
 
         <ExecRegion Name="ER_RAM_RW" Base="+0" Options="ABSOLUTE" Size="0x2f000">
 
-            <FileMapping Name="*" Options="(+RW-DATA, +ZI)" />
+            <FileMapping Name="*" Options="(+RW-DATA,+ZI)" />
 
         </ExecRegion>
 
-       
         <!-- Profile build -->
 
         <IfDefined Name="PROFILE_BUILD">

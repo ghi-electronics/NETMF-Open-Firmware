@@ -365,7 +365,8 @@ struct BlockDeviceInfo
 //   V     Byte indicating if the block is valid (a.k.a. bad)
 //   E     Bytes typically used for by a NAND driver for ECC
 //
-struct SectorMetadata
+ADS_PACKED 
+struct GNU_PACKED SectorMetadata
 {
     DWORD dwReserved1; // Used by the FAL to hold the logical to physical sector mapping information.
     BYTE bOEMReserved; // For use by OEM. See OEMReservedBits for more information.

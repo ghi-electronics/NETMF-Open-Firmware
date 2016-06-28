@@ -6,6 +6,7 @@
     <Groups>Hardware</Groups>
     <Documentation>
     </Documentation>
+    <ONEWIRE_FEATUREPROJ>True</ONEWIRE_FEATUREPROJ>
   </PropertyGroup>
 
   <Import Project="$(SPOCLIENT)\Framework\Features\OneWire_PAL.libcatproj"/>

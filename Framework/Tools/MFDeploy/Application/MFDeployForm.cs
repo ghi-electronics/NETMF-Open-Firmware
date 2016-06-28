@@ -403,7 +403,11 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
                 {
                     try
                     {
+                        m_deploy.OpenWithoutConnect = true;
+                        
                         m_device = m_deploy.Connect(port, port is MFTcpIpPort ? m_transportTinyBooter : null);
+
+                        m_deploy.OpenWithoutConnect = false;
 
                         if (m_device != null)
                         {
@@ -436,18 +440,6 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
                                     MessageBox.Show(this, "Invalid password or certificate!", "MFDeploy Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                     m_device.Disconnect();
                                     return null;
-                                }
-                            }
-                            else if (!string.IsNullOrEmpty(textBoxCert.Text) && File.Exists(textBoxCert.Text))
-                            {
-                                try
-                                {
-                                    X509Certificate2 cert = new X509Certificate2(textBoxCert.Text, textBoxCertPwd.Text);
-
-                                    m_device.UseSsl(cert, Properties.Settings.Default.SslRequireClientCert);
-                                }
-                                catch
-                                {
                                 }
                             }
 
@@ -1000,7 +992,7 @@ namespace Microsoft.NetMicroFramework.Tools.MFDeployTool
                 {
                     device = ConnectToSelectedDevice();
 
-                    if (device == null || !device.IsConnected)
+                    if (device == null)
                     {
                         MessageBox.Show(this, string.Format(Properties.Resources.ErrorDeviceNotResponding, comboBoxDevice.Text), Properties.Resources.ApplicationTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;

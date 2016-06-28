@@ -3,8 +3,8 @@
     <FeatureName>SerialPort</FeatureName>
   </PropertyGroup>
 
-  <Import Project="$(SPOCLIENT)\Framework\Features\hardware.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\serial_port.featureproj" />
+  <Import Condition="'$(HARDWARE_FEATUREPROJ)'   ==''" Project="$(SPOCLIENT)\Framework\Features\hardware.featureproj" />
+  <Import Condition="'$(SERIAL_PORT_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\serial_port.featureproj" />
 
   <ItemGroup>
     <InteropFeature Include="Microsoft_SPOT_Hardware_SerialPort" />
@@ -24,5 +24,6 @@
     <Groups>Hardware</Groups>
     <Documentation>
     </Documentation>
+    <SERIALPORT_FEATUREPROJ>True</SERIALPORT_FEATUREPROJ>
   </PropertyGroup>
 </Project>

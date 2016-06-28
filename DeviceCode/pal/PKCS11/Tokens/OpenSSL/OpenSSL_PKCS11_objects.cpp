@@ -299,7 +299,7 @@ CK_RV PKCS11_Objects_OpenSSL::GetAttributeValue(Cryptoki_Session_Context* pSessi
     {
         CERT_DATA* pCertData = (CERT_DATA*)pObj->Data;
         X509* pCert = pCertData->cert;
-        UINT32 valLen = 0;
+        INT32 valLen = 0;
     
         for(int i=0; i<(int)ulCount; i++)
         {

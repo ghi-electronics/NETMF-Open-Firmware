@@ -66,6 +66,8 @@ err_t   lpc24xx_ethhw_init( netif * myNetIf)
 { 
     myNetIf->mtu = ETH_MAX_FLEN;
 
+    myNetIf->flags = NETIF_FLAG_IGMP | NETIF_FLAG_ETHARP | NETIF_FLAG_ETHERNET;
+
     /* ethhw_init() is user-defined */
     /* use ip_input instead of ethernet_input for non-ethernet hardware */
     /* (this function is assigned to netif.input and should be called by the hardware driver) */
@@ -172,6 +174,9 @@ int LPC24XX_EMAC_LWIP_Driver::Open(int index)
     subnetmask.addr = iface->subnetmask;
 
     pNetIF = netif_add( &g_LPC24XX_EMAC_NetIF, &ipaddr, &subnetmask, &gateway, NULL, lpc24xx_ethhw_init, ethernet_input );
+
+    /* Initialize the continuation routine for the driver interrupt and receive */    
+    InitContinuations( pNetIF );
        
     /* Enable the INTERRUPT */                            
     CPU_INTC_ActivateInterrupt(LPC24XX_VIC::c_IRQ_INDEX_EMAC, (HAL_CALLBACK_FPN)LPC24XX_EMAC_lwip_interrupt, &g_LPC24XX_EMAC_NetIF);
@@ -182,8 +187,6 @@ int LPC24XX_EMAC_LWIP_Driver::Open(int index)
     {
         netif_set_up( pNetIF );
     }
-    /* Initialize the continuation routine for the driver interrupt and receive */    
-    InitContinuations( pNetIF );
 
     // Return LWIP's net interface number
     return g_LPC24XX_EMAC_NetIF.num;    

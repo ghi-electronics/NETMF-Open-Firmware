@@ -11,6 +11,10 @@ BOOL DA_Initialize( DA_CHANNEL channel, INT32 precisionInBits )
     return FALSE;
 }
 
+void DA_Uninitialize( DA_CHANNEL channel )
+{
+}
+
 void DA_Write( DA_CHANNEL channel, INT32 level )
 {
 }

@@ -118,8 +118,17 @@
 
 #define USB_CURRENT_UNIT        2
 
-#define USB_VERSION             0x0110
-#define DEVICE_RELEASE_VERSION  0x0100
+/////////////////////////////////////////////////////////////////////////
+// ATTENTION:
+// 2.0 is the lowest version that works with WinUSB on Windows 8!!! 
+// use older values below if you do not care about that
+//
+#define USB_VERSION             0x0200 
+#define DEVICE_RELEASE_VERSION  0x0200
+// #define USB_VERSION             0x0110
+// #define DEVICE_RELEASE_VERSION  0x0110
+// 
+/////////////////////////////////////////////////////////////////////////
 
 #define USB_SETUP_COMPLETE      0
 #define USB_SETUP_ERROR         1

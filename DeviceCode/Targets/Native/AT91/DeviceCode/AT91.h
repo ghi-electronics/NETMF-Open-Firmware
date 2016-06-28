@@ -55,7 +55,7 @@ struct AT91_PMC {
 
     /****/ volatile UINT32 PMC_CKGR_MCFR;  // Main Clock  Frequency Register
     static const    UINT32 CKGR_MAINF      = (0xFFFF << 0);     // (CKGR) Main Clock Frequency
-    static const    UINT32 CKGR_MAINRDY    = (0x1 << 16);       // (CKGR) Main Clock Ready
+    static const    UINT32 CKGR_MAINRDY    = (0x1UL << 16);       // (CKGR) Main Clock Ready
     
 
     /****/ volatile UINT32 PMC_CKGR_PLLAR;  // PLL Register
@@ -70,11 +70,11 @@ struct AT91_PMC {
     static const    UINT32 CKGR_OUT_1      = (0x1 << 14);     // (CKGR) Please refer to the PLL datasheet
     static const    UINT32 CKGR_OUT_2      = (0x2 << 14);     // (CKGR) Please refer to the PLL datasheet
     static const    UINT32 CKGR_OUT_3      = (0x3 << 14);     // (CKGR) Please refer to the PLL datasheet
-    static const    UINT32 CKGR_MUL        = (0x7FF << 16);   // (CKGR) PLL Multiplier
-    static const    UINT32 CKGR_USBDIV     = (0x3 << 28);     // (CKGR) Divider for USB Clocks
-    static const    UINT32 CKGR_USBDIV_0   = (0x0 << 28);     // (CKGR) Divider output is PLL clock output
-    static const    UINT32 CKGR_USBDIV_1   = (0x1 << 28);     // (CKGR) Divider output is PLL clock output divided by 2
-    static const    UINT32 CKGR_USBDIV_2   = (0x2 << 28);     // (CKGR) Divider output is PLL clock output divided by 4
+    static const    UINT32 CKGR_MUL        = (0x7FFUL << 16);   // (CKGR) PLL Multiplier
+    static const    UINT32 CKGR_USBDIV     = (0x3UL << 28);     // (CKGR) Divider for USB Clocks
+    static const    UINT32 CKGR_USBDIV_0   = (0x0UL << 28);     // (CKGR) Divider output is PLL clock output
+    static const    UINT32 CKGR_USBDIV_1   = (0x1UL << 28);     // (CKGR) Divider output is PLL clock output divided by 2
+    static const    UINT32 CKGR_USBDIV_2   = (0x2UL << 28);     // (CKGR) Divider output is PLL clock output divided by 4
 
     /****/ volatile UINT32 Reserved1[1];            // 
     
@@ -187,16 +187,16 @@ struct AT91_PMC {
     static const    UINT32 CKGR_DIV_0      = (0x0);           // (CKGR) Divider output is 0
     static const    UINT32 CKGR_DIV_BYPASS = (0x1);           // (CKGR) Divider is bypassed
     static const    UINT32 CKGR_PLLCOUNT   = (0x3F << 8);     // (CKGR) PLL Counter
-    static const    UINT32 CKGR_OUT        = (0x3 << 14);     // (CKGR) PLL Output Frequency Range
-    static const    UINT32 CKGR_OUT_0      = (0x0 << 14);     // (CKGR) Please refer to the PLL datasheet
-    static const    UINT32 CKGR_OUT_1      = (0x1 << 14);     // (CKGR) Please refer to the PLL datasheet
-    static const    UINT32 CKGR_OUT_2      = (0x2 << 14);     // (CKGR) Please refer to the PLL datasheet
-    static const    UINT32 CKGR_OUT_3      = (0x3 << 14);     // (CKGR) Please refer to the PLL datasheet
-    static const    UINT32 CKGR_MUL        = (0x7FF << 16);   // (CKGR) PLL Multiplier
-    static const    UINT32 CKGR_USBDIV     = (0x3 << 28);     // (CKGR) Divider for USB Clocks
-    static const    UINT32 CKGR_USBDIV_0   = (0x0 << 28);     // (CKGR) Divider output is PLL clock output
-    static const    UINT32 CKGR_USBDIV_1   = (0x1 << 28);     // (CKGR) Divider output is PLL clock output divided by 2
-    static const    UINT32 CKGR_USBDIV_2   = (0x2 << 28);     // (CKGR) Divider output is PLL clock output divided by 4
+    static const    UINT32 CKGR_OUT        = (0x3UL << 14);     // (CKGR) PLL Output Frequency Range
+    static const    UINT32 CKGR_OUT_0      = (0x0UL << 14);     // (CKGR) Please refer to the PLL datasheet
+    static const    UINT32 CKGR_OUT_1      = (0x1UL << 14);     // (CKGR) Please refer to the PLL datasheet
+    static const    UINT32 CKGR_OUT_2      = (0x2UL << 14);     // (CKGR) Please refer to the PLL datasheet
+    static const    UINT32 CKGR_OUT_3      = (0x3UL << 14);     // (CKGR) Please refer to the PLL datasheet
+    static const    UINT32 CKGR_MUL        = (0x7FFUL << 16);   // (CKGR) PLL Multiplier
+    static const    UINT32 CKGR_USBDIV     = (0x3UL << 28);     // (CKGR) Divider for USB Clocks
+    static const    UINT32 CKGR_USBDIV_0   = (0x0UL << 28);     // (CKGR) Divider output is PLL clock output
+    static const    UINT32 CKGR_USBDIV_1   = (0x1UL << 28);     // (CKGR) Divider output is PLL clock output divided by 2
+    static const    UINT32 CKGR_USBDIV_2   = (0x2UL << 28);     // (CKGR) Divider output is PLL clock output divided by 4
 
     /****/ volatile UINT32 PMC_MCKR;  // Master Clock Register
     static const    UINT32 PMC_CSS           = (0x3 <<  0);   //  (PMC) Programmable Clock Selection
@@ -417,58 +417,58 @@ struct AT91_TC {
     static const    UINT32     TC_WAVESEL_UPDOWN               = (0x1 << 13);// (TC)UPDOWN mode without automatic trigger on RC Compare
     static const    UINT32     TC_WAVESEL_UP_AUTO              = (0x2 << 13);// (TC)UP mode with automatic trigger on RC Compare
     static const    UINT32     TC_WAVESEL_UPDOWN_AUTO          = (0x3 << 13);// (TC)UPDOWN mode with automatic trigger on RC Compare
-    static const    UINT32 TC_CPCTRG       = (0x1 << 14);// (TC)RC Compare Trigger Enable
-    static const    UINT32 TC_WAVE         = (0x1 << 15);// (TC)
-    static const    UINT32 TC_ACPA         = (0x3 << 16);// (TC)RA Compare Effect on TIOA
-    static const    UINT32     TC_ACPA_NONE                 = (0x0 << 16);// (TC)Effect: none
-    static const    UINT32     TC_ACPA_SET                  = (0x1 << 16);// (TC)Effect: set
-    static const    UINT32     TC_ACPA_CLEAR                = (0x2 << 16);// (TC)Effect: clear
-    static const    UINT32     TC_ACPA_TOGGLE               = (0x3 << 16);// (TC)Effect: toggle
-    static const    UINT32 TC_LDRA         = (0x3 << 16);// (TC)RA Loading Selection
-    static const    UINT32     TC_LDRA_NONE                 = (0x0 << 16);// (TC)Edge: None
-    static const    UINT32     TC_LDRA_RISING               = (0x1 << 16);// (TC)Edge: rising edge of TIOA
-    static const    UINT32     TC_LDRA_FALLING              = (0x2 << 16);// (TC)Edge: falling edge of TIOA
-    static const    UINT32     TC_LDRA_BOTH                 = (0x3 << 16);// (TC)Edge: each edge of TIOA
-    static const    UINT32 TC_ACPC         = (0x3 << 18);// (TC)RC Compare Effect on TIOA
-    static const    UINT32     TC_ACPC_NONE                 = (0x0 << 18);// (TC)Effect: none
-    static const    UINT32     TC_ACPC_SET                  = (0x1 << 18);// (TC)Effect: set
-    static const    UINT32     TC_ACPC_CLEAR                = (0x2 << 18);// (TC)Effect: clear
-    static const    UINT32     TC_ACPC_TOGGLE               = (0x3 << 18);// (TC)Effect: toggle
-    static const    UINT32 TC_LDRB         = (0x3 << 18);// (TC)RB Loading Selection
-    static const    UINT32     TC_LDRB_NONE                 = (0x0 << 18);// (TC)Edge: None
-    static const    UINT32     TC_LDRB_RISING               = (0x1 << 18);// (TC)Edge: rising edge of TIOA
-    static const    UINT32     TC_LDRB_FALLING              = (0x2 << 18);// (TC)Edge: falling edge of TIOA
-    static const    UINT32     TC_LDRB_BOTH                 = (0x3 << 18);// (TC)Edge: each edge of TIOA
-    static const    UINT32 TC_AEEVT        = (0x3 << 20);// (TC)External Event Effect on TIOA
-    static const    UINT32     TC_AEEVT_NONE                 = (0x0 << 20);// (TC)Effect: none
-    static const    UINT32     TC_AEEVT_SET                  = (0x1 << 20);// (TC)Effect: set
-    static const    UINT32     TC_AEEVT_CLEAR                = (0x2 << 20);// (TC)Effect: clear
-    static const    UINT32     TC_AEEVT_TOGGLE               = (0x3 << 20);// (TC)Effect: toggle
-    static const    UINT32 TC_ASWTRG       = (0x3 << 22);// (TC)Software Trigger Effect on TIOA
-    static const    UINT32     TC_ASWTRG_NONE                 = (0x0 << 22);// (TC)Effect: none
-    static const    UINT32     TC_ASWTRG_SET                  = (0x1 << 22);// (TC)Effect: set
-    static const    UINT32     TC_ASWTRG_CLEAR                = (0x2 << 22);// (TC)Effect: clear
-    static const    UINT32     TC_ASWTRG_TOGGLE               = (0x3 << 22);// (TC)Effect: toggle
-    static const    UINT32 TC_BCPB         = (0x3 << 24);// (TC)RB Compare Effect on TIOB
-    static const    UINT32     TC_BCPB_NONE                 = (0x0 << 24);// (TC)Effect: none
-    static const    UINT32     TC_BCPB_SET                  = (0x1 << 24);// (TC)Effect: set
-    static const    UINT32     TC_BCPB_CLEAR                = (0x2 << 24);// (TC)Effect: clear
-    static const    UINT32     TC_BCPB_TOGGLE               = (0x3 << 24);// (TC)Effect: toggle
-    static const    UINT32 TC_BCPC         = (0x3 << 26);// (TC)RC Compare Effect on TIOB
-    static const    UINT32     TC_BCPC_NONE                 = (0x0 << 26);// (TC)Effect: none
-    static const    UINT32     TC_BCPC_SET                  = (0x1 << 26);// (TC)Effect: set
-    static const    UINT32     TC_BCPC_CLEAR                = (0x2 << 26);// (TC)Effect: clear
-    static const    UINT32     TC_BCPC_TOGGLE               = (0x3 << 26);// (TC)Effect: toggle
-    static const    UINT32 TC_BEEVT        = (0x3 << 28);// (TC)External Event Effect on TIOB
-    static const    UINT32     TC_BEEVT_NONE                 = (0x0 << 28);// (TC)Effect: none
-    static const    UINT32     TC_BEEVT_SET                  = (0x1 << 28);// (TC)Effect: set
-    static const    UINT32     TC_BEEVT_CLEAR                = (0x2 << 28);// (TC)Effect: clear
-    static const    UINT32     TC_BEEVT_TOGGLE               = (0x3 << 28);// (TC)Effect: toggle
-    static const    UINT32 TC_BSWTRG       = ((UINT32)0x3 << 30);// (TC)Software Trigger Effect on TIOB
-    static const    UINT32     TC_BSWTRG_NONE                 = ((UINT32)0x0 << 30);// (TC)Effect: none
-    static const    UINT32     TC_BSWTRG_SET                  = ((UINT32)0x1 << 30);// (TC)Effect: set
-    static const    UINT32     TC_BSWTRG_CLEAR                = ((UINT32)0x2 << 30);// (TC)Effect: clear
-    static const    UINT32     TC_BSWTRG_TOGGLE               = ((UINT32)0x3 << 30);// (TC)Effect: toggle
+    static const    UINT32 TC_CPCTRG       = (0x1UL << 14);// (TC)RC Compare Trigger Enable
+    static const    UINT32 TC_WAVE         = (0x1UL << 15);// (TC)
+    static const    UINT32 TC_ACPA         = (0x3UL << 16);// (TC)RA Compare Effect on TIOA
+    static const    UINT32     TC_ACPA_NONE                 = (0x0UL << 16);// (TC)Effect: none
+    static const    UINT32     TC_ACPA_SET                  = (0x1UL << 16);// (TC)Effect: set
+    static const    UINT32     TC_ACPA_CLEAR                = (0x2UL << 16);// (TC)Effect: clear
+    static const    UINT32     TC_ACPA_TOGGLE               = (0x3UL << 16);// (TC)Effect: toggle
+    static const    UINT32 TC_LDRA         = (0x3UL << 16);// (TC)RA Loading Selection
+    static const    UINT32     TC_LDRA_NONE                 = (0x0UL << 16);// (TC)Edge: None
+    static const    UINT32     TC_LDRA_RISING               = (0x1UL << 16);// (TC)Edge: rising edge of TIOA
+    static const    UINT32     TC_LDRA_FALLING              = (0x2UL << 16);// (TC)Edge: falling edge of TIOA
+    static const    UINT32     TC_LDRA_BOTH                 = (0x3UL << 16);// (TC)Edge: each edge of TIOA
+    static const    UINT32 TC_ACPC         = (0x3UL << 18);// (TC)RC Compare Effect on TIOA
+    static const    UINT32     TC_ACPC_NONE                 = (0x0UL << 18);// (TC)Effect: none
+    static const    UINT32     TC_ACPC_SET                  = (0x1UL << 18);// (TC)Effect: set
+    static const    UINT32     TC_ACPC_CLEAR                = (0x2UL << 18);// (TC)Effect: clear
+    static const    UINT32     TC_ACPC_TOGGLE               = (0x3UL << 18);// (TC)Effect: toggle
+    static const    UINT32 TC_LDRB         = (0x3UL << 18);// (TC)RB Loading Selection
+    static const    UINT32     TC_LDRB_NONE                 = (0x0UL << 18);// (TC)Edge: None
+    static const    UINT32     TC_LDRB_RISING               = (0x1UL << 18);// (TC)Edge: rising edge of TIOA
+    static const    UINT32     TC_LDRB_FALLING              = (0x2UL << 18);// (TC)Edge: falling edge of TIOA
+    static const    UINT32     TC_LDRB_BOTH                 = (0x3UL << 18);// (TC)Edge: each edge of TIOA
+    static const    UINT32 TC_AEEVT        = (0x3UL << 20);// (TC)External Event Effect on TIOA
+    static const    UINT32     TC_AEEVT_NONE                 = (0x0UL << 20);// (TC)Effect: none
+    static const    UINT32     TC_AEEVT_SET                  = (0x1UL << 20);// (TC)Effect: set
+    static const    UINT32     TC_AEEVT_CLEAR                = (0x2UL << 20);// (TC)Effect: clear
+    static const    UINT32     TC_AEEVT_TOGGLE               = (0x3UL << 20);// (TC)Effect: toggle
+    static const    UINT32 TC_ASWTRG       = (0x3UL << 22);// (TC)Software Trigger Effect on TIOA
+    static const    UINT32     TC_ASWTRG_NONE                 = (0x0UL << 22);// (TC)Effect: none
+    static const    UINT32     TC_ASWTRG_SET                  = (0x1UL << 22);// (TC)Effect: set
+    static const    UINT32     TC_ASWTRG_CLEAR                = (0x2UL << 22);// (TC)Effect: clear
+    static const    UINT32     TC_ASWTRG_TOGGLE               = (0x3UL << 22);// (TC)Effect: toggle
+    static const    UINT32 TC_BCPB         = (0x3UL << 24);// (TC)RB Compare Effect on TIOB
+    static const    UINT32     TC_BCPB_NONE                 = (0x0UL << 24);// (TC)Effect: none
+    static const    UINT32     TC_BCPB_SET                  = (0x1UL << 24);// (TC)Effect: set
+    static const    UINT32     TC_BCPB_CLEAR                = (0x2UL << 24);// (TC)Effect: clear
+    static const    UINT32     TC_BCPB_TOGGLE               = (0x3UL << 24);// (TC)Effect: toggle
+    static const    UINT32 TC_BCPC         = (0x3UL << 26);// (TC)RC Compare Effect on TIOB
+    static const    UINT32     TC_BCPC_NONE                 = (0x0UL << 26);// (TC)Effect: none
+    static const    UINT32     TC_BCPC_SET                  = (0x1UL << 26);// (TC)Effect: set
+    static const    UINT32     TC_BCPC_CLEAR                = (0x2UL << 26);// (TC)Effect: clear
+    static const    UINT32     TC_BCPC_TOGGLE               = (0x3UL << 26);// (TC)Effect: toggle
+    static const    UINT32 TC_BEEVT        = (0x3UL << 28);// (TC)External Event Effect on TIOB
+    static const    UINT32     TC_BEEVT_NONE                 = (0x0UL << 28);// (TC)Effect: none
+    static const    UINT32     TC_BEEVT_SET                  = (0x1UL << 28);// (TC)Effect: set
+    static const    UINT32     TC_BEEVT_CLEAR                = (0x2UL << 28);// (TC)Effect: clear
+    static const    UINT32     TC_BEEVT_TOGGLE               = (0x3UL << 28);// (TC)Effect: toggle
+    static const    UINT32 TC_BSWTRG       = ((UINT32)0x3UL << 30);// (TC)Software Trigger Effect on TIOB
+    static const    UINT32     TC_BSWTRG_NONE                 = ((UINT32)0x0UL << 30);// (TC)Effect: none
+    static const    UINT32     TC_BSWTRG_SET                  = ((UINT32)0x1UL << 30);// (TC)Effect: set
+    static const    UINT32     TC_BSWTRG_CLEAR                = ((UINT32)0x2UL << 30);// (TC)Effect: clear
+    static const    UINT32     TC_BSWTRG_TOGGLE               = ((UINT32)0x3UL << 30);// (TC)Effect: toggle
     
     /****/ volatile UINT32 Reserved0[2];  
 
@@ -489,9 +489,9 @@ struct AT91_TC {
     static const    UINT32 TC_LDRAS        = (0x1 <<  5);// (TC)RA Loading
     static const    UINT32 TC_LDRBS        = (0x1 <<  6);// (TC)RB Loading
     static const    UINT32 TC_ETRGS        = (0x1 <<  7);// (TC)External Trigger
-    static const    UINT32 TC_CLKSTA       = (0x1 << 16);// (TC)Clock Enabling
-    static const    UINT32 TC_MTIOA        = (0x1 << 17);// (TC)TIOA Mirror
-    static const    UINT32 TC_MTIOB        = (0x1 << 18);// (TC)TIOA Mirror
+    static const    UINT32 TC_CLKSTA       = (0x1UL << 16);// (TC)Clock Enabling
+    static const    UINT32 TC_MTIOA        = (0x1UL << 17);// (TC)TIOA Mirror
+    static const    UINT32 TC_MTIOB        = (0x1UL << 18);// (TC)TIOA Mirror
 
     /****/ volatile UINT32 TC_IER;    // Interrupt Enable Register
 
@@ -644,10 +644,10 @@ struct AT91_SPI
     static const    UINT32 SPI_MR_MSTR              = (0x1 <<  0); // 1--Master mode\0--Slave mode
     static const    UINT32 SPI_MR_PS                = (0x1 <<  1); // peripheral select 1--varable\0--fixed
     static const    UINT32 SPI_MR_MODFDIS           = (0x1 <<  4); // peripheral select 1--varable\0--fixed
-    static const    UINT32 SPI_MR_CS0               = (0x0 <<  16);
-    static const    UINT32 SPI_MR_CS1               = (0x1 <<  16);
-    static const    UINT32 SPI_MR_CS2               = (0x3 <<  16);
-    static const    UINT32 SPI_MR_CS3               = (0x7 <<  16);
+    static const    UINT32 SPI_MR_CS0               = (0x0UL <<  16);
+    static const    UINT32 SPI_MR_CS1               = (0x1UL <<  16);
+    static const    UINT32 SPI_MR_CS2               = (0x3UL <<  16);
+    static const    UINT32 SPI_MR_CS3               = (0x7UL <<  16);
 
     /****/ volatile UINT32 SPI_RDR;        // Receive Data Register
 
@@ -660,7 +660,7 @@ struct AT91_SPI
     static const    UINT32 SPI_SR_TXBUFE            = (0x1 <<  7); // transmit buffer empty
     static const    UINT32 SPI_SR_NSSR              = (0x1 <<  8); // Slave mode control
     static const    UINT32 SPI_SR_TXEMPTY           = (0x1 <<  9); // transmit register and internal shifters are empty
-    static const    UINT32 SPI_SR_SPIENS            = (0x1 <<  16); // SPI enable status
+    static const    UINT32 SPI_SR_SPIENS            = (0x1UL <<  16); // SPI enable status
 
     /****/ volatile UINT32 SPI_IER;        // Interrupt Enable Register
     /****/ volatile UINT32 SPI_IDR;        // Interrupt Disable Register
@@ -673,11 +673,11 @@ struct AT91_SPI
     static const    UINT32 SPI_CSR_BITS_MASK        = (0xF << 4); // bits per transfer
     static const    UINT32 SPI_CSR_8BITS            = (0x0 <<  4);
     static const    UINT32 SPI_CSR_16BITS           = (0x8 <<  4);
-    static const    UINT32 SPI_CSR_SCBR_MASK        = (0xFF<< 8); // serial clock baud rate
+    static const    UINT32 SPI_CSR_SCBR_MASK        = (0xFFUL << 8); // serial clock baud rate
     static const    UINT32 SPI_CSR_SCBR_SHIFT       = (0x8);     // serial clock baud rate
-    static const    UINT32 SPI_CSR_DLYBS_MASK       = (0xFF<< 16); // delay before SPCK
+    static const    UINT32 SPI_CSR_DLYBS_MASK       = (0xFFUL << 16); // delay before SPCK
     static const    UINT32 SPI_CSR_DLYBS_SHIFT      = (16);     // delay before SPCK
-    static const    UINT32 SPI_CSR_DLYBCT_MASK      = ((UINT32)0xFF<< 24); // delay between transfer
+    static const    UINT32 SPI_CSR_DLYBCT_MASK      = (0xFFUL << 24); // delay between transfer
     static const    UINT32 SPI_CSR_DLYBCT_SHIFT     = (24);     // delay between transfer
 
     /****/ volatile UINT32 SPI_CSR1;       // Chip Select Register 1
@@ -852,10 +852,10 @@ struct AT91_USART {
     static const    UINT32 US_RSTIT        = ((unsigned int) 0x1 << 13); //  (USART) Reset Iterations
     static const    UINT32 US_RSTNACK      = ((unsigned int) 0x1 << 14); //  (USART) Reset Non Acknowledge
     static const    UINT32 US_RETTO        = ((unsigned int) 0x1 << 15); //  (USART) Rearm Time-out
-    static const    UINT32 US_DTREN        = ((unsigned int) 0x1 << 16); //  (USART) Data Terminal ready Enable
-    static const    UINT32 US_DTRDIS       = ((unsigned int) 0x1 << 17); //  (USART) Data Terminal ready Disable
-    static const    UINT32 US_RTSEN        = ((unsigned int) 0x1 << 18); //  (USART) Request to Send enable
-    static const    UINT32 US_RTSDIS       = ((unsigned int) 0x1 << 19); //  (USART) Request to Send Disable
+    static const    UINT32 US_DTREN        = ((unsigned int) 0x1UL << 16); //  (USART) Data Terminal ready Enable
+    static const    UINT32 US_DTRDIS       = ((unsigned int) 0x1UL << 17); //  (USART) Data Terminal ready Disable
+    static const    UINT32 US_RTSEN        = ((unsigned int) 0x1UL << 18); //  (USART) Request to Send enable
+    static const    UINT32 US_RTSDIS       = ((unsigned int) 0x1UL << 19); //  (USART) Request to Send Disable
 
     /****/ volatile UINT32 US_MR;          // Mode Register
     static const    UINT32 US_USMODE       = ((unsigned int) 0xF <<  0); //  (USART) Usart mode
@@ -898,10 +898,10 @@ struct AT91_USART {
     static const    UINT32     US_PAR_NONE                 = (0x4 <<  9); // = (DBGU); No Parity
     static const    UINT32     US_PAR_MULTI_DROP           = (0x6 <<  9); // = (DBGU); Multi-drop mode
     static const    UINT32 US_CHMODE       = (0x3 << 14); // = (DBGU); Channel Mode
-    static const    UINT32     US_CHMODE_NORMAL               = (0x0 << 14); // = (DBGU); Normal Mode: The USART channel operates as an RX/TX USART.
-    static const    UINT32     US_CHMODE_AUTO                 = (0x1 << 14); // = (DBGU); Automatic Echo: Receiver Data Input is connected to the TXD pin.
-    static const    UINT32     US_CHMODE_LOCAL                = (0x2 << 14); // = (DBGU); Local Loopback: Transmitter Output Signal is connected to Receiver Input Signal.
-    static const    UINT32     US_CHMODE_REMOTE               = (0x3 << 14); // = (DBGU); Remote Loopback: RXD pin is internally connected to TXD pin.
+    static const    UINT32     US_CHMODE_NORMAL               = (0x0UL << 14); // = (DBGU); Normal Mode: The USART channel operates as an RX/TX USART.
+    static const    UINT32     US_CHMODE_AUTO                 = (0x1UL << 14); // = (DBGU); Automatic Echo: Receiver Data Input is connected to the TXD pin.
+    static const    UINT32     US_CHMODE_LOCAL                = (0x2UL << 14); // = (DBGU); Local Loopback: Transmitter Output Signal is connected to Receiver Input Signal.
+    static const    UINT32     US_CHMODE_REMOTE               = (0x3UL << 14); // = (DBGU); Remote Loopback: RXD pin is internally connected to TXD pin.
 
     /****/ volatile UINT32 US_IER;         // Interrupt Enable Register
     static const    UINT32 US_RXBRK        = ((unsigned int) 0x1 <<  2); //  (USART) Break Received/End of Break
@@ -912,18 +912,18 @@ struct AT91_USART {
     static const    UINT32 US_DSRIC        = ((unsigned int) 0x1 << 17); //  (USART) Data Set Ready Input Change Flag
     static const    UINT32 US_DCDIC        = ((unsigned int) 0x1 << 18); //  (USART) Data Carrier Flag
     static const    UINT32 US_CTSIC        = ((unsigned int) 0x1 << 19); //  (USART) Clear To Send Input Change Flag
-    static const    UINT32 US_RXRDY        = (0x1 <<  0); // = (DBGU); RXRDY Interrupt
-    static const    UINT32 US_TXRDY        = (0x1 <<  1); // = (DBGU); TXRDY Interrupt
-    static const    UINT32 US_ENDRX        = (0x1 <<  3); // = (DBGU); End of Receive Transfer Interrupt
-    static const    UINT32 US_ENDTX        = (0x1 <<  4); // = (DBGU); End of Transmit Interrupt
-    static const    UINT32 US_OVRE         = (0x1 <<  5); // = (DBGU); Overrun Interrupt
-    static const    UINT32 US_FRAME        = (0x1 <<  6); // = (DBGU); Framing Error Interrupt
-    static const    UINT32 US_PARE         = (0x1 <<  7); // = (DBGU); Parity Error Interrupt
-    static const    UINT32 US_TXEMPTY      = (0x1 <<  9); // = (DBGU); TXEMPTY Interrupt
-    static const    UINT32 US_TXBUFE       = (0x1 << 11); // = (DBGU); TXBUFE Interrupt
-    static const    UINT32 US_RXBUFF       = (0x1 << 12); // = (DBGU); RXBUFF Interrupt
-    static const    UINT32 US_COMM_TX      = (0x1 << 30); // = (DBGU); COMM_TX Interrupt
-    static const    UINT32 US_COMM_RX      = ((UINT32)0x1 << 31); // = (DBGU); COMM_RX Interrupt
+    static const    UINT32 US_RXRDY        = (0x1UL <<  0); // = (DBGU); RXRDY Interrupt
+    static const    UINT32 US_TXRDY        = (0x1UL <<  1); // = (DBGU); TXRDY Interrupt
+    static const    UINT32 US_ENDRX        = (0x1UL <<  3); // = (DBGU); End of Receive Transfer Interrupt
+    static const    UINT32 US_ENDTX        = (0x1UL <<  4); // = (DBGU); End of Transmit Interrupt
+    static const    UINT32 US_OVRE         = (0x1UL <<  5); // = (DBGU); Overrun Interrupt
+    static const    UINT32 US_FRAME        = (0x1UL <<  6); // = (DBGU); Framing Error Interrupt
+    static const    UINT32 US_PARE         = (0x1UL <<  7); // = (DBGU); Parity Error Interrupt
+    static const    UINT32 US_TXEMPTY      = (0x1UL <<  9); // = (DBGU); TXEMPTY Interrupt
+    static const    UINT32 US_TXBUFE       = (0x1UL << 11); // = (DBGU); TXBUFE Interrupt
+    static const    UINT32 US_RXBUFF       = (0x1UL << 12); // = (DBGU); RXBUFF Interrupt
+    static const    UINT32 US_COMM_TX      = (0x1UL << 30); // = (DBGU); COMM_TX Interrupt
+    static const    UINT32 US_COMM_RX      = (0x1UL << 31); // = (DBGU); COMM_RX Interrupt
 
     /****/ volatile UINT32 US_IDR;         // Interrupt Disable Register
 
@@ -1073,8 +1073,8 @@ struct AT91_UDP {
     static const    UINT32 UDP_EPTYPE_BULK_IN  = (0x6 <<  8); // (UDP) Bulk IN
     static const    UINT32 UDP_EPTYPE_INT_IN   = (0x7 <<  8); // (UDP) Interrupt IN
     static const    UINT32 UDP_DTGLE           = (0x1 << 11); // (UDP) Data Toggle
-    static const    UINT32 UDP_EPEDS           = (0x1 << 15); // (UDP) Endpoint Enable Disable
-    static const    UINT32 UDP_RXBYTECNT       = (0x7FF << 16); // (UDP) Number Of Bytes Available in the FIFO
+    static const    UINT32 UDP_EPEDS           = (0x1UL << 15); // (UDP) Endpoint Enable Disable
+    static const    UINT32 UDP_RXBYTECNT       = (0x7FFUL << 16); // (UDP) Number Of Bytes Available in the FIFO
 
     /****/ volatile UINT32 Reserved3[2];     // 
 
@@ -1105,43 +1105,43 @@ struct AT91_MATRIX {
 
     /****/ volatile UINT32 MATRIX_SCFG0;    //  Slave Configuration Register 0
     static const    UINT32 MATRIX_SLOT_CYCLE                 = (0xFF <<  0); // (MATRIX) Maximum Number of Allowed Cycles for a Burst
-    static const    UINT32 MATRIX_DEFMSTR_TYPE               = (0x3 << 16); // (MATRIX) Default Master Type
-    static const    UINT32 MATRIX_DEFMSTR_TYPE_NO_DEFMSTR    = (0x0 << 16); // (MATRIX) No Default Master. At the end of current Slave access, if no other master request is pending, the Slave is deconnected from all masters. This results in having a one cycle latency for the first transfer of a burst.
-    static const    UINT32 MATRIX_DEFMSTR_TYPE_LAST_DEFMSTR  = (0x1 << 16); // (MATRIX) Last Default Master. At the end of current Slave access, if no other master request is pending, the Slave stay connected with the last master having accessed it. This results in not having the one cycle latency when the last master re-trying access on the Slave.
-    static const    UINT32 MATRIX_DEFMSTR_TYPE_FIXED_DEFMSTR = (0x2 << 16); // (MATRIX) Fixed Default Master. At the end of current Slave access, if no other master request is pending, the Slave connects with fixed which number is in FIXED_DEFMSTR field. This results in not having the one cycle latency when the fixed master re-trying access on the Slave.
-    static const    UINT32 MATRIX_FIXED_DEFMSTR0             = (0x7 << 18); // (MATRIX) Fixed Index of Default Master
-    static const    UINT32 MATRIX_FIXED_DEFMSTR0_ARM926I     = (0x0 << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
-    static const    UINT32 MATRIX_FIXED_DEFMSTR0_ARM926D     = (0x1 << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
-    static const    UINT32 MATRIX_FIXED_DEFMSTR0_HPDC3       = (0x2 << 18); // (MATRIX) HPDC3 Master is Default Master
-    static const    UINT32 MATRIX_FIXED_DEFMSTR0_LCDC        = (0x3 << 18); // (MATRIX) LCDC Master is Default Master
-    static const    UINT32 MATRIX_FIXED_DEFMSTR0_UHP         = (0x4 << 18); // (MATRIX) UHP Master is Default Master
+    static const    UINT32 MATRIX_DEFMSTR_TYPE               = (0x3UL << 16); // (MATRIX) Default Master Type
+    static const    UINT32 MATRIX_DEFMSTR_TYPE_NO_DEFMSTR    = (0x0UL << 16); // (MATRIX) No Default Master. At the end of current Slave access, if no other master request is pending, the Slave is deconnected from all masters. This results in having a one cycle latency for the first transfer of a burst.
+    static const    UINT32 MATRIX_DEFMSTR_TYPE_LAST_DEFMSTR  = (0x1UL << 16); // (MATRIX) Last Default Master. At the end of current Slave access, if no other master request is pending, the Slave stay connected with the last master having accessed it. This results in not having the one cycle latency when the last master re-trying access on the Slave.
+    static const    UINT32 MATRIX_DEFMSTR_TYPE_FIXED_DEFMSTR = (0x2UL << 16); // (MATRIX) Fixed Default Master. At the end of current Slave access, if no other master request is pending, the Slave connects with fixed which number is in FIXED_DEFMSTR field. This results in not having the one cycle latency when the fixed master re-trying access on the Slave.
+    static const    UINT32 MATRIX_FIXED_DEFMSTR0             = (0x7UL << 18); // (MATRIX) Fixed Index of Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR0_ARM926I     = (0x0UL << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR0_ARM926D     = (0x1UL << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR0_HPDC3       = (0x2UL << 18); // (MATRIX) HPDC3 Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR0_LCDC        = (0x3UL << 18); // (MATRIX) LCDC Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR0_UHP         = (0x4UL << 18); // (MATRIX) UHP Master is Default Master
 
     /****/ volatile UINT32 MATRIX_SCFG1;    //  Slave Configuration Register 1
-    static const    UINT32 MATRIX_FIXED_DEFMSTR1             = (0x7 << 18); // (MATRIX) Fixed Index of Default Master
-    static const    UINT32 MATRIX_FIXED_DEFMSTR1_ARM926I     = (0x0 << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
-    static const    UINT32 MATRIX_FIXED_DEFMSTR1_ARM926D     = (0x1 << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
-    static const    UINT32 MATRIX_FIXED_DEFMSTR1_HPDC3       = (0x2 << 18); // (MATRIX) HPDC3 Master is Default Master
-    static const    UINT32 MATRIX_FIXED_DEFMSTR1_LCDC        = (0x3 << 18); // (MATRIX) LCDC Master is Default Master
-    static const    UINT32 MATRIX_FIXED_DEFMSTR1_UHP         = (0x4 << 18); // (MATRIX) UHP Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR1             = (0x7UL << 18); // (MATRIX) Fixed Index of Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR1_ARM926I     = (0x0UL << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR1_ARM926D     = (0x1UL << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR1_HPDC3       = (0x2UL << 18); // (MATRIX) HPDC3 Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR1_LCDC        = (0x3UL << 18); // (MATRIX) LCDC Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR1_UHP         = (0x4UL << 18); // (MATRIX) UHP Master is Default Master
 
     /****/ volatile UINT32 MATRIX_SCFG2;    //  Slave Configuration Register 2
-    static const    UINT32 MATRIX_FIXED_DEFMSTR2             = (0x1 << 18); // (MATRIX) Fixed Index of Default Master
-    static const    UINT32 MATRIX_FIXED_DEFMSTR2_ARM926I     = (0x0 << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
-    static const    UINT32 MATRIX_FIXED_DEFMSTR2_ARM926D     = (0x1 << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR2             = (0x1UL << 18); // (MATRIX) Fixed Index of Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR2_ARM926I     = (0x0UL << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR2_ARM926D     = (0x1UL << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
 
     /****/ volatile UINT32 MATRIX_SCFG3;    //  Slave Configuration Register 3
-    static const    UINT32 MATRIX_FIXED_DEFMSTR3             = (0x7 << 18); // (MATRIX) Fixed Index of Default Master
-    static const    UINT32 MATRIX_FIXED_DEFMSTR3_ARM926I     = (0x0 << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
-    static const    UINT32 MATRIX_FIXED_DEFMSTR3_ARM926D     = (0x1 << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
-    static const    UINT32 MATRIX_FIXED_DEFMSTR3_HPDC3       = (0x2 << 18); // (MATRIX) HPDC3 Master is Default Master
-    static const    UINT32 MATRIX_FIXED_DEFMSTR3_LCDC        = (0x3 << 18); // (MATRIX) LCDC Master is Default Master
-    static const    UINT32 MATRIX_FIXED_DEFMSTR3_UHP         = (0x4 << 18); // (MATRIX) UHP Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR3             = (0x7UL << 18); // (MATRIX) Fixed Index of Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR3_ARM926I     = (0x0UL << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR3_ARM926D     = (0x1UL << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR3_HPDC3       = (0x2UL << 18); // (MATRIX) HPDC3 Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR3_LCDC        = (0x3UL << 18); // (MATRIX) LCDC Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR3_UHP         = (0x4UL << 18); // (MATRIX) UHP Master is Default Master
 
     /****/ volatile UINT32 MATRIX_SCFG4;    //  Slave Configuration Register 4
-    static const    UINT32 MATRIX_FIXED_DEFMSTR4             = (0x3 << 18); // (MATRIX) Fixed Index of Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR4_ARM926I    = (0x0 << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR4_ARM926D    = (0x1 << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR4_HPDC3      = (0x2 << 18); // (MATRIX) HPDC3 Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR4             = (0x3UL << 18); // (MATRIX) Fixed Index of Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR4_ARM926I    = (0x0UL << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR4_ARM926D    = (0x1UL << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR4_HPDC3      = (0x2UL << 18); // (MATRIX) HPDC3 Master is Default Master
 
     /****/ volatile UINT32 Reserved0[3];    // 
 
@@ -1199,43 +1199,43 @@ struct AT91_MATRIX {
     /****/ volatile UINT32 Reserved0[10];    // 
     /****/ volatile UINT32 MATRIX_SCFG0;    //  Slave Configuration Register 0
     static const    UINT32 MATRIX_SLOT_CYCLE                  = (0xFF <<  0); // (MATRIX) Maximum Number of Allowed Cycles for a Burst
-    static const    UINT32 MATRIX_DEFMSTR_TYPE                = (0x3 << 16); // (MATRIX) Default Master Type
-    static const    UINT32  MATRIX_DEFMSTR_TYPE_NO_DEFMSTR    = (0x0 << 16); // (MATRIX) No Default Master. At the end of current slave access, if no other master request is pending, the slave is deconnected from all masters. This results in having a one cycle latency for the first transfer of a burst.
-    static const    UINT32  MATRIX_DEFMSTR_TYPE_LAST_DEFMSTR  = (0x1 << 16); // (MATRIX) Last Default Master. At the end of current slave access, if no other master request is pending, the slave stay connected with the last master having accessed it. This results in not having the one cycle latency when the last master re-trying access on the slave.
-    static const    UINT32  MATRIX_DEFMSTR_TYPE_FIXED_DEFMSTR = (0x2 << 16); // (MATRIX) Fixed Default Master. At the end of current slave access, if no other master request is pending, the slave connects with fixed which number is in FIXED_DEFMSTR field. This results in not having the one cycle latency when the fixed master re-trying access on the slave.
-    static const    UINT32 MATRIX_FIXED_DEFMSTR0              = (0x7 << 18); // (MATRIX) Fixed Index of Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR0_ARM926I     = (0x0 << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR0_ARM926D     = (0x1 << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR0_HPDC3       = (0x2 << 18); // (MATRIX) HPDC3 Master is Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR0_LCDC        = (0x3 << 18); // (MATRIX) LCDC Master is Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR0_UHP         = (0x4 << 18); // (MATRIX) UHP Master is Default Master
+    static const    UINT32 MATRIX_DEFMSTR_TYPE                = (0x3UL << 16); // (MATRIX) Default Master Type
+    static const    UINT32  MATRIX_DEFMSTR_TYPE_NO_DEFMSTR    = (0x0UL << 16); // (MATRIX) No Default Master. At the end of current slave access, if no other master request is pending, the slave is deconnected from all masters. This results in having a one cycle latency for the first transfer of a burst.
+    static const    UINT32  MATRIX_DEFMSTR_TYPE_LAST_DEFMSTR  = (0x1UL << 16); // (MATRIX) Last Default Master. At the end of current slave access, if no other master request is pending, the slave stay connected with the last master having accessed it. This results in not having the one cycle latency when the last master re-trying access on the slave.
+    static const    UINT32  MATRIX_DEFMSTR_TYPE_FIXED_DEFMSTR = (0x2UL << 16); // (MATRIX) Fixed Default Master. At the end of current slave access, if no other master request is pending, the slave connects with fixed which number is in FIXED_DEFMSTR field. This results in not having the one cycle latency when the fixed master re-trying access on the slave.
+    static const    UINT32 MATRIX_FIXED_DEFMSTR0              = (0x7UL << 18); // (MATRIX) Fixed Index of Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR0_ARM926I     = (0x0UL << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR0_ARM926D     = (0x1UL << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR0_HPDC3       = (0x2UL << 18); // (MATRIX) HPDC3 Master is Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR0_LCDC        = (0x3UL << 18); // (MATRIX) LCDC Master is Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR0_UHP         = (0x4UL << 18); // (MATRIX) UHP Master is Default Master
 
     /****/ volatile UINT32 MATRIX_SCFG1;    //  Slave Configuration Register 1
-    static const    UINT32 MATRIX_FIXED_DEFMSTR1              = (0x7 << 18); // (MATRIX) Fixed Index of Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR1_ARM926I     = (0x0 << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR1_ARM926D     = (0x1 << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR1_HPDC3       = (0x2 << 18); // (MATRIX) HPDC3 Master is Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR1_LCDC        = (0x3 << 18); // (MATRIX) LCDC Master is Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR1_UHP         = (0x4 << 18); // (MATRIX) UHP Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR1              = (0x7UL << 18); // (MATRIX) Fixed Index of Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR1_ARM926I     = (0x0UL << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR1_ARM926D     = (0x1UL << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR1_HPDC3       = (0x2UL << 18); // (MATRIX) HPDC3 Master is Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR1_LCDC        = (0x3UL << 18); // (MATRIX) LCDC Master is Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR1_UHP         = (0x4UL << 18); // (MATRIX) UHP Master is Default Master
 
     /****/ volatile UINT32 MATRIX_SCFG2;    //  Slave Configuration Register 2
-    static const    UINT32 MATRIX_FIXED_DEFMSTR2              = (0x1 << 18); // (MATRIX) Fixed Index of Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR2_ARM926I     = (0x0 << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR2_ARM926D     = (0x1 << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR2              = (0x1UL << 18); // (MATRIX) Fixed Index of Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR2_ARM926I     = (0x0UL << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR2_ARM926D     = (0x1UL << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
 
     /****/ volatile UINT32 MATRIX_SCFG3;    //  Slave Configuration Register 3
-    static const    UINT32 MATRIX_FIXED_DEFMSTR3              = (0x7 << 18); // (MATRIX) Fixed Index of Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR3_ARM926I     = (0x0 << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR3_ARM926D     = (0x1 << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR3_HPDC3       = (0x2 << 18); // (MATRIX) HPDC3 Master is Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR3_LCDC        = (0x3 << 18); // (MATRIX) LCDC Master is Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR3_UHP         = (0x4 << 18); // (MATRIX) UHP Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR3              = (0x7UL << 18); // (MATRIX) Fixed Index of Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR3_ARM926I     = (0x0UL << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR3_ARM926D     = (0x1UL << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR3_HPDC3       = (0x2UL << 18); // (MATRIX) HPDC3 Master is Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR3_LCDC        = (0x3UL << 18); // (MATRIX) LCDC Master is Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR3_UHP         = (0x4UL << 18); // (MATRIX) UHP Master is Default Master
 
     /****/ volatile UINT32 MATRIX_SCFG4;    //  Slave Configuration Register 4
-    static const    UINT32 MATRIX_FIXED_DEFMSTR4              = (0x3 << 18); // (MATRIX) Fixed Index of Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR4_ARM926I     = (0x0 << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR4_ARM926D     = (0x1 << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
-    static const    UINT32  MATRIX_FIXED_DEFMSTR4_HPDC3       = (0x2 << 18); // (MATRIX) HPDC3 Master is Default Master
+    static const    UINT32 MATRIX_FIXED_DEFMSTR4              = (0x3UL << 18); // (MATRIX) Fixed Index of Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR4_ARM926I     = (0x0UL << 18); // (MATRIX) ARM926EJ-S Instruction Master is Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR4_ARM926D     = (0x1UL << 18); // (MATRIX) ARM926EJ-S Data Master is Default Master
+    static const    UINT32  MATRIX_FIXED_DEFMSTR4_HPDC3       = (0x2UL << 18); // (MATRIX) HPDC3 Master is Default Master
 
     /****/ volatile UINT32 MATRIX_SCFG5;    //  Slave Configuration Register 5
     
@@ -1319,7 +1319,7 @@ struct AT91_LCDC {
 
     /****/ volatile UINT32 LCDC_FRMCFG;     // DMA Frame Configuration Register
     static const    UINT32 LCDC_FRSIZE     = ((UINT32) 0x3FFFFF <<  0); // (LCDC) FRAME SIZE
-    static const    UINT32 LCDC_BLENGTH    = ((UINT32) 0xF << 24); // (LCDC) BURST LENGTH
+    static const    UINT32 LCDC_BLENGTH    = ((UINT32) 0xFUL << 24); // (LCDC) BURST LENGTH
     
     /****/ volatile UINT32 LCDC_DMACON;     // DMA Control Register
     static const    UINT32 LCDC_DMAEN      = ((UINT32) 0x1 <<  0); // (LCDC) DAM Enable
@@ -1328,14 +1328,14 @@ struct AT91_LCDC {
 
     /****/ volatile UINT32 LCDC_DMA2DCFG;   // DMA 2D addressing configuration
     static const    UINT32 LCDC_ADDRINC    = ((UINT32) 0xFFFF <<  0); // (LCDC) Number of 32b words that the DMA must jump when going to the next line
-    static const    UINT32 LCDC_PIXELOFF   = ((UINT32) 0x1F << 24); // (LCDC) Offset (in bits) of the first pixel of the screen in the memory word which contain it
+    static const    UINT32 LCDC_PIXELOFF   = ((UINT32) 0x1FUL << 24); // (LCDC) Offset (in bits) of the first pixel of the screen in the memory word which contain it
 
     /****/ volatile UINT32 Reserved0[503]; 
 
     /****/ volatile UINT32 LCDC_LCDCON1;    // LCD Control 1 Register
     static const    UINT32 LCDC_BYPASS     = ((UINT32) 0x1 <<  0); // (LCDC) Bypass lcd_pccklk divider
-    static const    UINT32 LCDC_CLKVAL     = ((UINT32) 0x1FF << 12); // (LCDC) 9-bit Divider for pixel clock frequency
-    static const    UINT32 LCDC_LINCNT     = ((UINT32) 0x7FF << 21); // (LCDC) Line Counter (RO)
+    static const    UINT32 LCDC_CLKVAL     = ((UINT32) 0x1FFUL << 12); // (LCDC) 9-bit Divider for pixel clock frequency
+    static const    UINT32 LCDC_LINCNT     = ((UINT32) 0x7FFUL << 21); // (LCDC) Line Counter (RO)
 
     /****/ volatile UINT32 LCDC_LCDCON2;    // LCD Control 2 Register
     static const    UINT32 LCDC_DISTYPE    = ((UINT32) 0x3 <<  0); // (LCDC) Display Type
@@ -1429,7 +1429,7 @@ struct AT91_LCDC {
     /****/ volatile UINT32 LCDC_PWRCON;     // Power Control Register
     static const    UINT32 LCDC_PWR        = ((UINT32) 0x1 <<  0); // (LCDC) LCD Module Power Control
     static const    UINT32 LCDC_GUARDT     = ((UINT32) 0x7F <<  1); // (LCDC) Delay in Frame Period
-    static const    UINT32 LCDC_BUSY       = ((UINT32) 0x1 << 31); // (LCDC) Read Only : 1 indicates that LCDC is busy
+    static const    UINT32 LCDC_BUSY       = ((UINT32) 0x1UL << 31); // (LCDC) Read Only : 1 indicates that LCDC is busy
     static const    UINT32  LCDC_BUSY_LCDNOTBUSY           = ((UINT32) 0x0 << 31); // (LCDC) LCD is Not Busy
     static const    UINT32  LCDC_BUSY_LCDBUSY              = ((UINT32) 0x1 << 31); // (LCDC) LCD is Busy
 
@@ -1493,14 +1493,14 @@ struct AT91_SMC {
     static const    UINT32  SMC_DBW_WIDTH_EIGTH_BITS     = (0x0 << 12); // (Static Memory Controller) 8 bits.
     static const    UINT32  SMC_DBW_WIDTH_SIXTEEN_BITS   = (0x1 << 12); // (Static Memory Controller) 16 bits.
     static const    UINT32  SMC_DBW_WIDTH_THIRTY_TWO_BITS = (0x2 << 12); // (Static Memory Controller) 32 bits.
-    static const    UINT32 SMC_TDF         = (0xF << 16); // (Static Memory Controller) Data Float Time.
-    static const    UINT32 SMC_TDFEN       = (0x1 << 20); // (Static Memory Controller) TDF Enabled.
-    static const    UINT32 SMC_PMEN        = (0x1 << 24); // (Static Memory Controller) Page Mode Enabled.
-    static const    UINT32 SMC_PS          = (0x3 << 28); // (Static Memory Controller) Page Size
-    static const    UINT32  SMC_PS_SIZE_FOUR_BYTES      = (0x0 << 28); // (Static Memory Controller) 4 bytes.
-    static const    UINT32  SMC_PS_SIZE_EIGHT_BYTES     = (0x1 << 28); // (Static Memory Controller) 8 bytes.
-    static const    UINT32  SMC_PS_SIZE_SIXTEEN_BYTES   = (0x2 << 28); // (Static Memory Controller) 16 bytes.
-    static const    UINT32  SMC_PS_SIZE_THIRTY_TWO_BYTES = (0x3 << 28); // (Static Memory Controller) 32 bytes.
+    static const    UINT32 SMC_TDF         = (0xFUL << 16); // (Static Memory Controller) Data Float Time.
+    static const    UINT32 SMC_TDFEN       = (0x1UL << 20); // (Static Memory Controller) TDF Enabled.
+    static const    UINT32 SMC_PMEN        = (0x1UL << 24); // (Static Memory Controller) Page Mode Enabled.
+    static const    UINT32 SMC_PS          = (0x3UL << 28); // (Static Memory Controller) Page Size
+    static const    UINT32  SMC_PS_SIZE_FOUR_BYTES      = (0x0UL << 28); // (Static Memory Controller) 4 bytes.
+    static const    UINT32  SMC_PS_SIZE_EIGHT_BYTES     = (0x1UL << 28); // (Static Memory Controller) 8 bytes.
+    static const    UINT32  SMC_PS_SIZE_SIXTEEN_BYTES   = (0x2UL << 28); // (Static Memory Controller) 16 bytes.
+    static const    UINT32  SMC_PS_SIZE_THIRTY_TWO_BYTES = (0x3UL << 28); // (Static Memory Controller) 32 bytes.
 
     /****/ volatile UINT32 SMC_SETUP1;  //  Setup Register for CS 1
 
@@ -1633,58 +1633,58 @@ struct AT91_SDRAMC {
     static const    UINT32  SDRAMC_TRC_13                   = (0xD << 12); // (SDRAM) Value : 13
     static const    UINT32  SDRAMC_TRC_14                   = (0xE << 12); // (SDRAM) Value : 14
     static const    UINT32  SDRAMC_TRC_15                   = (0xF << 12); // (SDRAM) Value : 15
-    static const    UINT32 SDRAMC_TRP      = (0xF << 16); // (SDRAM) Number of RAS Precharge Time Cycles
-    static const    UINT32  SDRAMC_TRP_0                    = (0x0 << 16); // (SDRAM) Value :  0
-    static const    UINT32  SDRAMC_TRP_1                    = (0x1 << 16); // (SDRAM) Value :  1
-    static const    UINT32  SDRAMC_TRP_2                    = (0x2 << 16); // (SDRAM) Value :  2
-    static const    UINT32  SDRAMC_TRP_3                    = (0x3 << 16); // (SDRAM) Value :  3
-    static const    UINT32  SDRAMC_TRP_4                    = (0x4 << 16); // (SDRAM) Value :  4
-    static const    UINT32  SDRAMC_TRP_5                    = (0x5 << 16); // (SDRAM) Value :  5
-    static const    UINT32  SDRAMC_TRP_6                    = (0x6 << 16); // (SDRAM) Value :  6
-    static const    UINT32  SDRAMC_TRP_7                    = (0x7 << 16); // (SDRAM) Value :  7
-    static const    UINT32  SDRAMC_TRP_8                    = (0x8 << 16); // (SDRAM) Value :  8
-    static const    UINT32  SDRAMC_TRP_9                    = (0x9 << 16); // (SDRAM) Value :  9
-    static const    UINT32  SDRAMC_TRP_10                   = (0xA << 16); // (SDRAM) Value : 10
-    static const    UINT32  SDRAMC_TRP_11                   = (0xB << 16); // (SDRAM) Value : 11
-    static const    UINT32  SDRAMC_TRP_12                   = (0xC << 16); // (SDRAM) Value : 12
-    static const    UINT32  SDRAMC_TRP_13                   = (0xD << 16); // (SDRAM) Value : 13
-    static const    UINT32  SDRAMC_TRP_14                   = (0xE << 16); // (SDRAM) Value : 14
-    static const    UINT32  SDRAMC_TRP_15                   = (0xF << 16); // (SDRAM) Value : 15
-    static const    UINT32 SDRAMC_TRCD     = (0xF << 20); // (SDRAM) Number of RAS to CAS Delay Cycles
-    static const    UINT32  SDRAMC_TRCD_0                    = (0x0 << 20); // (SDRAM) Value :  0
-    static const    UINT32  SDRAMC_TRCD_1                    = (0x1 << 20); // (SDRAM) Value :  1
-    static const    UINT32  SDRAMC_TRCD_2                    = (0x2 << 20); // (SDRAM) Value :  2
-    static const    UINT32  SDRAMC_TRCD_3                    = (0x3 << 20); // (SDRAM) Value :  3
-    static const    UINT32  SDRAMC_TRCD_4                    = (0x4 << 20); // (SDRAM) Value :  4
-    static const    UINT32  SDRAMC_TRCD_5                    = (0x5 << 20); // (SDRAM) Value :  5
-    static const    UINT32  SDRAMC_TRCD_6                    = (0x6 << 20); // (SDRAM) Value :  6
-    static const    UINT32  SDRAMC_TRCD_7                    = (0x7 << 20); // (SDRAM) Value :  7
-    static const    UINT32  SDRAMC_TRCD_8                    = (0x8 << 20); // (SDRAM) Value :  8
-    static const    UINT32  SDRAMC_TRCD_9                    = (0x9 << 20); // (SDRAM) Value :  9
-    static const    UINT32  SDRAMC_TRCD_10                   = (0xA << 20); // (SDRAM) Value : 10
-    static const    UINT32  SDRAMC_TRCD_11                   = (0xB << 20); // (SDRAM) Value : 11
-    static const    UINT32  SDRAMC_TRCD_12                   = (0xC << 20); // (SDRAM) Value : 12
-    static const    UINT32  SDRAMC_TRCD_13                   = (0xD << 20); // (SDRAM) Value : 13
-    static const    UINT32  SDRAMC_TRCD_14                   = (0xE << 20); // (SDRAM) Value : 14
-    static const    UINT32  SDRAMC_TRCD_15                   = (0xF << 20); // (SDRAM) Value : 15
-    static const    UINT32 SDRAMC_TRAS     = (0xF << 24); // (SDRAM) Number of RAS Active Time Cycles
-    static const    UINT32  SDRAMC_TRAS_0                    = (0x0 << 24); // (SDRAM) Value :  0
-    static const    UINT32  SDRAMC_TRAS_1                    = (0x1 << 24); // (SDRAM) Value :  1
-    static const    UINT32  SDRAMC_TRAS_2                    = (0x2 << 24); // (SDRAM) Value :  2
-    static const    UINT32  SDRAMC_TRAS_3                    = (0x3 << 24); // (SDRAM) Value :  3
-    static const    UINT32  SDRAMC_TRAS_4                    = (0x4 << 24); // (SDRAM) Value :  4
-    static const    UINT32  SDRAMC_TRAS_5                    = (0x5 << 24); // (SDRAM) Value :  5
-    static const    UINT32  SDRAMC_TRAS_6                    = (0x6 << 24); // (SDRAM) Value :  6
-    static const    UINT32  SDRAMC_TRAS_7                    = (0x7 << 24); // (SDRAM) Value :  7
-    static const    UINT32  SDRAMC_TRAS_8                    = (0x8 << 24); // (SDRAM) Value :  8
-    static const    UINT32  SDRAMC_TRAS_9                    = (0x9 << 24); // (SDRAM) Value :  9
-    static const    UINT32  SDRAMC_TRAS_10                   = (0xA << 24); // (SDRAM) Value : 10
-    static const    UINT32  SDRAMC_TRAS_11                   = (0xB << 24); // (SDRAM) Value : 11
-    static const    UINT32  SDRAMC_TRAS_12                   = (0xC << 24); // (SDRAM) Value : 12
-    static const    UINT32  SDRAMC_TRAS_13                   = (0xD << 24); // (SDRAM) Value : 13
-    static const    UINT32  SDRAMC_TRAS_14                   = (0xE << 24); // (SDRAM) Value : 14
-    static const    UINT32  SDRAMC_TRAS_15                   = (0xF << 24); // (SDRAM) Value : 15
-    static const    UINT32 SDRAMC_TXSR     = ((UINT32) 0xF << 28); // (SDRAM) Number of Command Recovery Time Cycles
+    static const    UINT32 SDRAMC_TRP      = (0xFUL << 16); // (SDRAM) Number of RAS Precharge Time Cycles
+    static const    UINT32  SDRAMC_TRP_0                    = (0x0UL << 16); // (SDRAM) Value :  0
+    static const    UINT32  SDRAMC_TRP_1                    = (0x1UL << 16); // (SDRAM) Value :  1
+    static const    UINT32  SDRAMC_TRP_2                    = (0x2UL << 16); // (SDRAM) Value :  2
+    static const    UINT32  SDRAMC_TRP_3                    = (0x3UL << 16); // (SDRAM) Value :  3
+    static const    UINT32  SDRAMC_TRP_4                    = (0x4UL << 16); // (SDRAM) Value :  4
+    static const    UINT32  SDRAMC_TRP_5                    = (0x5UL << 16); // (SDRAM) Value :  5
+    static const    UINT32  SDRAMC_TRP_6                    = (0x6UL << 16); // (SDRAM) Value :  6
+    static const    UINT32  SDRAMC_TRP_7                    = (0x7UL << 16); // (SDRAM) Value :  7
+    static const    UINT32  SDRAMC_TRP_8                    = (0x8UL << 16); // (SDRAM) Value :  8
+    static const    UINT32  SDRAMC_TRP_9                    = (0x9UL << 16); // (SDRAM) Value :  9
+    static const    UINT32  SDRAMC_TRP_10                   = (0xAUL << 16); // (SDRAM) Value : 10
+    static const    UINT32  SDRAMC_TRP_11                   = (0xBUL << 16); // (SDRAM) Value : 11
+    static const    UINT32  SDRAMC_TRP_12                   = (0xCUL << 16); // (SDRAM) Value : 12
+    static const    UINT32  SDRAMC_TRP_13                   = (0xDUL << 16); // (SDRAM) Value : 13
+    static const    UINT32  SDRAMC_TRP_14                   = (0xEUL << 16); // (SDRAM) Value : 14
+    static const    UINT32  SDRAMC_TRP_15                   = (0xFUL << 16); // (SDRAM) Value : 15
+    static const    UINT32 SDRAMC_TRCD     = (0xFUL << 20); // (SDRAM) Number of RAS to CAS Delay Cycles
+    static const    UINT32  SDRAMC_TRCD_0                    = (0x0UL << 20); // (SDRAM) Value :  0
+    static const    UINT32  SDRAMC_TRCD_1                    = (0x1UL << 20); // (SDRAM) Value :  1
+    static const    UINT32  SDRAMC_TRCD_2                    = (0x2UL << 20); // (SDRAM) Value :  2
+    static const    UINT32  SDRAMC_TRCD_3                    = (0x3UL << 20); // (SDRAM) Value :  3
+    static const    UINT32  SDRAMC_TRCD_4                    = (0x4UL << 20); // (SDRAM) Value :  4
+    static const    UINT32  SDRAMC_TRCD_5                    = (0x5UL << 20); // (SDRAM) Value :  5
+    static const    UINT32  SDRAMC_TRCD_6                    = (0x6UL << 20); // (SDRAM) Value :  6
+    static const    UINT32  SDRAMC_TRCD_7                    = (0x7UL << 20); // (SDRAM) Value :  7
+    static const    UINT32  SDRAMC_TRCD_8                    = (0x8UL << 20); // (SDRAM) Value :  8
+    static const    UINT32  SDRAMC_TRCD_9                    = (0x9UL << 20); // (SDRAM) Value :  9
+    static const    UINT32  SDRAMC_TRCD_10                   = (0xAUL << 20); // (SDRAM) Value : 10
+    static const    UINT32  SDRAMC_TRCD_11                   = (0xBUL << 20); // (SDRAM) Value : 11
+    static const    UINT32  SDRAMC_TRCD_12                   = (0xCUL << 20); // (SDRAM) Value : 12
+    static const    UINT32  SDRAMC_TRCD_13                   = (0xDUL << 20); // (SDRAM) Value : 13
+    static const    UINT32  SDRAMC_TRCD_14                   = (0xEUL << 20); // (SDRAM) Value : 14
+    static const    UINT32  SDRAMC_TRCD_15                   = (0xFUL << 20); // (SDRAM) Value : 15
+    static const    UINT32 SDRAMC_TRAS     = (0xFUL << 24); // (SDRAM) Number of RAS Active Time Cycles
+    static const    UINT32  SDRAMC_TRAS_0                    = (0x0UL << 24); // (SDRAM) Value :  0
+    static const    UINT32  SDRAMC_TRAS_1                    = (0x1UL << 24); // (SDRAM) Value :  1
+    static const    UINT32  SDRAMC_TRAS_2                    = (0x2UL << 24); // (SDRAM) Value :  2
+    static const    UINT32  SDRAMC_TRAS_3                    = (0x3UL << 24); // (SDRAM) Value :  3
+    static const    UINT32  SDRAMC_TRAS_4                    = (0x4UL << 24); // (SDRAM) Value :  4
+    static const    UINT32  SDRAMC_TRAS_5                    = (0x5UL << 24); // (SDRAM) Value :  5
+    static const    UINT32  SDRAMC_TRAS_6                    = (0x6UL << 24); // (SDRAM) Value :  6
+    static const    UINT32  SDRAMC_TRAS_7                    = (0x7UL << 24); // (SDRAM) Value :  7
+    static const    UINT32  SDRAMC_TRAS_8                    = (0x8UL << 24); // (SDRAM) Value :  8
+    static const    UINT32  SDRAMC_TRAS_9                    = (0x9UL << 24); // (SDRAM) Value :  9
+    static const    UINT32  SDRAMC_TRAS_10                   = (0xAUL << 24); // (SDRAM) Value : 10
+    static const    UINT32  SDRAMC_TRAS_11                   = (0xBUL << 24); // (SDRAM) Value : 11
+    static const    UINT32  SDRAMC_TRAS_12                   = (0xCUL << 24); // (SDRAM) Value : 12
+    static const    UINT32  SDRAMC_TRAS_13                   = (0xDUL << 24); // (SDRAM) Value : 13
+    static const    UINT32  SDRAMC_TRAS_14                   = (0xEUL << 24); // (SDRAM) Value : 14
+    static const    UINT32  SDRAMC_TRAS_15                   = (0xFUL << 24); // (SDRAM) Value : 15
+    static const    UINT32 SDRAMC_TXSR     = ((UINT32) 0xFUL << 28); // (SDRAM) Number of Command Recovery Time Cycles
     static const    UINT32  SDRAMC_TXSR_0                    = (0x0ul << 28); // (SDRAM) Value :  0
     static const    UINT32  SDRAMC_TXSR_1                    = (0x1ul << 28); // (SDRAM) Value :  1
     static const    UINT32  SDRAMC_TXSR_2                    = (0x2ul << 28); // (SDRAM) Value :  2

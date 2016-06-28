@@ -57,6 +57,75 @@ namespace Microsoft.SPOT.Platform.Tests
                     return MFTestResults.Fail;
                 }
 
+                // change to RFC4548 encoding
+                byte[] dataToEncodeRFC4648 = new byte[256];
+                for (int b = 0; b < 256; b++)
+                {
+                    dataToEncodeRFC4648[b] = (byte)b;
+                }
+
+                strEncoded = System.Convert.ToBase64String(dataToEncodeRFC4648);
+                dataDecoded = System.Convert.FromBase64String(strEncoded);
+
+                System.Convert.UseRFC4648Encoding = true;
+                string strEncodedRFC4648 = System.Convert.ToBase64String(dataToEncodeRFC4648);
+                byte[] dataDecodedRFC4648 = System.Convert.FromBase64String(strEncodedRFC4648);
+
+                if(strEncoded.Length != strEncodedRFC4648.Length)
+                {
+                    Log.Comment("RFC4648 encoding had a different length than default encoding.");
+                    return MFTestResults.Fail;
+                }
+                for (int i = 0; i < strEncoded.Length; i++)
+                {
+                    bool fOK = true;
+
+                    switch (strEncoded[i])
+                    {
+                        case '!':
+                            fOK = strEncodedRFC4648[i] == '+';
+                            break;
+                        case '*':
+                            fOK = strEncodedRFC4648[i] == '/';
+                            break;
+                        default:
+                            fOK = strEncodedRFC4648[i] == strEncoded[i];
+                            break;
+                    }
+                    switch(strEncodedRFC4648[i])
+                    {
+                        case '+':
+                            fOK = strEncoded[i] == '!';
+                            break;
+                        case '/':
+                            fOK = strEncoded[i] == '*';
+                            break;
+                        default:
+                            fOK = strEncoded[i] == strEncodedRFC4648[i];
+                            break;
+                    }
+
+
+                    if (!fOK)
+                    {
+                        Log.Comment("The RFC4648 encoding does not match the default encoding at index: " + i);
+                        Log.Comment("RF4648  result: " + strEncodedRFC4648[i]);
+                        Log.Comment("default result: " + strEncoded[i]);
+                        return MFTestResults.Fail;
+                    }
+                }
+                
+                for (int b = 0; b < 256; b++)
+                {
+                    if ((dataDecodedRFC4648[b] != (byte)b) ||
+                        (dataDecoded[b]        != (byte)b))
+                    {
+                        Log.Comment("Failed in decoding of the string.");
+                        Log.Comment("Expected result: " + (byte)b);
+                        Log.Comment("Actual result: " + dataDecodedRFC4648[b]);
+                        return MFTestResults.Fail;
+                    }
+                }
             }
             catch (Exception ex)
             {

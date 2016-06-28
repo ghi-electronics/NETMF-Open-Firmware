@@ -13,9 +13,6 @@
     <AssemblyBothEndian>true</AssemblyBothEndian>
   </PropertyGroup>
   <Import Project="$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.CSharp.Targets" />
-  <PropertyGroup>
-    <NoWarn>$(NoWarn),1591</NoWarn>
-  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Classes\Capture.cs" />
     <Compile Include="Classes\Group.cs" />
@@ -44,7 +41,6 @@
     <Compile Include="Exceptions\RegexExecutionTimeException.cs" />
     <Compile Include="Exceptions\SyntaxException.cs" />
     <Compile Include="Interfaces\ICharacterIterator.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.IO">

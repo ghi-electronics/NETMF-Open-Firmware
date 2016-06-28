@@ -62,7 +62,7 @@ namespace Microsoft.SPOT.Platform.Tests
             {
                 Log.Comment("SUN web page");
                 // Print for now, Parse later
-                string data = new string(Encoding.UTF8.GetChars(GetRequested("http://www.nytimes.com", "SUN")));
+                string data = new string(Encoding.UTF8.GetChars(GetRequested("http://www.nytimes.com", "SUN", "APACHE")));
             }
             catch (Exception ex)
             {
@@ -191,7 +191,7 @@ namespace Microsoft.SPOT.Platform.Tests
             return MFTestResults.Pass;
         }
 
-        private byte[] GetRequested(string uri, string server)
+        private byte[] GetRequested(string uri, params string[] servers)
         {
             byte[] page = null;
 
@@ -271,9 +271,19 @@ namespace Microsoft.SPOT.Platform.Tests
                         respStream.Close();
                     }
 
-                    if (resp.Headers["server"].ToLower().IndexOf(server.ToLower()) < 0)
+                    bool fFoundExpectedServer = false;
+                    string httpServer = resp.Headers["server"].ToLower();
+                    foreach(string server in servers)
                     {
-                        Log.Exception("Expected server: " + server + ", but got server: " + resp.Headers["Server"]);
+                        if (httpServer.IndexOf(server.ToLower()) >= 0)
+                        {
+                            fFoundExpectedServer = true;
+                            break;
+                        }
+                    }
+                    if(!fFoundExpectedServer)
+                    {
+                        Log.Exception("Expected server: " + servers[0] + ", but got server: " + resp.Headers["Server"]);
                         throw new ArgumentException("Unexpected Server type");
                     }
 

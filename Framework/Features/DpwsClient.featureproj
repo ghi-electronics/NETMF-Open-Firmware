@@ -2,7 +2,7 @@
   <PropertyGroup>
     <FeatureName>DpwsClient</FeatureName>
   </PropertyGroup>
-  <Import Project="$(SPOCLIENT)\Framework\Features\DpwsStack.featureproj" />
+  <Import Condition="'$(DPWSSTACK_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\DpwsStack.featureproj" />
   <ItemGroup>
     <MMP_DAT_CreateDatabase Include="$(BUILD_TREE_CLIENT)\pe\$(ENDIANNESS)\MFDpwsClient.pe" />
     <RequiredManagedProjects Include="$(SPOCLIENT)\Framework\Core\Dpws\DpwsClient\Dpws.Client.csproj" Condition="'$(AUTOMATED_BUILD)'==''" />
@@ -13,5 +13,6 @@
     <Groups>DPWS</Groups>
     <Documentation>
     </Documentation>
+    <DPWSCLIENT_FEATURPROJ>True</DPWSCLIENT_FEATURPROJ>
   </PropertyGroup>
 </Project>

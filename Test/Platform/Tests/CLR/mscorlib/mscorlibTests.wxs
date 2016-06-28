@@ -6,6 +6,7 @@
       <ComponentRef Id='Component_arrays' />
       <ComponentRef Id='Component_attributes' />
       <ComponentRef Id='Component_basicconcepts' />  
+	  <ComponentRef Id='Component_bitconverter' />  
       <ComponentRef Id='Component_classes1' />
       <ComponentRef Id='Component_classes2' />
       <ComponentRef Id='Component_classes3' />

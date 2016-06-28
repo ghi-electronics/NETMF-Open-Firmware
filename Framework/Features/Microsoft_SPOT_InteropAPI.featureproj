@@ -6,6 +6,7 @@
     </Description>
     <Groups>
     </Groups>
+    <MICROSOFT_SPOT_INTEROPAPI_FEATUREPROJ>True</MICROSOFT_SPOT_INTEROPAPI_FEATUREPROJ>
   </PropertyGroup>
   <ItemGroup>
     <InteropFeature Include="Microsoft_SPOT_InteropAPI" />

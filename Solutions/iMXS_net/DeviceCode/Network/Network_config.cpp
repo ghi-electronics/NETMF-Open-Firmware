@@ -17,7 +17,7 @@ NETWORK_CONFIG g_NetworkConfig =
     1,      // interface count
     {       // ENC28J60 chip
         {                                      
-            SOCK_NETWORKCONFIGURATION_FLAGS_DHCP | SOCK_NETWORKCONFIGURATION_FLAGS_TYPE__set(SOCK_NETWORKCONFIGURATION_FLAGS_WIRELESS),
+            SOCK_NETWORKCONFIGURATION_FLAGS_DHCP,
             SOCK_MAKE_IP_ADDR_LITTLEEND(192,168,  5,100), 
             SOCK_MAKE_IP_ADDR_LITTLEEND(255,255,255,  0), 
             SOCK_MAKE_IP_ADDR_LITTLEEND(192,168,  5,  1), 

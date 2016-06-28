@@ -7,7 +7,8 @@
 <!-- -->
 
   <ItemGroup>
-    <RequiredProjects Condition="'$(TinyCLR_Platform)'!='Server' AND '$(AUTOMATED_BUILD)'==''" Include="$(SPOCLIENT)\PK.proj" />
+    <RequiredProjects Condition="'$(TinyCLR_Platform)'!='Server' AND '$(AUTOMATED_BUILD)'=='' AND '$(InPKProj)'    !='True'" Include="$(SPOCLIENT)\PK.proj" />
+    <RequiredProjects Condition="'$(TinyCLR_Platform)'!='Server' AND '$(AUTOMATED_BUILD)'=='' AND '$(InCLRDefines)'!='True'" Include="$(SPOCLIENT)\Framework\Tools\CreateCLRDefines.proj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -195,15 +196,15 @@
 
 
   <Target Name="DoFastBuild"
-    DependsOnTargets="StartMessage;Prebuild;ExtraEnvironment;SubdirectoryProjects;CoreSystemBuild;PostBuild"
+    DependsOnTargets="StartMessage;Prebuild;DoPreBuild;ExtraEnvironment;SubdirectoryProjects;CoreSystemBuild;PostBuild"
     />
 
   <Target Name="DoLocalBuild"
-    DependsOnTargets="StartMessage;PreBuild;ExtraEnvironment;CoreSystemBuild;PostBuild"
+    DependsOnTargets="StartMessage;PreBuild;DoPreBuild;ExtraEnvironment;CoreSystemBuild;PostBuild"
     />
 
   <Target Name="DoBuild"
-    DependsOnTargets="StartMessage;Prebuild;ExtraEnvironment;MakeDirectories;SubdirectoryProjects;BuildDependencies;CoreSystemBuild;PostBuild"
+    DependsOnTargets="StartMessage;Prebuild;DoPreBuild;ExtraEnvironment;MakeDirectories;SubdirectoryProjects;BuildDependencies;CoreSystemBuild;PostBuild"
     />
 
 
@@ -307,6 +308,15 @@
     <MakeDir Directories="$(OBJ_DIR)" Condition="!Exists('$(OBJ_DIR)')" />
     <MakeDir Directories="$(LIB_DIR)" Condition="!Exists('$(LIB_DIR)')" />
     <MakeDir Directories="$(BIN_DIR)" Condition="!Exists('$(BIN_DIR)')" />
+  </Target>
+
+  <Target Name="DoPreBuild">
+    <!-- Build any projects that this one depends on -->
+    <MSBuild
+        Projects="@(PreBuildProjects)"
+        Targets="Build"
+        Properties="$(MainProps)"
+        />
   </Target>
 
   <Target Name="BuildDependencies">

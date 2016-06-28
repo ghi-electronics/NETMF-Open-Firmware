@@ -68,7 +68,7 @@
 #include <stdio.h>
 #endif
 
-const char EVP_version[]="EVP" OPENSSL_VERSION_PTEXT;
+//const char EVP_version[]="EVP" OPENSSL_VERSION_PTEXT;
 
 void EVP_CIPHER_CTX_init(EVP_CIPHER_CTX *ctx)
 	{

@@ -119,6 +119,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #endif
+#include <errno.h>
 #endif
 
 #include <openssl/ossl_typ.h>
@@ -138,8 +139,6 @@ extern "C" {
 #else
 #define ERR_PUT_error(a,b,c,d,e)	ERR_put_error(a,b,c,NULL,0)
 #endif
-
-#include <errno.h>
 
 #define ERR_TXT_MALLOCED	0x01
 #define ERR_TXT_STRING		0x02

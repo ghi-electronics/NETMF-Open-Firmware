@@ -106,10 +106,18 @@ void CLR_HW_Hardware::PrepareForGC()
 void CLR_HW_Hardware::ProcessActivity()
 {
     NATIVE_PROFILE_CLR_HARDWARE();
-    HAL_CONTINUATION::Dequeue_And_Execute();
+
+    for(int i=0; i<10; i++)
+    {
+        if(!HAL_CONTINUATION::Dequeue_And_Execute()) break;
+    }
 
     TINYCLR_FOREACH_MESSAGING(msg)
     {
+        if(!msg.IsDebuggerInitialized())
+        {
+            msg.InitializeDebugger();
+        }
         msg.PurgeCache();
     }
     TINYCLR_FOREACH_MESSAGING_END();

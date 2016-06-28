@@ -28,6 +28,16 @@ HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogInput::Initia
     TINYCLR_NOCLEANUP();
 }
 
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogInput::Uninitialize___STATIC__VOID__MicrosoftSPOTHardwareCpuAnalogChannel( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+
+    TINYCLR_SET_AND_LEAVE(stack.NotImplementedStub());
+
+    TINYCLR_NOCLEANUP();
+}
+
 HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogOutput::WriteRaw___VOID__I4( CLR_RT_StackFrame& stack )
 {
     NATIVE_PROFILE_CLR_HARDWARE();
@@ -39,6 +49,16 @@ HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogOutput::Write
 }
 
 HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogOutput::Initialize___STATIC__VOID__MicrosoftSPOTHardwareCpuAnalogOutputChannel__I4( CLR_RT_StackFrame& stack )
+{
+    NATIVE_PROFILE_CLR_HARDWARE();
+    TINYCLR_HEADER();
+
+    TINYCLR_SET_AND_LEAVE(stack.NotImplementedStub());
+
+    TINYCLR_NOCLEANUP();
+}
+
+HRESULT Library_spot_hardware_native_Microsoft_SPOT_Hardware_AnalogOutput::Uninitialize___STATIC__VOID__MicrosoftSPOTHardwareCpuAnalogOutputChannel( CLR_RT_StackFrame& stack )
 {
     NATIVE_PROFILE_CLR_HARDWARE();
     TINYCLR_HEADER();

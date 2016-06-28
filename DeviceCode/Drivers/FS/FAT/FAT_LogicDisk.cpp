@@ -807,6 +807,8 @@ UINT32 FAT_LogicDisk::GetNextFreeClusHelper( UINT32 fromClus, UINT32 toClus )
 
                 if( data16 == CLUST_NONE)
                 {
+                    // change to read-write
+                    SectorCache.GetSector( m_FATBaseSector[0] + sectorsOffset, FALSE, TRUE );
                     return clusIndex;
                 }
 
@@ -827,6 +829,8 @@ UINT32 FAT_LogicDisk::GetNextFreeClusHelper( UINT32 fromClus, UINT32 toClus )
 
                 if (data32 == CLUST_NONE)
                 {
+                    // change to read-write
+                    SectorCache.GetSector( m_FATBaseSector[0] + sectorsOffset, FALSE, TRUE );
                     return clusIndex;
                 }
 
@@ -1125,11 +1129,11 @@ FAT_Directory* FAT_LogicDisk::GetFile( LPCWSTR path, UINT32 pathLen, FAT_FILE* f
             return NULL;
         }
 
-        dirEntry = fileInfo->GetDirectoryEntry( FALSE );
+#ifndef FAT_FS__DO_NOT_UPDATE_FILE_ACCESS_TIME
+        dirEntry = fileInfo->GetDirectoryEntry( TRUE );
         
         if(!dirEntry) return NULL;
 
-#ifndef FAT_FS__DO_NOT_UPDATE_FILE_ACCESS_TIME
         if(flags) 
         {
             UINT16 date,time;
@@ -1153,6 +1157,10 @@ FAT_Directory* FAT_LogicDisk::GetFile( LPCWSTR path, UINT32 pathLen, FAT_FILE* f
                 dirEntry->Set_DIR_LstAccDate(date);
             }
         }            
+#else
+        dirEntry = fileInfo->GetDirectoryEntry( FALSE );
+
+        if(!dirEntry) return NULL;
 #endif
 
         // if we're not at the last segment, or we wants only directory 

@@ -50,7 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <HFiles Include="$(SPOCLIENT)\clr\graphics\graphics.h" />
-    <HFiles Include="$(SPOCLIENT)\clr\include\clr_defines.h" />
+    <HFiles Include="$(PLATFORM_INDEPENDENT_LIB_DIR)\CLR_defines.h" />
     <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_application.h" />
     <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_debugging.h" />
     <HFiles Include="$(SPOCLIENT)\clr\include\tinyclr_errorcodes.h" />

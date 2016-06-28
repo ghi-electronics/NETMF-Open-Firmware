@@ -21,5 +21,6 @@
     <Groups>Graphics</Groups>
     <Documentation>
     </Documentation>
+    <GRAPHICS_FEATUREPROJ>True</GRAPHICS_FEATUREPROJ>
   </PropertyGroup>
 </Project>

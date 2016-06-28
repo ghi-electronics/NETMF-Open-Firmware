@@ -482,11 +482,12 @@ void MC9328MXL_USB_Driver::TxPacket( USB_CONTROLLER_STATE* State, int endpoint )
     if( State->Queues[endpoint] == NULL || !State->IsTxQueue[endpoint] )
         return;
 
-    for(;;)
-    {
-        Packet64 = USB_TxDequeue( State, endpoint, TRUE );
+    Packet64 = USB_TxDequeue( State, endpoint, TRUE );
 
-        if(Packet64 == NULL || Packet64->Size > 0) break;
+    if(Packet64 != NULL && Packet64->Size == 0)
+    {
+        g_MC9328MXL_USB_Driver.TxNeedZLPS[endpoint] = TRUE;
+        Packet64 = NULL;
     }
     
     if(Packet64)

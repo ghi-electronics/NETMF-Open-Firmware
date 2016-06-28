@@ -154,7 +154,14 @@ namespace System.Net
                 // Close the underlying stream
                 if (m_clientOutputStream != null)
                 {
-                    m_clientOutputStream.m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger, lingerValue);
+                    try
+                    {
+                        if(m_clientOutputStream.m_Socket != null)
+                        {
+                            m_clientOutputStream.m_Socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger, lingerValue);
+                        }
+                    }
+                    catch{}
                     m_clientOutputStream.Dispose();
                     m_clientOutputStream = null;
                 }

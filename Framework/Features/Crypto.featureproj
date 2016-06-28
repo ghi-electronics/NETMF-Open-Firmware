@@ -30,5 +30,6 @@
     </Groups>
     <Documentation>
     </Documentation>
+    <CRYPTO_FEATUREPROJ>True</CRYPTO_FEATUREPROJ>
   </PropertyGroup>
 </Project>

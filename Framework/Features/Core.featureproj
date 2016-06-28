@@ -27,6 +27,7 @@
     <Guid>{fde96751-f081-449d-a471-4a438575de4a}</Guid>
     <Required>true</Required>
     <Groups>System</Groups>
+    <CORE_FEATUREPROJ>TRUE</CORE_FEATUREPROJ>
     <Documentation>
     </Documentation>
   </PropertyGroup>

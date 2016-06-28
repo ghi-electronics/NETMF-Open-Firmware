@@ -10,6 +10,9 @@
     <ProjectGuid>{BF83A322-89EF-4710-B834-8831EC1C1D3C}</ProjectGuid>
     <NoWarn>,1668</NoWarn>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Microsoft.SPOT.Platform.Tests.IOTests</StartupObject>
+  </PropertyGroup>
   <Import Project="$(SPOCLIENT)\tools\Targets\Microsoft.SPOT.Test.CSharp.Targets" />
   <ItemGroup>
     <Compile Include="Master.cs" />

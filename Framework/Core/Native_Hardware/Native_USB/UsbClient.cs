@@ -183,17 +183,17 @@ namespace Microsoft.SPOT.Hardware.UsbClient
             public DeviceDescriptor(ushort Vendor, ushort Product, ushort DeviceVersion)
                 : base(0)
             {
-                idVendor = Vendor;
-                idProduct = Product;
-                bcdDevice = DeviceVersion;
-                iManufacturer = 0;        // Default to no Manufacturer string
-                iProduct = 0;        // Default to no Product string
-                iSerialNumber = 0;        // Default to no Serial Number string
-                bDeviceClass = 0;        // Default to no Device Class
+                idVendor        = Vendor;
+                idProduct       = Product;
+                bcdDevice       = DeviceVersion;
+                iManufacturer   = 0;        // Default to no Manufacturer string
+                iProduct        = 0;        // Default to no Product string
+                iSerialNumber   = 0;        // Default to no Serial Number string
+                bDeviceClass    = 0;        // Default to no Device Class
                 bDeviceSubClass = 0;        // Default to no Device Sub Class
                 bDeviceProtocol = 0;        // Default to no Device Protocol
                 bMaxPacketSize0 = 8;        // Default to maximum control packet size of 8
-                bcdUSB = 0x0110;   // Default to USB version 1.10
+                bcdUSB          = 0x0200;   // Default to USB version 2.00
             }
 
             public ushort idVendor;

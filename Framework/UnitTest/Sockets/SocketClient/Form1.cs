@@ -91,7 +91,7 @@ namespace SocketClient
 
         private void RecvThread()
         {
-            byte []data = new byte[100];
+            byte []data = new byte[1024];
             Socket sock = m_sockets[m_sockets.Count - 1] as Socket;
 
             m_evt.Set();
@@ -101,18 +101,15 @@ namespace SocketClient
                 try
                 {
                     int len = sock.Receive(data);
-                    StringBuilder sb = new StringBuilder(len);
                     if (len > 0)
                     {
-                        for (int i = 0; i < len; i++)
-                        {
-                            sb.Append((char)data[i]);
-                        }
                         richTextBox2.Invoke((MethodInvoker)delegate
                         {
-                            richTextBox2.AppendText(sb.ToString());
+                            richTextBox2.AppendText(new string(UTF8Encoding.UTF8.GetChars(data, 0, len)));
                             richTextBox2.ScrollToCaret();
                         });
+
+                        m_evt.Set();
                     }
                     else
                     {
@@ -261,6 +258,149 @@ namespace SocketClient
                 }
             }
 
+        }
+
+        private void StressThread()
+        {
+            if (m_udpSocket == null)
+            {
+                CreateUdpSock();
+            }
+
+            try
+            {
+                m_ip = IPAddress.Parse(textBox1.Text);
+            }
+            catch
+            {
+                MessageBox.Show("Invalid IP address");
+                textBox1.Text = "";
+                return;
+            }
+            try
+            {
+                m_port = int.Parse(textBox2.Text);
+            }
+            catch
+            {
+                MessageBox.Show("Invalid Port number");
+                textBox2.Text = "";
+                return;
+            }
+
+            byte[] data = StringToByteArray(@"The Microsoft® .NET Micro Framework combines the reliability and efficiency of managed code with the premier development tools of Microsoft Visual Studio® to deliver exceptional productivity for developing embedded applications on small devices. The Microsoft .NET Micro Framework SDK supports development of code, including device I/O, in the C# language using a subset of the .NET libraries, and is fully integrated with the Microsoft Visual Studio® development environment. The .NET Micro Framework class library supports all major namespaces and types from the desktop framework, managed drivers support, Remote Firmware Updates and Cryptographic functions for Secure Devices. This CodePlex project allows building the full SDK and Porting Kit (PK) installers and it includes the RTIP TCP/IP stack from EBSnet Inc., the lwIP open source TCP/IP stack and the OpenSSL distribution.");
+
+            byte[] retData = new byte[data.Length*2];
+            int port = m_port;
+
+            while (m_stressStarted)
+            {
+                try
+                {
+                    int retries = 10;
+                    int cnt = m_udpSocket.SendTo(data, new IPEndPoint(IPAddress.Parse(textBox1.Text), 54321));
+                    while (retries-- >= 0 && m_udpSocket.Available == 0)
+                    {
+                        Thread.Sleep(100);
+                    }
+                    EndPoint ep = new IPEndPoint(IPAddress.Any, 0);
+                    while (m_udpSocket.Available > 0)
+                    {
+                        int len = m_udpSocket.ReceiveFrom(retData, ref ep);
+
+                        if (len > 0)
+                        {
+                            richTextBox2.Invoke((MethodInvoker)delegate
+                            {
+                                richTextBox2.AppendText(new string(UTF8Encoding.UTF8.GetChars(retData, 0, len)));
+                                richTextBox2.ScrollToCaret();
+                            });
+                        }
+                    }
+
+                    using (Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+                    {
+                        sock.ReceiveTimeout = 5000;
+                        sock.SendTimeout = 1000;
+                        sock.Connect(m_ip, port);
+
+                        sock.Send(data);
+                        retries = 10;
+                        int recd = 0;
+
+                        while (recd < data.Length || sock.Available > 0) 
+                        {
+                            int len = sock.Receive(retData);
+
+                            recd += len;
+
+                            if (len > 0)
+                            {
+                                richTextBox2.Invoke((MethodInvoker)delegate
+                                {
+                                    richTextBox2.AppendText(new string(UTF8Encoding.UTF8.GetChars(retData, 0, len)));
+                                    richTextBox2.ScrollToCaret();
+                                });
+
+                                Thread.Sleep(50);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+                catch (SocketException se)
+                {
+                    if (se.ErrorCode == (int)SocketError.ConnectionAborted || se.ErrorCode == (int)SocketError.ConnectionRefused ||
+                        se.ErrorCode == (int)SocketError.ConnectionReset)
+                    {
+                        CreateUdpSock();
+                    }
+                    Thread.Sleep(500);
+                }
+                catch (Exception e)
+                {
+                    richTextBox2.Invoke((MethodInvoker)delegate
+                    {
+                        richTextBox2.AppendText(e.ToString());
+                        richTextBox2.ScrollToCaret();
+                    });
+                }
+            }
+        }
+
+        private bool m_stressStarted = false;
+        private Thread m_stressThread = null;
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            if(!m_stressStarted)
+            {
+                m_stressThread = new Thread(new ThreadStart(this.StressThread));
+                m_stressThread.Start();
+                m_stressStarted = true;
+
+                button6.Enabled = false;
+                button7.Enabled = true;
+            }
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            if (m_stressStarted)
+            {
+                m_stressStarted = false;
+                m_evt.Set();
+                if (!m_stressThread.Join(500))
+                {
+                    m_stressThread.Abort();
+                }
+
+                button6.Enabled = true;
+                button7.Enabled = false;
+            }
         }
     }
 }

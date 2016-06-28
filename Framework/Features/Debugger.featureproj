@@ -15,5 +15,6 @@
     </Groups>
     <Documentation>
     </Documentation>
+    <DEBUGGER_FEATURPROJ>True</DEBUGGER_FEATURPROJ>
   </PropertyGroup>
 </Project>

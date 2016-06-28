@@ -2,7 +2,7 @@
   <PropertyGroup>
     <FeatureName>FileSystem</FeatureName>
   </PropertyGroup>
-  <Import Project="$(SPOCLIENT)\Framework\Features\Stream.featureproj" />
+  <Import Condition="'$(STREAM_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Stream.featureproj" />
   <Import Project="$(SPOCLIENT)\Framework\Features\FileSystem_PAL.libcatproj" />
   <PropertyGroup>
     <Description>File system</Description>
@@ -11,5 +11,6 @@
     </Groups>
     <Documentation>
     </Documentation>
+    <FILESYSTEM_FEATUREPROJ>True</FILESYSTEM_FEATUREPROJ>
   </PropertyGroup>
 </Project>

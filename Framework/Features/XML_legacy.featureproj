@@ -2,8 +2,9 @@
   <PropertyGroup>
     <FeatureName>XML_legacy</FeatureName>
   </PropertyGroup>
-  <Import Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
-  <Import Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
+
+  <Import Condition="'$(CORE_FEATUREPROJ)'    ==''" Project="$(SPOCLIENT)\Framework\Features\core.featureproj" />
+  <Import Condition="'$(HARDWARE_FEATUREPROJ)'==''" Project="$(SPOCLIENT)\Framework\Features\Hardware.featureproj" />
 
   <ItemGroup>
     <MMP_DAT_CreateDatabase Include="$(BUILD_TREE_CLIENT)\pe\$(ENDIANNESS)\system.xml.legacy.pe" />
@@ -16,5 +17,6 @@
     </Groups>
     <Documentation>
     </Documentation>
+    <XML_LEGACY_FEATUREPROJ>True</XML_LEGACY_FEATUREPROJ>
   </PropertyGroup>
 </Project>

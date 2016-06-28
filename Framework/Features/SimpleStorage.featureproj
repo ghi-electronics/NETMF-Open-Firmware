@@ -13,6 +13,7 @@
     <Groups>Storage</Groups>
     <Documentation />
     <IsSolutionWizardVisible>True</IsSolutionWizardVisible>
+    <SIMPLESTORAGE_FEATUREPROJ>True</SIMPLESTORAGE_FEATUREPROJ>
   </PropertyGroup>
 
 </Project>

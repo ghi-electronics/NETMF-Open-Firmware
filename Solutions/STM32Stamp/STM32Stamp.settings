@@ -1,6 +1,6 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Author>Ominc</Author>
+    <Author>Oberon microsystems, Inc.</Author>
     <Description>STM32Stamp board solution</Description>
     <Documentation>
     </Documentation>

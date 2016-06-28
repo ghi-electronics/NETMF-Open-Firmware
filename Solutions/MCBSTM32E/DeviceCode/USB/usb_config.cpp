@@ -16,7 +16,7 @@
 //--//
 
 //string descriptor
-#define     MANUFACTURER_NAME_SIZE  5   /* "Ominc" */
+#define     MANUFACTURER_NAME_SIZE 19   /* "Oberon microsystems" */
 // NOTE: Having more than (probably) 32 characters causes the MFUSB KERNEL driver
 // to *CRASH* which, of course, causes Windows to crash
 #define     PRODUCT_NAME_SIZE      15   /* "STM32 .Net Test" */
@@ -66,6 +66,7 @@ ADS_PACKED struct GNU_PACKED USB_DYNAMIC_CONFIGURATION
       USB_STRING_CHAR            friendlyString[FRIENDLY_NAME_SIZE];
     USB_OS_STRING_DESCRIPTOR     OS_String;
     USB_XCOMPATIBLE_OS_ID        OS_XCompatible_ID;
+    USB_XPROPERTIES_OS_WINUSB    OS_XProperty;
     USB_DESCRIPTOR_HEADER        endList;
 };
 
@@ -82,7 +83,7 @@ const struct USB_DYNAMIC_CONFIGURATION UsbDefaultConfiguration =
         },
         USB_DEVICE_DESCRIPTOR_LENGTH,       // Length of device descriptor
         USB_DEVICE_DESCRIPTOR_TYPE,         // USB device descriptor type
-        0x0110,                             // USB Version 1.10 (BCD)
+        USB_VERSION,                        // USB Version
         0,                                  // Device class (none)
         0,                                  // Device subclass (none)
         0,                                  // Device protocol (none)
@@ -162,7 +163,7 @@ const struct USB_DYNAMIC_CONFIGURATION UsbDefaultConfiguration =
         USB_STRING_DESCRIPTOR_HEADER_LENGTH + (sizeof(USB_STRING_CHAR) * MANUFACTURER_NAME_SIZE),
         USB_STRING_DESCRIPTOR_TYPE
     },
-    { 'O', 'm', 'i', 'n', 'c' },
+    { 'O', 'b', 'e', 'r', 'o', 'n', ' ', 'm', 'i', 'c', 'r', 'o', 's', 'y', 's', 't', 'e', 'm', 's' },
 
     // Product name string descriptor
     {
@@ -200,7 +201,7 @@ const struct USB_DYNAMIC_CONFIGURATION UsbDefaultConfiguration =
     },
     { 'a', '7', 'e', '7', '0', 'e', 'a', '2' },
 
-    // OS Descriptor string for Sideshow
+    // OS Descriptor string for WinUSB
     {
         {
             USB_STRING_DESCRIPTOR_MARKER,
@@ -214,7 +215,7 @@ const struct USB_DYNAMIC_CONFIGURATION UsbDefaultConfiguration =
         0x00
     },
 
-    // OS Extended Compatible ID for Sideshow
+    // OS Extended Compatible ID WinUSB
     {
         // Generic Descriptor header
         {
@@ -236,9 +237,78 @@ const struct USB_DYNAMIC_CONFIGURATION UsbDefaultConfiguration =
         // Extended Compatible OS ID function record
         0,                                                  // Interface 0
         1,                                                  // (reserved)
-        { 'S', 'I', 'D', 'E', 'S', 'H', 'W', 0 },           // Compatible ID
-        { 'E', 'N', 'H', 'V', '1',  0,   0,  0 },           // Sub-compatible ID
+        { 'W', 'I', 'N', 'U', 'S', 'B',  0,  0 },           // Compatible ID
+        {  0,   0,   0,   0,   0,   0,   0,  0 },           // Sub-compatible ID
         { 0, 0, 0, 0, 0, 0 }                                // Padding
+    },
+
+    // OS Extended Property 
+    {
+        // Generic Descriptor header
+        {
+            {
+                USB_GENERIC_DESCRIPTOR_MARKER,
+                0,
+                sizeof(USB_GENERIC_DESCRIPTOR_HEADER) + USB_XPROPERTY_OS_SIZE_WINUSB
+            },
+            USB_REQUEST_TYPE_IN | USB_REQUEST_TYPE_VENDOR,
+            OS_DESCRIPTOR_STRING_VENDOR_CODE,
+            0,                                              // Intfc # << 8 + Page #
+            USB_XPROPERTY_OS_REQUEST                        // Extended Property OS ID request
+        },
+        USB_XPROPERTY_OS_SIZE_WINUSB,                       // Size of this descriptor (78 bytes for guid + 40 bytes for the property name + 24 bytes for other fields = 142 bytes)
+        OS_DESCRIPTOR_EX_VERSION,                           // Version 1.00 (BCD)
+        USB_XPROPERTY_OS_REQUEST,                           // Extended Compatible OS ID response
+        1,                                                  // Only 1 ex property record
+        // Extended Property OS ID function record
+        0x00000084,                                         // size in bytes 
+        EX_PROPERTY_DATA_TYPE__REG_SZ,                      // data type (unicode string)
+        0x0028,                                             // name length
+        { 'D','\0', 'e','\0', 'v','\0', 'i','\0', 'c','\0', 'e','\0', 'I','\0', 'n','\0', 't','\0', 'e','\0', 'r','\0', 'f','\0', 'a','\0', 'c','\0', 'e','\0', 'G','\0', 'u','\0', 'i','\0', 'd','\0', '\0','\0' }, // property name (null -terminated unicode string: 'DeviceInterfaceGuid\0') 
+        0x0000004E,                                         // data length
+        //{ '{','\0', 'D','\0', '3','\0', '2','\0', 'D','\0', '1','\0', 'D','\0', '6','\0', '4','\0', '-','\0', '9','\0', '6','\0', '3','\0', 'D','\0', '-','\0', '4','\0', '6','\0', '3','\0', 'E','\0', '-','\0', '8','\0', '7','\0', '4','\0', 'A','\0', '-','\0', '8','\0', 'E','\0', 'C','\0', '8','\0', 'C','\0', '8','\0', '0','\0', '8','\0', '2','\0', 'C','\0', 'B','\0', 'F','\0', '}','\0', '\0','\0' } // data ({D32D1D64-963D-463E-874A-8EC8C8082CBF})
+
+        { 
+            0x007B, // {
+            0x0044, // D
+            0x0033, // 3
+            0x0032, // 2
+            0x0044, // D
+            0x0031, // 1
+            0x0044, // D
+            0x0036, // 6
+            0x0034, // 4
+            // -
+            0x0039, // 9
+            0x0036, // 6
+            0x0033, // 3
+            0x0044, // D
+            // -
+            0x0034, // 4
+            0x0036, // 6
+            0x0033, // 3
+            0x0045, // E
+            // -
+            0x0038, // 8
+            0x0037, // 7
+            0x0034, // 4
+            0x0041, // A
+            // -
+            0x0038, // 8
+            0x0045, // E
+            0x0043, // C
+            0x0038, // 8
+            0x0043, // C
+            0x0038, // 8
+            0x0030, // 0
+            0x0038, // 8
+            0x0032, // 2
+            0x0043, // C
+            0x0042, // B
+            0x0046, // F
+            0x007D, // }
+            0x0000  // NULL
+        }, 
     },
 
     // End of configuration marker

@@ -11,6 +11,7 @@ namespace Microsoft.SPOT.Platform.Tests
     {
         Uri uri;
         UriProperties props;
+        ParsedUri parsed;
 
         [SetUp]
         public InitializeResult Initialize()
@@ -56,7 +57,7 @@ namespace Microsoft.SPOT.Platform.Tests
 
             switch (uri.Scheme.ToLower())
             {
-                case "http": 
+                case "http":
                 case "https":
                     if (uri.Port != props.Port)
                     {
@@ -95,7 +96,7 @@ namespace Microsoft.SPOT.Platform.Tests
             {
                 Log.Comment("null string constructor");
                 try { uri = new Uri(null); }
-                catch (ArgumentNullException ex) 
+                catch (ArgumentNullException ex)
                 {
                     if (!HttpTests.ValidateException(ex, typeof(ArgumentNullException)))
                         result = MFTestResults.Fail;
@@ -116,7 +117,7 @@ namespace Microsoft.SPOT.Platform.Tests
                     if (!HttpTests.ValidateException(ex, typeof(ArgumentException)))
                         result = MFTestResults.Fail;
                 }
-                
+
                 Log.Comment("uri, starts with non-alpha");
                 try { uri = new Uri("1ttp://foo.com"); }
                 catch (ArgumentException ex)
@@ -143,7 +144,7 @@ namespace Microsoft.SPOT.Platform.Tests
 
                 Log.Comment("No ABSPath port URI");
                 try { uri = new Uri(HttpTests.MSUrl + ":80"); }
-                catch (ArgumentException ex) 
+                catch (ArgumentException ex)
                 {
                     if (!HttpTests.ValidateException(ex, typeof(ArgumentException)))
                         result = MFTestResults.Fail;
@@ -167,6 +168,7 @@ namespace Microsoft.SPOT.Platform.Tests
             return result;
         }
 
+        [TestMethod]
         public MFTestResults ValidUri()
         {
             MFTestResults result = MFTestResults.Pass;
@@ -207,6 +209,7 @@ namespace Microsoft.SPOT.Platform.Tests
             return result;
         }
 
+        [TestMethod]
         public MFTestResults ValidURN()
         {
             MFTestResults result = MFTestResults.Pass;
@@ -276,7 +279,7 @@ namespace Microsoft.SPOT.Platform.Tests
             return result;
         }
 
-
+        [TestMethod]
         public MFTestResults AdditionalValidUri()
         {
             MFTestResults result = MFTestResults.Pass;
@@ -311,27 +314,27 @@ namespace Microsoft.SPOT.Platform.Tests
                     result = MFTestResults.Fail;
 
                 Log.Comment("FTP URI");
-                props = new UriProperties("ftp","//ftp.microsoft.com/file.txt");
-                uri = new Uri(props.OriginalUri);
-                if (!ValidUri(uri, props))
+                uri = new Uri("ftp://ftp.microsoft.com/file.txt");
+                parsed = new ParsedUri("ftp", "ftp.microsoft.com", UriHostNameType.Dns, 21, "/file.txt", "ftp://ftp.microsoft.com/file.txt");
+                if (!parsed.ValidUri(uri))
                     result = MFTestResults.Fail;
 
                 Log.Comment("Unix style file");
-                props = new UriProperties("file", @"///etc/hosts");
-                uri = new Uri(props.OriginalUri);
-                if (!ValidUri(uri, props))
+                uri = new Uri("file:///etc/hosts");
+                parsed = new ParsedUri("file", string.Empty, UriHostNameType.Basic, -1, "/etc/hosts", "file:///etc/hosts");
+                if (!parsed.ValidUri(uri))
                     result = MFTestResults.Fail;
 
                 Log.Comment("Windows share style file");
-                props = new UriProperties("file", "///\\\\server\\folder\\file.txt");
-                uri = new Uri(props.OriginalUri);
-                if (!ValidUri(uri, props))
+                uri = new Uri("file:///\\\\server\\folder\\file.txt");
+                parsed = new ParsedUri("file", "server", UriHostNameType.Dns, -1, "/folder/file.txt", "file://server/folder/file.txt");
+                if (!parsed.ValidUri(uri))
                     result = MFTestResults.Fail;
 
                 Log.Comment("Windows drive style file");
-                props = new UriProperties("file" , "///c:\\rbllog");
-                uri = new Uri(props.OriginalUri);
-                if (!ValidUri(uri, props))
+                uri = new Uri("file:///c:\\rbllog");
+                parsed = new ParsedUri("file", string.Empty, UriHostNameType.Basic, -1, "c:/rbllog", "file:///c:/rbllog");
+                if (!parsed.ValidUri(uri))
                     result = MFTestResults.Fail;
             }
             catch (Exception ex)
@@ -343,6 +346,7 @@ namespace Microsoft.SPOT.Platform.Tests
             return result;
         }
 
+        [TestMethod]
         public MFTestResults RelativeURI()
         {
             MFTestResults result = MFTestResults.Pass;
@@ -378,7 +382,115 @@ namespace Microsoft.SPOT.Platform.Tests
 
             return result;
         }
-        
+
+        [TestMethod]
+        public MFTestResults MoreSchemes()
+        {
+            MFTestResults result = MFTestResults.Pass;
+
+            var sUris = new string[]
+            {
+                "ws://ws.pusherapp.com:80/app/?client=js&version=1.9.3&protocol=5",
+                "\tftp://abc.com   ",
+                "ldap://[2001:db8::7]/c=GB?objectClass?one",
+                "mailto:John.Doe@example.com",                
+                "mailto://abc/d",
+                "news:comp.infosystems.www.servers.unix",
+                "tel:+1-816-555-1212",
+                "telnet://192.0.2.16:80/",
+                "h323:abc",
+                "h323://abc/d"
+            };
+
+            var parseds = new ParsedUri[]
+            {
+                new ParsedUri("ws", "ws.pusherapp.com", UriHostNameType.Dns, 80, "/app/?client=js&version=1.9.3&protocol=5", "ws://ws.pusherapp.com/app/?client=js&version=1.9.3&protocol=5"),
+                new ParsedUri("ftp", "abc.com", UriHostNameType.Dns, 21, "/", "ftp://abc.com/"),
+                new ParsedUri("ldap", "[2001:db8::7]", UriHostNameType.IPv6, 389, "/c=GB?objectClass?one", "ldap://[2001:db8::7]/c=GB?objectClass?one"),
+                new ParsedUri("mailto", "John.Doe@example.com", UriHostNameType.Dns, 25, string.Empty, "mailto:John.Doe@example.com"),
+                new ParsedUri("mailto", string.Empty, UriHostNameType.Basic, 25, "//abc/d", "mailto://abc/d"),
+                new ParsedUri("news", string.Empty, UriHostNameType.Unknown, -1, "comp.infosystems.www.servers.unix", "news:comp.infosystems.www.servers.unix"),
+                new ParsedUri("tel", string.Empty, UriHostNameType.Unknown, -1, "+1-816-555-1212", "tel:+1-816-555-1212"),
+                new ParsedUri("telnet", "192.0.2.16", UriHostNameType.IPv4, 80, "/", "telnet://192.0.2.16:80/"),
+                new ParsedUri("h323", string.Empty, UriHostNameType.Unknown, -1, "abc", "h323:abc"),
+                new ParsedUri("h323", "abc", UriHostNameType.Dns, -1, "/d", "h323://abc/d")
+            };
+
+            for (int i = 0; i < sUris.Length; i++)
+            {
+                uri = new Uri(sUris[i]);
+                if (!parseds[i].ValidUri(uri))
+                {
+                    result = MFTestResults.Fail;
+                }
+            }
+
+            return result;
+        }
+
+        [TestMethod]
+        public MFTestResults FileScheme()
+        {
+            MFTestResults result = MFTestResults.Pass;
+
+            var sUris = new string[]
+            {
+                "file://",
+                "file:///",
+                "file:////",
+                "file://c",
+                "file:///c",
+                "file:////c",
+            };
+
+            var parseds = new ParsedUri[]
+            {
+                new ParsedUri("file", string.Empty, UriHostNameType.Basic, -1, "/", "file:///"),
+                new ParsedUri("file", string.Empty, UriHostNameType.Basic, -1, "/", "file:///"),
+                new ParsedUri("file", string.Empty, UriHostNameType.Basic, -1, "//", "file:////"),
+                new ParsedUri("file", "c", UriHostNameType.Dns, -1, "/", "file://c/"),
+                new ParsedUri("file", string.Empty, UriHostNameType.Basic, -1, "/c", "file:///c"),
+                new ParsedUri("file", "c", UriHostNameType.Dns, -1, "/", "file://c/"),
+            };
+
+            for (int i = 0; i < sUris.Length; i++)
+            {
+                uri = new Uri(sUris[i]);
+                if (!parseds[i].ValidUri(uri))
+                {
+                    result = MFTestResults.Fail;
+                }
+            }
+
+            return result;
+        }
+
+        [TestMethod]
+        public MFTestResults Exceptions()
+        {
+            MFTestResults result = MFTestResults.Pass;
+
+            var sUris = new string[]
+            {
+                "file:///c:",
+                "http:abc/d/",
+                "file:/server"
+            };
+
+            for (int i = 0; i < sUris.Length; i++)
+            {
+                try
+                {
+                    uri = new Uri(sUris[i]);
+                    result = MFTestResults.Fail;
+                }
+                catch (ArgumentException)
+                {
+                }
+            }
+
+            return result;
+        }
         #endregion Test Cases
     }
 
@@ -398,27 +510,28 @@ namespace Microsoft.SPOT.Platform.Tests
             _host = Host;
         }
 
-        public string Scheme 
+        public string Scheme
         {
             get { return _scheme; }
         }
 
-        public string Host 
+        public string Host
         {
+            set { _host = value; }
             get { return _host; }
         }
 
-        public int Port 
-        { 
+        public int Port
+        {
             get
             {
                 return _port;
-            } 
+            }
             set
             {
                 _portSet = true;
                 _port = value;
-            } 
+            }
         }
 
         public bool PortSet
@@ -431,7 +544,7 @@ namespace Microsoft.SPOT.Platform.Tests
 
         public string Path { get; set; }
 
-        public UriHostNameType Type 
+        public UriHostNameType Type
         {
             get
             {
@@ -482,7 +595,7 @@ namespace Microsoft.SPOT.Platform.Tests
                         {
                             Path = _host;
                             _host = "";
-                        } 
+                        }
                         uri += ":" + _host;
                         break;
                 }
@@ -499,6 +612,75 @@ namespace Microsoft.SPOT.Platform.Tests
             }
         }
 
+    }
+
+    class ParsedUri
+    {
+        public string Scheme { get; set; }
+        public string Host { get; set; }
+        public UriHostNameType HostNameType { get; set; }
+        public int Port { get; set; }
+        public string AbsolutePath { get; set; }
+        public string AbsoluteUri { get; set; }
+
+        public ParsedUri(string _scheme, string _host, UriHostNameType _hostNameType, int _port, string _absolutePath, string _absoluteUri)
+        {
+            Scheme = _scheme;
+            Host = _host;
+            HostNameType = _hostNameType;
+            Port = _port;
+            AbsolutePath = _absolutePath;
+            AbsoluteUri = _absoluteUri;
+        }
+
+        public bool ValidUri(Uri uri)
+        {
+            bool result = true;
+
+            // Scheme
+            if (uri.Scheme != Scheme)
+            {
+                Log.Exception("Expected Scheme: " + Scheme + ", but got: " + uri.Scheme);
+                result = false;
+            }
+
+            // Host
+            if (uri.Host != Host)
+            {
+                Log.Exception("Expected Host: " + Host + ", but got: " + uri.Host);
+                result = false;
+            }
+
+            // Port
+            if (uri.Port != Port)
+            {
+                Log.Exception("Expected Port: " + Port.ToString() + ", but got: " + uri.Port.ToString());
+                result = false;
+            }
+
+            // AbsolutePath
+            if (uri.AbsolutePath != AbsolutePath)
+            {
+                Log.Exception("Expected AbsolutePath: " + AbsolutePath + ", but got: " + uri.AbsolutePath);
+                result = false;
+            }
+
+            // AbsoluteUri
+            if (uri.AbsoluteUri != AbsoluteUri)
+            {
+                Log.Exception("Expected AbsoluteUri: " + AbsoluteUri + ", but got: " + uri.AbsoluteUri);
+                result = false;
+            }
+
+            // HostNameType
+            if (uri.HostNameType != HostNameType)
+            {
+                Log.Exception("Expected HostNameType: " + HostNameType + ", but got: " + uri.HostNameType);
+                result = false;
+            }
+
+            return result;
+        }
     }
     #endregion helper class
 }

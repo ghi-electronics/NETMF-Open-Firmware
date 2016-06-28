@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TinyCLR_Platform>Server</TinyCLR_Platform>
     <DocFile Condition=" '$(TinyCLR_CSharp_Documentation)'=='true' ">$(OutputPath)$(AssemblyName).xml</DocFile>
-    <NoWarn>$(NoWarn),1668</NoWarn>
+    <NoWarn>$(NoWarn),1668,1762</NoWarn>
     <AllowUnsafeBlocks Condition="'$(AllowUnsafeBlocks)'==''" >false</AllowUnsafeBlocks>
     <CheckForOverflowUnderflow Condition="'$(CheckForOverflowUnderflow)'==''" >false</CheckForOverflowUnderflow>
     <CommonAssemblyInfoTemplate>$(SPOCLIENT)\tools\AssemblyInfo.cs.template</CommonAssemblyInfoTemplate>

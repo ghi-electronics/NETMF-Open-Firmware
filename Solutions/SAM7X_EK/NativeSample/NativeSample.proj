@@ -240,19 +240,19 @@
     <DriverLibs Include="sockets_hal_async_LWIP.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup Condition="'$(TCP_IP_STACK)'=='LWIP'">
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\lwip_1_3_2\src\dotNetMF_sockets.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\LWIP\src\dotNetMF_sockets.proj" />
     <DriverLibs Include="sockets_hal_sockets_LWIP.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup Condition="'$(TCP_IP_STACK)'=='LWIP'">
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\lwip_1_3_2\src\dotNetMF_dhcp.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\LWIP\src\dotNetMF_dhcp.proj" />
     <DriverLibs Include="sockets_hal_dhcp_LWIP.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup Condition="'$(TCP_IP_STACK)'=='LWIP'">
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\lwip_1_3_2\src\dotNetMF_tcp.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\LWIP\src\dotNetMF_tcp.proj" />
     <DriverLibs Include="sockets_hal_tcp_LWIP.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup Condition="'$(TCP_IP_STACK)'=='LWIP'">
-    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\lwip_1_3_2\src\dotNetMF_udp.proj" />
+    <RequiredProjects Include="$(SPOCLIENT)\DeviceCode\PAL\lwip\LWIP\src\dotNetMF_udp.proj" />
     <DriverLibs Include="sockets_hal_udp_LWIP.$(LIB_EXT)" />
   </ItemGroup>
   <ItemGroup Condition="'$(TCP_IP_STACK)'=='LWIP'">

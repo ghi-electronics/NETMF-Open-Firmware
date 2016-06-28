@@ -16,8 +16,8 @@
 #include "..\stm32f10x.h"
 
 
-    static const int STM32_FLASH_KEY1 = 0x45670123;
-    static const int STM32_FLASH_KEY2 = 0xcdef89ab;
+    static const UINT32 STM32_FLASH_KEY1 = 0x45670123;
+    static const UINT32 STM32_FLASH_KEY2 = 0xcdef89ab;
 
 
 //--//
@@ -29,7 +29,7 @@
     // Input:
     //
     // Returns:
-    //   true if succesful; false if not
+    //   true if successful; false if not
     //
     // Remarks:
     //    No other functions in this interface may be called
@@ -46,7 +46,7 @@ BOOL __section(SectionForFlashOperations)STM32_Flash_Driver::ChipInitialize( voi
     //    Initializes a given block device for use
     // 
     // Returns:
-    //   true if succesful; false if not
+    //   true if successful; false if not
     //
     // Remarks:
     //   De initializes the device when no longer needed
@@ -80,7 +80,7 @@ const BlockDeviceInfo* __section(SectionForFlashOperations)STM32_Flash_Driver::G
     //                  being read.
     //
     // Returns:
-    //   true if succesful; false if not
+    //   true if successful; false if not
     //
     // Remarks:
     //   This function reads the number of sectors specified from the device.
@@ -117,7 +117,7 @@ BOOL  __section(SectionForFlashOperations)STM32_Flash_Driver::Read( void* contex
     //                  for the number of sectors being written.
     //
     // Returns:
-    //   true if succesful; false if not
+    //   true if successful; false if not
     //
     // Remarks:
     //   This function reads the number of sectors specified from the device.
@@ -234,7 +234,7 @@ BOOL __section(SectionForFlashOperations)STM32_Flash_Driver::IsBlockErased( void
     //    Address - Logical Sector Address
     //
     // Returns:
-    //   true if succesful; false if not
+    //   true if successful; false if not
     //
     // Remarks:
     //    Erases the block containing the sector address specified.
@@ -258,7 +258,7 @@ BOOL __section(SectionForFlashOperations)STM32_Flash_Driver::EraseBlock( void* c
     FLASH->AR = Sector;
     // start erase
     FLASH->CR = FLASH_CR_PER | FLASH_CR_STRT;
-    // asure busy flag is set up (see STM32 errata)
+    // assure busy flag is set up (see STM32 errata)
     FLASH->CR = FLASH_CR_PER | FLASH_CR_STRT;
     // wait for completion
     while (FLASH->SR & FLASH_SR_BSY);

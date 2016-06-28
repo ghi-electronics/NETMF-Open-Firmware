@@ -538,6 +538,10 @@
 				>
 			</File>
 			<File
+				RelativePath="corlib_native_System_BitConverter.cpp"
+				>
+			</File>			
+			<File
 				RelativePath="corlib_native_System_Collections_Queue.cpp"
 				>
 			</File>

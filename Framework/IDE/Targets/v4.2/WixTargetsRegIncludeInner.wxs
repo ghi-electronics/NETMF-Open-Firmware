@@ -5,7 +5,7 @@
     <RegistryValue
         Root="HKLM"
         Key ="$(var.VSSafeImports)"
-        Name=".NetMicroFramework_v$(var.ProdVerMajor)_$(var.ProdVerMinor).01"
+        Name=".NetMicroFramework_v4_2.01"
         Type ="string"
         Value ="[#$(var.IDDevice_targets)]"
         />
@@ -13,7 +13,7 @@
     <RegistryValue
         Root="HKLM"
         Key="$(var.VSSafeImports)"
-        Name=".NetMicroFramework_v$(var.ProdVerMajor)_$(var.ProdVerMinor).02"
+        Name=".NetMicroFramework_v4_2.02"
         Type="string"
         Value ="[#$(var.IDTasks_settings)]"
         />
@@ -21,7 +21,7 @@
     <RegistryValue
         Root="HKLM"
         Key="$(var.VSSafeImports)"
-        Name=".NetMicroFramework_v$(var.ProdVerMajor)_$(var.ProdVerMinor).03"
+        Name=".NetMicroFramework_v4_2.03"
         Type="string"
         Value ="[#$(var.IDCSharp_targets)]"
         />
@@ -29,7 +29,7 @@
     <RegistryValue
         Root="HKLM"
         Key="$(var.VSSafeImports)"
-        Name=".NetMicroFramework_v$(var.ProdVerMajor)_$(var.ProdVerMinor).04"
+        Name=".NetMicroFramework_v4_2.04"
         Type="string"
         Value ="[#$(var.IDEmulator_targets)]"
         />
@@ -37,7 +37,7 @@
       <RegistryValue
         Root="HKLM"
         Key="$(var.VSSafeImports)"
-        Name=".NetMicroFramework_v$(var.ProdVerMajor)_$(var.ProdVerMinor).05"
+        Name=".NetMicroFramework_v4_2.05"
         Type="string"
         Value ="[#$(var.IDVisualBasic_targets)]"
         />

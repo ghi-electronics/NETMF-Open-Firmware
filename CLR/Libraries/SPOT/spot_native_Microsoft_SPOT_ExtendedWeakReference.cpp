@@ -150,3 +150,16 @@ HRESULT Library_spot_native_Microsoft_SPOT_ExtendedWeakReference::Recover___STAT
 
     TINYCLR_NOCLEANUP();
 }
+
+HRESULT Library_spot_native_Microsoft_SPOT_ExtendedWeakReference::FlushAll___STATIC__VOID( CLR_RT_StackFrame& stack )
+{
+    TINYCLR_HEADER();
+
+    g_CLR_RT_Persistence_Manager.Flush();
+    g_CLR_RT_Persistence_Manager.m_state = CLR_RT_Persistence_Manager::STATE_FlushNextObject;
+    g_CLR_RT_Persistence_Manager.m_pending_object = NULL;
+    g_CLR_RT_Persistence_Manager.Flush();
+
+    TINYCLR_NOCLEANUP_NOLABEL();
+}
+
