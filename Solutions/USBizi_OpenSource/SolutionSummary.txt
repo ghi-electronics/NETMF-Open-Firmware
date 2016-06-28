@@ -1,0 +1,185 @@
+The .NET Micro Framework Solution Wizard will create the 'USBizi_OpenSource' solution in the directory:
+
+	C:\MicroFrameworkPK_v4_1\\Solutions\USBizi_OpenSource
+
+The following is a description of the components of this solution.  Each solution consists of a set of projects which in turn have a set of features and libraries.
+
+    Solution:                          	 USBizi_OpenSource
+    Author:                            	 GHI Electronics, LLC
+    Description:                       	 
+    Processor:                         	 LPC24XX
+    Debugger Port:                     	 COM1
+
+
+Project NativeSample
+    Description:                       	 
+    Path:                              	 Solutions\USBizi_OpenSource\NativeSample
+
+Libraries:
+    backlight_hal_stubs:               	 Backlight HAL stub library
+    batterymeasurement_hal_stubs:      	 Battery measurement stub library
+    batterycharger_hal_stubs:          	 Battery charger stub library
+    fs_pal_stubs:                      	 File System stub library
+    usb_pal_stubs:                     	 USB stub driver
+    CRC:                               	 CRC library
+    FS_Config_stubs:                   	 File system config stub
+    system_initialization_hal:         	 System initialization library
+    TinyHal:                           	 Core HAL library
+    WireProtocol:                      	 Device communication protocol
+    asyncproccall_pal:                 	 Asynchronous procedure call library
+    Buttons_pal:                       	 Buttons library
+    Buttons_pal_stubs:                 	 Buttons stub library
+    cpu_cache_stubs:                   	 Cache stub library
+    COM_pal:                           	 Communication port director
+    config_pal:                        	 System configuration
+    Crypto:                            	 Cryptography library
+    cpu_ebiu_stubs:                    	 EBIU stub library
+    events_pal:                        	 System event library
+    GlobalLock_hal:                    	 Global lock (native threading control)
+    LPC24XX_GPIO:                      	 LPC24XX GPIO driver
+    heap_pal:                          	 Managed heap size and location configuration
+    LPC24XX_I2C:                       	 LPC24XX I2C driver
+    i2c_pal:                           	 I2C drivers
+    LPC24XX_VIC:                       	 LPC24XX interrupt controller driver
+    cpu_mmu_stubs:                     	 Memory management unit stub library
+    Display_Font8x8:                   	 Text Font (8x8 pixels)
+    piezo_pal_stubs:                   	 Piezo stub driver
+    LPC24XX_Power:                     	 LPC24XX power driver
+    LPC24XX_PreStackInit:              	 LPC24XX processor pre-stack initialization
+    LPC24XX_SPI:                       	 LPC24XX SPI driver
+    LPC24XX_TIME:                      	 LPC24XX time driver
+    tinycrt_pal:                       	 CRT functionality
+    LPC24XX_USART:                     	 LPC24XX USART driver
+    usart_pal:                         	 USART driver
+    LPC24XX_Bootstrap:                 	 LPC24XX bootstrap driver
+    SST39WF_16BL:                      	 SST39WF 16-bit flash block storage driver
+    blockstorage_pal:                  	 Block storage library
+    sockets_pal_stubs:                 	 Network socket stub driver
+    LPC24XX_WATCHDOG:                  	 LPC24XX watchdog driver
+    LPC24XX_LCDC:                      	 LPC24XX LCD Controller driver
+    TimeService_pal_stubs:             	 TimeService set of methods used by TimeService, TimeService
+    Watchdog_pal_stubs:                	 Watchdog stub
+    Time_pal:                          	 Time set of methods used by Time, Time
+    Ink_pal_stubs:                     	 Ink set of methods used by Ink, Ink
+    Gesture_pal_stubs:                 	 Gesture set of methods used by Gesture, Ink
+    palevent_pal_stubs:                	 palevent set of methods used by Gesture, Ink
+    SimpleHeap_stubs:                  	 SimpleHeap unmanaged heap stub library
+    SimpleHeap_config_stubs:           	 SimpleHeap configuration stub library
+    diagnostics_pal:                   	 Diagnostics library
+    USB_HAL_USBizi_OpenSource:         	 Generates template code in your solution's DeviceCode directory for the given Library Category.The project will be generated in Solutions\USBizi_OpenSource\DeviceCode\USB_HAL
+    DP83848_USBizi_OpenSource:         	 
+    LPC24XX_Bootstrap_HAL_USBizi_OpenSource:	 Bootstrap library for USBizi_OpenSource solution
+    BlockStorageConfig_HAL_USBizi_OpenSource:	 Block storage SST39VF320_16 config for USBizi_OpenSource
+    DP83848_USBizi_OpenSource_LWIP:    	 
+    BlockStorage_AddDevices_USBizi_OpenSource:	 Block storage add device driver for USBizi_OpenSource
+    LCD_HAL_USBizi_OpenSource:         	 TFT-G240320LTSW-118W display driver
+
+
+Project tinyclr
+    Description:                       	 
+    Path:                              	 Solutions\USBizi_OpenSource\TinyCLR
+
+Features:
+    Core:                              	 Core functionality (required)
+    Hardware:                          	 Core hardware component
+    NativeEventDispatcher:             	 Native event dispatching for interop
+    Stream:                            	 Stream component
+    BlockStorage:                      	 Block storage support
+    Serial:                            	 Serial transport
+    SOCKET:                            	 Socket transport
+    DataStorage:                       	 Data storage (extended weak reference storage)
+    Debugger:                          	 Visual Studio debugger support
+    InterruptHandler:                  	 Support for interrupt handling
+    Diagnostics:                       	 Diagnostic utilities
+    SerialPort:                        	 Serial port component
+    SPI:                               	 SPI support
+    USB:                               	 Usb Transport
+    UsbClient:                         	 Usb client component
+
+Libraries:
+    CLRStartup:                        	 Common CLR initialization library
+    Core:                              	 CLR core library
+    CorLib:                            	 Subset of mscorlib
+    Hardware:                          	 Core hardware functionality
+    SPOT:                              	 Common interop library
+    SPOT_Hardware_SerialPort:          	 SerialPort interop library
+    HeapPersistence:                   	 Extended weak references data storage 
+    Debugger:                          	 Visual Studio debugging support
+    Messaging:                         	 Core communication component
+    InterruptHandler:                  	 Interrupt handler library
+    SPOT_IO:                           	 Stream interop library
+    CRC:                               	 CRC library
+    Stream:                            	 Generic stream functionality
+    batterymeasurement_hal_stubs:      	 Battery measurement stub library
+    LargeBuffer_hal_stubs:             	 LargeBuffer stub library
+    batterycharger_hal_stubs:          	 Battery charger stub library
+    system_initialization_hal:         	 System initialization library
+    Debugger_full:                     	 Full Visual Studio debugging support
+    IOPort:                            	 Native event dispatcher (formerly IOPort)
+    SPOT_Hardware:                     	 Hardware interop library
+    TinyHal:                           	 Core HAL library
+    WireProtocol:                      	 Device communication protocol
+    asyncproccall_pal:                 	 Asynchronous procedure call library
+    Buttons_pal:                       	 Buttons library
+    Buttons_pal_stubs:                 	 Buttons stub library
+    cpu_cache_stubs:                   	 Cache stub library
+    COM_pal:                           	 Communication port director
+    config_pal:                        	 System configuration
+    Crypto:                            	 Cryptography library
+    cpu_ebiu_stubs:                    	 EBIU stub library
+    events_pal:                        	 System event library
+    GlobalLock_hal:                    	 Global lock (native threading control)
+    LPC24XX_GPIO:                      	 LPC24XX GPIO driver
+    heap_pal:                          	 Managed heap size and location configuration
+    LPC24XX_WATCHDOG:                  	 LPC24XX watchdog driver
+    LPC24XX_VIC:                       	 LPC24XX interrupt controller driver
+    cpu_mmu_stubs:                     	 Memory management unit stub library
+    piezo_pal_stubs:                   	 Piezo stub driver
+    LPC24XX_Power:                     	 LPC24XX power driver
+    LPC24XX_PreStackInit:              	 LPC24XX processor pre-stack initialization
+    LPC24XX_TIME:                      	 LPC24XX time driver
+    tinycrt_pal:                       	 CRT functionality
+    LPC24XX_USART:                     	 LPC24XX USART driver
+    usart_pal:                         	 USART driver
+    LPC24XX_Bootstrap:                 	 LPC24XX bootstrap driver
+    SST39WF_16BL:                      	 SST39WF 16-bit flash block storage driver
+    blockstorage_pal:                  	 Block storage library
+    I2C_stub:                          	 I2C stub library
+    i2c_pal_stubs:                     	 I2C stub library
+    SimpleHeap:                        	 SimpleHeap unmanaged heap
+    SimpleHeap_config:                 	 Simple unmanaged heap
+    Watchdog_pal:                      	 Watchdog set of methods used by Watchdog feature
+    palevent_pal:                      	 palevent set of methods used by Gesture, Ink
+    Gesture_pal_stubs:                 	 Gesture set of methods used by Gesture, Ink
+    Ink_pal_stubs:                     	 Ink set of methods used by Ink, Ink
+    Time_pal:                          	 Time set of methods used by Time, Time
+    backlight_hal_stubs:               	 Backlight HAL stub library
+    FS_Config_stubs:                   	 File system config stub
+    cpu_i2c_stubs:                     	 I2C stub library
+    diagnostics_pal:                   	 Diagnostics library
+    Diagnostics_stub:                  	 Diagnostics stub library
+    Diagnostics:                       	 Diagnostic functionality
+    diagnostics_pal_stubs:             	 Diagnostics stub library
+    cpu_performancecounter_stubs:      	 Performance counter stub library
+    LPC24XX_SPI:                       	 LPC24XX SPI driver
+    Graphics_stub:                     	 Graphics stub library
+    lcd_hal_stubs:                     	 Stub display driver
+    sockets_pal_stubs:                 	 Network socket stub driver
+    SPOT_Messaging_stub:               	 Messaging interop stub library
+    usb_pal:                           	 USB driver
+    SPOT_Hardware_Usb:                 	 
+    TimeService_pal_stubs:             	 TimeService set of methods used by TimeService, TimeService
+    SPOT_Serialization_stub:           	 Serialization interop stub library
+    SPOT_Crypto_stub:                  	 Crypto stub library
+    RPC_stub:                          	 Remote procedure call stub library
+    cpu_LCD_stubs:                     	 Display controller stub library
+    Serialization_stub:                	 Binary serialization stub library
+    fs_pal_stubs:                      	 File System stub library
+    USB_Config_PAL_USBizi_OpenSource:  	 Generates template code in your solution's DeviceCode directory for the given Library Category.The project will be generated in Solutions\USBizi_OpenSource\DeviceCode\USB_Config_PAL
+    USB_HAL_USBizi_OpenSource:         	 Generates template code in your solution's DeviceCode directory for the given Library Category.The project will be generated in Solutions\USBizi_OpenSource\DeviceCode\USB_HAL
+    BlockStorageConfig_HAL_USBizi_OpenSource:	 Block storage SST39VF320_16 config for USBizi_OpenSource
+    BlockStorage_AddDevices_USBizi_OpenSource:	 Block storage add device driver for USBizi_OpenSource
+    VirtualKey_HAL_USBizi_OpenSource:  	 Virtual key stub library
+    DP83848_USBizi_OpenSource:         	 
+    DP83848_USBizi_OpenSource_LWIP:    	 
+    LPC24XX_Bootstrap_HAL_USBizi_OpenSource:	 Bootstrap library for USBizi_OpenSource solution

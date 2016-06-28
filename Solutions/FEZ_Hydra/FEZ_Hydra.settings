@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Author>Aron L. Phillips</Author>
+    <Description>FEZ Hydra Prototype Build</Description>
+    <Documentation />
+    <PlatformGuid>{64f9943a-99d7-4122-8907-0daa96a90187}</PlatformGuid>
+    <TARGETPLATFORM>FEZ_Hydra</TARGETPLATFORM>
+    <PLATFORM>FEZ_Hydra</PLATFORM>
+    <IsSolutionWizardVisible>True</IsSolutionWizardVisible>
+    <ENDIANNESS>le</ENDIANNESS>
+  </PropertyGroup>
+  <ItemGroup>
+    <IncludePaths Include="Solutions\FEZ_Hydra" />
+  </ItemGroup>
+  <Import Project="$(SPOCLIENT)\devicecode\Targets\Native\AT91\AT91SAM9RL64.settings" />
+</Project>
