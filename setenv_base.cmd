@@ -79,8 +79,8 @@ rem @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 rem set tool-chains variables 
 
 IF /I NOT "%COMPILER_TOOL%" == "VS" (
-  IF NOT "%VS110COMNTOOLS%" == "" (
-      CALL "%VS110COMNTOOLS%vsvars32.bat"
+  IF NOT "%VS140COMNTOOLS%" == "" (
+      CALL "%VS140COMNTOOLS%vsvars32.bat"
   ) ELSE (
     IF NOT "%VS100COMNTOOLS%" == "" (
       CALL "%VS100COMNTOOLS%vsvars32.bat"
@@ -351,9 +351,9 @@ IF "%COMPILER_TOOL_VERSION_NUM%"=="10" (
   GOTO :EOF
 )
 
-IF "%COMPILER_TOOL_VERSION_NUM%"=="11" (
-  IF "" == "%VS110COMNTOOLS%" GOTO BAD_VS_ARG
-  CALL "%VS110COMNTOOLS%vsvars32.bat"
+IF "%COMPILER_TOOL_VERSION_NUM%"=="14" (
+  IF "" == "%VS140COMNTOOLS%" GOTO BAD_VS_ARG
+  CALL "%VS140COMNTOOLS%vsvars32.bat"
   GOTO :EOF
 )
 
